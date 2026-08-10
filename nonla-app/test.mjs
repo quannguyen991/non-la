@@ -2,6 +2,7 @@
 import { normalize, dice, parsePrice, parseLine, parseMenu, matchDish,
          verdict, readNotes, zeroSlip, fmtVND } from "./match.js";
 import { project, unproject, distance, fmtDistance, Viewport, boundsOf } from "./geo.js";
+import { summarise, priceBand, validate, farFrom } from "./posts.js";
 import { camera, drawTown } from "./iso.js";
 import { artTransform, fitArt } from "./artmap.js";
 import { buildFabric, drawFabric } from "./citymap.js";
@@ -295,6 +296,60 @@ console.log("\n── route: tuyến đi bộ ───────────�
   ok("tham chiếu hỏng thì trả null",
     resolveRoute({ id: "x", stops: [{ ref: "sight:999" }, { ref: "place:nope" }] }, geo, []) === null);
 }
+
+console.log("\n── posts: gộp sao ──────────────────────────");
+const mk = (stars, extra = {}) => ({ stars, dishId: "cao-lau", paidVnd: 50000, ...extra });
+eq("chưa có bài", summarise([]), { avg: null, count: 0, show: false });
+eq("1 bài thì giấu", summarise([mk(5)]), { avg: 5, count: 1, show: false });
+eq("2 bài vẫn giấu", summarise([mk(5), mk(4)]), { avg: 4.5, count: 2, show: false });
+eq("3 bài thì hiện", summarise([mk(5), mk(4), mk(3)]), { avg: 4, count: 3, show: true });
+eq("làm tròn 1 chữ số", summarise([mk(5), mk(4), mk(4)]), { avg: 4.3, count: 3, show: true });
+// Bài không chấm sao KHÔNG được tính vào mẫu số, nếu không một bài chỉ có ảnh
+// sẽ kéo trung bình xuống như thể người ta chấm 0 sao.
+eq("bỏ qua bài không sao", summarise([mk(5), mk(3), mk(null), mk(4)]),
+   { avg: 4, count: 3, show: true });
+
+console.log("\n── posts: khoảng giá cộng đồng ─────────────");
+const band = priceBand(
+  [40000, 45000, 48000, 52000, 60000].map((p) => mk(4, { paidVnd: p })), "cao-lau");
+eq("p25–p75 của 5 mẫu", band, { lo: 45000, hi: 52000, n: 5 });
+eq("dưới 3 mẫu thì không đủ", priceBand([mk(4), mk(4)], "cao-lau"), null);
+eq("lọc đúng món", priceBand([mk(4, { dishId: "mi-quang" })], "cao-lau"), null);
+eq("bỏ bài không ghi giá",
+   priceBand([mk(4), mk(4, { paidVnd: null }), mk(4)], "cao-lau"), null);
+
+console.log("\n── posts: kiểm tra bài ─────────────────────");
+const draft = { placeId: "ba-be", zone: "hoian-oldtown", dishId: "cao-lau",
+                paidVnd: 50000, stars: 4, worthReturn: true, body: "Good", photo: null, coords: null };
+eq("bài hợp lệ", validate(draft), { ok: true, errors: [] });
+eq("thiếu quán", validate({ ...draft, placeId: "" }),
+   { ok: false, errors: ["Pick a place"] });
+eq("sao ngoài khoảng", validate({ ...draft, stars: 6 }),
+   { ok: false, errors: ["Rating must be 1 to 5 stars"] });
+eq("giá âm", validate({ ...draft, paidVnd: -1 }),
+   { ok: false, errors: ["That price doesn't look right"] });
+eq("giá quá nhỏ", validate({ ...draft, paidVnd: 500 }),
+   { ok: false, errors: ["That price doesn't look right"] });
+eq("nhận xét quá dài", validate({ ...draft, body: "x".repeat(601) }),
+   { ok: false, errors: ["Keep it under 600 characters"] });
+// Bài rỗng hoàn toàn không có gì để người khác đọc.
+eq("bài trống rỗng",
+   validate({ ...draft, dishId: null, paidVnd: null, stars: null, worthReturn: null, body: null }),
+   { ok: false, errors: ["Add a photo, a price, a rating or a note"] });
+eq("chỉ có ảnh là đủ",
+   validate({ ...draft, dishId: null, paidVnd: null, stars: null, worthReturn: null,
+              body: null, photo: {} }),
+   { ok: true, errors: [] });
+eq("gộp nhiều lỗi", validate({ ...draft, placeId: "", stars: 9 }),
+   { ok: false, errors: ["Pick a place", "Rating must be 1 to 5 stars"] });
+
+console.log("\n── posts: xa quán ──────────────────────────");
+const baBe = { at: [15.87755, 108.3278] };
+ok("không có toạ độ thì không kết luận", farFrom(baBe, null) === false);
+ok("đứng ngay tại quán", farFrom(baBe, [15.87755, 108.3278]) === false);
+ok("cách 300m vẫn tính là tại chỗ", farFrom(baBe, [15.88025, 108.3278]) === false);
+ok("cách 900m là xa", farFrom(baBe, [15.8856, 108.3278]) === true);
+ok("quán không có toạ độ thì không kết luận", farFrom({}, [15.9, 108.3]) === false);
 
 console.log("\n════════════════════════════════════════════");
 console.log(`${pass} pass · ${fail} fail\n`);
