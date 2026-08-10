@@ -1,0 +1,2173 @@
+/* ═══════════════════════════════════════════════════════════════
+   Nón Lá — app.js
+   Camera → OCR trên máy → khớp món → phán quyết giá.
+   Không gửi ảnh đi đâu. Chạy được khi không có mạng.
+   ═══════════════════════════════════════════════════════════════ */
+import { parseMenu, matchDish, verdict, readNotes, zeroSlip,
+         parsePrice, pickZone, fmtVND, fmtFX } from "./match.js";
+import { birdFlying, birdStanding, deer, cloudBand,
+         FRIEZE, dataURI, wrap } from "./motifs.js";
+import * as BigMap from "./bigmap.js";
+import { distance, fmtDistance } from "./geo.js";
+import * as Img from "./imgsvc.js";
+import { iconOf as sightIcon } from "./sights.js";
+import * as Auth from "./auth.js";
+import * as FoodMap from "./foodmap.js";
+
+/* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
+   dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
+   không có API key thì nó trả null và MỌI mốc trên bản đồ đều trơ ra một
+   hình mặc định, kể cả Chùa Cầu. Một app chạy offline không thể để bộ ký
+   hiệu cốt lõi treo vào một lần gọi mạng. */
+/* Ba lớp, theo thứ tự: ảnh người dùng tự vẽ lại → ảnh ship kèm app →
+   hình vẽ tay trong sights.js. Lớp giữa là lý do app không còn cần khoá
+   API để có hình: assets/ đã sinh sẵn một lần bằng _gen_assets.mjs. */
+/* Giá kèm quy đổi. Tiền đồng vẫn là con số CHÍNH — đó là thứ người dùng
+   sẽ trả và sẽ nhìn thấy trên thực đơn; ngoại tệ nhỏ hơn, có dấu ≈, chỉ
+   để họ ước lượng. Đảo thứ tự đó là app tự nhận mình biết tỉ giá quầy. */
+const money = (vnd) => {
+  const fx = fmtFX(vnd, S.fx);
+  return `${fmtVND(vnd)}${fx ? `<small class="fx">≈ ${esc(fx)}</small>` : ""}`;
+};
+
+const shippedIcon = (k) => (S.assets?.icons?.has(k) ? `assets/icons/${k}.webp` : null);
+const markIcon = (kind) => Img.iconOf(kind) || shippedIcon(kind) || sightIcon(kind);
+
+/* Ảnh một món. Cùng ba lớp như trên, nhưng lớp cuối là khung giấy dó
+   rỗng chứ không phải hình vẽ tay — sights.js chỉ vẽ mốc, không vẽ món. */
+const dishPhoto = (d, ratio = "1/1") => {
+  const url = Img.iconOf(d.id) || shippedIcon(d.id);
+  return url
+    ? `<figure class="ph" style="aspect-ratio:${ratio}">
+         <img src="${esc(url)}" alt="${esc(d.vi)} — ${esc(d.en || "")}" loading="lazy" decoding="async">
+         <figcaption>${esc(d.vi)}</figcaption>
+       </figure>`
+    : photo(`assets/dishes/${d.id}.jpg`, `${d.vi}${d.en ? ` — ${d.en}` : ""}`, ratio);
+};
+import { resolveRoute } from "./route.js";
+
+/* ── trạng thái ───────────────────────────────────────────── */
+const S = {
+  dishes: [], prices: {}, places: [], maps: {},
+  zone: localStorage.getItem("nl.zone") || "hoian-oldtown",
+  mode: "menu",
+  tab: "scan",
+  session: [],                       // món đã gọi trong phiên, cho Bill Check
+  showAll: false,                    // See all mở danh sách đầy đủ
+  exFilter: "fair",                  // bộ lọc đang chọn ở tab Nearby
+  exMap: null,                       // bản đồ xem trước đang sống ở tab Nearby
+  me: null,                          // [vĩ, kinh] của người dùng, nếu đã cho phép
+  saved: new Set(),                  // My List — tuyến và địa điểm đã lưu
+  worker: null, ocrReady: false,
+  stream: null,
+};
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+/* ── hoạ tiết ─────────────────────────────────────────────── */
+function sunStar(size, fill) {
+  let d = "";
+  for (let i = 0; i < 14; i++) {
+    const a = (i / 14) * Math.PI * 2, w = 0.105;
+    d += `M${50 + Math.cos(a - w) * 17} ${50 + Math.sin(a - w) * 17}`
+       + `L${50 + Math.cos(a) * 45} ${50 + Math.sin(a) * 45}`
+       + `L${50 + Math.cos(a + w) * 17} ${50 + Math.sin(a + w) * 17}Z`;
+  }
+  return `<svg viewBox="0 0 100 100" style="width:${size}px;height:${size}px" aria-hidden="true">
+    <path d="${d}" fill="${fill}"/><circle cx="50" cy="50" r="13" fill="${fill}"/></svg>`;
+}
+/* Vòng ngắm. Bán kính phải xếp thành một thang RÕ RÀNG, lớn dần từ trong
+   ra, và khung bốn góc phải BAO được vòng ngoài cùng.
+
+   Bản trước: khung góc đặt ở 14..86, tức nửa cạnh 36, trong khi vòng vàng
+   bán kính 38 — vòng thò ra ngoài khung ở bốn phía. Mắt đọc ra hai hình
+   không ăn nhập, đúng cái "hai vòng tròn không cân đối".
+
+   Thang mới:  tâm 6 · vòng trong 17 · vạch 22–27 · vòng vàng 34 ·
+               chim bay 40 · khung góc 42 (nửa cạnh) · vòng mờ ngoài 47.
+   Mọi thứ nằm gọn trong khung, khoảng cách giữa các lớp đều nhau hơn. */
+const R_IN = 17, R_TICK_A = 22, R_TICK_B = 27, R_GOLD = 34, R_BIRD = 40, R_FRAME = 42, R_OUT = 47;
+
+function reticleSVG() {
+  let birds = "", ticks = "";
+  for (let i = 0; i < 18; i++)
+    birds += `<path d="M50 ${50 - R_BIRD} l3.4 4.6 -3.4 -1.1 -3.4 1.1z" fill="#E8A33D" opacity=".85" transform="rotate(${(i / 18) * 360} 50 50)"/>`;
+  for (let i = 0; i < 48; i++) {
+    const lg = i % 4 === 0;
+    ticks += `<line x1="50" y1="${50 - R_TICK_B + (lg ? 0 : 1.6)}" x2="50" y2="${50 - R_TICK_A}"
+      stroke="#EFEAD8" stroke-width="${lg ? 1 : 0.5}" opacity="${lg ? 0.8 : 0.4}"
+      transform="rotate(${(i / 48) * 360} 50 50)"/>`;
+  }
+  // Khung góc: nét dài 10, bo tròn đầu, đặt đúng trên cạnh hình vuông
+  // nửa cạnh R_FRAME nên nó ôm trọn vòng vàng lẫn vành chim.
+  const corners = [[0, 0], [1, 0], [1, 1], [0, 1]].map(([x, y]) => {
+    const cx = 50 + (x ? R_FRAME : -R_FRAME), cy = 50 + (y ? R_FRAME : -R_FRAME);
+    const sx = x ? -1 : 1, sy = y ? -1 : 1;
+    return `<path d="M${cx} ${cy + 10 * sy} L${cx} ${cy} L${cx + 10 * sx} ${cy}"
+      fill="none" stroke="#E8A33D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }).join("");
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+    <circle cx="50" cy="50" r="${R_OUT}" fill="none" stroke="#EFEAD8" stroke-width=".5" opacity=".3"/>
+    <g class="ring-slow">${birds}</g>
+    <circle cx="50" cy="50" r="${R_GOLD}" fill="none" stroke="#E8A33D" stroke-width=".7" opacity=".55"/>
+    <g class="ring-rev">${ticks}</g>
+    ${/* Vòng trắng trong đã bỏ: nó nằm ngay dưới vòng vàng nên hai đường
+         tròn đè lên nhau, đọc ra thành một vệt đôi chứ không ra vòng ngắm.
+         Giữ một vòng vàng làm mốc, tâm là ngôi sao. */""}
+    <g transform="translate(50 50) scale(.14) translate(-50 -50)">${sunStar(0, "#EFEAD8").replace(/<\/?svg[^>]*>/g, "")}</g>
+    ${corners}</svg>`;
+}
+const lanternSVG = `<svg viewBox="0 0 60 80" aria-hidden="true">
+  <line x1="30" y1="0" x2="30" y2="12" stroke="#C9A227" stroke-width="1.5"/>
+  <ellipse cx="30" cy="18" rx="13" ry="4" fill="#C9A227"/>
+  <path d="M17 18 Q8 42 17 62 L43 62 Q52 42 43 18Z" fill="#E8A33D"/>
+  <path d="M17 18 Q8 42 17 62" fill="none" stroke="#C0392B" stroke-width="1.2" opacity=".55"/>
+  <path d="M30 18 V62M23 19 Q18 40 23 61M37 19 Q42 40 37 61" stroke="#C0392B" stroke-width=".8" opacity=".4" fill="none"/>
+  <ellipse cx="30" cy="62" rx="13" ry="4" fill="#C9A227"/>
+  <path d="M24 66 v9M30 66 v12M36 66 v9" stroke="#C0392B" stroke-width="1.2"/></svg>`;
+/* Đường phân cách = đường diềm trên tang trống, không phải một nét kẻ. */
+const GOLD = "#D9A227", SON = "#B0201A", THEN = "#0E2B24", GIAY = "#FBF7EC", CHAM = "#3A6EA8";
+
+/* Khung ảnh có lối lui. App ship không kèm ảnh — thả file vào
+   assets/ là khung tự đầy. Thiếu ảnh thì hiện nền giấy dó có dấu
+   nón lá, không bao giờ hiện icon ảnh vỡ. */
+/* Thử .jpg trước rồi mới tới .png: model ảnh trả về định dạng nào là tuỳ
+   model, và bắt cả bộ ảnh phải cùng một đuôi chỉ để chiều mã nguồn là
+   cách nhanh nhất để một hôm nào đó cả loạt khung ảnh trống trơn. */
+/* Ảnh đã thiếu thì NHỚ là thiếu. Không nhớ thì mỗi lần dựng lại markup —
+   đổi tab, vẽ lại bản đồ, lọc danh sách — lại hỏi máy chủ đúng hai tệp
+   không tồn tại; đo trong một phiên ngắn đã ra vài chục lượt 404 cho cùng
+   một quán. Ngoài phố đó là pin và độ trễ thật, không phải chuyện nhỏ.
+   Nhớ trong bộ nhớ thôi: thả ảnh vào assets/ rồi nạp lại là khung tự đầy. */
+const PH_MISS = (window.__nlPhMiss ||= new Set());
+
+const photo = (src, alt, ratio = "4/3") => {
+  const gone = PH_MISS.has(src);
+  return `<figure class="ph${gone ? " empty" : ""}" style="aspect-ratio:${ratio}">
+     ${gone ? "" : `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async"
+          data-src0="${esc(src)}"
+          onerror="var o=this.dataset.src0;
+            if(!this.dataset.alt2&&/\\.jpg$/.test(o)){
+              this.dataset.alt2=1;this.src=o.replace(/\\.jpg$/,'.png');
+            }else{window.__nlPhMiss.add(o);
+              this.closest('.ph').classList.add('empty');this.remove()}">`}
+     <figcaption>${esc(alt)}</figcaption>
+   </figure>`;
+};
+/* Ảnh một cơ sở. Ưu tiên ảnh đã sinh, rồi mới tới file trong assets/.
+   assets/places/*.jpg không được ship kèm app (xem assets/README.md) nên
+   trên máy sạch chúng luôn 404 và mọi khung ảnh đều rỗng — đó là lý do
+   lớp sinh ảnh tồn tại. Thiếu cả hai thì photo() lo phần nền giấy dó. */
+/* Khung VUÔNG phải lấy bản thumb, không lấy bản 16/10.
+   Bốn trong năm chỗ dùng ảnh cơ sở là ô vuông, nhỏ tới 54px ở mini-card.
+   Nạp bản 1024×640 nặng 200KB vào đó là ba cái sai cùng lúc: tải thừa
+   ~10 lần, giải mã 2,6 triệu điểm ảnh cho một ô 54px, và ảnh ngang bị
+   object-fit cắt mất hai đầu. Bản thumb 256×256 nặng 20KB.            */
+const placePhoto = (p, ratio = "16/10") => {
+  const gen = Img.iconOf(`place:${p.id}`);
+  if (gen) {
+    return `<figure class="ph" style="aspect-ratio:${ratio}">
+         <img src="${esc(gen)}" alt="${esc(p.name)}" loading="lazy" decoding="async">
+         <figcaption>${esc(p.name)}</figcaption>
+       </figure>`;
+  }
+  const square = String(ratio).replace(/\s/g, "") === "1/1";
+  // photo() tự lo phần nền giấy dó khi cả hai đường đều không có ảnh.
+  return photo(`assets/places/${p.id}${square ? ".thumb" : ""}.jpg`, p.name, ratio);
+};
+const wave = (kind = "batTrang", c = CHAM) =>
+  `<div class="frieze" style="background-image:${dataURI(FRIEZE[kind](c))}" aria-hidden="true"></div>`;
+const tickIcon = `<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 8 Q6 1 10.5 8" fill="none"/><path d="M1.5 8 h9"/></svg>`;
+
+/* Bộ icon cho tab Nearby. Vẽ tay bằng SVG — không dùng emoji, và mỗi
+   nhãn trạng thái luôn đi kèm chữ, không bao giờ chỉ dựa vào màu. */
+const I = {
+  pagoda: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 2 2.5 7.5h19Z"/><path d="M4.5 7.5v2.5M19.5 7.5v2.5"/>
+    <path d="M12 10 4 14.5h16Z"/><path d="M6 14.5V21h12v-6.5"/><path d="M10.5 21v-4h3v4"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.6 7.5 10 4.3-1.4 7.5-5.4 7.5-10v-6Z"/>
+    <path d="m8.8 11.8 2.3 2.3 4.1-4.4"/></svg>`,
+  pinSm: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 21s7-5.7 7-11a7 7 0 1 0-14 0c0 5.3 7 11 7 11Z"/><circle cx="12" cy="10" r="2.4"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>`,
+  trendUp: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M3 17 10 10l4 4 7-7"/><path d="M15 7h6v6"/></svg>`,
+  alert: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 3.5 1.8 20.5h20.4Z"/><path d="M12 9.5v5M12 17.6v.1"/></svg>`,
+  question: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M9 9a3 3 0 1 1 4.2 2.8c-.8.4-1.2 1-1.2 1.9v.6"/><path d="M12 17.8v.1"/></svg>`,
+  clock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/></svg>`,
+  spark: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 2c.6 5 2.4 7.4 8 8-5.6.6-7.4 3-8 8-.6-5-2.4-7.4-8-8 5.6-.6 7.4-3 8-8Z"/></svg>`,
+  chevron: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>`,
+  crosshair: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>
+    <path d="M12 1.5v3.5M12 19v3.5M1.5 12h3.5M19 12h3.5"/></svg>`,
+  plus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+    stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`,
+  minus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+    stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>`,
+  external: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M14 4h6v6"/><path d="M20 4 11 13"/>
+    <path d="M18 14.5V19a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 19V8a1.5 1.5 0 0 1 1.5-1.5H10"/></svg>`,
+  back: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg>`,
+  share: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 15V3"/><path d="m7.5 7.5 4.5-4.5 4.5 4.5"/>
+    <path d="M4.5 13v6.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V13"/></svg>`,
+  bookmark: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M6.5 3.5h11a1 1 0 0 1 1 1V21l-6.5-4.2L5.5 21V4.5a1 1 0 0 1 1-1Z"/></svg>`,
+  bowl: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M3 11h18a9 9 0 0 1-18 0Z"/><path d="M7 8c0-1.4 1.2-1.4 1.2-2.8M12 7.6c0-1.4 1.2-1.4 1.2-2.8"/>
+    <path d="M15.5 10.4 21 5"/></svg>`,
+  coins: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <ellipse cx="12" cy="6.5" rx="7.5" ry="3.2"/>
+    <path d="M4.5 6.5v4c0 1.8 3.4 3.2 7.5 3.2s7.5-1.4 7.5-3.2v-4"/>
+    <path d="M4.5 10.5v4c0 1.8 3.4 3.2 7.5 3.2s7.5-1.4 7.5-3.2v-4"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M18 8.5a6 6 0 1 0-12 0c0 6-2.2 7.5-2.2 7.5h16.4S18 14.5 18 8.5Z"/>
+    <path d="M13.7 19.5a2 2 0 0 1-3.4 0"/></svg>`,
+  play: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M8 5.2a1 1 0 0 1 1.5-.87l9 6.8a1 1 0 0 1 0 1.74l-9 6.8A1 1 0 0 1 8 18.8Z"/></svg>`,
+  pause: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <rect x="6.5" y="5" width="4" height="14" rx="1.3"/>
+    <rect x="13.5" y="5" width="4" height="14" rx="1.3"/></svg>`,
+  headphones: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 14v-2a8 8 0 0 1 16 0v2"/>
+    <path d="M4 14h2.5a1 1 0 0 1 1 1v3.5a1 1 0 0 1-1 1H5.5A1.5 1.5 0 0 1 4 18Z"/>
+    <path d="M20 14h-2.5a1 1 0 0 0-1 1v3.5a1 1 0 0 0 1 1h1a1.5 1.5 0 0 0 1.5-1.5Z"/></svg>`,
+  pencil: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="M14.5 6.5l3 3"/></svg>`,
+  refresh: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg>`,
+  sliders: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" aria-hidden="true">
+    <path d="M3 7h11M18 7h3M3 17h4M11 17h10"/>
+    <circle cx="16" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>`,
+  navigate: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 3 3 10.5l8 2.5 2.5 8Z"/></svg>`,
+  coffee: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M3.5 9h13v5.5a4 4 0 0 1-4 4h-5a4 4 0 0 1-4-4Z"/>
+    <path d="M16.5 10.5h1.8a2.6 2.6 0 0 1 0 5.2h-1.8"/>
+    <path d="M7 5.6c0-1 .9-1 .9-2M11 5.2c0-1 .9-1 .9-2"/></svg>`,
+  alertDot: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M12 6.5v6.5M12 16.6v.1" stroke="#FBEDE9" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  mapPinUnknown: (c) => `<svg viewBox="0 0 24 32" aria-hidden="true">
+    <path d="M12 0C5.4 0 0 5.4 0 12c0 8.4 12 20 12 20s12-11.6 12-20C24 5.4 18.6 0 12 0Z" fill="${c}"/>
+    <path d="M9.2 9.4a3 3 0 1 1 4.2 2.8c-.8.4-1.3 1-1.3 1.9v.5" fill="none" stroke="#fff"
+      stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M12 18.4v.1" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  mapPin: (c) => `<svg viewBox="0 0 24 32" aria-hidden="true">
+    <path d="M12 0C5.4 0 0 5.4 0 12c0 8.4 12 20 12 20s12-11.6 12-20C24 5.4 18.6 0 12 0Z" fill="${c}"/>
+    <path d="m6.6 12.4 3.6 3.6 7.2-7.6" fill="none" stroke="#fff" stroke-width="2.6"
+      stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  mapPinAlert: (c) => `<svg viewBox="0 0 24 32" aria-hidden="true">
+    <path d="M12 0C5.4 0 0 5.4 0 12c0 8.4 12 20 12 20s12-11.6 12-20C24 5.4 18.6 0 12 0Z" fill="${c}"/>
+    <path d="M12 5.5v8M12 17.2v.1" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+  /* Ghim must-see: cùng dáng giọt nước với ghim giá nhưng màu vàng đồng và
+     ruột là ngôi sao. Cùng dáng thì mắt biết cả hai đều là "một địa điểm";
+     khác màu và khác ruột thì biết chúng trả lời hai câu hỏi khác nhau. */
+  mapPinStar: (c) => `<svg viewBox="0 0 24 32" aria-hidden="true">
+    <path d="M12 0C5.4 0 0 5.4 0 12c0 8.4 12 20 12 20s12-11.6 12-20C24 5.4 18.6 0 12 0Z" fill="${c}"/>
+    <path d="m12 5.2 2.06 4.3 4.64.63-3.38 3.3.83 4.67L12 15.9l-4.15 2.2.83-4.67-3.38-3.3 4.64-.63Z"
+      fill="#fff"/></svg>`,
+  starSm: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="m12 2.6 2.9 6.05 6.5.88-4.73 4.62L17.8 21 12 17.9 6.2 21l1.13-6.85L2.6 9.53l6.5-.88Z"/></svg>`,
+};
+const spkIcon = `<svg viewBox="0 0 20 20"><path d="M4 8v4h3l4 3V5L7 8H4Z"/><path d="M14 7a4 4 0 0 1 0 6"/></svg>`;
+
+/* ── tiện ích ─────────────────────────────────────────────── */
+let toastT;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("on");
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600);
+}
+const NOZONE = { name: "—", updated: "—", items: {}, center: [0, 0] };
+// Không bao giờ trả undefined: giao diện dựng xong trước khi dữ liệu nạp,
+// và một cú chạm sớm vào nút quét từng làm sập cả app.
+const zone = () => S.prices[S.zone] || Object.values(S.prices)[0] || NOZONE;
+/* Tên vùng viết cho người đọc tiếng Anh. Bản trước ghi cứng "Hoi An · Old Town"
+   ở tab Nearby, nên đổi vùng sang Hà Nội mà tiêu đề vẫn nói Hội An. */
+const zoneEn = () => zone().en || zone().name || "";
+const stat = (id) => zone()?.items?.[id];
+const dishById = (id) => S.dishes.find((d) => d.id === id);
+
+function say(text) {
+  if (!("speechSynthesis" in window)) return toast("Speech not available on this device");
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "vi-VN"; u.rate = 0.85;
+  const v = speechSynthesis.getVoices().find((x) => x.lang?.startsWith("vi"));
+  if (v) u.voice = v;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
+  if (!v) toast("No Vietnamese voice installed — showing text only");
+}
+
+/* ── nhật ký ──────────────────────────────────────────────── */
+const journal = {
+  all: () => JSON.parse(localStorage.getItem("nl.journal") || "[]"),
+  add(e) {
+    const a = this.all();
+    a.unshift({ ts: Date.now(), ...e });
+    localStorage.setItem("nl.journal", JSON.stringify(a.slice(0, 300)));
+  },
+  clear() { localStorage.removeItem("nl.journal"); },
+};
+
+/* ── camera ───────────────────────────────────────────────── */
+function showCamFallback(msg) {
+  $("#camFallback").style.display = "grid";
+  $("#camFallback p").innerHTML = msg;
+}
+/** Không bao giờ await hàm này trong luồng khởi động — hộp thoại xin quyền
+ *  có thể treo vô hạn và chặn mọi thứ phía sau. */
+function startCam() {
+  if (S.stream || S.camTried) return;
+  S.camTried = true;
+  if (!navigator.mediaDevices?.getUserMedia || !window.isSecureContext) {
+    return showCamFallback(`<strong>Camera needs HTTPS.</strong><br>Open this page over https or on localhost, or use <em>Enter prices by hand</em>.`);
+  }
+  // nếu người dùng không trả lời hộp thoại quyền, vẫn phải cho họ lối đi tiếp
+  const nudge = setTimeout(() => showCamFallback(
+    `<strong>Waiting for camera permission.</strong><br>Allow it in the address bar, or use <em>Enter prices by hand</em> below.`), 4000);
+
+  const fail = (msg) => {
+    clearTimeout(nudge);
+    S.camTried = false;                       // cho phép thử lại
+    // showCamFallback đã tự đặt display:grid — gán lại "" ở đây sẽ xoá nó
+    // và thông báo vừa dựng lại biến mất ngay.
+    showCamFallback(`${msg}<br>Use <em>Enter prices by hand</em>, or tap to retry.`);
+    const fb = $("#camFallback");
+    fb.onclick = () => { fb.onclick = null; startCam(); };
+  };
+
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 } }, audio: false,
+  }).then(async (st) => {
+    clearTimeout(nudge);
+    S.stream = st;
+    const v = $("#cam");
+    v.srcObject = st;
+
+    /* PHẢI gọi play() và PHẢI đợi nó.
+       Bản trước chỉ gán srcObject rồi thôi, tin vào thuộc tính autoplay.
+       Trên Android, autoplay bị chặn khi thẻ đang ở nền hoặc khi trước đó
+       trang từng bị chặn phát tự động — lúc đó video đứng im, không ném
+       lỗi, không có sự kiện nào. Mà `nudge` vừa bị huỷ ở dòng trên, nên
+       người dùng nhìn một mảng xám trống và KHÔNG có một chữ nào giải
+       thích. Đúng lỗi đang gặp. */
+    try {
+      await v.play();
+    } catch (e) {
+      return fail(`<strong>Camera blocked from playing</strong> (${esc(e.name)}).`);
+    }
+
+    /* Chó canh: play() trả về thành công vẫn chưa nghĩa là có khung hình.
+       videoWidth còn 0 sau 3,5 giây nghĩa là luồng rỗng — máy ảnh đang bị
+       ứng dụng khác giữ, hoặc trình duyệt cấp một luồng câm. Thà nói ra
+       còn hơn để người dùng chĩa máy vào thực đơn và chờ mãi. */
+    clearTimeout(S._camWatch);
+    S._camWatch = setTimeout(() => {
+      if (!v.videoWidth) {
+        fail(`<strong>Camera gave no picture.</strong> Another app may be holding it — close other camera apps and tap to retry.`);
+      }
+    }, 3500);
+
+    v.addEventListener("loadedmetadata", () => {
+      clearTimeout(S._camWatch);
+      $("#camFallback").style.display = "none";
+    }, { once: true });
+  }).catch((e) => {
+    // Tên lỗi là thứ nói đúng nguyên nhân: NotAllowedError là bị từ chối
+    // quyền, NotFoundError là máy không có camera, NotReadableError là
+    // camera đang bị chiếm. Gộp hết thành "unavailable" là vứt đi manh mối.
+    const why = {
+      NotAllowedError: "Permission denied. Tap the lock icon next to the address bar → Permissions → Camera → Allow.",
+      NotFoundError: "This device reports no camera.",
+      NotReadableError: "The camera is busy — another app is using it.",
+      OverconstrainedError: "No camera matches the requested settings.",
+      SecurityError: "Blocked by the browser's security settings.",
+    }[e.name] || esc(e.message || "");
+    fail(`<strong>Camera unavailable</strong> (${esc(e.name)}).<br>${why}`);
+  });
+}
+
+/* Chẩn đoán dán vào console khi camera vẫn không lên. In ra đủ thứ cần
+   để biết hỏng ở đâu mà không phải đoán. */
+window.__nlCam = async () => {
+  const v = document.querySelector("#cam");
+  const r = v?.getBoundingClientRect();
+  let perm = "?";
+  try { perm = (await navigator.permissions.query({ name: "camera" })).state; } catch { perm = "không hỏi được"; }
+  let cams = [];
+  try { cams = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput"); } catch { /* chưa có quyền */ }
+  return {
+    secureContext: window.isSecureContext,
+    hasGetUserMedia: !!navigator.mediaDevices?.getUserMedia,
+    permission: perm,
+    cameras: cams.length,
+    hasStream: !!S.stream,
+    tracks: S.stream ? S.stream.getVideoTracks().map((t) => `${t.label || "?"}:${t.readyState}`) : [],
+    paused: v?.paused, readyState: v?.readyState,
+    videoSize: v ? `${v.videoWidth}x${v.videoHeight}` : "no element",
+    cssSize: r ? `${Math.round(r.width)}x${Math.round(r.height)}` : "-",
+    fallbackShown: getComputedStyle(document.querySelector("#camFallback")).display,
+  };
+};
+/* `colour:true` bỏ bước xám hoá. Nhận diện món dựa vào MÀU nhiều hơn bất
+   cứ dấu hiệu nào khác — nghệ vàng của cơm gà, xanh của rau sống, nâu của
+   nước dùng. Đưa ảnh xám cho model thị giác là vứt đi phần lớn thông tin
+   rồi trách nó đoán sai. Ngược lại OCR menu thì xám hoá lại giúp. */
+function grabFrame({ colour = false } = {}) {
+  const v = $("#cam"), c = $("#shot");
+  if (!v.videoWidth) return null;
+  const W = Math.min(v.videoWidth, 1600), sc = W / v.videoWidth;
+  c.width = W; c.height = Math.round(v.videoHeight * sc);
+  const g = c.getContext("2d", { willReadFrequently: true });
+  g.drawImage(v, 0, 0, c.width, c.height);
+  if (colour) return c;
+  // xám hoá + tăng tương phản — giúp OCR trên menu loá đèn
+  const im = g.getImageData(0, 0, c.width, c.height), d = im.data;
+  for (let i = 0; i < d.length; i += 4) {
+    let y = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+    y = Math.max(0, Math.min(255, (y - 128) * 1.45 + 128));
+    d[i] = d[i+1] = d[i+2] = y;
+  }
+  g.putImageData(im, 0, 0);
+  return c;
+}
+
+/* Nạp máy đọc chữ trong nền, KHÔNG hiện lớp che "đang bận".
+   ocr() cũng tạo worker nếu chưa có, nên hàm này chỉ là kéo trước cho
+   xong sớm; nó phải im lặng, vì người dùng chưa yêu cầu gì cả. */
+async function warmOCR() {
+  if (S.worker || typeof Tesseract === "undefined") return;
+  S.worker = await Tesseract.createWorker(["vie", "eng"], 1);
+}
+
+/* ── OCR ──────────────────────────────────────────────────── */
+async function ocr(canvas) {
+  const busy = $("#busy"), txt = $("#busyTxt"), pct = $("#busyPct");
+  busy.classList.add("on");
+  try {
+    if (!S.worker) {
+      txt.textContent = "Loading Vietnamese text engine…";
+      pct.textContent = "first run only, ~5 MB";
+      S.worker = await Tesseract.createWorker(["vie", "eng"], 1, {
+        logger: (m) => {
+          if (m.status === "recognizing text") {
+            txt.textContent = "Reading the text…";
+            pct.textContent = Math.round((m.progress || 0) * 100) + "%";
+          } else if (m.progress != null) {
+            pct.textContent = Math.round(m.progress * 100) + "%";
+          }
+        },
+      });
+      S.ocrReady = true;
+    }
+    txt.textContent = "Reading the text…";
+    const { data } = await S.worker.recognize(canvas);
+    return { text: data.text || "", conf: data.confidence ?? null };
+  } catch (e) {
+    console.error(e);
+    toast("Could not read that — try again or enter by hand");
+    return { text: "", conf: null };
+  } finally {
+    busy.classList.remove("on");
+  }
+}
+
+/* ── phán quyết + hiển thị ────────────────────────────────── */
+function setEdge(level) {
+  const e = $("#edge");
+  if (!level) e.removeAttribute("data-level"); else e.setAttribute("data-level", level);
+  if (level && navigator.vibrate) navigator.vibrate(level === "high" ? [40,60,40,60,40] : level === "warn" ? [40,60,40] : [30]);
+}
+function openSheet(html) {
+  const top = $("#sheet .cloudtop");
+  if (top && !top.style.backgroundImage) top.style.backgroundImage = dataURI(cloudBand(GOLD, GIAY, 8));
+  $("#sheetBody").innerHTML = html; $("#sheet").classList.add("open");
+}
+function closeSheet() { $("#sheet").classList.remove("open"); setEdge(null); }
+
+function rowHTML(r) {
+  const v = r.v;
+  const note = v.level === "unknown"
+    ? "No local data for this item yet"
+    : `Typical ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)} here`;
+  const badge = v.level === "ok" ? "fair"
+    : v.level === "warn" ? "above 75%"
+    : v.level === "high" ? (v.pct != null ? `+${v.pct}%` : "high") : "unknown";
+  return `<button class="row" data-dish="${esc(r.id || "")}">
+    <span class="dot" data-l="${v.level}"></span>
+    <span><span class="nm">${esc(r.label)}</span><span class="note">${esc(note)}</span></span>
+    <span class="amt" data-l="${v.level}">${money(r.price)}<small>${esc(badge)}</small></span>
+  </button>`;
+}
+
+function judgeRows(pairs) {
+  return pairs.map(({ name, price }) => {
+    const m = matchDish(name, S.dishes);
+    const id = m?.dish.id || null;
+    const st = id ? stat(id) : null;
+    return { id, label: m ? m.dish.vi : name, price, st, v: verdict(price, st) };
+  });
+}
+
+function showMenuResult(rows, conf) {
+  const z = zone();
+  const worst = rows.reduce((a, r) =>
+    ({ ok:0, unknown:0, warn:1, high:2 }[r.v.level] > { ok:0, unknown:0, warn:1, high:2 }[a] ? r.v.level : a), "ok");
+  setEdge(worst);
+  S.session = rows.filter((r) => r.id).map((r) => ({ id: r.id, label: r.label, price: r.price }));
+
+  const seeded = rows.some((r) => r.st?.seed);
+  const known = rows.filter((r) => r.st);
+  const n = known.length ? Math.round(known.reduce((s, r) => s + r.st.n, 0) / known.length) : 0;
+
+  openSheet(`
+    <h3>Menu · ${esc(z.name)}</h3>
+    <p class="src">${rows.length} item${rows.length===1?"":"s"} read${n?` · compared with ~${n} nearby places`:""} · updated ${esc(z.updated)}${conf!=null?` · OCR confidence ${Math.round(conf)}%`:""}</p>
+    ${wave()}
+    ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">No prices found in that shot. Move closer, hold steady, or enter them by hand below.</p>`}
+    ${manualBlock()}
+    ${seeded ? `<p class="seedwarn">Reference prices are seed data, not a completed field survey. Every verdict shows its sample size so you can judge how much to trust it.</p>` : ""}
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+function showCashResult(text) {
+  const notes = readNotes(text);
+  if (!notes.length) {
+    setEdge(null);
+    return openSheet(`<h3>No banknotes recognised</h3>
+      <p class="src">Lay the notes flat with the big number facing the camera, then scan again.</p>
+      ${manualBlock("cash")}
+      <button class="btn sec" data-act="close">Close</button>`);
+  }
+  const total = notes.reduce((a, b) => a + b, 0);
+  const expected = S.session.reduce((a, r) => a + r.price, 0) || null;
+  const slip = zeroSlip(total, expected);
+  setEdge(slip ? "high" : "ok");
+
+  const counts = notes.reduce((m, v) => (m[v] = (m[v] || 0) + 1, m), {});
+  openSheet(`
+    <h3>You're holding</h3>
+    <p style="font-size:32px;font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin-top:4px">${fmtVND(total)}</p>
+    ${wave()}
+    ${Object.entries(counts).sort((a,b)=>b[0]-a[0]).map(([v,c]) =>
+      `<div class="row"><span class="dot" data-l="ok"></span>
+        <span><span class="nm">${fmtVND(+v)}</span><span class="note">${c} note${c>1?"s":""}</span></span>
+        <span class="amt">${fmtVND(v*c)}</span></div>`).join("")}
+    ${expected ? `<div class="warnbox ${slip ? "" : "okbox"}">
+        ${slip ? `Your bill is ${fmtVND(expected)}. That's ${slip.factor}× less — one zero more in your hand. Check before you hand it over.`
+               : `Your bill is ${fmtVND(expected)}. This looks right.`}</div>`
+      : `<div class="warnbox infobox">Scan a menu or a bill first and Nón Lá will check this against what you owe.</div>`}
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+function showBillResult(rows) {
+  const ordered = new Map(S.session.map((r) => [r.id, r]));
+  const matched = [], extra = [];
+  for (const r of rows) (r.id && ordered.has(r.id) ? matched : extra).push(r);
+  const total = rows.reduce((a, r) => a + r.price, 0);
+  const expected = S.session.reduce((a, r) => a + r.price, 0);
+  setEdge(extra.length ? "high" : "ok");
+
+  openSheet(`
+    <h3>Bill check</h3>
+    <p class="src">${S.session.length ? `Matched against ${S.session.length} item${S.session.length===1?"":"s"} from the menu you scanned` : "No menu scanned yet — showing the bill as read"}</p>
+    ${wave()}
+    ${matched.map(rowHTML).join("")}
+    ${extra.length ? `<h2 class="sect" style="color:var(--son)">Not on your menu scan</h2>${extra.map(rowHTML).join("")}` : ""}
+    <div class="row" style="border-top:1px solid var(--line);margin-top:6px">
+      <span></span><span class="nm">Bill total</span><span class="amt">${fmtVND(total)}</span></div>
+    ${S.session.length ? `<div class="warnbox ${extra.length ? "" : "okbox"}">
+      ${extra.length
+        ? `${extra.length} line${extra.length===1?"":"s"} you didn't order. Expected ${fmtVND(expected)}.`
+        : `Every line matches what you ordered.`}</div>` : ""}
+    ${extra.length ? sayBlock("Cho tôi xem lại hoá đơn", "chaw toy sem lai hwa dun") : ""}
+    <p class="muted" style="margin-top:10px">Ask politely first. Most extra lines are honest mistakes, and they come off the bill when you point at them.</p>
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+const sayBlock = (vi, ph) => `<button class="say" data-say="${esc(vi)}">
+  <span><span class="vi">${esc(vi)}</span><span class="ph">${esc(ph)}</span></span>
+  <span class="spk">${spkIcon}</span></button>`;
+
+const manualBlock = (kind = "menu") => `
+  <h2 class="sect">Enter by hand</h2>
+  <p class="muted">${kind === "cash" ? "Type the notes you're holding, one per line." : "Type an item and its price. Nón Lá never leaves you stuck."}</p>
+  <div class="manual">
+    <input id="mName" placeholder="${kind === "cash" ? "500000" : "Cao lầu"}" ${kind==="cash"?'inputmode="numeric"':""}>
+    <input id="mPrice" placeholder="${kind === "cash" ? "× 1" : "55000"}" inputmode="numeric">
+  </div>
+  <button class="btn pri" data-act="manual" data-kind="${kind}">Check it</button>`;
+
+/* ── xử lý quét ───────────────────────────────────────────── */
+async function doScan() {
+  if (!S.ready) return toast("Still loading local prices — one moment");
+  if (S.mode === "dish") return doDishScan();
+  const c = grabFrame();
+  if (!c) {
+    openSheet(`<h3>No camera image</h3>
+      <p class="src">This device has no usable camera, or the page isn't served over HTTPS.</p>
+      ${manualBlock(S.mode === "cash" ? "cash" : "menu")}
+      <button class="btn sec" data-act="close">Close</button>`);
+    return;
+  }
+  const { text, conf } = await ocr(c);
+  handleText(text, conf);
+}
+
+/* ── quét MÓN: ảnh đồ ăn → món gì → giá bao nhiêu ─────────────
+   Khác hẳn ba chế độ kia ở một điểm phải nói thẳng: nó CẦN MẠNG và cần
+   khoá. OCR chạy trên máy, còn nhận diện vật thể thì không có model nào
+   đủ nhỏ để nhét vào một PWA. Nên khi không có mạng, chế độ này phải
+   nhường đường cho lối chọn tay chứ không được để người dùng đứng chờ.  */
+async function doDishScan() {
+  if (!Img.hasKey()) {
+    return openSheet(`<h3>Dish photos need a key</h3>
+      <p class="src">Reading a photo of food takes a vision model, which runs online.
+        Text on menus is read on your own device and always works offline.</p>
+      <div class="warnbox infobox">${I.clock}<span>Add a key under
+        <b>You → Illustrations</b>, or just pick the dish by hand below.</span></div>
+      ${dishPickerHTML()}
+      <button class="btn sec" data-act="close">Close</button>`);
+  }
+  const c = grabFrame({ colour: true });
+  if (!c) {
+    return openSheet(`<h3>No camera image</h3>
+      <p class="src">This device has no usable camera, or the page isn't served over HTTPS.</p>
+      ${dishPickerHTML()}
+      <button class="btn sec" data-act="close">Close</button>`);
+  }
+  const busy = $("#busy"), txt = $("#busyTxt"), pct = $("#busyPct");
+  busy.classList.add("on");
+  txt.textContent = "Looking at the dish…";
+  pct.textContent = "sending one photo";
+  try {
+    // JPEG .72: ảnh món không cần nét từng sợi mì, mà mỗi KB là thời gian
+    // chờ thật của người đang đứng trước bát bún.
+    const top = await Img.identifyDish(c.toDataURL("image/jpeg", 0.72), S.dishes);
+    showDishGuess(top);
+  } catch (e) {
+    openSheet(`<h3>Could not read the photo</h3>
+      <p class="src">${esc(e.message || String(e))}</p>
+      ${dishPickerHTML()}
+      <button class="btn sec" data-act="close">Close</button>`);
+  } finally {
+    busy.classList.remove("on");
+  }
+}
+
+const dishPickerHTML = () => `
+  <h2 class="sect">Pick the dish yourself</h2>
+  <div class="manual" style="grid-template-columns:1fr">
+    <select id="dishPick" style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;background:#fff">
+      ${S.dishes.map((d) => `<option value="${esc(d.id)}">${esc(d.vi)} — ${esc(d.en || "")}</option>`).join("")}
+    </select>
+  </div>
+  <button class="btn pri" data-act="dishPick">See the local price</button>`;
+
+/* Kết quả nhận diện. KHÔNG tự chốt một món rồi phán giá luôn: model chỉ
+   đạt 71–98% ngay cả khi đã ép chọn trong danh sách, và ở đây đoán sai
+   nghĩa là so với khoảng giá của một món khác hẳn. Người dùng xác nhận
+   trước, app nói giá sau. */
+function showDishGuess(top) {
+  if (!top.length) {
+    return openSheet(`<h3>Not a dish it knows</h3>
+      <p class="src">Nothing in the local list matched this photo. That doesn't mean the dish
+        is unusual — the list only covers ${S.dishes.length} dishes so far.</p>
+      ${dishPickerHTML()}
+      <button class="btn sec" data-act="close">Close</button>`);
+  }
+  openSheet(`
+    <h3>Is this what you're looking at?</h3>
+    <p class="src">Read from your photo · tap to confirm</p>
+    ${wave()}
+    ${top.map(({ id, confidence }) => {
+      const d = dishById(id), st = stat(id);
+      return `<button class="row" data-dish="${esc(id)}">
+        <span class="dot" data-l="${st ? "ok" : "unknown"}"></span>
+        <span><span class="nm">${esc(d?.vi || id)}</span>
+          <span class="note">${d ? esc(d.en) : ""} · ${confidence}% sure</span></span>
+        <span class="amt">${st ? money(st.p50) : "—"}<small>typical</small></span>
+      </button>`;
+    }).join("")}
+    <div class="warnbox infobox">${I.alertDot}<span>A photo tells you <b>what the dish is</b>,
+      never what this seller charges. Confirm the dish, then scan the menu or enter the price
+      you were quoted to get a verdict.</span></div>
+    ${dishPickerHTML()}
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+function handleText(text, conf) {
+  if (!S.ready) return toast("Still loading local prices — one moment");
+  if (S.mode === "cash") return showCashResult(text);
+  const pairs = parseMenu(text);
+  const rows = judgeRows(pairs);
+  if (S.mode === "bill") { showBillResult(rows); logScan(rows, "bill"); }
+  else { showMenuResult(rows, conf); logScan(rows, "menu"); }
+}
+
+function logScan(rows, kind) {
+  for (const r of rows) {
+    if (!r.id) continue;
+    journal.add({ kind, id: r.id, label: r.label, price: r.price, level: r.v.level,
+      over: r.v.level === "high" && r.st ? r.price - r.st.p50 : 0, zone: S.zone });
+  }
+}
+
+/* ── Tab Eat ──────────────────────────────────────────────
+   Trên cùng: món đặc trưng của vùng, kèm cơ sở đáng tin nhất
+   phục vụ món đó. Kéo xuống: các món khác, dùng LẠI đúng thẻ
+   .dish-card của hàng "Signature dishes" — một hình thức, hai
+   ngữ cảnh, nên người dùng chỉ phải học một lần.
+   ───────────────────────────────────────────────────────── */
+
+/* Cơ sở tiến cử = quán ĐẠT CHUẨN có nhiều lượt quét độc lập nhất
+   trong số những quán phục vụ món đặc trưng của vùng. Chọn theo dữ
+   liệu, không gán tay — nếu quán tuột huy hiệu thì nó tự rời khỏi đây. */
+function featured() {
+  const z = zone();
+  const sig = z.signature || Object.keys(z.items || {})[0];
+  const cands = S.places
+    .filter((p) => p.zone === S.zone && p.fair === true && p.known.includes(sig))
+    .sort((a, b) => b.scans - a.scans);
+  return cands.length ? { place: cands[0], dishId: sig } : null;
+}
+
+/* Thẻ món dùng chung cho hàng ngang và danh sách dọc */
+function dishCardHTML(dishId, price) {
+  const d = dishById(dishId);
+  if (!d) return "";
+  const st = stat(dishId);
+  const show = price ?? st?.p50 ?? null;
+  return `<button class="dish-card" data-dish="${esc(dishId)}">
+    ${dishPhoto(d, "1/1")}
+    <span>
+      <span class="nm">${esc(d.vi)}</span>
+      <span class="amt">${show != null ? money(show) : "—"}<small>${esc(d.unit || "")}</small></span>
+      <span class="desc">${esc(d.en)}${st ? ` · typical ${fmtVND(st.p25)}–${fmtVND(st.p75)}` : ""}</span>
+    </span>
+  </button>`;
+}
+
+/* Thanh so giá: vị trí của một mức giá trên dải p25 → p95 của vùng */
+function priceCheckHTML(place, dishId) {
+  const st = stat(dishId), d = dishById(dishId);
+  const paid = place.prices?.[dishId];
+  if (!st || paid == null) return "";
+  const lo = st.p25, mid = st.p50, hi = st.p95;
+  const pct = Math.max(4, Math.min(96, ((paid - lo) / Math.max(1, hi - lo)) * 100));
+  const inside = paid <= st.p75;
+  return `<section class="pricecheck">
+    <div class="hd">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <div>
+        <h3>Price check</h3>
+        <p>Compared with the local range for ${esc(d.vi)}</p>
+      </div>
+      <span class="verdict ${inside ? "in" : "out"}">
+        ${inside ? I.check : I.trendUp}${inside ? "Inside local range" : "Above local range"}</span>
+    </div>
+    <div class="pcbar">
+      <div class="lead">
+        <span class="who">${esc(place.name)}</span>
+        <span class="amt">${fmtVND(paid)}</span>
+      </div>
+      <div class="track" role="img"
+        aria-label="${esc(place.name)} charges ${fmtVND(paid)}; local range ${fmtVND(lo)} to ${fmtVND(hi)}, average ${fmtVND(mid)}">
+        <span class="fill" style="width:${pct}%"></span>
+        <span class="mark ${inside ? "" : "out"}" style="left:${pct}%">
+          ${inside ? I.shield : I.trendUp}</span>
+      </div>
+      <div class="scale">
+        <div>Local low<b>${fmtVND(lo)}</b></div>
+        <div>Average<b>${fmtVND(mid)}</b></div>
+        <div>Local high<b>${fmtVND(hi)}</b></div>
+      </div>
+    </div>
+    <p class="seedwarn">Based on ${st.n} places recorded nearby, updated ${esc(zone().updated)}.
+      Reference prices are seed data, not a completed field survey.</p>
+  </section>`;
+}
+
+function renderEat(filter = "") {
+  const z = zone();
+  const f = featured();
+  const q = filter.trim().toLowerCase();
+
+  // Món khác trong vùng: bỏ những món đã nằm ở hàng Signature phía trên
+  const shown = new Set(f ? f.place.known : []);
+  const rest = S.dishes.filter((d) => {
+    if (!(z.items && z.items[d.id])) return false;
+    if (!q && shown.has(d.id)) return false;
+    if (!q) return true;
+    return (d.vi + " " + d.en + " " + d.aliases.join(" ")).toLowerCase().includes(q);
+  });
+
+  const heroDish = f ? dishById(f.dishId) : null;
+  const heroStat = f ? stat(f.dishId) : null;
+
+  $("#eatBody").innerHTML = `
+    <div class="eat-top">
+      <button class="iconbtn" aria-label="Back to scanner" data-act="goScan">${I.back}</button>
+      <span class="kick"><span class="pag" aria-hidden="true">${I.pagoda}</span>
+        <span>${esc(z.name)}</span></span>
+      <button class="iconbtn" aria-label="Must-Try Food Map" data-act="foodMap">${I.pinSm}</button>
+      <button class="iconbtn" aria-label="Share this place" data-act="share">${I.share}</button>
+      <button class="iconbtn" aria-label="Save this place" data-act="save">${I.bookmark}</button>
+    </div>
+
+    ${f ? `
+    <section class="eat-hero">
+      <span class="avwrap">
+        ${placePhoto(f.place, "1/1")}
+        <span class="seal" aria-hidden="true">${I.shield}</span>
+      </span>
+      <div>
+        <h1 class="nm">${esc(f.place.name)}</h1>
+        <p class="meta">${I.pinSm}${esc(f.place.street)} · ${esc(f.place.tier)}</p>
+        <span class="pill ok" style="width:auto">${I.shield}Fair Price</span>
+        <p class="blurb">A trusted local spot for ${esc(heroDish.vi)} that has stayed inside
+          the local price range across ${f.place.scans} independent scans.</p>
+      </div>
+    </section>
+
+    <div class="fact-grid">
+      <div class="fact">
+        <span class="hd"><span class="ico">${I.bowl}</span><span class="ttl">Known for</span></span>
+        <span class="val">${f.place.known.map((k) => esc(dishById(k)?.vi || k)).join(" · ")}</span>
+        <span class="note">${esc(heroDish.en)}.</span>
+      </div>
+      <div class="fact">
+        <span class="hd"><span class="ico">${I.coins}</span><span class="ttl">Typical price</span></span>
+        <span class="val"><b>${fmtVND(heroStat.p25)} – ${money(heroStat.p75)}</b><br>${esc(heroDish.unit || "")}</span>
+        <span class="note">Range recorded across ${heroStat.n} nearby places.</span>
+      </div>
+      <div class="fact">
+        <span class="hd"><span class="ico">${I.clock}</span><span class="ttl">Best time</span></span>
+        <span class="val">11:00 – 13:00<br>17:30 – 19:30</span>
+        <span class="note">Local meal times — busiest at lunch and dinner.</span>
+      </div>
+    </div>
+
+    ${priceCheckHTML(f.place, f.dishId)}
+
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>Signature dishes</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <div class="dish-rail">
+      ${f.place.known.map((k) => dishCardHTML(k, f.place.prices?.[k])).join("")}
+    </div>
+
+    <button class="btn save" data-act="save">${I.bookmark}Save trusted spot</button>
+    <p class="savenote">Saved places stay on this device and are easy to find later.</p>
+    ` : `<p class="muted" style="margin-top:18px">No badged place for this area yet —
+      Nón Lá needs 20 independent scans before it will recommend one.</p>`}
+
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>${q ? "Search results" : "More dishes here"}</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <div class="manual" style="grid-template-columns:1fr;margin-bottom:12px">
+      <input id="eatSearch" type="search" placeholder="Search a dish" value="${esc(filter)}"
+        aria-label="Search a dish">
+    </div>
+    <div class="dish-list">
+      ${rest.length
+        ? rest.map((d) => dishCardHTML(d.id)).join("")
+        : `<p class="muted">Nothing matches “${esc(filter)}”.</p>`}
+    </div>
+
+    <p class="seedwarn">Prices shown are the local typical range, not what any one place
+      charges. Scan a menu to check a real one.</p>`;
+}
+
+function showDish(id) {
+  const d = dishById(id); if (!d) return;
+  const st = stat(id);
+  const tagCls = (t) => /shrimp paste|soy|peanut|gluten|egg|dairy|alcohol|charged/i.test(t) ? "alert"
+    : /veg|vegan/i.test(t) ? "veg" : "";
+  openSheet(`
+    ${dishPhoto(d, "16/10")}
+    <h3>${esc(d.vi)}</h3>
+    <p class="src">${esc(d.en)}${d.spice !== "none" ? ` · ${esc(d.spice)} heat` : ""}</p>
+    ${wave()}
+    <p class="muted" style="font-size:13.5px">${esc(d.desc)}</p>
+    <div class="tagrow">${d.tags.map((t) => `<span class="tg ${tagCls(t)}">${esc(t)}</span>`).join("")}${d.spice === "hot" ? '<span class="tg hot">Spicy</span>' : ""}</div>
+    ${st ? `<div class="card"><p class="kicker">Local price</p>
+        <p style="font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:3px">${fmtVND(st.p25)} – ${money(st.p75)}</p>
+        <p class="src">Typical range in ${esc(zone().name)} · ${st.n} places · ${esc(zone().updated)}${st.seed ? " · seed data" : ""}</p></div>` : ""}
+    ${whereToEat(id)}
+    ${sayBlock(d.say, d.ph)}
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+/* ── "Ăn món này ở đâu" ───────────────────────────────────────
+   Chạm một món xong phải trả lời được câu hỏi tiếp theo: đi đâu ăn.
+   Hai nhóm, tách bạch vì mức bằng chứng khác hẳn nhau:
+
+   · Nhóm trên — cơ sở ĐANG THEO DÕI GIÁ (places.json): có số lượt quét,
+     có phán quyết Đúng Giá / Trên khoảng. Đây là thứ duy nhất app dám
+     nói gì đó về giá.
+   · Nhóm dưới — quán từ OpenStreetMap có tên gợi đúng món: CHƯA quét
+     lần nào. Chỉ để trả lời "quanh đây có chỗ nào bán", không kèm bất
+     kỳ phán quyết nào.
+
+   Không trộn hai nhóm vào một danh sách: trộn xong thì người dùng đọc
+   cả danh sách như thể chúng cùng mức tin cậy. */
+function whereToEat(dishId) {
+  const d = dishById(dishId);
+  const tracked = (S.places || []).filter(
+    (p) => p.zone === S.zone && (p.known || []).includes(dishId));
+
+  // Khớp tên quán với tên món: bỏ dấu để "Cao Lau" khớp "Cao lầu".
+  const bare = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/đ/gi, "d").toLowerCase();
+  const needles = [d?.vi, d?.en, ...(d?.aliases || [])].filter(Boolean).map(bare);
+  const osm = (S.eateries || [])
+    .filter((e) => needles.some((n) => n.length > 3 && bare(e.name).includes(n)))
+    .filter((e) => !tracked.some((p) => p.at && distance(e.at, p.at) < 40))
+    .slice(0, 8);
+
+  const fam0 = (S.famous || []).filter((f) => f.dish === dishId);
+  if (!tracked.length && !osm.length && !fam0.length) return "";
+
+  const row = (name, sub, at, level, right) => `<button class="row"
+    ${at ? `data-goto="${esc(at.join(","))}" data-goname="${esc(name)}"` : ""}>
+    <span class="dot" data-l="${level}"></span>
+    <span><span class="nm">${esc(name)}</span><span class="note">${esc(sub)}</span></span>
+    <span class="amt">${right}</span></button>`;
+
+  return `
+    <h2 class="sect">Where to eat this</h2>
+    ${tracked.length ? tracked.map((p) => row(
+      p.name,
+      `${p.street || ""} · ${p.scans || 0} scan${p.scans === 1 ? "" : "s"} on record`,
+      p.at,
+      p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown",
+      p.prices?.[dishId] ? money(p.prices[dishId]) : "—",
+    )).join("") : ""}
+
+    ${(() => {
+      /* Nhóm "báo chí nhắc tới": tách hẳn khỏi hai nhóm kia và LUÔN kèm
+         nguồn. Đây là ghi nhận của người khác, không phải phán quyết của
+         Nón Lá — không có nguồn thì nó chỉ là tin đồn có giao diện đẹp. */
+      const fam = (S.famous || []).filter((f) => f.dish === dishId);
+      if (!fam.length) return "";
+      return `<p class="src" style="margin-top:10px">Written up in the travel press.
+        Nón Lá has not scanned these — no price verdict, and this is someone else's
+        recommendation, not ours:</p>
+        ${fam.map((f) => `<button class="row"
+          ${f.at ? `data-goto="${esc(f.at.join(","))}" data-goname="${esc(f.name)}"` : ""}>
+          <span class="dot" data-l="unknown"></span>
+          <span><span class="nm">${esc(f.name)}</span>
+            <span class="note">${esc(f.street || "")} · ${esc(f.note || "")}</span>
+            <span class="note" style="opacity:.75">Source: ${esc(f.source || "")}</span></span>
+          <span class="amt">${f.at ? "→" : "<small>no map pin</small>"}</span></button>`).join("")}`;
+    })()}
+
+    ${osm.length ? `<p class="src" style="margin-top:8px">Also listed nearby, never scanned —
+      no price data, and no opinion on the food:</p>
+      ${osm.map((e) => row(
+        e.name,
+        [e.no, e.street].filter(Boolean).join(" ") || "OpenStreetMap",
+        e.at, "unknown", "—",
+      )).join("")}` : ""}
+
+    ${S.me ? `<p class="src">Tap a row for walking directions from where you are.</p>`
+           : `<p class="src">Turn on location in the map to get directions from where you are.</p>`}`;
+}
+
+/* ── Tab Nearby — "Explore by map" ───────────────────────
+   Bố cục map-first: tiêu đề, hai ô số liệu, hàng bộ lọc, khối bản đồ
+   chiếm phần lớn màn hình, rồi khay thẻ cuộn ngang đè lên mép dưới.
+
+   Bản đồ ở đây KHÔNG phải hình vẽ trang trí riêng: nó gọi thẳng
+   BigMap.preview() nên dùng đúng nét vẽ, đúng phép chiếu và đúng toạ
+   độ của bản đồ chi tiết. Hai màn hình không thể nói lệch nhau về
+   cùng một con phố.
+   ───────────────────────────────────────────────────────── */
+
+function alertCardHTML(p) {
+  const known = p.known.map((k) => esc(dishById(k)?.vi || k)).join(" · ");
+  return `<button class="alert-card" data-place="${esc(p.id)}">
+    <span class="warnmark" aria-hidden="true">${I.alert}</span>
+    <span class="avwrap">
+      ${placePhoto(p, "1/1")
+        .replace('class="ph"', 'class="ph round"')}
+    </span>
+    <span>
+      <span class="top">
+        <span><span class="nm">${esc(p.name)}</span>
+          <span class="meta">${esc(p.street)} · ${esc(p.tier)}</span></span>
+        <span class="pill bad">${I.trendUp}Above range</span>
+      </span>
+      <span style="display:block;margin-top:8px"><span class="chip-scan">${p.scans} scans</span></span>
+      ${p.flag ? `<span class="why" role="status">${I.alertDot}<span>${esc(p.flag)}</span></span>` : ""}
+      <span class="known"><b>Known for</b>${known}</span>
+    </span>
+  </button>`;
+}
+
+function miniCardHTML(p) {
+  const ok = p.fair === true;
+  const known = p.known.map((k) => esc(dishById(k)?.vi || k)).join(" · ") || "—";
+  return `<button class="mini-card" data-place="${esc(p.id)}">
+    <span class="flag ${ok ? "ok" : "unknown"}"
+      aria-label="${ok ? "Fair Price" : "Not enough data"}">${ok ? I.check : I.question}</span>
+    <span class="row1">
+      <span class="avwrap">${placePhoto(p, "1/1")
+        .replace('class="ph"', 'class="ph round"')}</span>
+      <span><span class="nm">${esc(p.name)}</span>
+        <span class="meta">${esc(p.street)} · ${esc(p.tier)}</span>
+        <span style="display:block;margin-top:6px"><span class="chip-scan">${p.scans} scans</span></span></span>
+    </span>
+    <span class="known"><b>Known for</b>${known}</span>
+  </button>`;
+}
+
+/* Bộ lọc ở tab Nearby. Mỗi bộ lọc phải trả lời được từ dữ liệu đang có —
+   không có bộ lọc nào dựa trên trường mà places.json chưa hề chứa. */
+const EX_FILTERS = [
+  { k: "fair", label: "Fair Price", lvl: "ok", ico: () => I.shield,
+    title: "Top fair-price nearby", empty: "No fair-price badge in this area yet.",
+    test: (p) => p.fair === true },
+  { k: "over", label: "Above range", lvl: "bad", ico: () => I.trendUp,
+    title: "Above the local range", empty: "Nothing above the local range here.",
+    test: (p) => p.fair === false },
+  { k: "coffee", label: "Coffee", lvl: "", ico: () => I.coffee,
+    title: "Coffee nearby", empty: "No coffee spot scanned here yet.",
+    test: (p) => p.known.some((k) => /^ca-phe/.test(k)) },
+  { k: "street", label: "Street food", lvl: "", ico: () => I.bowl,
+    title: "Street food nearby", empty: "No street stall scanned here yet.",
+    test: (p) => p.tier === "street" },
+];
+const exFilter = () => EX_FILTERS.find((f) => f.k === S.exFilter) || EX_FILTERS[0];
+
+/* "2026-04" → "Apr 2026". Tháng viết chữ vì 04/2026 và 2026-04 đọc ngược
+   nhau tuỳ nước người đọc đến từ đâu. */
+function fmtSince(s) {
+  const m = /^(\d{4})-(\d{2})$/.exec(s || "");
+  if (!m) return "";
+  const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${names[+m[2] - 1] || m[2]} ${m[1]}`;
+}
+
+/* Thẻ nằm ngang trong khay dưới — ảnh trái, thông tin phải.
+   KHÔNG có sao đánh giá: dữ liệu của app là số lượt quét và mức lệch giá,
+   không phải điểm bình chọn. Bịa một con số 4,8 ra là nói dối người dùng
+   ngay trên thứ họ dùng để quyết định ăn ở đâu. */
+function exCardHTML(p) {
+  const pill = p.fair === true ? `<span class="pill ok">${I.shield}Fair Price</span>`
+    : p.fair === false ? `<span class="pill bad">${I.trendUp}Above range</span>`
+    : `<span class="pill unknown">${I.question}Not enough data</span>`;
+  const since = p.fair === true && p.since
+    ? `<span class="since">${I.check}since ${esc(fmtSince(p.since))}</span>` : "";
+  return `<button class="ex-card" data-place="${esc(p.id)}">
+    <span class="ex-thumb">${placePhoto(p, "1/1")
+      .replace('class="ph"', 'class="ph sq"')}</span>
+    <span class="ex-body">
+      <span class="nm">${esc(p.name)}</span>
+      <span class="meta">${I.pinSm}${esc(p.street)} · ${esc(p.tier)}</span>
+      <span class="ex-row"><span class="chip-scan">${p.scans} scans</span>${since}</span>
+      ${pill}
+    </span>
+  </button>`;
+}
+
+/* Thẻ mời đi tuyến, đặt ngay dưới bản đồ. Số chặng và số phút LẤY TỪ tuyến
+   đã giải, không ghi tay — nếu ai đó sửa một chặng thì con số ở đây đi theo. */
+function walkTeaserHTML() {
+  const geo = S.maps[S.zone];
+  const def = geo?.routes?.[0];
+  if (!def) return "";
+  const r = resolveRoute(def, geo, S.places);
+  if (!r) return "";
+  return `<button class="walk-teaser" data-act="openRoute">
+    <span class="wt-ico" aria-hidden="true">${I.navigate}</span>
+    <span class="wt-body">
+      <span class="wt-name">${esc(r.name)}</span>
+      <span class="wt-meta">${r.stops.length} stops · ${r.totalMin} min · ${esc(fmtDistance(r.totalM))}</span>
+    </span>
+    <span class="wt-go" aria-hidden="true">${I.chevron}</span>
+  </button>`;
+}
+
+function renderMap() {
+  S.exMap?.destroy();
+  S.exMap = null;
+
+  const list = S.places.filter((p) => p.zone === S.zone);
+  const badged = list.filter((p) => p.fair === true);
+  const flagged = list.filter((p) => p.fair === false);
+  const F = exFilter();
+  // Xếp theo số lượt quét độc lập — càng nhiều lần được xác nhận thì càng
+  // đáng tin. Xếp theo thứ tự dữ liệu sẽ biến nhãn "Top" thành lời nói dối.
+  const matched = list.filter(F.test).sort((a, b) => b.scans - a.scans);
+  const rest = list.filter((p) => !matched.includes(p));
+
+  $("#mapBody").innerHTML = `
+    <div class="ex-head">
+      <div class="nb-topbar">
+        <span class="pag" aria-hidden="true">${I.pagoda}</span>
+        <span class="kick">${esc(zoneEn())}</span>
+      </div>
+      <button class="nb-bell" aria-label="Notifications" data-act="notif">${I.bell}</button>
+
+      <h1 class="nb-h1 ex-h1">Explore by map</h1>
+      <p class="nb-sub ex-sub">Discover fair-price spots in ${esc(zoneEn().replace(" · ", " "))}
+        with live scan insights.</p>
+    </div>
+
+    <div class="ex-stats">
+      <div class="ex-stat">
+        <span class="ico ok">${I.shield}</span>
+        <span><b>${badged.length}</b><i>Fair-price spot${badged.length === 1 ? "" : "s"} nearby</i></span>
+      </div>
+      <span class="ex-div" aria-hidden="true"></span>
+      <div class="ex-stat">
+        <span class="ico bad">${I.alert}</span>
+        <span><b>${flagged.length}</b><i>Above range nearby</i></span>
+      </div>
+    </div>
+
+    <div class="ex-chips" role="group" aria-label="Filter what the map shows">
+      ${EX_FILTERS.map((f) => `<button class="ex-chip" data-exf="${f.k}" data-lvl="${f.lvl}"
+        aria-pressed="${String(f.k === S.exFilter)}">${f.ico()}${f.label}</button>`).join("")}
+      <button class="ex-chip round" data-act="exFilterInfo"
+        aria-label="How these filters work">${I.sliders}</button>
+    </div>
+
+    <div class="ex-map">
+      <div class="ex-canvas" id="exCanvas"></div>
+      <button class="ex-open" data-act="bigMap"
+        aria-label="Open the detailed map"><span>Open full map</span></button>
+      <div class="ex-fabs">
+        <button class="ex-fab" data-act="exLocate" aria-label="Find my location">${I.crosshair}</button>
+        <button class="ex-fab" data-act="bigMap" aria-label="Open the detailed map">${I.navigate}</button>
+      </div>
+    </div>
+
+    <div class="ex-sheet">
+      <span class="ex-grab" aria-hidden="true"></span>
+      <div class="sect-row">
+        <span class="spark" aria-hidden="true">${I.spark}</span>
+        <h2>${F.title}</h2>
+        <span class="rule" aria-hidden="true"></span>
+        <button class="act" data-act="allPlaces" aria-expanded="${S.showAll ? "true" : "false"}">
+          ${S.showAll ? "Show less" : "See all"}${I.chevron}</button>
+      </div>
+      ${matched.length
+        ? `<div class="ex-rail" id="trustRail">${matched.map(exCardHTML).join("")}</div>
+           <div class="rail-dots" id="railDots" aria-hidden="true">
+             ${matched.map((_, i) => `<i class="${i === 0 ? "on" : ""}"></i>`).join("")}</div>`
+        : `<p class="ex-empty">${I.clock}${esc(F.empty)}</p>`}
+      ${walkTeaserHTML()}
+    </div>
+
+    ${flagged.length && S.exFilter !== "over" ? flagged.map(alertCardHTML).join("") : ""}
+
+    ${S.showAll && rest.length ? `
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>Everything else nearby</h2>
+      <span class="rule" aria-hidden="true"></span>
+      <span class="note">${I.clock}Still checking…</span>
+    </div>
+    <div class="mini-grid">${rest.map(miniCardHTML).join("")}</div>` : ""}
+
+    <p class="seedwarn">Nón Lá never calls a business dishonest. It reports how a price compares
+      with others nearby, shows the sample size, and gives owners a way to contest it.</p>`;
+
+  const geo = S.maps[S.zone];
+  if (geo) {
+    S.exMap = BigMap.preview({
+      host: $("#exCanvas"), geo, places: list, icons: I, me: S.me || null,
+    });
+    // Ghim vẫn vẽ hết rồi mới ẩn: giữ nguyên khung khít cho cả vùng nên
+    // đổi bộ lọc không làm bản đồ nhảy sang một khung nhìn khác.
+    S.exMap?.filter(F.test);
+  }
+  syncRailDots();
+}
+
+/* Chấm chỉ vị trí đồng bộ theo cuộn. Dùng IntersectionObserver thay vì
+   nghe sự kiện scroll — rẻ hơn và không chạy trên luồng chính mỗi khung. */
+let railObs;
+function syncRailDots() {
+  railObs?.disconnect();
+  const rail = $("#trustRail"), dots = $("#railDots");
+  if (!rail || !dots) return;
+  const cards = [...rail.children], bullets = [...dots.children];
+  railObs = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      const i = cards.indexOf(e.target);
+      bullets.forEach((b, j) => b.classList.toggle("on", j === i));
+    }
+  }, { root: rail, threshold: 0.6 });
+  cards.forEach((c) => railObs.observe(c));
+}
+
+/* Thẻ chi tiết một cơ sở — mở khi chạm bất kỳ thẻ nào ở tab Nearby */
+/* ── bảng so giá từng món ─────────────────────────────────────
+   Câu "quán này đắt" là vô dụng: khách đang cầm menu và cần biết ĐẮT Ở
+   MÓN NÀO. Bảng này đặt cạnh nhau giá quán đang lấy và khoảng giá phổ
+   biến của vùng, từng dòng một, để họ tự đọc ra kết luận.
+
+   Mọi con số ở đây đều CÓ THẬT trong dữ liệu: p.prices là giá đã ghi
+   nhận tại quán, stat(k) là phân phối p25–p75 của vùng. Không có giá thì
+   dòng đó ghi "—", không nội suy. */
+function priceBreakdown(p) {
+  const rows = (p.known || []).map((k) => {
+    const d = dishById(k), st = stat(k), paid = p.prices?.[k];
+    if (!d) return null;
+    const over = st && paid != null && paid > st.p75;
+    const under = st && paid != null && paid < st.p25;
+    return { d, st, paid, state: paid == null || !st ? "none" : over ? "bad" : under ? "low" : "ok" };
+  }).filter(Boolean);
+  if (!rows.length) return "";
+
+  const label = { bad: "Above range", ok: "In range", low: "Below range", none: "No data" };
+  return `
+    <h2 class="sect">Sample prices vs local range</h2>
+    <div class="pcmp">
+      <div class="pcmp-h"><span>Menu item</span><span>Local range</span><span>This place</span></div>
+      ${rows.map((r) => `<div class="pcmp-r" data-s="${r.state}">
+        <span class="it"><span class="nm">${esc(r.d.vi)}</span>
+          <span class="un">${esc(r.d.unit || "")}</span></span>
+        <span class="rg">${r.st ? `${fmtVND(r.st.p25)} – ${fmtVND(r.st.p75)}` : "—"}</span>
+        <span class="pd">${r.paid != null ? money(r.paid) : "—"}
+          <span class="tag">${label[r.state]}</span></span>
+      </div>`).join("")}
+    </div>
+    <p class="src">Ranges come from ${rows[0].st?.n || 0} places recorded in
+      ${esc(zone().name)}, updated ${esc(zone().updated)}. A price inside the range is
+      not a promise the meal is good — only that the number is ordinary here.</p>`;
+}
+
+/* ── "Nên làm gì" ─────────────────────────────────────────────
+   Chỉ hiện khi quán ở trên khoảng giá. Ba việc này là thứ khách LÀM ĐƯỢC
+   ngay tại chỗ, không phải lời khuyên chung chung — và tuyệt đối không
+   phải lời khuyên tránh quán: app không kết luận ai gian. */
+function whatToDo(p) {
+  if (p.fair !== false) return "";
+  const alt = (S.places || []).filter((x) => x.zone === p.zone && x.fair === true && x.at)
+    .map((x) => ({ x, m: p.at ? distance(p.at, x.at) : Infinity }))
+    .sort((a, b) => a.m - b.m).slice(0, 3);
+  return `
+    <h2 class="sect">What you can do</h2>
+    <div class="todo">
+      <div><span class="ic">${I.clock}</span><b>Compare the menu</b>
+        <small>Check a few items before you order, not just one.</small></div>
+      <div><span class="ic">${I.question}</span><b>Ask before ordering</b>
+        <small>Confirm the price of set menus and anything sold by weight.</small></div>
+      <div><span class="ic">${I.shield}</span><b>Or walk a little</b>
+        <small>${alt.length ? `${alt.length} fair-price places within ${fmtDistance(alt[alt.length - 1].m)}.`
+          : "No fair-price place recorded nearby yet."}</small></div>
+    </div>
+    ${alt.length ? alt.map(({ x, m }) => `<button class="row" data-place="${esc(x.id)}">
+      <span class="dot" data-l="ok"></span>
+      <span><span class="nm">${esc(x.name)}</span>
+        <span class="note">${esc(x.street || "")} · ${x.scans} scans</span></span>
+      <span class="amt">${fmtDistance(m)}<small>away</small></span></button>`).join("") : ""}`;
+}
+
+function showPlace(id, metres = null) {
+  const p = S.places.find((x) => x.id === id);
+  if (!p) return;
+  const lvl = p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown";
+  const pill = p.fair === true ? `<span class="pill ok">${I.shield}Fair Price</span>`
+    : p.fair === false ? `<span class="pill bad">${I.trendUp}Above range</span>`
+    : `<span class="pill unknown">${I.question}Not enough data</span>`;
+  setEdge(p.fair === false ? "high" : p.fair === true ? "ok" : null);
+  openSheet(`
+    ${placePhoto(p, "16/10")}
+    <h3>${esc(p.name)}</h3>
+    <p class="src">${esc(p.street)} · ${esc(p.tier)} · ${p.scans} independent scans${p.since ? ` · badged since ${esc(p.since)}` : ""}${metres != null ? ` · ${fmtDistance(metres)} away` : ""}</p>
+    <div style="margin-top:9px">${pill}</div>
+    ${wave()}
+    ${p.flag ? `<div class="warnbox">${I.alert}<span>${esc(p.flag)}</span></div>` : ""}
+    ${p.fair === null ? `<div class="warnbox infobox">${I.clock}<span>Only ${p.scans} scans so far.
+      A place needs 20 before Nón Lá will say anything about it.</span></div>` : ""}
+    ${priceBreakdown(p)}
+    ${whatToDo(p)}
+    <h2 class="sect">Known for</h2>
+    ${p.known.map((k) => {
+      const d = dishById(k), st = stat(k);
+      return `<button class="row" data-dish="${esc(k)}">
+        <span class="dot" data-l="${st ? "ok" : "unknown"}"></span>
+        <span><span class="nm">${esc(d?.vi || k)}</span>
+          <span class="note">${d ? esc(d.en) : "No local data yet"}</span></span>
+        <span class="amt">${st ? money(st.p50) : "—"}<small>typical</small></span>
+      </button>`;
+    }).join("")}
+    ${p.at ? `<a class="btn maps" href="${esc(BigMap.mapsLink(p).geo)}"
+       data-web="${esc(BigMap.mapsLink(p).web)}" data-act="openMaps" rel="noopener">
+       ${I.external}Open in maps</a>` : ""}
+    <p class="seedwarn">Badge status comes from accumulated scans, never assigned by hand.
+      A place loses it automatically when prices drift outside the local range.
+      ${p.at ? "Coordinates are approximate placements on the named street, not surveyed addresses." : ""}</p>
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+/* ── màn hình: Nhật ký ────────────────────────────────────── */
+function renderJournal() {
+  const all = journal.all();
+  const byDay = {};
+  for (const e of all) {
+    const d = new Date(e.ts).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+    (byDay[d] = byDay[d] || []).push(e);
+  }
+  const dishes = new Set(all.filter((e) => e.kind !== "cash").map((e) => e.id)).size;
+  const fair = all.filter((e) => e.level === "ok").length;
+  const saved = all.reduce((a, e) => a + (e.over > 0 ? e.over : 0), 0);
+
+  $("#journalBody").innerHTML = `
+    ${crest(wrap(birdStanding(GOLD, THEN), "-16 -10 200 165"), 112, -4, -14)}
+    <p class="kicker">Your trip</p>
+    <h1 class="title">Journal</h1>
+    ${all.length === 0
+      ? `<p class="muted" style="margin-top:14px">Nothing yet. Every scan you make writes itself in here — dishes, prices, places — and you can export it when you get home.</p>`
+      : `<div class="jstat">
+          <div><small>DISHES</small><b>${dishes}</b></div>
+          <div><small>FAIR PRICE</small><b>${fair}/${all.length}</b></div>
+          <div><small>OVERCHARGE SPOTTED</small><b>${saved ? fmtVND(saved).replace("₫","") : "0"}</b></div>
+        </div>
+        ${Object.entries(byDay).map(([d, es]) => `
+          <h2 class="sect">${esc(d)}</h2>
+          ${es.map((e) => `<div class="jrow">
+            <span class="jd" style="background:${e.level==="ok"?"#1F8A70":e.level==="warn"?"#E8A33D":e.level==="high"?"#C0392B":"#7D7565"}"></span>
+            <span><span class="jn">${esc(e.label)}</span><span class="js">${esc(S.prices[e.zone]?.name || "")} · ${esc(e.kind)}</span></span>
+            <span class="ja">${fmtVND(e.price)}</span>
+          </div>`).join("")}`).join("")}
+        <button class="btn sec" data-act="export" style="border-color:rgba(201,162,39,.4);color:#EDE4D2">Export as text</button>
+        <button class="btn sec" data-act="clearJournal" style="border-color:rgba(201,162,39,.25);color:#A99B80">Clear journal</button>`}`;
+}
+
+/* ── màn hình: Tôi ────────────────────────────────────────── */
+/* ── xưởng icon ───────────────────────────────────────────────
+   Ô nhập khoá + lưới icon có nút vẽ lại từng cái.
+
+   Khoá KHÔNG được lưu xuống đĩa. Đổi lại người dùng phải nhập lại sau mỗi
+   lần tải trang — đó là cái giá đúng: một khoá API nằm trong localStorage
+   là lỗ XSS chờ sẵn, bất kỳ script lạ nào lọt vào trang cũng mang nó đi
+   tiêu tiền được.
+
+   Không dùng thẻ <form>: ở đây không có gì để submit, và một <form> lạc
+   trong PWA này chỉ thêm một đường Enter làm tải lại trang.               */
+function iconStudioHTML() {
+  const c = Img.counts();
+  const ready = Img.hasKey();
+  const blocked = Img.isBlocked();
+  const cfg = Img.config();
+
+  const note = blocked
+    ? `<p class="src" role="status" style="color:var(--son-dam)">Requests can't leave this page
+        (CORS, firewall or offline). Using the built-in hand-drawn icons — everything still works.</p>`
+    : ready
+      ? `<p class="src" role="status">${c.done}/${c.total} drawn${c.fail ? ` · ${c.fail} failed` : ""}${c.run ? ` · ${c.run} in queue` : ""}</p>`
+      : `<p class="src">No key yet — the map uses the built-in hand-drawn icons. Everything works without this.</p>`;
+
+  const cell = (it) => {
+    const url = Img.iconOf(it.key);
+    const st = Img.statusOf(it.key);
+    return `<div class="ic-cell${it.group === "photo" ? " wide" : ""}" data-icon-cell="${esc(it.key)}">
+      <span class="ic-art ${st}">${url
+        ? `<img src="${url}" alt="${esc(it.label)}">`
+        /* Placeholder vẽ bằng SVG chứ không dùng ký tự "✎": ký tự đó không
+           có trong Inter nên trình duyệt đi mượn font khác và trên máy này
+           nó ra hình con nhện. Glyph mượn là thứ không kiểm soát được. */
+        : `<i aria-hidden="true">${st === "run" ? I.clock : I.pencil}</i>`}</span>
+      <span class="ic-name">${esc(it.label)}</span>
+      <button class="ic-redo" data-regen="${esc(it.key)}"
+        aria-label="Redraw ${esc(it.label)}"${ready ? "" : " disabled"}>${I.refresh}</button>
+      ${st === "fail" ? `<span class="ic-err">${esc(Img.errorOf(it.key))}</span>` : ""}
+    </div>`;
+  };
+
+  /* Chia nhóm và cho sinh từng nhóm một. Danh mục đầy đủ đã hơn 70 tấm —
+     một nút "Draw all" duy nhất buộc người dùng hoặc trả tiền cho cả bộ
+     hoặc không có gì. Ảnh cơ sở là nhóm đắt nhất và ít cần nhất, nên nó
+     phải tách ra được. */
+  const GROUPS = [
+    ["sight", "Sights and places"], ["food", "Dishes"],
+    ["ui", "Symbols"], ["photo", "Place photos"],
+  ];
+  const sections = GROUPS.map(([g, title]) => {
+    const items = Img.ICON_SET.filter((i) => i.group === g);
+    if (!items.length) return "";
+    const done = items.filter((i) => Img.statusOf(i.key) === "done").length;
+    return `<div class="ic-sect">
+      <div class="sect-row">
+        <span class="spark" aria-hidden="true">${I.spark}</span>
+        <h2>${esc(title)}</h2>
+        <span class="rule" aria-hidden="true"></span>
+        <button class="act" data-gengroup="${g}"${ready ? "" : " disabled"}>
+          ${done}/${items.length}${done < items.length ? " · draw" : " · redraw"}</button>
+      </div>
+      <div class="ic-grid${g === "photo" ? " photos" : ""}">${items.map(cell).join("")}</div>
+    </div>`;
+  }).join("");
+
+  return `<div class="card" id="iconStudio">
+    <div class="manual" style="grid-template-columns:1fr">
+      <input id="aiKey" type="password" inputmode="text" autocomplete="off"
+        placeholder="API key (kept in memory only)" value=""
+        style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;background:#fff">
+      <input id="aiBase" type="url" inputmode="url" autocomplete="off"
+        placeholder="Base URL" value="${esc(cfg.base)}"
+        style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;background:#fff;margin-top:8px">
+    </div>
+    <div class="ic-actions">
+      <button class="btn sec" data-act="aiSave">Use this key</button>
+      <button class="btn sec" data-act="aiGen"${ready ? "" : " disabled"}>Draw all (${c.total})</button>
+      ${c.done ? `<button class="btn sec" data-act="aiClear">Delete saved</button>` : ""}
+    </div>
+    ${note}
+    ${/* Số ảnh là số lần gọi API, tức là tiền. Nói ra trước khi người dùng
+          bấm, không để họ phát hiện sau khi hoá đơn đã chạy. */""}
+    <p class="src">Each image is one API call. Drawing the full set is
+      <b>${c.total} calls</b> — check your provider's per-image price first.</p>
+    ${sections}
+    <p class="src" style="margin-top:10px">The key stays in memory for this session only —
+      reload and you'll enter it again. <b>Images are saved to this device</b> and reloaded
+      next time, so you only pay for each one once. They're stored shrunk, not at full size.</p>
+  </div>`;
+}
+
+/* ── tài khoản ────────────────────────────────────────────────
+   Ba trạng thái, và trạng thái ĐẦU phải nói rõ app không cần cái này:
+   người dùng mở tab You giữa phố cổ mất sóng không được thấy một bức
+   tường đăng nhập chắn trước phần cài đặt vùng. */
+function accountHTML() {
+  const cfg = Auth.isConfigured();
+  const p = Auth.profile();
+  const busy = Auth.statusOf() === "busy";
+  const err = Auth.errorOf();
+
+  if (!cfg) {
+    return `<div class="card" id="acct">
+      <h2 class="sect" style="margin-top:0">Account</h2>
+      <p class="src">Accounts are off. Everything below works without one — scans,
+        map and journal all live on this device.</p>
+      <div class="manual" style="grid-template-columns:1fr">
+        <input id="sbUrl" type="url" inputmode="url" autocomplete="off"
+          placeholder="https://xxxx.supabase.co">
+        <input id="sbKey" type="password" autocomplete="off"
+          placeholder="anon public key" style="margin-top:8px">
+      </div>
+      <button class="btn sec" data-act="authCfg">Connect a Supabase project</button>
+      <p class="src">Project URL and anon key are public values — they ship in every
+        web build. Security comes from Row Level Security on the server, not from
+        hiding them.</p>
+    </div>`;
+  }
+
+  if (Auth.signedIn() || p) {
+    const stale = !Auth.signedIn();
+    return `<div class="card" id="acct">
+      <h2 class="sect" style="margin-top:0">Account</h2>
+      <div class="row" style="pointer-events:none">
+        <span class="dot" data-l="${stale ? "unknown" : "ok"}"></span>
+        <span><span class="nm">${esc(p?.name || p?.email || "Signed in")}</span>
+          <span class="note">${esc(p?.email || "")}${stale ? " · offline, session expired" : ""}</span></span>
+      </div>
+      <div class="manual" style="grid-template-columns:1fr">
+        <input id="acctName" placeholder="Display name" value="${esc(p?.name || "")}">
+      </div>
+      <div class="ic-actions">
+        <button class="btn sec" data-act="authSave"${stale ? " disabled" : ""}>Save name</button>
+        <button class="btn sec" data-act="authOut">Sign out</button>
+      </div>
+      ${stale ? `<p class="src">Showing your saved profile. Reconnect to sync.</p>` : ""}
+    </div>`;
+  }
+
+  return `<div class="card" id="acct">
+    <h2 class="sect" style="margin-top:0">Account</h2>
+    <p class="src">Optional — sign in to carry your journal and saved dishes between devices.</p>
+    <div class="manual" style="grid-template-columns:1fr">
+      <input id="acctEmail" type="email" inputmode="email" autocomplete="username" placeholder="Email">
+      <input id="acctPass" type="password" autocomplete="current-password"
+        placeholder="Password" style="margin-top:8px">
+      <input id="acctName" placeholder="Display name (sign up only)" style="margin-top:8px">
+    </div>
+    <div class="ic-actions">
+      <button class="btn pri" data-act="authIn"${busy ? " disabled" : ""}>${busy ? "Working…" : "Sign in"}</button>
+      <button class="btn sec" data-act="authUp"${busy ? " disabled" : ""}>Create account</button>
+    </div>
+    ${err ? `<div class="warnbox">${I.alert}<span>${esc(err)}</span></div>` : ""}
+    <button class="btn sec" data-act="authForget">Disconnect project</button>
+  </div>`;
+}
+
+function renderMe() {
+  $("#meBody").innerHTML = `
+    ${crest(wrap(birdStanding(SON, GIAY), "-16 -10 200 165"), 104, -2, -14)}
+    <p class="kicker">Settings</p>
+    <h1 class="title">You</h1>
+
+    ${accountHTML()}
+
+    <h2 class="sect">Where you are</h2>
+    <div class="manual" style="grid-template-columns:1fr">
+      <select id="zoneSel" style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;background:#fff">
+        ${Object.entries(S.prices).map(([id, z]) =>
+          `<option value="${id}"${id === S.zone ? " selected" : ""}>${esc(z.name)}</option>`).join("")}
+      </select></div>
+    <button class="btn sec" data-act="locate">Use my location</button>
+
+    <h2 class="sect">Works offline</h2>
+    <div class="card">
+      <h4>${esc(zone().name)} pack</h4>
+      <p class="src" id="cacheState">Checking…</p>
+      <p class="src" style="margin-top:7px">Reference prices, dish knowledge and the text engine are stored on this device. Nothing you scan is uploaded.</p>
+    </div>
+
+    <h2 class="sect">Illustrated icons</h2>
+    ${iconStudioHTML()}
+
+    <h2 class="sect">How verdicts work</h2>
+    <div class="card"><p class="muted" style="font-size:13px">
+      A price is compared with the spread of prices recorded nearby for the same item.
+      At or below the 75th percentile it reads <strong>fair</strong>.
+      Between the 75th and 95th it reads <strong>above 75% of places</strong>.
+      Above the 95th it shows how far past the local median it sits.
+      Nón Lá never labels a business dishonest — it reports the gap and the sample size.</p></div>
+
+    <p class="seedwarn">Reference prices shipping with this build are seed data, not a completed field survey. Replace <code>data/prices.json</code> with surveyed figures before using this with real travellers.</p>`;
+
+  const sel = $("#zoneSel");
+  sel.onchange = () => { S.zone = sel.value; localStorage.setItem("nl.zone", S.zone); toast("Zone set to " + zone().name); renderMe(); };
+  caches?.keys?.().then((k) => {
+    $("#cacheState").textContent = k.length ? `Cached and ready (${k.join(", ")})` : "Not cached yet — reload once while online";
+  }).catch(() => { $("#cacheState").textContent = "Cache status unavailable"; });
+}
+
+/* ── màn hình bản đồ chi tiết ─────────────────────────────
+   Blob ở tab Nearby là hình tóm tắt; chạm vào nó mở bản đồ thật
+   có kéo, phóng, lọc và định vị.                                */
+/* Bản đồ ẩm thực. Mở đè lên như bản đồ chi tiết — giấu thanh nav để tranh
+   chiếm trọn màn hình, và trả lại khi đóng. */
+function openFoodMap() {
+  const geo = S.maps[S.zone];
+  if (!geo) return toast("No map for this area yet");
+  $("#v-foodmap").hidden = false;
+  $(".tabbar").hidden = true;
+  FoodMap.open({
+    host: $("#v-foodmap"), geo, zoneId: S.zone,
+    places: S.places, dishes: S.dishes, eateries: S.eateries || [],
+    assets: S.assets?.icons, icons: I,
+    onOpenPlace: (id) => showPlace(id),
+    onClose: () => { $("#v-foodmap").hidden = true; $(".tabbar").hidden = false; },
+  });
+}
+
+function openBigMap() {
+  const geo = S.maps[S.zone];
+  if (!geo) return toast("No map for this area yet");
+  $("#v-bigmap").hidden = false;
+  $(".tabbar").hidden = true;
+  BigMap.open({
+    zoneId: S.zone, zone: zone(), geo, places: S.places, icons: I,
+    iconOf: markIcon,
+    // Lớp quán ăn mới chỉ nhập cho Hội An. Vùng khác truyền mảng rỗng để
+    // chip Eateries không hiện, thay vì hiện một nút bấm ra danh sách trống.
+    eateries: S.zone === "hoian-oldtown" ? (S.eateries || []) : [],
+    onOpenPlace: (id, m) => showPlace(id, m),
+    onOpenMark: (lm, m) => showMark(lm, m),
+    onOpenEat: (e, m) => showEatery(e, m),
+  });
+}
+
+/* Thẻ một quán lấy từ OpenStreetMap.
+   Quán ở lớp này CHƯA được quét giá lần nào, nên thẻ không có nhãn phán
+   quyết, không có khoảng giá, và nói thẳng điều đó. Đây là chỗ dễ trượt
+   nhất của cả tính năng: chỉ cần mượn cái pill "Fair Price" cho đẹp là
+   app bịa ra một tuyên bố mà không có một lần quét nào chống lưng. */
+function showEatery(e, metres = null) {
+  setEdge(null);
+  const KIND = { restaurant: "Restaurant", cafe: "Café", street: "Street food" };
+  const addr = [e.no, e.street].filter(Boolean).join(" ");
+  const tracked = (S.places || []).find(
+    (p) => p.at && distance(e.at, p.at) < 40 && p.zone === S.zone);
+
+  openSheet(`
+    <h3>${esc(e.name)}</h3>
+    <p class="src">${esc(KIND[e.kind] || "Eatery")}${addr ? ` · ${esc(addr)}` : ""}${
+      e.cuisine ? ` · ${esc(e.cuisine.replace(/[_;]/g, " "))}` : ""}${
+      metres != null ? ` · ${fmtDistance(metres)} away` : ""}</p>
+    <div style="margin-top:9px">${
+      tracked ? `<span class="pill unknown">${I.question}Price data under “${esc(tracked.name)}”</span>`
+              : `<span class="pill unknown">${I.question}No price data yet</span>`}</div>
+    ${wave()}
+    ${e.hours ? `<h2 class="sect">Opening hours</h2>
+      <p class="muted">${esc(e.hours)}</p>` : ""}
+    ${e.veg ? `<div class="warnbox infobox">${I.check}<span>Tagged as serving
+      vegetarian food.</span></div>` : ""}
+
+    <div class="warnbox infobox">${I.clock}<span>Nón Lá has never scanned a menu here, so it
+      has nothing to say about this place's prices — and nothing to say about whether the
+      food is good. Scan a menu to start a record.</span></div>
+
+    ${tracked ? `<h2 class="sect">Tracked as</h2>
+      <button class="row" data-place="${esc(tracked.id)}">
+        <span class="dot" data-l="${tracked.fair === true ? "ok" : tracked.fair === false ? "bad" : "unknown"}"></span>
+        <span><span class="nm">${esc(tracked.name)}</span>
+          <span class="note">${tracked.scans} scans on record</span></span>
+        <span class="amt">→</span>
+      </button>` : ""}
+
+    <a class="btn maps" href="${esc(BigMap.mapsLink({ name: e.name, at: e.at }).geo)}"
+       data-web="${esc(BigMap.mapsLink({ name: e.name, at: e.at }).web)}"
+       data-act="openMaps" rel="noopener">${I.external}Open in maps</a>
+    <p class="seedwarn">Name, address and position from OpenStreetMap contributors (ODbL),
+      not from Nón Lá. Details can be out of date — shops in the old town change hands often.</p>
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+/* Thẻ một điểm tham quan. Tên Việt để to nhất — đó là thứ viết trên biển
+   ngoài phố và là thứ khách phải chỉ vào khi hỏi đường; tên tiếng Anh chỉ
+   để nhận ra mình đang đứng trước cái gì. */
+/* Phải phủ HẾT giá trị `t` có trong maps.json. Thiếu một loại thì thẻ
+   hiện chữ "Sight" chung chung — không sai, nhưng vứt đi thông tin mà
+   dữ liệu vốn đã có. Ba loại church/civic/heritage đến từ đợt nhập
+   OpenStreetMap, không có trong bản viết tay ban đầu. */
+const MARK_KIND = {
+  bridge: "Bridge", hall: "Assembly hall", house: "Old house", temple: "Temple",
+  market: "Market", pier: "Boat pier", museum: "Museum", well: "Well",
+  craft: "Workshop", lake: "Lake", church: "Church", civic: "Civic building",
+  heritage: "Heritage site", sight: "Sight",
+};
+function showMark(lm, metres = null) {
+  setEdge(null);
+  const kind = MARK_KIND[lm.t] || "Sight";
+  const near = S.places
+    .filter((p) => p.zone === S.zone && p.at)
+    .map((p) => ({ p, m: distance(lm.at, p.at) }))
+    .filter((x) => x.m <= 260)
+    .sort((a, b) => a.m - b.m)
+    .slice(0, 3);
+
+  openSheet(`
+    <h3>${esc(lm.n)}</h3>
+    <p class="src">${esc(kind)}${lm.en ? ` · ${esc(lm.en)}` : ""}${metres != null ? ` · ${fmtDistance(metres)} away` : ""}</p>
+    ${wave()}
+    ${lm.note ? `<p class="muted" style="margin-top:2px">${esc(lm.note)}</p>` : ""}
+
+    ${near.length ? `<h2 class="sect">Tracked places within ${fmtDistance(260)}</h2>
+      ${near.map(({ p, m }) => `<button class="row" data-place="${esc(p.id)}">
+        <span class="dot" data-l="${p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown"}"></span>
+        <span><span class="nm">${esc(p.name)}</span>
+          <span class="note">${esc(p.known.map((k) => dishById(k)?.vi || k).join(" · ")) || "—"}</span></span>
+        <span class="amt">${fmtDistance(m)}<small>away</small></span>
+      </button>`).join("")}`
+      : `<div class="warnbox infobox">${I.clock}<span>No place near this sight is being
+        tracked yet. That means no price data — not that the food here is bad.</span></div>`}
+
+    <a class="btn maps" href="${esc(BigMap.mapsLink({ name: lm.n, at: lm.at }).geo)}"
+       data-web="${esc(BigMap.mapsLink({ name: lm.n, at: lm.at }).web)}"
+       data-act="openMaps" rel="noopener">${I.external}Open in maps</a>
+    <p class="seedwarn">Nón Lá does not rank sights or recommend restaurants. This position is
+      unsurveyed seed data — good enough to orient by, not to navigate by.</p>
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+/* Mở tuyến đi bộ của vùng đang chọn. Vùng nào chưa có tuyến thì nói thẳng,
+   không mở ra một màn hình trống rồi để người dùng tự đoán. */
+function openWalk() {
+  const geo = S.maps[S.zone];
+  const def = geo?.routes?.[0];
+  if (!def) return toast("No walking route for this area yet");
+  const route = resolveRoute(def, geo, S.places);
+  if (!route) return toast("That route is missing its stops");
+  $("#v-bigmap").hidden = false;
+  $(".tabbar").hidden = true;
+  BigMap.openRoute({
+    zoneId: S.zone, zone: zone(), geo, places: S.places, icons: I, route, iconOf: markIcon,
+    onOpenStop: null,
+  });
+}
+
+function closeBigMap() {
+  BigMap.close();
+  $("#v-bigmap").hidden = true;
+  $(".tabbar").hidden = false;
+  $("#v-bigmap").innerHTML = "";
+}
+
+/* ── định tuyến ───────────────────────────────────────────── */
+const TABS = [
+  { id: "map", label: "Nearby", icon: '<path d="M8 2 2 4v12l6-2 6 2 6-2V2l-6 2Z"/><path d="M8 2v12M14 4v12"/>' },
+  { id: "eat", label: "Eat", icon: '<path d="M2.5 9.5h13a6.5 6.5 0 0 1-13 0Z"/><path d="M5.8 7c0-1.1.9-1.1.9-2.2M9 6.6c0-1.1.9-1.1.9-2.2"/><path d="M12.4 8.4 18.6 3M13.6 9.4 19.4 4.6"/>' },
+  { id: "scan", label: "", icon: "" },
+  { id: "journal", label: "Journal", icon: '<path d="M3 3h6a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H3Z"/><path d="M17 3h-2a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h3Z"/>' },
+  { id: "me", label: "You", icon: '<circle cx="10" cy="6.5" r="3.5"/><path d="M3.5 17a6.5 6.5 0 0 1 13 0"/>' },
+];
+function renderTabs() {
+  $("#tabbar").innerHTML = TABS.map((t) => t.id === "scan"
+    ? `<button class="scanbtn" id="scanBtn" aria-label="Scan">${sunStar(25, GOLD)}</button>`
+    : `<button class="tab" data-tab="${t.id}"${S.tab === t.id ? ' aria-current="page"' : ""}>
+        <svg viewBox="0 0 20 20" aria-hidden="true">${t.icon}</svg><span>${t.label}</span></button>`).join("");
+}
+function go(tab) {
+  // Thẻ kết quả và viền cảnh báo nằm ở cấp #app nên chúng KHÔNG tự biến mất
+  // khi đổi tab nữa. Trước đây chúng nằm trong #v-scan và được `hidden` che hộ;
+  // sau khi tách ra, một cảnh báo đỏ từ lần quét trước còn treo trên tab Eat.
+  closeSheet();
+  // Bản đồ xem trước giữ một ResizeObserver; rời tab mà không gỡ thì mỗi lần
+  // quay lại lại chồng thêm một cái nữa và khung vẽ lại nhiều lần mỗi frame.
+  if (tab !== "map") { S.exMap?.destroy(); S.exMap = null; }
+  S.tab = tab;
+  for (const t of ["scan", "eat", "map", "journal", "me"]) $("#v-" + t).hidden = t !== tab;
+  renderTabs();
+  if (tab === "scan") {
+    startCam();                            // không await: xin quyền có thể treo
+    /* Nạp trước máy đọc chữ. Người dùng báo "ấn chụp xong chờ lâu" — cái
+       chậm không phải camera mà là Tesseract: lần quét đầu phải kéo ~5MB
+       traineddata tiếng Việt về. Kéo ngay lúc MỞ tab thì nó tải trong lúc
+       người ta còn đang ngắm thực đơn, tới khi bấm là sẵn sàng.
+       Không await và nuốt lỗi: đây là tối ưu, hỏng thì đường quét cũ vẫn
+       tự nạp như trước. */
+    if (!S.worker && !S._ocrWarm) {
+      S._ocrWarm = true;
+      warmOCR().catch(() => { S._ocrWarm = false; });
+    }
+  }
+  if (tab === "eat") renderEat();
+  if (tab === "map") renderMap();
+  if (tab === "journal") renderJournal();
+  if (tab === "me") renderMe();
+}
+
+/* ── sự kiện ──────────────────────────────────────────────── */
+document.addEventListener("click", async (ev) => {
+  const el = (s) => ev.target.closest(s);
+
+  if (el("#scanBtn")) {
+    if (S.tab !== "scan") return go("scan");
+    return doScan();
+  }
+  const tb = el("[data-tab]"); if (tb) return go(tb.dataset.tab);
+
+  const md = el(".mode");
+  if (md) {
+    S.mode = md.dataset.mode;
+    $$(".mode").forEach((b) => b.setAttribute("aria-pressed", String(b === md)));
+    $("#hint").textContent = { menu: "Point at a menu and tap the button",
+      cash: "Lay the notes flat, big number facing up",
+      bill: "Point at the bill you were just given",
+      dish: "Point at the food itself — needs a connection" }[S.mode];
+    closeSheet();
+    return;
+  }
+
+  if (el("[data-act='close']")) return closeSheet();
+
+  const sy = el("[data-say]"); if (sy) return say(sy.dataset.say);
+
+  const pl = el("[data-place]");
+  if (pl && pl.dataset.place) return showPlace(pl.dataset.place);
+
+  const dd = el("[data-dish]");
+  if (dd && dd.dataset.dish) return showDish(dd.dataset.dish);
+
+  if (el("[data-act='allPlaces']")) { S.showAll = !S.showAll; renderMap(); return; }
+  if (el("[data-act='goScan']")) return go("scan");
+
+  // ── tab Nearby: bộ lọc và định vị ──
+  const exf = el("[data-exf]");
+  if (exf) {
+    if (exf.dataset.exf === S.exFilter) return;
+    S.exFilter = exf.dataset.exf;
+    renderMap();
+    return;
+  }
+  // ── tuyến đi bộ ──
+  if (el("[data-act='openRoute']")) return openWalk();
+  if (el("[data-act='rtPlay']")) {
+    const on = BigMap.toggleRun();
+    return toast(on ? "Walking — a stop every few seconds" : "Paused");
+  }
+  const stp = el("[data-stop]");
+  if (stp) return BigMap.setStop(Number(stp.dataset.stop));
+  if (el("[data-act='rtAudio']")) return toast("Audio guide arrives with the community layer");
+  if (el("[data-act='rtSave']")) {
+    const st = BigMap.routeState();
+    if (!st) return;
+    S.saved.has(st.route.id) ? S.saved.delete(st.route.id) : S.saved.add(st.route.id);
+    return toast(S.saved.has(st.route.id) ? "Saved to My List" : "Removed from My List");
+  }
+  if (el("[data-act='rtShare']")) {
+    const st = BigMap.routeState();
+    if (!st) return;
+    const txt = `${st.route.name} — ${st.route.stops.length} stops, ${st.route.totalMin} min\n`
+      + st.route.stops.map((s, i) => `${i + 1}. ${s.name}`).join("\n");
+    // Web Share API chỉ có trên một số trình duyệt; không có thì chép vào
+    // clipboard. Im lặng không làm gì là cách tệ nhất.
+    if (navigator.share) return navigator.share({ title: st.route.name, text: txt }).catch(() => {});
+    return navigator.clipboard?.writeText(txt)
+      .then(() => toast("Route copied"), () => toast("Could not share on this device"));
+  }
+
+  /* Chỉ đường tới một địa điểm. Có vị trí người dùng thì gửi cả điểm đầu,
+     không thì chỉ gửi điểm đến — app bản đồ của máy tự lấy vị trí hiện tại.
+     Lược đồ geo: là cách hợp lệ duy nhất để có chỉ đường thật mà không
+     nhúng bản đồ bên thứ ba; máy nào không nhận thì rơi về OpenStreetMap. */
+  const go2 = el("[data-goto]");
+  if (go2) {
+    const [la, lo] = go2.dataset.goto.split(",").map(Number);
+    const name = go2.dataset.goname || "";
+    const web = S.me
+      ? `https://www.openstreetmap.org/directions?engine=fossgis_osrm_foot&route=${S.me[0]},${S.me[1]};${la},${lo}`
+      : `https://www.openstreetmap.org/?mlat=${la}&mlon=${lo}#map=18/${la}/${lo}`;
+    const a = document.createElement("a");
+    a.href = `geo:${la},${lo}?q=${la},${lo}(${encodeURIComponent(name)})`;
+    a.rel = "noopener";
+    a.click();
+    setTimeout(() => { if (!document.hidden) window.open(web, "_blank", "noopener"); }, 700);
+    if (S.me) toast(`${fmtDistance(distance(S.me, [la, lo]))} away — opening directions`);
+    return;
+  }
+
+  // ── bản đồ ẩm thực ──
+  if (el("[data-act='foodMap']")) return openFoodMap();
+  if (!$("#v-foodmap").hidden && FoodMap.tap(el)) return;
+
+  // ── tài khoản ──
+  if (el("[data-act='authCfg']")) {
+    const u = $("#sbUrl")?.value, k = $("#sbKey")?.value;
+    if (!Auth.configure(u, k)) return toast("Need a project URL and an anon key");
+    renderMe();
+    return toast("Project connected");
+  }
+  if (el("[data-act='authForget']")) { Auth.configure("", ""); renderMe(); return toast("Project disconnected"); }
+  if (el("[data-act='authIn']") || el("[data-act='authUp']")) {
+    const up = !!el("[data-act='authUp']");
+    const em = $("#acctEmail")?.value?.trim(), pw = $("#acctPass")?.value || "";
+    if (!em || pw.length < 6) return toast("Email and a password of 6+ characters");
+    renderMe();
+    try {
+      if (up) {
+        const r = await Auth.signUp(em, pw, $("#acctName")?.value?.trim());
+        toast(r.needsEmailConfirm ? "Check your email to confirm" : "Account created");
+      } else { await Auth.signIn(em, pw); toast("Signed in"); }
+    } catch (e) { toast(e.message || "Could not sign in"); }
+    renderMe();
+    return;
+  }
+  if (el("[data-act='authSave']")) {
+    try { await Auth.updateProfile({ name: $("#acctName")?.value?.trim() || "" }); toast("Saved"); }
+    catch (e) { toast(e.message || "Could not save"); }
+    renderMe();
+    return;
+  }
+  if (el("[data-act='authOut']")) { await Auth.signOut(); renderMe(); return toast("Signed out"); }
+
+  // ── xưởng icon ──
+  if (el("[data-act='aiSave']")) {
+    const k = $("#aiKey")?.value || "";
+    if (k.trim().length < 9) return toast("Paste an API key first");
+    Img.setKey(k, $("#aiBase")?.value);
+    // Xoá ô ngay sau khi nhận: khoá không nên nằm lại trong DOM để một
+    // ảnh chụp màn hình hay một extension đọc được.
+    $("#aiKey").value = "";
+    renderMe();
+    return toast("Key accepted — kept in memory only");
+  }
+  if (el("[data-act='aiGen']")) {
+    const r = Img.generate();
+    return toast(r.queued ? `Drawing ${r.queued} images…`
+      : r.reason === "no-key" ? "Add a key first" : "All images already drawn");
+  }
+  const gg = el("[data-gengroup]");
+  if (gg) {
+    if (!Img.hasKey()) return toast("Add a key first");
+    const g = gg.dataset.gengroup;
+    const keys = Img.ICON_SET.filter((i) => i.group === g).map((i) => i.key);
+    const pending = keys.filter((k) => Img.statusOf(k) !== "done");
+    // Nhóm đã xong hết thì bấm lần nữa nghĩa là VẼ LẠI — đó là tiêu tiền
+    // lần hai, nên phải hỏi trước chứ không lặng lẽ chạy.
+    if (!pending.length) {
+      if (!confirm(`Redraw all ${keys.length} images in this group? That's ${keys.length} new API calls.`))
+        return;
+      const r = Img.generate(keys, { force: true });
+      return toast(`Redrawing ${r.queued} images…`);
+    }
+    const r = Img.generate(pending);
+    return toast(`Drawing ${r.queued} images…`);
+  }
+  if (el("[data-act='aiClear']")) {
+    if (!confirm("Delete every saved image from this device? You'll pay to draw them again."))
+      return;
+    Img.clearStore().then(() => { renderMe(); toast("Saved images deleted"); });
+    return;
+  }
+  const rg = el("[data-regen]");
+  if (rg) {
+    if (!Img.hasKey()) return toast("Add a key first");
+    Img.generate([rg.dataset.regen], { force: true });
+    return toast("Redrawing…");
+  }
+
+  if (el("[data-act='exFilterInfo']")) {
+    return toast("Filters read your scans: badge, above-range, drinks and street stalls");
+  }
+  if (el("[data-act='exLocate']")) {
+    if (!navigator.geolocation) return toast("This device has no location");
+    toast("Finding you…");
+    return navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        S.me = [pos.coords.latitude, pos.coords.longitude];
+        S.exMap?.setMe(S.me);
+        // Ở nhà cách vùng 800km thì chấm định vị nằm ngoài khung — nói thẳng
+        // ra thay vì để người dùng đi tìm một chấm không bao giờ xuất hiện.
+        const far = distance(S.me, S.maps[S.zone]?.center || S.me) > 20000;
+        toast(far ? "You're outside this area — map stayed put" : "Found you");
+      },
+      () => toast("Could not get your location"),
+      { timeout: 8000, enableHighAccuracy: true });
+  }
+
+  // ── màn hình bản đồ ──
+  if (el("[data-act='bigMap']")) return openBigMap();
+  if (el("[data-act='bmClose']")) return closeBigMap();
+  if (el("[data-act='bmIn']")) return BigMap.zoom(1.5);
+  if (el("[data-act='bmOut']")) return BigMap.zoom(1 / 1.5);
+  if (el("[data-act='bmLocate']")) {
+    toast("Finding you…");
+    return BigMap.locate().then(
+      ({ far }) => toast(far ? "You're outside this area — map stayed put" : "Found you"),
+      () => toast("Could not get your location"));
+  }
+  const bmf = el("[data-bmf]");
+  if (bmf) return BigMap.setFilter(bmf.dataset.bmf);
+  const pin = el("[data-pin]");
+  if (pin) return BigMap.select(pin.dataset.pin);
+  const mark = el("[data-mark]");
+  if (mark) return BigMap.selectMark(Number(mark.dataset.mark));
+  if (el("[data-act='dishPick']")) {
+    const id = $("#dishPick")?.value;
+    if (id) return showDish(id);
+  }
+  if (el("[data-act='bmMode']")) {
+    const r = BigMap.toggleMode();
+    if (r.mode !== "3d") return toast("Flat view — best for reading street names");
+    // Tự phóng thì phải nói, không thì người dùng tưởng bản đồ nhảy lung tung.
+    return toast(r.zoomed ? "3D view — zoomed in so the buildings fit"
+                          : "3D view — tilted, shows buildings");
+  }
+  if (el("[data-act='bmEat']")) {
+    const r = BigMap.toggleEat();
+    // Bật lớp ở mức thu xa thì chưa vẽ gì. Nói ra lý do, đừng để người dùng
+    // bấm rồi tưởng nút hỏng.
+    if (r.on && !r.zoomedEnough) toast("Zoom in to see eateries");
+    return;
+  }
+  const eat = el("[data-eat]");
+  if (eat) return BigMap.selectEat(Number(eat.dataset.eat));
+  // Liên kết geo: chỉ mở được khi máy có app bản đồ. Không có thì rơi
+  // về OpenStreetMap trên web — không im lặng nuốt cú chạm của người dùng.
+  const om = el("[data-act='openMaps']");
+  if (om) {
+    const web = om.dataset.web;
+    setTimeout(() => { if (!document.hidden) window.open(web, "_blank", "noopener"); }, 700);
+    return;
+  }
+  if (el("[data-act='share']")) return toast("Sharing arrives with the community layer");
+  if (el("[data-act='save']")) return toast("Saved to this device");
+  if (el("[data-act='notif']")) return toast("No alerts right now");
+
+  const mn = el("[data-act='manual']");
+  if (mn) {
+    const a = $("#mName").value.trim(), b = $("#mPrice").value.trim();
+    if (mn.dataset.kind === "cash") {
+      const denom = parsePrice(a) ?? parseInt(a.replace(/\D/g, ""), 10);
+      const count = Math.max(1, parseInt(b.replace(/\D/g, ""), 10) || 1);
+      if (!denom) return toast("Type a banknote value, e.g. 500000");
+      return showCashResult(Array(count).fill(String(denom)).join(" "));
+    }
+    const price = parsePrice(b);
+    if (!a || !price) return toast("Type an item and a price, e.g. Cao lầu / 55000");
+    const rows = judgeRows([{ name: a, price }]);
+    showMenuResult(rows, null); logScan(rows, "manual");
+    return;
+  }
+
+  if (el("[data-act='locate']")) {
+    if (!navigator.geolocation) return toast("Location not available");
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        S.zone = pickZone(S.prices, { lat: p.coords.latitude, lng: p.coords.longitude }, S.zone);
+        localStorage.setItem("nl.zone", S.zone);
+        toast("Zone set to " + zone().name); renderMe();
+      },
+      () => toast("Could not get your location"), { timeout: 8000 });
+    return;
+  }
+
+  if (el("[data-act='clearJournal']")) { journal.clear(); renderJournal(); return toast("Journal cleared"); }
+
+  if (el("[data-act='export']")) {
+    const txt = journal.all().map((e) =>
+      `${new Date(e.ts).toLocaleString("en-GB")}  ${e.label}  ${fmtVND(e.price)}  ${e.level}`).join("\n");
+    navigator.clipboard?.writeText(txt).then(() => toast("Journal copied to clipboard"),
+      () => toast("Copy failed — long-press to select"));
+    return;
+  }
+});
+
+document.addEventListener("input", (ev) => {
+  if (ev.target.id === "eatSearch") {
+    const v = ev.target.value;
+    renderEat(v);
+    const i = $("#eatSearch"); i.focus(); i.setSelectionRange(v.length, v.length);
+  }
+});
+
+/* ── hoạ tiết nền ─────────────────────────────────────────
+   Chỉ còn MỘT dấu chìm: dải mây xoắn dưới ô số liệu tab Nearby.
+   Sơn một lần lúc khởi động rồi thôi — đây là ảnh nền tĩnh.
+
+   Mặt trống đồng sau mỗi màn hình, dải răng cưa dưới thanh nav và
+   mây góc thẻ đều đã GỠ. Cả ba lấy ảnh từ assets/icons/*.webp, mà
+   những tệp đó lưu không kênh alpha (_shrink.py convert("RGB")) nên
+   dùng làm dấu chìm thì hiện ra một khối chữ nhật đục đè lên nền —
+   thấy rõ nhất ở màn Journal trống và ở mép dưới thanh nav.
+
+   Lớp còn lại này dựng BẰNG CODE nên nền thật sự trong suốt. Đó cũng
+   là lằn ranh: dấu chìm thì vẽ bằng code, ảnh sinh sẵn chỉ dùng ở chỗ
+   có khung riêng (ghim bản đồ, ô ảnh món).                          */
+function paintMotifs() {
+  const style = document.createElement("style");
+  style.textContent = `
+    .ex-stats::after{background-image:${dataURI(cloudBand(GOLD, GIAY, 5, "line"))}}
+  `;
+  document.head.appendChild(style);
+}
+
+/* Dấu nổi linh vật đặt góc trên phải của một màn hình */
+const crest = (svg, w = 108, top = 4, right = -12) =>
+  `<div class="crest" style="width:${w}px;top:${top}px;right:${right}px">${svg}</div>`;
+
+/* ── khởi động ────────────────────────────────────────────── */
+async function boot() {
+  // cache:"no-cache" buộc kiểm lại với máy chủ trước khi dùng bản đã lưu.
+  // Với app này, một file giá cũ nằm trong cache nghĩa là hiển thị SAI SỐ TIỀN
+  // cho người dùng — không phải chuyện chậm vài trăm mili giây.
+  const load = (u) => fetch(u, { cache: "no-cache" }).then((r) => r.json());
+  // eateries.json là lớp "quanh đây có gì" lấy từ OpenStreetMap, KHÔNG phải
+  // dữ liệu giá. Thiếu nó thì bản đồ vẫn chạy đủ — nên .catch về rỗng chứ
+  // không để Promise.all đánh sập cả lượt khởi động vì một lớp phụ.
+  const [d, p, pl, mp, ea, ax, fm] = await Promise.all([
+    load("data/dishes.json"), load("data/prices.json"), load("data/places.json"),
+    load("data/maps.json"),
+    load("data/eateries.json").catch(() => ({ eateries: [] })),
+    // Chỉ mục ảnh ship kèm. Thăm dò từng file bằng 72 request 404 thì vừa
+    // chậm vừa làm bẩn log — một tệp chỉ mục rẻ hơn nhiều.
+    load("assets/index.json").catch(() => ({ icons: [], photos: [] })),
+    // Quán nổi tiếng theo báo chí — thiếu cũng không sao, app vẫn chạy đủ.
+    load("data/famous.json").catch(() => ({ places: [] })),
+  ]);
+  S.assets = { icons: new Set(ax.icons || []), photos: new Set(ax.photos || []) };
+  S.famous = fm.places || [];
+  S.maps = mp.zones;
+  S.dishes = d.dishes; S.prices = p.zones; S.places = pl.places;
+  S.fx = p._fx || null;
+  S.eateries = ea.eateries || [];
+  S.eatSource = ea._source || "";
+
+  /* Danh mục ảnh sinh từ CHÍNH dữ liệu, không chép tay sang imgsvc.js.
+     Thêm một món vào dishes.json là nó tự có mục icon; chép tay thì bản
+     sao lệch ngay lần đầu và món mới im lặng không bao giờ có ảnh. */
+  Img.registerIcons([
+    ...S.dishes.map((d) => ({
+      key: d.id, group: "food", label: d.vi,
+      subject: `a Vietnamese dish of ${d.en || d.vi}${d.desc ? `, ${d.desc}` : ""}`,
+    })),
+    /* Ảnh cơ sở: KHÔNG đưa tên quán vào prompt. Mô hình sẽ vẽ tên đó lên
+       biển hiệu, và một tấm ảnh có biển tên giả là nói dối người dùng về
+       nơi họ sắp bước vào. Chỉ tả loại hình và con phố. */
+    /* Mọi vùng, không chỉ vùng đang mở: đăng ký chạy đúng một lần lúc
+       khởi động, nên lọc theo S.zone ở đây nghĩa là đổi sang Hà Nội thì
+       cơ sở bên đó vĩnh viễn không có mục ảnh nào. */
+    ...S.places.map((p) => ({
+      key: `place:${p.id}`, group: "photo", label: p.name,
+      subject: `a ${p.tier === "street" ? "street-side food stall" : "small casual eatery"}`
+        + ` on ${p.street} in the Hoi An old town, serving `
+        + p.known.map((k) => S.dishes.find((d) => d.id === k)?.en || k).join(" and "),
+    })),
+  ]);
+  // Ảnh của những lần chạy trước — người dùng đã trả tiền rồi, không sinh lại.
+  // onChange bên trong restore() đã tự vẽ lại Icon Studio nếu đang mở.
+  Img.restore();
+  // Phiên đăng nhập: khôi phục ngầm, không bao giờ chặn khởi động.
+  Auth.restore().then(() => { if (S.tab === "me") renderMe(); });
+  if (!S.prices[S.zone]) S.zone = Object.keys(S.prices)[0];
+  S.ready = true;
+
+  $("#reticle").innerHTML = reticleSVG();
+  $("#lantern").innerHTML = lanternSVG;
+  paintMotifs();
+
+  // Đăng ký service worker TRƯỚC khi chạm vào camera. Hộp thoại xin quyền
+  // camera có thể treo vô hạn và sẽ nuốt mất bước này nếu đặt sau.
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    try {
+      await navigator.serviceWorker.register("sw.js");
+      $("#offlineBadge").style.display = "flex";
+    } catch (e) { console.warn("SW register failed:", e); }
+  }
+
+  go("scan");
+  window.addEventListener("offline", () => toast("Offline — everything still works"));
+}
+
+/* Icon sinh xong thì vẽ lại chỗ đang hiện nó. Chỉ vẽ lại tab You khi tab
+   You đang mở — dựng lại một màn hình đang ẩn là công vứt đi, và nó xoá
+   mất trạng thái cuộn của màn hình người dùng đang đứng. */
+Img.onChange(() => {
+  if (S.tab === "me") {
+    const st = document.querySelector("#iconStudio");
+    if (st) st.outerHTML = iconStudioHTML();
+  }
+  if (!$("#v-bigmap").hidden) BigMap.refreshIcons();
+});
+
+// cho phép kiểm thử pipeline mà không cần camera
+window.__nonla = { S, handleText, judgeRows, go, showDish, showPlace, ocr, doScan, Img };
+
+boot().catch((e) => { console.error(e); document.body.innerHTML =
+  `<pre style="color:#fff;padding:20px;font:13px monospace">Failed to start: ${esc(e.message)}</pre>`; });

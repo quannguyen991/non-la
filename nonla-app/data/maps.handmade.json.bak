@@ -1,0 +1,695 @@
+{
+  "_note": "Bản đồ định hướng vẽ tay, neo theo toạ độ thật. KHÔNG phải bản đồ khảo sát và không thay thế bản đồ dẫn đường — app có nút mở sang ứng dụng bản đồ của máy. Hình học đơn giản hoá để chạy được offline: không tile, không thư viện, không gọi mạng. Toạ độ landmark là DỮ LIỆU HẠT GIỐNG chưa khảo sát thực địa — đủ để định hướng tương đối trong lưới phố, KHÔNG đủ để dẫn đường. Sai số có thể tới hàng chục mét, mà trong phố cổ chừng đó là nhầm sang dãy phố khác. Phải đo lại trước khi đưa cho khách du lịch dùng; giao diện tự khai điều này ở chân bản đồ.",
+  "zones": {
+    "hoian-oldtown": {
+      "center": [
+        15.877,
+        108.3285
+      ],
+      "spanM": 1100,
+      "water": [
+        [
+          [
+            15.8752,
+            108.322
+          ],
+          [
+            15.8747,
+            108.326
+          ],
+          [
+            15.8744,
+            108.33
+          ],
+          [
+            15.8746,
+            108.334
+          ],
+          [
+            15.873,
+            108.334
+          ],
+          [
+            15.873,
+            108.322
+          ]
+        ]
+      ],
+      "streets": [
+        {
+          "n": "Trần Phú",
+          "w": 3,
+          "l": [
+            [
+              15.87775,
+              108.3245
+            ],
+            [
+              15.8776,
+              108.328
+            ],
+            [
+              15.87745,
+              108.3315
+            ]
+          ]
+        },
+        {
+          "n": "Nguyễn Thái Học",
+          "w": 3,
+          "l": [
+            [
+              15.8768,
+              108.3248
+            ],
+            [
+              15.87665,
+              108.3282
+            ],
+            [
+              15.8765,
+              108.3312
+            ]
+          ]
+        },
+        {
+          "n": "Bạch Đằng",
+          "w": 3,
+          "l": [
+            [
+              15.8758,
+              108.3252
+            ],
+            [
+              15.87565,
+              108.3286
+            ],
+            [
+              15.8755,
+              108.3315
+            ]
+          ]
+        },
+        {
+          "n": "Phan Châu Trinh",
+          "w": 3,
+          "l": [
+            [
+              15.87905,
+              108.326
+            ],
+            [
+              15.87895,
+              108.3295
+            ],
+            [
+              15.87885,
+              108.3325
+            ]
+          ]
+        },
+        {
+          "n": "Lê Lợi",
+          "w": 2,
+          "l": [
+            [
+              15.8796,
+              108.327
+            ],
+            [
+              15.8756,
+              108.3274
+            ]
+          ]
+        },
+        {
+          "n": "Nguyễn Huệ",
+          "w": 2,
+          "l": [
+            [
+              15.8796,
+              108.3302
+            ],
+            [
+              15.8756,
+              108.3306
+            ]
+          ]
+        },
+        {
+          "n": "Hoàng Diệu",
+          "w": 2,
+          "l": [
+            [
+              15.8795,
+              108.3318
+            ],
+            [
+              15.876,
+              108.3321
+            ]
+          ]
+        },
+        {
+          "n": "Châu Thượng Văn",
+          "w": 2,
+          "l": [
+            [
+              15.8795,
+              108.3243
+            ],
+            [
+              15.876,
+              108.3247
+            ]
+          ]
+        }
+      ],
+      "landmarks": [
+        {
+          "n": "Chùa Cầu",
+          "en": "Japanese Covered Bridge",
+          "t": "bridge",
+          "at": [
+            15.8772,
+            108.3266
+          ],
+          "note": "The 18th-century covered bridge on the 20,000₫ note. Ticketed to cross.",
+          "star": true
+        },
+        {
+          "n": "Nhà cổ Phùng Hưng",
+          "en": "Phung Hung Old House",
+          "t": "house",
+          "at": [
+            15.87695,
+            108.3262
+          ],
+          "note": "Two-storey merchant house beside the bridge. Trapdoor in the floor for flood season."
+        },
+        {
+          "n": "Hội quán Quảng Đông",
+          "en": "Cantonese Assembly Hall",
+          "t": "hall",
+          "at": [
+            15.87765,
+            108.327
+          ],
+          "note": "Cantonese congregation hall. Red-and-gold courtyard, dragon fountain."
+        },
+        {
+          "n": "Xưởng thủ công mỹ nghệ",
+          "en": "Handicraft Workshop",
+          "t": "craft",
+          "at": [
+            15.87672,
+            108.3268
+          ],
+          "note": "Working silk and lantern workshop. Short traditional music sets through the day."
+        },
+        {
+          "n": "Bảo tàng Văn hoá Sa Huỳnh",
+          "en": "Sa Huynh Culture Museum",
+          "t": "museum",
+          "at": [
+            15.87768,
+            108.3276
+          ],
+          "note": "Burial jars and bronze from the Sa Huynh culture, 2,000 years before the port."
+        },
+        {
+          "n": "Nhà cổ Tấn Ký",
+          "en": "Tan Ky Old House",
+          "t": "house",
+          "at": [
+            15.87668,
+            108.328
+          ],
+          "note": "Seven generations of one family. Japanese, Chinese and Vietnamese joinery in one room.",
+          "star": true
+        },
+        {
+          "n": "Hội quán Phúc Kiến",
+          "en": "Fujian Assembly Hall",
+          "t": "hall",
+          "at": [
+            15.8774,
+            108.329
+          ],
+          "note": "The largest assembly hall. Dedicated to Thiên Hậu, protector of sailors.",
+          "star": true
+        },
+        {
+          "n": "Giếng Bá Lễ",
+          "en": "Ba Le Well",
+          "t": "well",
+          "at": [
+            15.8783,
+            108.3287
+          ],
+          "note": "Cham-era well down a narrow alley. Cao lầu is said to need this water."
+        },
+        {
+          "n": "Nhà thờ tộc Trần",
+          "en": "Tran Family Chapel",
+          "t": "house",
+          "at": [
+            15.8789,
+            108.3272
+          ],
+          "note": "Private ancestral chapel in a walled garden. Still used by the family."
+        },
+        {
+          "n": "Chùa Ông",
+          "en": "Quan Cong Temple",
+          "t": "temple",
+          "at": [
+            15.87752,
+            108.3303
+          ],
+          "note": "Temple to general Quan Công, facing the market. Traders came here to swear oaths."
+        },
+        {
+          "n": "Chợ Hội An",
+          "en": "Hoi An Market",
+          "t": "market",
+          "at": [
+            15.8768,
+            108.3298
+          ],
+          "note": "Produce in the morning, cooked food all day. The cheapest prices in the old town.",
+          "star": true
+        },
+        {
+          "n": "Bến thuyền Bạch Đằng",
+          "en": "Bach Dang Boat Pier",
+          "t": "pier",
+          "at": [
+            15.87562,
+            108.329
+          ],
+          "note": "Where the paper-lantern boats launch after dark. Agree the fare before boarding."
+        }
+      ],
+      "art": {
+        "_note": "Tranh vẽ tay dùng làm nền. KHÔNG phải bản đồ khảo sát: bố cục phố trong tranh là ấn tượng của người vẽ. Hai mốc dưới đây neo Chùa Cầu vào đúng cây cầu trong tranh và ấn định tỉ lệ + góc xoay, nên KHOẢNG CÁCH VÀ HƯỚNG GIỮA CÁC GHIM là thật; vị trí tuyệt đối so với từng mái nhà trong tranh thì không. Bản đồ chính xác là bản vector ở Open full map.",
+        "src": "assets/maps/hoian-oldtown.jpg",
+        "w": 1536,
+        "h": 1024,
+        "alt": "Illustrated aerial view of Hoi An Old Town: tiled roofs, the Japanese Covered Bridge and the river",
+        "anchors": [
+          {
+            "at": [
+              15.8772,
+              108.3266
+            ],
+            "px": [
+              700,
+              415
+            ]
+          },
+          {
+            "at": [
+              15.8772,
+              108.328468
+            ],
+            "px": [
+              951.7,
+              537.7
+            ]
+          }
+        ]
+      },
+      "routes": [
+        {
+          "id": "lantern-walk",
+          "name": "Lantern Walk Route",
+          "blurb": "Wander slowly, greet locals, and let Hội An find you.",
+          "stops": [
+            {
+              "ref": "sight:0",
+              "tip": "Visit at sunset for the best lantern reflections on the water."
+            },
+            {
+              "ref": "sight:5",
+              "tip": "Ask to see the flood marks on the wall — they go up past head height."
+            },
+            {
+              "ref": "sight:6",
+              "tip": "The courtyard is quietest just after it opens."
+            },
+            {
+              "ref": "sight:11",
+              "tip": "Agree the boat price before stepping in, and count the lanterns you get."
+            }
+          ]
+        }
+      ]
+    },
+    "hanoi-hoankiem": {
+      "center": [
+        21.0335,
+        105.852
+      ],
+      "spanM": 1400,
+      "water": [
+        [
+          [
+            21.0306,
+            105.8518
+          ],
+          [
+            21.03,
+            105.8528
+          ],
+          [
+            21.0278,
+            105.853
+          ],
+          [
+            21.0266,
+            105.8522
+          ],
+          [
+            21.027,
+            105.8511
+          ],
+          [
+            21.0295,
+            105.8508
+          ]
+        ]
+      ],
+      "streets": [
+        {
+          "n": "Hàng Bạc",
+          "w": 3,
+          "l": [
+            [
+              21.034,
+              105.8504
+            ],
+            [
+              21.0339,
+              105.8532
+            ]
+          ]
+        },
+        {
+          "n": "Hàng Buồm",
+          "w": 3,
+          "l": [
+            [
+              21.0351,
+              105.8503
+            ],
+            [
+              21.035,
+              105.8534
+            ]
+          ]
+        },
+        {
+          "n": "Đinh Liệt",
+          "w": 2,
+          "l": [
+            [
+              21.0346,
+              105.852
+            ],
+            [
+              21.0327,
+              105.8522
+            ]
+          ]
+        },
+        {
+          "n": "Tạ Hiện",
+          "w": 2,
+          "l": [
+            [
+              21.0347,
+              105.8511
+            ],
+            [
+              21.0331,
+              105.8513
+            ]
+          ]
+        },
+        {
+          "n": "Hàng Quạt",
+          "w": 2,
+          "l": [
+            [
+              21.0345,
+              105.8496
+            ],
+            [
+              21.033,
+              105.85
+            ]
+          ]
+        },
+        {
+          "n": "Đinh Tiên Hoàng",
+          "w": 3,
+          "l": [
+            [
+              21.0323,
+              105.8522
+            ],
+            [
+              21.029,
+              105.8525
+            ],
+            [
+              21.027,
+              105.8523
+            ]
+          ]
+        },
+        {
+          "n": "Nguyễn Hữu Huân",
+          "w": 2,
+          "l": [
+            [
+              21.0356,
+              105.854
+            ],
+            [
+              21.0326,
+              105.8542
+            ]
+          ]
+        }
+      ],
+      "landmarks": [
+        {
+          "n": "Hồ Hoàn Kiếm",
+          "t": "lake",
+          "at": [
+            21.0287,
+            105.852
+          ],
+          "star": true
+        },
+        {
+          "n": "Đền Ngọc Sơn",
+          "t": "temple",
+          "at": [
+            21.0303,
+            105.8525
+          ],
+          "star": true
+        },
+        {
+          "n": "Chợ Đồng Xuân",
+          "t": "market",
+          "at": [
+            21.0383,
+            105.8497
+          ]
+        }
+      ],
+      "routes": [
+        {
+          "id": "lake-loop",
+          "name": "Hoan Kiem Loop",
+          "blurb": "One slow lap of the lake, ending in the old quarter.",
+          "stops": [
+            {
+              "ref": "sight:0",
+              "tip": "Early morning is when the lake belongs to the neighbourhood."
+            },
+            {
+              "ref": "sight:1",
+              "tip": "The red bridge is busiest at midday."
+            },
+            {
+              "ref": "sight:2",
+              "tip": "Go for the food lane behind the market, not the market itself."
+            }
+          ]
+        }
+      ]
+    },
+    "hcmc-district1": {
+      "center": [
+        10.773,
+        106.695
+      ],
+      "spanM": 2200,
+      "water": [
+        [
+          [
+            10.786,
+            106.706
+          ],
+          [
+            10.782,
+            106.708
+          ],
+          [
+            10.776,
+            106.707
+          ],
+          [
+            10.775,
+            106.709
+          ],
+          [
+            10.788,
+            106.7095
+          ]
+        ]
+      ],
+      "streets": [
+        {
+          "n": "Lê Lợi",
+          "w": 3,
+          "l": [
+            [
+              10.7726,
+              106.6982
+            ],
+            [
+              10.7733,
+              106.7005
+            ],
+            [
+              10.7742,
+              106.7028
+            ]
+          ]
+        },
+        {
+          "n": "Nguyễn Huệ",
+          "w": 3,
+          "l": [
+            [
+              10.774,
+              106.7033
+            ],
+            [
+              10.7712,
+              106.7042
+            ]
+          ]
+        },
+        {
+          "n": "Nguyễn Trãi",
+          "w": 3,
+          "l": [
+            [
+              10.7665,
+              106.684
+            ],
+            [
+              10.768,
+              106.691
+            ],
+            [
+              10.7695,
+              106.696
+            ]
+          ]
+        },
+        {
+          "n": "Võ Văn Tần",
+          "w": 2,
+          "l": [
+            [
+              10.776,
+              106.688
+            ],
+            [
+              10.7765,
+              106.694
+            ]
+          ]
+        },
+        {
+          "n": "Hai Bà Trưng",
+          "w": 2,
+          "l": [
+            [
+              10.784,
+              106.697
+            ],
+            [
+              10.776,
+              106.7
+            ],
+            [
+              10.771,
+              106.702
+            ]
+          ]
+        },
+        {
+          "n": "Pasteur",
+          "w": 2,
+          "l": [
+            [
+              10.783,
+              106.694
+            ],
+            [
+              10.773,
+              106.698
+            ]
+          ]
+        }
+      ],
+      "landmarks": [
+        {
+          "n": "Chợ Bến Thành",
+          "t": "market",
+          "at": [
+            10.7725,
+            106.698
+          ],
+          "star": true
+        },
+        {
+          "n": "Nhà thờ Đức Bà",
+          "t": "church",
+          "at": [
+            10.7797,
+            106.699
+          ],
+          "star": true
+        },
+        {
+          "n": "Bưu điện",
+          "t": "civic",
+          "at": [
+            10.7799,
+            106.6999
+          ]
+        }
+      ]
+    }
+  }
+}

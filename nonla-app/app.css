@@ -1,0 +1,1175 @@
+/* ═══════════════════════════════════════════════════════════
+   Nón Lá — hệ thiết kế ứng dụng
+   Bảng màu sơn mài Việt: then, son, vàng lá, vỏ điệp + ngọc bích.
+   ═══════════════════════════════════════════════════════════ */
+:root{
+  /* ngọc bích giữ lại cho phán quyết "giá bình thường" */
+  --ngoc:#1F8A70; --ngoc-sau:#0E4A3C;
+  /* son và vàng đồng — hai màu chủ của sơn mài và trống đồng */
+  --son:#B0201A; --dong:#D9A227; --vang-la:#C9A227;
+  /* Vàng lá dùng làm CHỮ thì phải sẫm hơn nhiều: #D9A227 trên nền giấy chỉ
+     đạt 2,0:1. Bản này đo được 5,3:1 — cùng một sắc, đủ đọc ngoài nắng. */
+  --dong-chu:#7D5F0E;
+  /* Ba trọng số viền vàng. Tách ra thành token vì mockup dùng viền như một
+     hệ thống — khung ngoài, chỉ trong, vòng đặc — chứ không phải trang trí
+     rời rạc từng thẻ. Trộn tay mỗi chỗ một sắc là cách nhanh nhất phá nhịp. */
+  --vien:rgba(201,162,39,.52);      /* khung ngoài, hairline */
+  --vien-in:rgba(201,162,39,.28);   /* chỉ lót bên trong, lùi vào 5px */
+  --vien-dam:#C9A227;               /* vòng đặc quanh ảnh và huy hiệu */
+  /* cam đất cho mức cảnh báo nhẹ, tách khỏi vàng đồng của hoạ tiết */
+  --ho-phach:#C8791F;
+  /* giấy dó làm nền sáng; sơn mài xanh làm nền tối */
+  --diep:#F5F0E4; --ngoc-nhat:#F5F0E4; --giay:#FBF7EC;
+  --then:#0E2B24;          /* sơn mài xanh — nền tối chủ đạo */
+  --then-sau:#08201B;
+  --muc:#1D2A24; --muc-nhat:#5F6E64;
+  --cham:#3A6EA8;          /* men lam Bát Tràng */
+  --line:#E2D9C4;
+  --son-dam:#8E1C17;   /* do son dam - chu tren nen hong, dat 4.5:1 */
+  --hong:#FBEDE9;      /* nen the canh bao */
+  --kem:#F3EEDF;       /* nen chip va anh rong */
+  --xam-ghim:#6E6A62;  /* ghim chua du du lieu */
+  --pad-x:18px;
+  --r:20px; --pill:999px;
+  /* Tiêu đề dùng serif — thứ tạo ra vẻ trang trọng trong bộ mockup.
+     Thân và số vẫn là Inter: serif đọc số tiền ngoài nắng rất tệ. */
+  --disp:"Playfair Display",Georgia,serif;
+  --body:"Inter",system-ui,sans-serif;
+  /* Không kéo thêm một họ mono nữa: Inter có chữ số đều bề rộng,
+     đủ để cột giá và hoá đơn thẳng hàng. */
+  --mono:"Inter",system-ui,sans-serif;
+  --safe: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:var(--body);background:var(--muc);color:var(--muc);
+  overscroll-behavior:none;
+  font-feature-settings:"cv05" 1,"cv08" 1,"ss03" 1;  /* l có đuôi, chữ số một tầng */
+}
+/* Mọi chỗ hiển thị số tiền, mã, thời gian: chữ số đều bề rộng để thẳng cột.
+   Thay cho họ mono ở bản trước. */
+[style*="--mono"],.amt,.ja,.rline,.rtot,.kicker,.src,#busyPct,
+.jstat b,.total .big{font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,select{font:inherit}
+
+#app{
+  position:fixed;inset:0;display:flex;flex-direction:column;
+  background:var(--ngoc-nhat);max-width:520px;margin:0 auto;
+  box-shadow:0 0 60px rgba(0,0,0,.5);overflow:hidden;
+}
+
+/* ── vùng nội dung ─────────────────────────────────────── */
+/* overflow-x phải kẹp: hoạ tiết nền và dấu nổi cố tình tràn mép phải,
+   để trôi tự do thì sinh cuộn ngang và đẩy lệch toàn bộ giao diện. */
+.view{flex:1;min-height:0;position:relative;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch}
+.view.noscroll{overflow:hidden}
+.pad{padding:18px 18px calc(96px + var(--safe));position:relative;z-index:1}
+
+/* KHÔNG có lớp dấu chìm mặt trống đồng sau các màn hình.
+   Đã thử và đã gỡ: ảnh hoạ tiết sinh sẵn trong assets/icons/ lưu bằng
+   WEBP không kênh alpha (_shrink.py convert("RGB")), nên dùng làm
+   background-image chồng lên nền thì cái hiện ra là một KHỐI CHỮ NHẬT
+   đục, không phải hoạ tiết. Muốn dựng lại lớp này thì phải sinh ảnh có
+   nền trong suốt trước, chứ không phải chỉnh opacity cho nhạt bớt. */
+
+/* dải hoạ tiết chạy ngang — dùng làm đường phân cách và chân trang */
+/* background-size:contain giữ đúng tỉ lệ ô hoạ tiết rồi mới lặp ngang.
+   Dùng "auto 100%" sẽ nén ô theo chiều cao và hoạ tiết vỡ nhịp. */
+.frieze{height:24px;background-repeat:repeat-x;background-position:center;
+  background-size:contain;opacity:.92;margin:14px 0}
+.frieze.tall{height:32px}
+
+/* dấu chìm linh vật cạnh tiêu đề mục */
+.crest{position:absolute;pointer-events:none;opacity:.14;z-index:0}
+
+/* ── khung ảnh ─────────────────────────────────────────
+   App không ship kèm ảnh. Thả file vào assets/ là khung đầy.
+   Thiếu ảnh thì hiện nền giấy dó có dấu nón lá — không bao giờ
+   để lộ icon ảnh vỡ cho người dùng thấy. */
+.ph{position:relative;width:100%;border-radius:16px;overflow:hidden;
+  border:1px solid var(--line);background:var(--giay);margin:2px 0 12px}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph figcaption{
+  position:absolute;left:11px;bottom:9px;z-index:2;
+  font-family:var(--disp);font-size:15px;font-weight:600;color:#FBF7EC;
+  text-shadow:0 1px 8px rgba(0,0,0,.7);
+}
+.ph::after{ /* lớp phủ để chữ đọc được trên ảnh sáng */
+  content:"";position:absolute;inset:auto 0 0 0;height:52%;z-index:1;
+  background:linear-gradient(transparent,rgba(8,32,27,.72));
+}
+.ph.empty{display:grid;place-items:center;
+  background:
+    radial-gradient(circle at 30% 25%,rgba(217,162,39,.10),transparent 55%),
+    repeating-linear-gradient(101deg,rgba(0,0,0,.016) 0 3px,transparent 3px 7px),
+    var(--giay);
+}
+.ph.empty::before{ /* nón lá vẽ một nét */
+  content:"";width:64px;height:38px;opacity:.3;
+  background:no-repeat center/contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 70'%3E%3Cpath d='M8 60 Q60 -8 112 60' fill='none' stroke='%235F6E64' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M8 60 Q60 46 112 60' fill='none' stroke='%235F6E64' stroke-width='2.5' stroke-linecap='round' opacity='.5'/%3E%3C/svg%3E");
+}
+.ph.empty::after{background:none}
+.ph.empty figcaption{position:static;color:var(--muc-nhat);text-shadow:none;
+  font-size:12px;font-family:var(--body);font-weight:400;margin-top:8px}
+
+h1.title{font-family:var(--disp);font-size:32px;font-weight:600;letter-spacing:-.012em;line-height:1.1}
+h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.008em;margin:24px 0 10px}
+.kicker{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muc-nhat)}
+.muted{color:var(--muc-nhat);font-weight:300;font-size:13px;line-height:1.6}
+
+/* ── thanh điều hướng nổi, bo tròn ─────────────────────── */
+.tabbar{
+  position:absolute;left:12px;right:12px;bottom:calc(10px + var(--safe));z-index:60;
+  height:68px;border-radius:34px;background:var(--then);
+  border:1px solid rgba(217,162,39,.5);
+  box-shadow:0 8px 24px rgba(14,43,36,.28),
+             inset 0 1px 0 rgba(217,162,39,.2);
+  display:grid;grid-template-columns:1fr 1fr 88px 1fr 1fr;
+  align-items:center;justify-items:center;
+}
+.tab{display:grid;justify-items:center;gap:4px;position:relative;z-index:1;
+  color:#CFC9B4;padding:8px 4px;min-width:56px;min-height:56px;align-content:center;
+  transition:color .2s cubic-bezier(.22,.61,.36,1)}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.75;
+  stroke-linecap:round;stroke-linejoin:round}
+.tab span{font-size:12px;font-weight:500;letter-spacing:.01em}
+.tab[aria-current="page"]{color:var(--dong)}
+.tab:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:14px}
+
+/* FAB giữa nhô lên khỏi thanh, hai vòng viền vàng */
+.scanbtn{
+  width:68px;height:68px;border-radius:50%;position:relative;z-index:2;
+  background:linear-gradient(160deg,#1F8A70,#0E4A3C);
+  border:0;display:grid;place-items:center;transform:translateY(-24px);
+  box-shadow:
+    inset 0 0 0 1px var(--dong),
+    0 0 0 3px var(--dong),
+    0 0 0 5px var(--then),
+    0 10px 26px -8px rgba(0,0,0,.85),
+    0 0 30px rgba(31,138,112,.45);
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.scanbtn:active{transform:translateY(-24px) scale(.97)}
+.scanbtn:focus-visible{outline:2px solid var(--dong);outline-offset:8px}
+
+@media (prefers-reduced-motion:reduce){
+  .tab,.scanbtn,.nb-range{transition:none}
+  .scanbtn:active{transform:translateY(-24px)}
+}
+
+/* ── màn hình quét ─────────────────────────────────────── */
+#camWrap{position:absolute;inset:0;background:#08201B;overflow:hidden}
+#cam{width:100%;height:100%;object-fit:cover;display:block}
+#camFallback{position:absolute;inset:0;display:none;place-items:center;padding:30px;text-align:center;
+  background:radial-gradient(150% 90% at 50% 15%,#4d5443,#15180f)}
+#camFallback p{color:#C9D2C4;font-size:13px;line-height:1.65;font-weight:300}
+
+.reticle{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);
+  width:min(62vw,240px);aspect-ratio:1;pointer-events:none}
+.reticle svg{width:100%;height:100%;overflow:visible}
+.ring-slow{transform-origin:50% 50%;animation:spin 34s linear infinite}
+.ring-rev{transform-origin:50% 50%;animation:spin 52s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.modes{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:0;right:0;z-index:20;
+  display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:0 12px}
+.mode{background:rgba(10,16,12,.62);border:1px solid rgba(255,255,255,.16);color:#D6DED2;
+  padding:8px 15px;border-radius:var(--pill);font-size:12px;font-weight:500;
+  backdrop-filter:blur(10px)}
+.mode[aria-pressed="true"]{background:var(--dong);border-color:var(--dong);color:#17130E;font-weight:600}
+
+.hint{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(150px + var(--safe));
+  z-index:20;background:rgba(10,16,12,.7);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.11);padding:9px 16px;border-radius:var(--pill);
+  color:#DCE4D8;font-size:12px;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+
+.offline{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;z-index:25;
+  display:none;align-items:center;gap:5px;background:rgba(31,138,112,.24);
+  border:1px solid rgba(127,217,190,.42);color:#8FE3C6;font-family:var(--mono);
+  font-size:9px;letter-spacing:.05em;padding:5px 10px;border-radius:var(--pill)}
+.offline i{width:5px;height:5px;border-radius:50%;background:#5CD6AE}
+
+/* dải cảnh báo ở viền — kín đáo, người bán không thấy */
+.edge{position:absolute;inset:0;z-index:50;pointer-events:none;transition:box-shadow .35s}
+#busy{border-radius:0}
+.edge[data-level="ok"]{box-shadow:inset 0 0 0 4px var(--ngoc)}
+.edge[data-level="warn"]{box-shadow:inset 0 0 0 4px var(--ho-phach)}
+.edge[data-level="high"]{box-shadow:inset 0 0 0 4px var(--son),inset 0 0 30px rgba(176,32,26,.3)}
+
+/* ── thẻ kết quả trượt lên ─────────────────────────────── */
+.sheet{
+  /* PHẢI cao hơn #v-bigmap và #v-foodmap (z-index 70). Ở 55, chạm một mốc
+     tham quan trên bản đồ toàn khung thì thẻ chi tiết mở ra NGAY PHÍA SAU
+     bản đồ — người dùng bấm và không thấy gì, tưởng nút chết. */
+  position:absolute;left:0;right:0;bottom:0;z-index:82;
+  background:var(--giay);color:var(--muc);
+  border-radius:28px 28px 0 0;max-height:76%;
+  display:flex;flex-direction:column;
+  box-shadow:0 -16px 40px -14px rgba(0,0,0,.55);
+  transform:translateY(101%);transition:transform .32s cubic-bezier(.32,.72,0,1);
+}
+.sheet.open{transform:translateY(0)}
+.sheet .grab{width:36px;height:4px;border-radius:4px;background:#D8CCB4;margin:9px auto 2px;flex:0 0 auto}
+.sheet .cloudtop{flex:0 0 auto;height:22px;margin:4px 0 -4px;opacity:.3;
+  background-repeat:repeat-x;background-position:center bottom;background-size:contain}
+.sheet .inner{overflow-y:auto;padding:6px 17px calc(92px + var(--safe))}
+.sheet h3{font-family:var(--disp);font-size:22px;font-weight:600;letter-spacing:-.01em;margin:10px 0 3px}
+.src{font-size:10.5px;color:var(--muc-nhat);font-weight:300;line-height:1.5}
+
+.wave{display:block;width:100%;height:8px;margin:11px 0;opacity:.45}
+
+/* ── dòng món ──────────────────────────────────────────── */
+.row{display:grid;grid-template-columns:10px 1fr auto;gap:11px;align-items:center;
+  padding:11px 0;border-bottom:1px solid var(--line);text-align:left;width:100%;background:none}
+.row:last-child{border-bottom:0}
+.dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.dot[data-l="ok"]{background:var(--ngoc)}
+.dot[data-l="warn"]{background:var(--ho-phach)}
+.dot[data-l="high"]{background:var(--son);box-shadow:0 0 0 3px rgba(192,57,43,.16)}
+.dot[data-l="unknown"]{background:#BDC5B9}
+.row .nm{display:block;font-size:13.5px;font-weight:500;line-height:1.3}
+.row .note{display:block;font-size:10.5px;color:var(--muc-nhat);font-weight:300;margin-top:2px}
+.row .amt{font-family:var(--mono);font-size:13px;font-weight:600;text-align:right;white-space:nowrap}
+.row .amt small{display:block;font-size:9.5px;font-weight:400;color:var(--muc-nhat)}
+.row .amt[data-l="high"]{color:var(--son)}
+
+/* ── nút ───────────────────────────────────────────────── */
+.btn{display:block;width:100%;text-align:center;border-radius:14px;padding:13px;
+  font-size:14px;font-weight:600;margin-top:10px}
+.btn.pri{background:var(--ngoc);color:#fff}
+.btn.sec{border:1px solid var(--line);color:var(--muc)}
+.btn.dark{background:var(--muc);color:#F3F1E9}
+.btn:active{transform:scale(.985)}
+.btn:focus-visible{outline:2px solid var(--ngoc);outline-offset:2px}
+
+/* ── nói hộ ────────────────────────────────────────────── */
+.say{display:flex;align-items:center;gap:11px;margin-top:13px;
+  background:var(--ngoc-sau);color:#EAF6F1;border-radius:15px;padding:12px 14px;width:100%;text-align:left}
+.say .vi{font-family:var(--disp);font-size:19px;font-weight:600}
+.say .ph{font-size:10px;opacity:.68;font-weight:300;margin-top:1px}
+.say .spk{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--ho-phach);
+  display:grid;place-items:center;flex:0 0 auto}
+.say .spk svg{width:15px;height:15px;fill:none;stroke:#14170F;stroke-width:1.9;stroke-linecap:round}
+
+/* ── thẻ chung ─────────────────────────────────────────── */
+.card{background:var(--giay);border:1px solid var(--line);border-radius:var(--r);padding:15px;margin-top:11px}
+.card h4{font-family:var(--disp);font-size:18px;font-weight:600;letter-spacing:-.008em}
+.tagrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.tg{font-size:10.5px;font-weight:500;padding:5px 10px;border-radius:var(--pill);background:#EFE6D3;color:var(--muc-nhat)}
+.tg.hot{background:#FBE9DF;color:#B4521F}
+.tg.alert{background:#FCEEEB;color:var(--son)}
+.tg.veg{background:#E3F3EA;color:#166B52}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;
+  padding:4px 9px;border-radius:var(--pill);background:var(--ngoc);color:#fff}
+.badge.no{background:#F2EEE4;color:var(--muc-nhat)}
+.badge.flag{background:#FCEEEB;color:var(--son)}
+.badge svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+
+/* ── ô nhập tay (lối thoát bắt buộc) ───────────────────── */
+.manual{display:grid;grid-template-columns:1fr 96px;gap:8px;margin-top:9px}
+.manual input{border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;width:100%;background:var(--giay)}
+.manual input:focus{outline:2px solid var(--ngoc);outline-offset:-1px}
+
+/* ── tiến trình OCR ────────────────────────────────────── */
+#busy{position:absolute;inset:0;z-index:84;display:none;place-items:center;
+  background:rgba(11,14,9,.72);backdrop-filter:blur(3px)}
+#busy.on{display:grid}
+.lantern{width:56px;height:74px;animation:sway 2.6s ease-in-out infinite;transform-origin:50% 4%}
+@keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+#busyTxt{margin-top:14px;color:#E4DFCE;font-size:12.5px;text-align:center;font-weight:300}
+#busyPct{font-family:var(--mono);font-size:11px;color:var(--ho-phach);margin-top:5px}
+
+/* ═══ TAB NEARBY — "Explore by map" ════════════════════
+   Bố cục map-first: tiêu đề, một thẻ số liệu chia đôi, hàng bộ
+   lọc cuộn ngang, khối bản đồ chiếm phần lớn màn hình, rồi khay
+   thẻ cuộn ngang đè lên mép dưới bản đồ.
+
+   Ba mức tin cậy luôn có ICON + CHỮ, không bao giờ chỉ dựa vào màu.
+   ═════════════════════════════════════════════════════ */
+.ex-head{position:relative;z-index:1}
+
+.nb-topbar{display:flex;align-items:center;gap:9px;padding-right:58px;
+  min-height:48px;position:relative;z-index:2}
+.nb-topbar .pag{width:24px;height:24px;flex:0 0 auto;color:var(--then)}
+.nb-topbar .kick{font-size:clamp(11px,3vw,13px);font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muc);line-height:1.2}
+.nb-bell{position:absolute;top:0;right:0;width:48px;height:48px;border-radius:50%;
+  background:#fff;border:1px solid var(--line);display:grid;place-items:center;
+  box-shadow:0 2px 8px -3px rgba(14,43,36,.18);color:var(--then);z-index:5}
+.nb-bell svg{width:21px;height:21px}
+
+.nb-h1{font-family:var(--disp);font-weight:600;color:var(--then);
+  font-size:clamp(32px,10.2vw,54px);line-height:.98;letter-spacing:-.02em;
+  margin-top:10px;position:relative;z-index:2}
+/* Không còn blob nổi bên phải, nên tiêu đề và phụ đề dùng hết bề ngang.
+   Bản trước kẹp max-width 56% để chừa chỗ cho blob — giữ lại thì tiêu đề
+   vỡ thành bốn dòng mà bên phải trống trơn. */
+.ex-h1{max-width:none}
+.nb-sub{font-size:clamp(13px,3.6vw,16px);line-height:1.5;color:var(--muc-nhat);
+  margin-top:12px;position:relative;z-index:2}
+.ex-sub{max-width:34ch}
+
+/* ── thẻ số liệu chia đôi ──────────────────────────── */
+.ex-stats{display:flex;align-items:stretch;gap:10px;position:relative;z-index:2;
+  margin-top:clamp(16px,4.6vw,22px);padding:14px 12px;border-radius:24px;
+  background:var(--giay);border:1.5px solid var(--vien);
+  box-shadow:0 8px 24px rgba(18,61,43,.08);overflow:hidden}
+/* Dải mây Đông Sơn chìm ở đáy thẻ — sơn bằng JS trong paintMotifs() */
+.ex-stats::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;
+  background-repeat:repeat-x;background-position:center bottom;background-size:auto 100%;
+  opacity:.13;pointer-events:none}
+.ex-stat{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:11px;
+  position:relative;z-index:1}
+.ex-stat .ico{width:clamp(44px,13vw,56px);aspect-ratio:1;border-radius:50%;flex:0 0 auto;
+  display:grid;place-items:center;border:2px solid var(--vien-dam)}
+.ex-stat .ico svg{width:52%;height:52%}
+.ex-stat .ico.ok{background:linear-gradient(165deg,#134338,#0B2620);color:var(--dong)}
+.ex-stat .ico.bad{background:var(--ho-phach);border-color:#9A5A12;color:#FFF6E8}
+.ex-stat b{display:block;font-size:clamp(26px,8vw,34px);font-weight:700;
+  letter-spacing:-.03em;line-height:1;color:var(--then);font-variant-numeric:tabular-nums}
+.ex-stat i{display:block;font-style:normal;margin-top:4px;
+  font-size:clamp(11px,3.1vw,12.5px);line-height:1.3;color:var(--muc-nhat)}
+.ex-div{width:1px;flex:0 0 auto;background:var(--line);margin:2px 0}
+
+/* ── hàng bộ lọc ───────────────────────────────────── */
+/* Tràn ra hai mép rồi tự đệm lại: chip cuối không bị cắt cụt ở mép phải,
+   và người dùng thấy được là hàng này còn cuộn tiếp. */
+.ex-chips{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;
+  padding:12px var(--pad-x) 4px;margin:0 calc(-1 * var(--pad-x));
+  scrollbar-width:none;overscroll-behavior-x:contain;position:relative;z-index:2}
+.ex-chips::-webkit-scrollbar{display:none}
+.ex-chip{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+  min-height:44px;padding:0 15px;border-radius:var(--pill);white-space:nowrap;
+  background:#fff;border:1.5px solid var(--vien);color:var(--muc);
+  font-size:clamp(12.5px,3.5vw,14px);font-weight:600;
+  transition:transform .2s cubic-bezier(.22,.61,.36,1)}
+.ex-chip:active{transform:scale(.96)}
+.ex-chip svg{width:17px;height:17px;flex:0 0 auto;color:var(--ngoc-sau)}
+.ex-chip[data-lvl="bad"] svg{color:var(--son)}
+.ex-chip[aria-pressed="true"]{background:var(--then);color:#F6F2E6;
+  border-color:var(--vien-dam);box-shadow:0 6px 16px -8px rgba(14,43,36,.7)}
+.ex-chip[aria-pressed="true"] svg{color:var(--dong)}
+.ex-chip.round{width:48px;padding:0;justify-content:center}
+.ex-chip:focus-visible{outline:2px solid var(--dong);outline-offset:2px}
+
+/* ── khối bản đồ ───────────────────────────────────── */
+/* Cao theo svh chứ không phải vh: trên mobile vh tính cả thanh địa chỉ,
+   nên khay thẻ bên dưới bị đẩy khuất khi thanh đó hiện ra. */
+/* Chiều cao kẹp ở 36svh chứ không phải 48: cao hơn thì mép trên của khay
+   thẻ rơi xuống dưới thanh nav, và màn hình mở ra trông như không có khay.
+   Thẻ đầu tiên phải ló ra được thì người dùng mới biết là còn nội dung. */
+.ex-map{position:relative;z-index:1;margin-top:12px;border-radius:24px;
+  height:clamp(230px,36vh,340px);overflow:hidden;
+  border:1.5px solid var(--vien);background:#F4EBD3;
+  box-shadow:0 10px 28px rgba(14,43,36,.14)}
+/* svh loại được thanh địa chỉ mobile ra khỏi phép tính, nhưng trình duyệt
+   cũ không hiểu — khai riêng một dòng để bản trên chỉ đè khi hiểu được,
+   gộp vào clamp ở trên thì cả khai báo hỏng và khối bản đồ cao 0. */
+@supports (height:1svh){ .ex-map{height:clamp(230px,36svh,340px)} }
+.ex-canvas{position:absolute;inset:0;overflow:hidden}
+.ex-canvas .ex-base{width:100%;height:100%;display:block}
+/* Tranh vẽ tay đã neo toạ độ. Kích thước và độ lệch do JS đặt theo phép
+   georeference, nên KHÔNG dùng object-fit — object-fit tự cắt theo ý nó
+   và mọi ghim lệch khỏi mái nhà của nó ngay. */
+.ex-art{position:absolute;left:0;top:0;transform-origin:0 0;
+  max-width:none;display:block;image-rendering:auto}
+.ex-art[hidden]{display:none}
+.ex-pins{position:absolute;inset:0;z-index:3;pointer-events:none}
+/* Ghim neo bằng transform do JS đặt, nên căn tâm bằng margin âm —
+   thêm translate vào transform sẽ bị JS ghi đè mỗi lần vẽ lại.
+   Hộp 44×52 là VÙNG CHẠM, hình vẽ 30×40 nằm sát đáy hộp: mũi nhọn
+   của ghim trùng đúng toạ độ, còn ngón tay vẫn có đủ 44px để bấm. */
+.ex-pin{position:absolute;left:0;top:0;width:44px;height:52px;
+  margin-left:-22px;margin-top:-52px;pointer-events:auto;
+  display:grid;place-items:end center;
+  filter:drop-shadow(0 3px 5px rgba(14,43,36,.42))}
+.ex-pin svg{width:30px;height:40px;display:block}
+/* `display:grid` ở trên là quy tắc của tác giả nên nó ĐÈ luôn display:none
+   mà trình duyệt gán cho [hidden]. Thiếu dòng này thì bộ lọc đổi thuộc tính
+   hidden nhưng ghim vẫn nằm nguyên trên bản đồ — phép thử đếm theo thuộc
+   tính vẫn xanh trong khi mắt thấy sai. */
+.ex-pin[hidden]{display:none}
+.ex-pin:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:8px}
+.ex-me{position:absolute;left:0;top:0;z-index:2;width:0;height:0}
+.ex-me i{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;
+  background:var(--cham);border:2.5px solid #fff;box-shadow:0 0 0 9px rgba(58,110,168,.18)}
+
+/* Nút phủ kín bản đồ: chạm chỗ trống mở bản đồ chi tiết. Nằm DƯỚI lớp
+   ghim (z-index 1 so với 3) nên không nuốt cú chạm vào ghim. */
+.ex-open{position:absolute;inset:0;z-index:1;display:block}
+.ex-open span{position:absolute;left:12px;bottom:12px;
+  display:inline-flex;align-items:center;min-height:38px;padding:0 14px;
+  border-radius:var(--pill);background:rgba(14,43,36,.92);color:#F6F2E6;
+  font-size:clamp(11.5px,3.2vw,13px);font-weight:600;
+  box-shadow:0 8px 20px -8px rgba(14,43,36,.8)}
+.ex-fabs{position:absolute;right:12px;bottom:12px;z-index:4;display:grid;gap:10px}
+.ex-fab{width:52px;height:52px;border-radius:50%;background:#fff;
+  border:1px solid var(--line);display:grid;place-items:center;color:var(--then);
+  box-shadow:0 6px 18px -6px rgba(14,43,36,.45);
+  transition:transform .2s cubic-bezier(.22,.61,.36,1)}
+.ex-fab:active{transform:scale(.94)}
+.ex-fab svg{width:22px;height:22px}
+
+/* ── khay thẻ dưới ─────────────────────────────────── */
+.ex-sheet{position:relative;z-index:2;margin-top:-26px;
+  padding:10px 14px 14px;border-radius:26px;
+  background:var(--diep);border:1.5px solid var(--vien);
+  box-shadow:0 -6px 24px rgba(14,43,36,.10)}
+.ex-grab{display:block;width:44px;height:5px;border-radius:var(--pill);
+  background:#D6CDBA;margin:0 auto 4px}
+/* Trong khay, hàng tiêu đề phải nằm gọn MỘT dòng: tiêu đề xuống dòng thì
+   đường diềm co lại còn một gạch ngắn và cả hàng trông như hỏng. Bỏ luôn
+   đường diềm ở đây — bề ngang còn lại sau "See all" không đủ cho nó. */
+.ex-sheet .sect-row{margin:6px 0 10px;gap:9px}
+.ex-sheet .sect-row h2{font-size:clamp(16px,4.4vw,20px)}
+.ex-sheet .sect-row .rule{display:none}
+
+.ex-rail{display:grid;grid-auto-flow:column;grid-auto-columns:min(86%,300px);
+  gap:12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+  padding:3px 14px 8px;margin:0 -14px;
+  scrollbar-width:none;overscroll-behavior-x:contain}
+.ex-rail::-webkit-scrollbar{display:none}
+
+.ex-card{scroll-snap-align:center;text-align:left;position:relative;overflow:hidden;
+  display:grid;grid-template-columns:clamp(80px,24vw,96px) 1fr;gap:12px;align-items:stretch;
+  background:linear-gradient(168deg,#fff 58%,#FDFAF1);
+  border:1.5px solid var(--vien);border-radius:20px;padding:12px;
+  box-shadow:0 4px 16px rgba(14,43,36,.07);
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+/* Mây xoắn chìm góc trên trái — sơn bằng JS trong paintMotifs() */
+.ex-card:active{transform:scale(.97)}
+.ex-card>*{position:relative;z-index:1}
+.ex-card .ph.sq{width:100%}
+/* Các thẻ trong khay cao bằng nhau (thẻ tên dài nhất quyết định). Dùng flex
+   để đẩy nhãn trạng thái xuống đáy — để nó bám theo chữ thì thẻ tên ngắn
+   có một mảng trống lơ lửng dưới nhãn. */
+.ex-body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ex-card .nm{font-family:var(--disp);font-size:clamp(16px,4.8vw,19px);
+  font-weight:600;color:var(--then);letter-spacing:-.008em;line-height:1.2}
+.ex-card .meta{display:flex;align-items:center;gap:5px;
+  font-size:clamp(11.5px,3.3vw,13px);color:var(--muc-nhat);line-height:1.3}
+.ex-card .meta svg{width:14px;height:14px;flex:0 0 auto;color:var(--dong)}
+.ex-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.since{display:inline-flex;align-items:center;gap:4px;
+  font-size:clamp(10.5px,3vw,12px);font-weight:600;padding:4px 9px;
+  border-radius:var(--pill);background:rgba(31,138,112,.12);
+  border:1px solid rgba(31,138,112,.3);color:var(--ngoc-sau)}
+.since svg{width:12px;height:12px;flex:0 0 auto}
+/* margin-top:auto đẩy nhãn xuống đáy thẻ. Các thẻ cao bằng nhau, nên nhãn
+   ở mọi thẻ thẳng một hàng thay vì bậc thang theo độ dài tên quán. */
+.ex-card .pill{width:100%;margin-top:auto;padding-top:2px}
+.ex-card .ex-thumb{align-self:start}
+
+.ex-empty{display:flex;align-items:center;gap:9px;padding:10px 2px 4px;
+  font-size:clamp(12.5px,3.6vw,14px);color:var(--muc-nhat)}
+.ex-empty svg{width:18px;height:18px;flex:0 0 auto;color:var(--dong)}
+
+/* ── hàng tiêu đề mục ──────────────────────────────── */
+.sect-row{display:flex;align-items:center;gap:11px;margin:clamp(26px,7vw,34px) 0 14px}
+.sect-row .spark{width:19px;height:19px;color:var(--dong);flex:0 0 auto}
+.sect-row h2{margin:0;flex:0 1 auto;min-width:0;font-family:var(--disp);
+  font-size:clamp(18px,5.2vw,23px);font-weight:600;color:var(--then);letter-spacing:-.01em}
+/* Đường kẻ nhạt dần về hai đầu — kẻ vàng đều tay trông như một thanh chắn,
+   kiểu này đọc ra là đường diềm. */
+.sect-row .rule{flex:1 1 auto;height:1px;min-width:10px;
+  background:linear-gradient(90deg,var(--vien-dam),rgba(201,162,39,.14))}
+.sect-row .act{display:inline-flex;align-items:center;gap:5px;min-height:46px;
+  padding:0 4px;font-size:clamp(13px,3.8vw,15px);font-weight:600;
+  color:var(--dong-chu);flex:0 0 auto}
+.sect-row .act svg{width:15px;height:15px}
+
+.ph.sq{aspect-ratio:1/1;border-radius:16px;margin:0;
+  border:1px solid var(--vien);background:var(--kem)}
+.ph.round{aspect-ratio:1;border-radius:50%;margin:0;border:2px solid var(--vien-dam)}
+/* Vòng vàng kép quanh ảnh: viền đặc, một chỉ trắng, rồi quầng vàng mỏng.
+   Dùng box-shadow chứ không phải outline lồng nhau — box-shadow không
+   chiếm chỗ nên không đẩy lệch lưới thẻ. */
+.alert-card .ph.round{
+  box-shadow:0 0 0 1.5px #fff,0 0 0 4.5px rgba(201,162,39,.34)}
+.ph.sq figcaption,.ph.sq::after,.ph.round figcaption,.ph.round::after{display:none}
+.ph.round.empty::before,.ph.sq.empty::before{width:46%;height:30%}
+
+/* ── nhãn trạng thái: LUÔN icon + chữ ──────────────── */
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:44px;padding:0 16px;border-radius:var(--pill);
+  font-size:clamp(13px,3.8vw,15px);font-weight:600;white-space:nowrap;
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.pill:active{transform:scale(.97)}
+.pill svg{width:17px;height:17px;flex:0 0 auto}
+.pill.ok{background:var(--then);color:#F6F2E6;width:100%}
+.pill.ok svg{color:var(--dong)}
+.pill.bad{background:#fff;color:var(--son-dam);border:1.5px solid rgba(176,32,26,.5);
+  min-height:42px;padding:0 14px;font-size:clamp(12.5px,3.6vw,14px)}
+.pill.unknown{background:var(--kem);color:var(--muc-nhat);min-height:42px}
+.chip-scan{display:inline-block;font-size:clamp(11.5px,3.3vw,13px);font-weight:500;
+  padding:5px 12px;border-radius:var(--pill);background:var(--kem);
+  border:1px solid var(--vien-in);color:var(--muc-nhat);font-variant-numeric:tabular-nums}
+
+.rail-dots{display:flex;justify-content:center;gap:7px;margin-top:6px}
+.rail-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);
+  transition:background .22s cubic-bezier(.22,.61,.36,1)}
+.rail-dots i.on{background:var(--dong)}
+
+/* ── thẻ cảnh báo ──────────────────────────────────── */
+/* Thẻ cảnh báo cũng nằm trong hệ viền vàng, nhưng chỉ lót giữ sắc son —
+   đủ để thẻ này khác hẳn nhóm thẻ đạt chuẩn mà không rơi ra ngoài bộ. */
+.alert-card{position:relative;overflow:hidden;display:grid;
+  grid-template-columns:clamp(74px,25vw,96px) 1fr;gap:14px;align-items:start;
+  background:var(--hong);border:1.5px solid var(--vien);
+  border-radius:20px;padding:18px;margin-top:18px;text-align:left;width:100%;
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.alert-card::before{content:"";position:absolute;inset:5px;border-radius:15px;
+  border:1px solid rgba(176,32,26,.22);pointer-events:none;z-index:2}
+.alert-card:active{transform:scale(.97)}
+.alert-card>*{position:relative;z-index:1}
+.alert-card .warnmark{position:absolute;right:-10px;bottom:-18px;
+  width:clamp(96px,30vw,132px);aspect-ratio:1;color:var(--son);opacity:.07;
+  pointer-events:none}
+/* Ở khổ 390px, nhãn "Above range" chiếm gần nửa bề ngang và bóp cột tên
+   xuống còn ~90px — "Quán ven sông" vỡ thành ba dòng. Cho phép xuống hàng
+   thì tên được trọn bề ngang, nhãn tụt xuống dưới. */
+.alert-card .top{display:flex;flex-wrap:wrap;justify-content:space-between;
+  gap:8px 10px;align-items:flex-start}
+.alert-card .top>span:first-child{min-width:0;flex:1 1 100%}
+.alert-card .pill{flex:0 0 auto}
+.alert-card .nm{display:block;font-family:var(--disp);font-size:clamp(19px,5.6vw,22px);
+  font-weight:600;color:var(--son-dam);letter-spacing:-.01em;line-height:1.2}
+.alert-card .meta{display:block;font-size:clamp(12.5px,3.6vw,14px);
+  color:var(--muc-nhat);margin-top:3px}
+.alert-card .why{display:flex;gap:7px;align-items:flex-start;margin-top:10px;
+  font-size:clamp(12.5px,3.6vw,14px);color:var(--son-dam);line-height:1.45}
+.alert-card .why svg{width:18px;height:18px;flex:0 0 auto;margin-top:1px;color:var(--son)}
+.alert-card .known{display:block;font-size:clamp(12px,3.5vw,13.5px);
+  color:var(--muc-nhat);margin-top:10px;line-height:1.5}
+.alert-card .known b{display:block;font-weight:600;margin-bottom:2px}
+.alert-card .chip-scan{background:#F6E0DA;border-color:rgba(176,32,26,.18)}
+
+/* ── danh sách đầy đủ, mở bằng See all ─────────────── */
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px}
+/* Thẻ nhỏ chỉ lấy khung ngoài, không có chỉ lót: ở khổ này hai đường
+   cách nhau 5px sẽ dính vào nhau thành một vệt dày. */
+.mini-card{position:relative;background:#fff;border:1.5px solid var(--vien);
+  border-radius:18px;padding:12px;text-align:left;display:grid;gap:8px;align-content:start;
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.mini-card:active{transform:scale(.97)}
+.mini-card .row1{display:flex;gap:10px;align-items:flex-start}
+.mini-card .row1>span:last-child{min-width:0;flex:1 1 auto}
+.mini-card .avwrap{position:relative;width:54px;flex:0 0 auto}
+.mini-card .nm{display:block;font-family:var(--disp);font-size:15px;font-weight:600;
+  color:var(--then);letter-spacing:-.008em;line-height:1.25;padding-right:26px;
+  overflow-wrap:anywhere}
+.mini-card .meta{display:block;font-size:11px;color:var(--muc-nhat);margin-top:3px}
+.mini-card .known{font-size:11px;color:var(--muc-nhat);line-height:1.45}
+.mini-card .known b{display:block;font-weight:600;margin-bottom:2px}
+.mini-card .flag{position:absolute;top:10px;right:10px;width:28px;height:28px;
+  border-radius:50%;display:grid;place-items:center}
+.mini-card .flag svg{width:16px;height:16px}
+.mini-card .flag.ok{background:#0E4A3C;color:#fff}
+.mini-card .flag.unknown{background:var(--kem);color:var(--muc-nhat)}
+
+@media (prefers-reduced-motion:reduce){
+  .trust-card,.alert-card,.mini-card,.pill,.rail-dots i{transition:none}
+  .trust-card:active,.alert-card:active,.mini-card:active,.pill:active{transform:none}
+}
+
+
+/* ═══ TAB EAT ══════════════════════════════════════════
+   Trên cùng là món được tiến cử của vùng, trình bày như một
+   trang chi tiết: ảnh tròn, tên, nhãn Đúng Giá, ba ô dữ kiện,
+   thanh so giá. Kéo xuống là danh sách các món khác, dùng LẠI
+   đúng thẻ .dish-card của hàng "Signature dishes" phía trên —
+   một hình thức, hai ngữ cảnh.
+   ═════════════════════════════════════════════════════ */
+
+/* ── thanh trên cùng ───────────────────────────────── */
+.eat-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.eat-top .kick{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;
+  font-size:clamp(11px,3vw,13px);font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muc)}
+.eat-top .kick .pag{width:22px;height:22px;flex:0 0 auto;color:var(--then)}
+.eat-top .kick span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iconbtn{width:44px;height:44px;flex:0 0 auto;border-radius:50%;
+  background:#fff;border:1px solid var(--line);display:grid;place-items:center;
+  color:var(--then);box-shadow:0 2px 8px -4px rgba(14,43,36,.2);
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.iconbtn:active{transform:scale(.94)}
+.iconbtn svg{width:20px;height:20px}
+.iconbtn:focus-visible{outline:2px solid var(--dong);outline-offset:2px}
+
+/* ── khối tiến cử ──────────────────────────────────── */
+.eat-hero{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);
+  gap:clamp(12px,4vw,20px);align-items:start;margin-top:10px}
+.eat-hero .avwrap{position:relative;padding-bottom:16px}
+.eat-hero .ph{aspect-ratio:1;border-radius:50%;margin:0;
+  border:2px solid rgba(217,162,39,.65);
+  box-shadow:0 8px 22px -10px rgba(14,43,36,.45)}
+.eat-hero .ph figcaption,.eat-hero .ph::after{display:none}
+.eat-hero .ph.empty::before{width:44%;height:26%}
+.eat-hero .seal{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:clamp(40px,12vw,52px);aspect-ratio:1;border-radius:50%;
+  background:linear-gradient(160deg,#1B6B57,#0B2620);
+  border:2.5px solid var(--dong);display:grid;place-items:center;color:var(--dong);
+  box-shadow:0 4px 12px -4px rgba(0,0,0,.55)}
+.eat-hero .seal svg{width:52%;height:52%}
+.eat-hero .nm{font-family:var(--disp);font-weight:600;color:var(--then);
+  font-size:clamp(22px,6.6vw,30px);line-height:1.12;letter-spacing:-.012em}
+.eat-hero .meta{display:flex;align-items:center;gap:5px;margin-top:7px;
+  font-size:clamp(12.5px,3.6vw,14px);color:var(--muc-nhat)}
+.eat-hero .meta svg{width:15px;height:15px;flex:0 0 auto;color:var(--dong)}
+.eat-hero .pill{margin-top:11px}
+.eat-hero .blurb{margin-top:11px;font-size:clamp(13px,3.7vw,15px);
+  line-height:1.5;color:var(--muc)}
+
+/* ── ba ô dữ kiện ──────────────────────────────────── */
+.fact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;
+  margin-top:clamp(18px,5vw,26px)}
+.fact{background:var(--giay);border:1px solid var(--line);border-radius:18px;
+  padding:12px 9px;display:grid;gap:7px;align-content:start;text-align:center}
+.fact .hd{display:grid;justify-items:center;gap:6px}
+.fact .ico{width:clamp(32px,9vw,40px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;border:1.5px solid var(--dong);
+  background:rgba(217,162,39,.1);color:var(--dong)}
+.fact .ico svg{width:52%;height:52%}
+.fact .ttl{font-family:var(--disp);font-size:clamp(13px,3.7vw,15px);
+  font-weight:600;color:var(--then);line-height:1.2}
+.fact .val{font-size:clamp(12px,3.4vw,13.5px);line-height:1.45;color:var(--muc);
+  font-variant-numeric:tabular-nums}
+.fact .val b{font-weight:600}
+.fact .note{border-top:1px solid var(--line);padding-top:8px;
+  font-size:clamp(10.5px,3vw,11.5px);line-height:1.4;color:var(--muc-nhat)}
+
+/* ── thanh so giá ──────────────────────────────────── */
+.pricecheck{background:var(--giay);border:1px solid var(--line);border-radius:20px;
+  padding:15px;margin-top:14px}
+.pricecheck .hd{display:flex;align-items:flex-start;gap:10px}
+.pricecheck .hd .spark{width:18px;height:18px;color:var(--dong);flex:0 0 auto;margin-top:3px}
+.pricecheck .hd h3{flex:1 1 auto;min-width:0;font-family:var(--disp);
+  font-size:clamp(17px,5vw,20px);font-weight:600;color:var(--then);letter-spacing:-.01em}
+.pricecheck .hd p{font-size:clamp(11.5px,3.3vw,13px);color:var(--muc-nhat);margin-top:2px}
+.pricecheck .verdict{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
+  min-height:34px;padding:0 12px;border-radius:var(--pill);
+  font-size:clamp(11.5px,3.2vw,13px);font-weight:600}
+.pricecheck .verdict svg{width:15px;height:15px}
+.pricecheck .verdict.in{background:#E4F1E9;color:#16624C}
+.pricecheck .verdict.out{background:var(--hong);color:var(--son-dam)}
+
+.pcbar{margin-top:14px}
+.pcbar .lead{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pcbar .lead .who{font-size:clamp(12px,3.4vw,13.5px);color:var(--muc-nhat);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.pcbar .lead .amt{font-size:clamp(20px,6vw,26px);font-weight:700;
+  letter-spacing:-.02em;color:var(--then);font-variant-numeric:tabular-nums}
+.pcbar .track{position:relative;height:12px;border-radius:999px;margin-top:12px;
+  background:linear-gradient(90deg,#E7DFC9,#EFE7D3)}
+.pcbar .fill{position:absolute;inset:0 auto 0 0;border-radius:999px;
+  background:linear-gradient(90deg,#1B7C64,#0E4A3C)}
+.pcbar .mark{position:absolute;top:50%;width:26px;height:26px;border-radius:50%;
+  transform:translate(-50%,-50%);display:grid;place-items:center;
+  background:#0E4A3C;color:#fff;border:2px solid var(--giay);
+  box-shadow:0 3px 8px -2px rgba(0,0,0,.45)}
+.pcbar .mark svg{width:14px;height:14px}
+.pcbar .mark.out{background:var(--son)}
+.pcbar .scale{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
+.pcbar .scale div{font-size:clamp(10.5px,3vw,11.5px);color:var(--muc-nhat);
+  letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+.pcbar .scale div:nth-child(2){text-align:center}
+.pcbar .scale div:last-child{text-align:right}
+.pcbar .scale b{display:block;margin-top:3px;font-size:clamp(12.5px,3.6vw,14.5px);
+  font-weight:700;letter-spacing:-.01em;text-transform:none;
+  font-variant-numeric:tabular-nums;color:var(--muc)}
+.pcbar .scale div:nth-child(2) b{color:var(--dong)}
+.pcbar .scale div:last-child b{color:var(--son)}
+
+/* ── thẻ món: dùng chung cho hàng ngang và danh sách dọc ── */
+.dish-rail{display:grid;grid-auto-flow:column;grid-auto-columns:min(78%,268px);
+  gap:11px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+  padding:3px var(--pad-x) 8px;margin:0 calc(-1 * var(--pad-x));
+  scrollbar-width:none;overscroll-behavior-x:contain}
+.dish-rail::-webkit-scrollbar{display:none}
+.dish-list{display:grid;gap:10px;margin-top:2px}
+
+.dish-card{scroll-snap-align:start;display:grid;
+  grid-template-columns:clamp(64px,20vw,84px) minmax(0,1fr);gap:12px;
+  align-items:start;text-align:left;width:100%;
+  background:var(--giay);border:1px solid var(--line);border-radius:18px;padding:11px;
+  box-shadow:0 3px 12px -8px rgba(14,43,36,.28);
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.dish-card:active{transform:scale(.97)}
+.dish-card .ph{aspect-ratio:1;border-radius:14px;margin:0;
+  border:1px solid rgba(217,162,39,.45);background:var(--kem)}
+.dish-card .ph figcaption,.dish-card .ph::after{display:none}
+.dish-card .ph.empty::before{width:52%;height:32%}
+.dish-card .nm{display:block;font-family:var(--disp);
+  font-size:clamp(16px,4.6vw,19px);font-weight:600;color:var(--then);
+  letter-spacing:-.008em;line-height:1.2}
+.dish-card .amt{display:block;margin-top:4px;font-size:clamp(13px,3.7vw,15px);
+  font-weight:700;color:#16624C;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.dish-card .amt small{font-weight:500;color:var(--muc-nhat);font-size:.82em;margin-left:3px}
+.dish-card .desc{display:block;margin-top:5px;font-size:clamp(11.5px,3.3vw,12.5px);
+  line-height:1.45;color:var(--muc-nhat)}
+.dish-card .tagrow{margin-top:6px;gap:5px}
+.dish-card .tg{font-size:10.5px;padding:3px 8px}
+
+/* ── nút lưu ───────────────────────────────────────── */
+.btn.save{display:flex;align-items:center;justify-content:center;gap:9px;
+  min-height:52px;border-radius:var(--pill);background:var(--then);color:#F6F2E6;
+  font-size:clamp(14px,4vw,16px);font-weight:600;margin-top:18px;
+  border:1px solid rgba(217,162,39,.45);
+  box-shadow:0 8px 20px -10px rgba(14,43,36,.7);
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.btn.save:active{transform:scale(.97)}
+.btn.save svg{width:19px;height:19px;color:var(--dong)}
+.savenote{text-align:center;font-size:clamp(11.5px,3.3vw,13px);
+  color:var(--muc-nhat);margin-top:9px}
+
+@media (prefers-reduced-motion:reduce){
+  .iconbtn,.dish-card,.btn.save{transition:none}
+  .iconbtn:active,.dish-card:active,.btn.save:active{transform:none}
+}
+
+
+/* ═══ MÀN HÌNH BẢN ĐỒ CHI TIẾT ═════════════════════════
+   Vector tự vẽ, không tile. Ghim là phần tử DOM thật để đạt
+   vùng chạm 44px — vẽ trong SVG thì bắt chạm rất khó chính xác.
+   ═════════════════════════════════════════════════════ */
+#v-bigmap{position:absolute;inset:0;z-index:70;background:#F4EBD3;
+  overflow:hidden;display:block}
+#v-bigmap[hidden]{display:none}
+
+.bm-canvas{position:absolute;inset:0;touch-action:none;cursor:grab;
+  overscroll-behavior:contain}
+.bm-canvas:active{cursor:grabbing}
+.bm-canvas>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+.bm-pins{position:absolute;inset:0;pointer-events:none}
+.bm-pin{position:absolute;top:0;left:0;pointer-events:auto;
+  display:grid;justify-items:center;gap:2px;
+  min-width:44px;min-height:44px;padding:0 4px;
+  margin-left:-22px;margin-top:-46px;
+  transition:filter .2s cubic-bezier(.22,.61,.36,1)}
+.bm-pin[hidden]{display:none}
+.bm-pin .glyph{width:30px;display:block;filter:drop-shadow(0 3px 5px rgba(14,43,36,.45))}
+.bm-pin .glyph svg{width:100%;height:auto;display:block}
+/* Nhãn TÊN nằm ngoài luồng và không nhận cú chạm.
+   Để nhãn trong luồng thì nút rộng bằng cả cái tên — 118px với "Cô Thảo ·
+   Cơm gà" — và vùng chạm đó phủ lên mọi thứ nằm dưới. Ở Hội An nó nuốt trọn
+   ba mốc Chùa Cầu, Nhà cổ Tấn Ký và Hội quán Phúc Kiến, tức cả lộ trình đèn
+   lồng, chỉ vì tên quán dài. Ghim vẫn nằm trên và vẫn thắng khi chồng ĐÚNG
+   chỗ — nhưng chỉ ở phần ký hiệu 44px, không phải cả dải chữ. */
+.bm-pin{width:44px;min-width:0;padding:0}
+.bm-pin .lbl{position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  pointer-events:none;margin-top:2px;
+  max-width:118px;font-size:11px;font-weight:600;line-height:1.25;
+  text-align:center;color:var(--muc);background:rgba(251,247,236,.94);
+  border:1px solid var(--line);border-radius:9px;padding:3px 7px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bm-pin .lbl i{display:block;font-style:normal;font-weight:500;font-size:10px;
+  color:var(--muc-nhat);font-variant-numeric:tabular-nums}
+.bm-pin.sel .glyph{filter:drop-shadow(0 0 0 3px var(--dong)) drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+.bm-pin.sel .lbl{border-color:var(--dong);background:#fff}
+.bm-pin:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:12px}
+
+/* ── ghim điểm tham quan ────────────────────────────────
+   Cố tình KHÁC hình với ghim giá: chấm tròn viền vàng, không phải giọt
+   nước. Ghim giá là phán quyết, landmark là mốc định hướng — nhìn một
+   cái phải phân biệt được ngay, không cần đọc nhãn.
+   Nằm dưới ghim giá trong thứ tự xếp lớp: khi hai thứ chồng nhau thì
+   thông tin giá là thứ phải thắng.                                    */
+.bm-marks{position:absolute;inset:0;pointer-events:none;z-index:1}
+.bm-pins{z-index:2}
+.bm-mark{position:absolute;top:0;left:0;pointer-events:auto;
+  display:grid;justify-items:center;gap:2px;
+  min-width:44px;min-height:44px;padding:0 4px;
+  margin-left:-22px;margin-top:-22px;align-content:center;
+  transition:filter .2s cubic-bezier(.22,.61,.36,1)}
+.bm-mark .dot{position:relative;display:block}
+
+/* ── mốc must-see: ghim giọt nước vàng đồng có ngôi sao ──
+   Neo ở MŨI ghim chứ không phải tâm, nên margin-top phải bằng cả chiều cao
+   hình. Để nguyên -22px như chấm tròn thì ghim cắm lệch xuống dưới địa điểm
+   nó đang chỉ đúng nửa thân. */
+.bm-mark.must{margin-top:-46px;align-content:start}
+.bm-mark.must .dot{width:30px;height:40px}
+.bm-mark.must .dot svg{width:100%;height:100%;display:block;
+  filter:drop-shadow(0 3px 5px rgba(14,43,36,.45))}
+
+/* ── điểm phụ: chấm tròn vàng nhỏ có sao ── */
+.bm-mark.minor .dot{width:18px;height:18px;border-radius:50%;
+  background:#FBF3DE;border:2px solid var(--vien-dam);
+  box-shadow:0 2px 5px rgba(14,43,36,.3);display:grid;place-items:center}
+.bm-mark.minor .dot svg{width:10px;height:10px;color:#C9922B;display:block}
+/* Chỉ hiện khi phóng đủ gần — placeMarks() gắn .far theo mức thu phóng. */
+.bm-mark.minor.far{display:none}
+
+/* Icon dán phủ lên hình vẽ bên dưới. Khi ảnh thiếu, JS gỡ thẻ <img> đi và
+   hình vẽ lộ lại — một lối lui, không phải hai đường vẽ song song phải giữ
+   cho khớp nhau. */
+.bm-mark .dot img{position:absolute;left:50%;bottom:100%;
+  width:38px;height:38px;margin-left:-19px;margin-bottom:-6px;
+  object-fit:contain;filter:drop-shadow(0 2px 3px rgba(14,43,36,.45))}
+.bm-mark.minor .dot img{width:30px;height:30px;margin-left:-15px;margin-bottom:-4px}
+/* Cùng lý do như nhãn ghim giá: chữ để đọc, không phải để bấm. */
+.bm-mark{width:44px;min-width:0;padding:0}
+.bm-mark .lbl{position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  pointer-events:none;margin-top:2px;
+  max-width:110px;font-size:10.5px;font-weight:600;line-height:1.2;
+  text-align:center;color:var(--muc);background:rgba(244,235,211,.94);
+  border:1px solid var(--vien-in);border-radius:8px;padding:2px 6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:none}
+/* Nhãn chỉ bật khi đủ gần — placeMarks() gắn .named theo mức thu phóng. */
+.bm-mark.named .lbl{display:block}
+
+/* ── lớp quán ăn (OpenStreetMap) ────────────────────────
+   Ký hiệu phải TRUNG TÍNH tuyệt đối: chấm tròn rỗng, không giọt nước,
+   không màu phán quyết. Quán ở lớp này chưa được quét lần nào — mượn
+   sắc xanh Đúng Giá hay sắc son Trên khoảng là app nói dối bằng màu.
+   Nằm dưới cả mốc tham quan lẫn ghim giá: đây là lớp đông nhất và ít
+   thẩm quyền nhất, chồng lên thì nó nuốt mất hai lớp kia.       */
+.bm-eat{position:absolute;inset:0;pointer-events:none;z-index:0}
+.bm-eat[hidden]{display:none}
+.bm-eat .bm-eat{display:none}
+.bm-eat>button{position:absolute;top:0;left:0;pointer-events:auto;
+  width:44px;height:44px;margin:-22px 0 0 -22px;
+  display:grid;place-items:center;padding:0}
+.bm-eat>button .dot{width:11px;height:11px;border-radius:50%;
+  background:#FBF7EC;border:2px solid #8A7E63;
+  box-shadow:0 1px 3px rgba(14,43,36,.3)}
+.bm-eat>button[data-kind="cafe"] .dot{border-color:#7A6A4E;border-style:double;border-width:3px}
+.bm-eat>button[data-kind="street"] .dot{border-radius:2px}
+/* Có icon sinh theo loại thì nó đè lên chấm — chấm trở thành nền đỡ.
+   Ảnh tự gỡ khi hỏng (onerror), lúc đó chấm lộ lại nguyên vẹn. */
+.bm-eat>button .dot:has(img){width:24px;height:24px;background:none;border:none;box-shadow:none}
+.bm-eat>button .dot img{width:24px;height:24px;object-fit:contain;display:block;
+  filter:drop-shadow(0 1px 2px rgba(14,43,36,.4))}
+.bm-eat>button .lbl{position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  pointer-events:none;margin-top:-8px;max-width:96px;
+  font-size:9.5px;font-weight:600;line-height:1.15;text-align:center;color:#4A4436;
+  background:rgba(251,247,236,.92);border:1px solid var(--vien-in);border-radius:6px;
+  padding:1px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none}
+.bm-eat>button.named .lbl{display:block}
+.bm-eat>button.sel .dot{background:var(--dong);border-color:var(--then);transform:scale(1.3)}
+.bm-eat>button:focus-visible{outline:2px solid var(--dong);outline-offset:-6px;border-radius:12px}
+.bm-chip.eat[aria-pressed="true"]{background:#6B5E42;border-color:#6B5E42;color:#F6F2E6}
+
+/* Nút đổi phẳng ↔ 3D. Dùng CHỮ chứ không icon: "3D" và "Flat" đọc ra ngay,
+   còn một hình khối lập phương thì người dùng phải đoán. */
+.bm-zoom .iconbtn.viewmode{font-size:12px;font-weight:700;letter-spacing:.04em}
+.bm-zoom .iconbtn.viewmode[aria-pressed="true"]{background:var(--then);color:#F6F2E6;
+  border-color:var(--vien-dam)}
+/* Ở 3D nhãn phố nằm nghiêng theo mặt đất nên khó đọc hơn — hạ bớt độ nổi
+   của nhãn ghim để chúng không cạnh tranh với chính hình khối thành phố. */
+#v-bigmap.is3d .bm-eat>button .lbl{opacity:.9}
+.bm-mark .lbl i{display:block;font-style:normal;font-weight:500;font-size:9.5px;
+  color:var(--muc-nhat);font-variant-numeric:tabular-nums}
+.bm-mark.sel .dot{border-color:var(--son);transform:scale(1.25)}
+.bm-mark.sel .lbl{border-color:var(--vien-dam);background:#fff}
+.bm-mark:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:12px}
+
+.bm-me{position:absolute;top:0;left:0;width:20px;height:20px;margin:-10px 0 0 -10px;
+  pointer-events:none;display:grid;place-items:center}
+.bm-me i{width:14px;height:14px;border-radius:50%;background:#2C6BE0;
+  border:2.5px solid #fff;box-shadow:0 0 0 6px rgba(44,107,224,.22),0 2px 6px rgba(0,0,0,.35)}
+
+.bm-top{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));
+  left:12px;right:12px;z-index:5;display:flex;align-items:center;gap:10px}
+.bm-title{flex:1 1 auto;min-width:0;display:grid;justify-items:center;gap:1px;
+  background:rgba(251,247,236,.95);border:1px solid var(--line);border-radius:var(--pill);
+  padding:7px 14px;box-shadow:0 3px 10px -5px rgba(14,43,36,.3)}
+.bm-title b{font-family:var(--disp);font-size:15px;font-weight:600;color:var(--then);
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bm-title small{font-size:11px;color:var(--muc-nhat);font-variant-numeric:tabular-nums}
+
+.bm-filters{position:absolute;left:0;right:0;z-index:5;
+  top:calc(66px + env(safe-area-inset-top,0px));
+  display:flex;gap:7px;overflow-x:auto;padding:0 12px 4px;
+  scrollbar-width:none;overscroll-behavior-x:contain}
+.bm-filters::-webkit-scrollbar{display:none}
+.bm-chip{flex:0 0 auto;min-height:38px;padding:0 14px;border-radius:var(--pill);
+  background:rgba(251,247,236,.95);border:1px solid var(--line);
+  font-size:12.5px;font-weight:600;color:var(--muc-nhat);
+  box-shadow:0 2px 8px -5px rgba(14,43,36,.3);
+  transition:background .2s cubic-bezier(.22,.61,.36,1),color .2s}
+.bm-chip[aria-pressed="true"]{background:var(--then);color:#F6F2E6;border-color:var(--then)}
+.bm-chip[data-lvl="ok"][aria-pressed="true"]{background:#0E4A3C;border-color:#0E4A3C}
+.bm-chip[data-lvl="bad"][aria-pressed="true"]{background:var(--son);border-color:var(--son)}
+.bm-chip[data-lvl="unknown"][aria-pressed="true"]{background:#6E6A62;border-color:#6E6A62}
+.bm-chip:focus-visible{outline:2px solid var(--dong);outline-offset:2px}
+
+.bm-zoom{position:absolute;right:12px;z-index:5;display:grid;gap:8px;
+  top:50%;transform:translateY(-50%)}
+
+.bm-foot{position:absolute;left:12px;right:12px;z-index:5;
+  bottom:calc(14px + var(--safe));display:grid;gap:8px;justify-items:start}
+.bm-scale{background:rgba(251,247,236,.95);border:1px solid var(--line);
+  border-radius:8px;padding:5px 8px}
+.bm-scale>span{display:block;border-bottom:2px solid var(--muc-nhat);
+  border-left:2px solid var(--muc-nhat);border-right:2px solid var(--muc-nhat);
+  height:12px;position:relative}
+.bm-scale i{position:absolute;left:0;right:0;top:-3px;text-align:center;
+  font-style:normal;font-size:10px;font-weight:600;color:var(--muc-nhat);
+  font-variant-numeric:tabular-nums}
+.bm-attr{background:rgba(251,247,236,.92);border:1px solid var(--line);
+  border-radius:12px;padding:8px 11px;font-size:11px;line-height:1.45;
+  color:var(--muc-nhat);max-width:100%}
+.bm-attr b{color:var(--then);font-weight:600}
+
+/* nút mở sang ứng dụng bản đồ trong thẻ chi tiết cơ sở */
+.btn.maps{display:flex;align-items:center;justify-content:center;gap:9px;
+  min-height:48px;border-radius:14px;border:1px solid var(--line);
+  background:var(--giay);color:var(--then);font-size:14px;font-weight:600;margin-top:10px}
+.btn.maps svg{width:18px;height:18px;color:var(--dong)}
+
+@media (prefers-reduced-motion:reduce){
+  .bm-pin,.bm-mark,.bm-chip{transition:none}
+}
+
+/* ── danh sách địa điểm ────────────────────────────────── */
+.place{display:block;width:100%;text-align:left;background:var(--giay);border:1px solid var(--line);
+  border-radius:var(--r);padding:14px;margin-top:10px}
+.place .top{display:flex;align-items:center;gap:9px;justify-content:space-between}
+.place .nm{display:block;font-family:var(--disp);font-size:18px;font-weight:600;letter-spacing:-.008em}
+.place .st{display:block;font-size:11.5px;color:var(--muc-nhat);font-weight:300;margin-top:2px}
+
+/* ── nhật ký ───────────────────────────────────────────── */
+.view.lacquer{background:
+  radial-gradient(circle at 22% 14%,rgba(201,162,39,.1),transparent 44%),
+  radial-gradient(circle at 80% 76%,rgba(192,57,43,.08),transparent 42%),
+  var(--then);color:#EDE4D2}
+.view.lacquer .muted{color:#A99B80}
+.view.lacquer .kicker{color:var(--vang-la)}
+.view.lacquer h1.title,.view.lacquer h2.sect{color:#F2E7CF}
+.jrow{display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:center;
+  padding:13px 0;border-bottom:1px solid rgba(201,162,39,.2)}
+.jrow .jd{width:9px;height:9px;border-radius:50%}
+.jrow .jn{display:block;font-size:13.5px;font-weight:500;color:#EDE4D2}
+.jrow .js{display:block;font-size:10.5px;color:#A99B80;font-weight:300;margin-top:2px}
+.jrow .ja{font-family:var(--mono);font-size:12.5px;color:var(--vang-la)}
+.jstat{display:flex;gap:22px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(201,162,39,.26)}
+.jstat div small{font-family:var(--mono);font-size:8.5px;color:#9A8E74;display:block;letter-spacing:.1em}
+.jstat div b{font-family:var(--body);font-size:24px;color:var(--vang-la);font-weight:700;letter-spacing:-.02em}
+
+/* ── thông báo ─────────────────────────────────────────── */
+#toast{position:absolute;left:50%;transform:translate(-50%,20px);bottom:calc(88px + var(--safe));
+  z-index:86;background:var(--muc);color:#F2F0E8;padding:11px 17px;border-radius:var(--pill);
+  font-size:12.5px;opacity:0;pointer-events:none;transition:.25s;max-width:88%;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+.warnbox{display:flex;gap:9px;background:#FCEEEB;border-radius:13px;padding:11px 13px;
+  margin-top:11px;font-size:12.5px;color:var(--son);font-weight:500;line-height:1.45}
+.okbox{background:#E7F3EC;color:#166B52}
+.infobox{background:#EEF1F7;color:var(--cham)}
+
+.seedwarn{font-size:10.5px;color:var(--muc-nhat);font-weight:300;line-height:1.5;
+  border-left:2px solid var(--ho-phach);padding-left:9px;margin-top:11px}
+
+@media (prefers-reduced-motion:reduce){
+  .ring-slow,.ring-rev,.lantern{animation:none}
+  .sheet{transition:none}
+}
+
+/* ── xưởng icon (tab You) ────────────────────────────────
+   Lưới icon có nút vẽ lại từng cái. Ô rỗng hiện cây bút chứ không hiện
+   khung ảnh vỡ: chưa vẽ là một trạng thái bình thường của màn hình này,
+   không phải lỗi. */
+.ic-actions{display:flex;gap:9px;margin:10px 0 8px;flex-wrap:wrap}
+.ic-actions .btn{flex:1 1 auto;min-width:140px;margin:0}
+.ic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));
+  gap:9px;margin-top:10px}
+.ic-cell{position:relative;display:grid;justify-items:center;gap:4px;
+  padding:7px 4px 6px;border-radius:14px;background:var(--giay);
+  border:1px solid var(--vien-in)}
+.ic-art{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;
+  background:var(--kem);border:1px solid var(--line);overflow:hidden}
+.ic-art img{width:100%;height:100%;object-fit:contain;display:block}
+.ic-art i{display:grid;place-items:center;width:20px;height:20px;color:var(--muc-nhat)}
+.ic-art i svg{width:100%;height:100%;display:block}
+.ic-art.run{animation:icPulse 1.1s ease-in-out infinite}
+.ic-art.fail{border-color:rgba(176,32,26,.45);background:var(--hong)}
+
+/* ── nhóm trong xưởng ảnh ───────────────────────────────
+   Danh mục đầy đủ hơn 70 tấm. Đổ hết vào một lưới thì người dùng cuộn
+   mãi không thấy đầu cuối, và không cách nào sinh riêng một nhóm. */
+.ic-sect{margin-top:6px}
+.ic-sect .sect-row{margin:18px 0 10px}
+.ic-sect .sect-row h2{font-size:clamp(15px,4.4vw,18px)}
+.ic-sect .sect-row .act{min-height:40px;font-size:13px}
+/* Ảnh cơ sở là ảnh cảnh 16/10, không phải icon vuông — ép chúng vào ô
+   48px thì chỉ còn thấy một vệt màu, không kiểm được ảnh có đạt không. */
+.ic-grid.photos{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+.ic-cell.wide .ic-art{width:100%;height:auto;aspect-ratio:16/10;border-radius:14px}
+.ic-cell.wide .ic-art img{object-fit:cover}
+.ic-cell.wide .ic-name{font-size:11px;text-align:center;line-height:1.25}
+@keyframes icPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.ic-name{font-size:10.5px;line-height:1.2;text-align:center;color:var(--muc-nhat);
+  max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ic-redo{position:absolute;top:2px;right:2px;width:44px;height:44px;
+  display:grid;place-items:center;color:var(--dong-chu);border-radius:12px}
+.ic-redo svg{width:15px;height:15px}
+.ic-redo[disabled]{opacity:.35}
+.ic-err{grid-column:1/-1;font-size:9.5px;line-height:1.25;color:var(--son-dam);
+  text-align:center;max-width:74px;overflow:hidden}
+@media (prefers-reduced-motion:reduce){ .ic-art.run{animation:none;opacity:.6} }
+
+/* ── thẻ mời đi tuyến (tab Nearby) ───────────────────────── */
+.walk-teaser{display:grid;grid-template-columns:46px 1fr 20px;gap:12px;align-items:center;
+  width:100%;text-align:left;margin-top:12px;padding:13px 14px;border-radius:20px;
+  background:linear-gradient(168deg,#fff 58%,#FDFAF1);
+  border:1.5px solid var(--vien);box-shadow:0 4px 16px rgba(14,43,36,.07);
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.walk-teaser:active{transform:scale(.98)}
+.wt-ico{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  background:var(--then);color:var(--dong);border:1.5px solid var(--vien-dam)}
+.wt-ico svg{width:20px;height:20px}
+.wt-name{display:block;font-family:var(--disp);font-size:clamp(16px,4.6vw,19px);
+  font-weight:600;color:var(--then)}
+.wt-meta{display:block;font-size:12.5px;color:var(--muc-nhat);margin-top:2px;
+  font-variant-numeric:tabular-nums}
+.wt-go{color:var(--dong-chu)}
+.wt-go svg{width:16px;height:16px}
+
+/* ── màn hình tuyến đi bộ ────────────────────────────────── */
+.rt-actions{position:absolute;left:10px;right:10px;top:74px;z-index:12;
+  display:flex;gap:7px;overflow-x:auto;padding:2px;scrollbar-width:none}
+.rt-actions::-webkit-scrollbar{display:none}
+.rt-btn{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;
+  min-height:44px;padding:0 14px;border-radius:var(--pill);white-space:nowrap;
+  background:rgba(251,247,236,.96);border:1px solid var(--line);
+  font-size:13px;font-weight:600;color:var(--muc);
+  box-shadow:0 3px 10px -4px rgba(14,43,36,.35)}
+.rt-btn svg{width:16px;height:16px;color:var(--then)}
+.rt-btn.primary{background:var(--then);color:#F6F2E6;border-color:var(--vien-dam)}
+.rt-btn.primary svg{color:var(--dong)}
+.rt-btn .ico{display:grid;place-items:center;width:16px;height:16px}
+
+/* Thẻ tiến trình nổi trên bản đồ, giống bản mockup: nó phải đọc được mà
+   không che mất tuyến, nên bám mép trái và chỉ rộng 62%. */
+/* Thẻ nằm ở GÓC DƯỚI TRÁI, ngay trên danh sách chặng — không phải góc trên.
+   Đặt trên cùng thì nó che mất chặng đầu tiên, đúng cái chặng người dùng
+   đang đứng và cần nhìn thấy nhất. */
+/* Dải NGANG sát trên danh sách chặng, không phải thẻ nổi bên trái. Thẻ nổi
+   chiếm 62% bề ngang đúng chỗ tuyến bắt đầu, nên hai chặng đầu — chặng người
+   dùng đang đứng và chặng kế tiếp — nằm khuất sau chính cái thẻ đang nói về
+   chúng. Dải ngang thấp trả lại toàn bộ bề ngang cho bản đồ. */
+/* Dải NGANG DẸP sát trên danh sách chặng. Thẻ nổi bên trái chiếm 62% bề
+   ngang đúng chỗ tuyến bắt đầu, nên hai chặng đầu nằm khuất sau chính cái
+   thẻ đang nói về chúng. Dải thấp trả lại bản đồ cho người dùng. */
+.rt-card{position:absolute;left:10px;right:10px;top:auto;bottom:calc(31% + 10px);z-index:11;
+  display:grid;grid-template-columns:1fr auto;gap:3px 10px;align-items:baseline;
+  padding:9px 13px 10px;border-radius:18px;background:rgba(255,253,247,.97);
+  border:1px solid var(--vien);box-shadow:0 8px 22px -8px rgba(14,43,36,.45)}
+.rt-card .now{grid-column:1;display:flex;align-items:center;gap:7px;
+  font-family:var(--disp);font-size:16px;font-weight:600;color:var(--then);line-height:1.15}
+.rt-card .count{grid-column:2;justify-self:end;font-size:11.5px;font-weight:600;
+  color:var(--muc-nhat);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rt-card .nxt{grid-column:1/-1;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  font-size:13px;font-weight:600;color:var(--muc);line-height:1.2}
+.rt-card .nxt .arrow{color:var(--dong-chu);font-weight:700}
+.rt-card .nxt.done{color:var(--ngoc-sau)}
+.rt-card .num{flex:0 0 auto;width:19px;height:19px;border-radius:50%;
+  background:var(--then);color:var(--dong);display:grid;place-items:center;
+  font-family:var(--body);font-size:11px;font-weight:700}
+.rt-card .nxt .num{background:var(--dong);color:var(--then-sau)}
+.rt-card .walk{font-size:11.5px;font-weight:500;color:var(--muc-nhat);
+  font-variant-numeric:tabular-nums}
+.rt-bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);
+  margin-top:4px;overflow:hidden}
+.rt-bar i{display:block;height:100%;border-radius:3px;background:var(--dong);
+  transition:width .35s cubic-bezier(.22,.61,.36,1)}
+/* Mẹo kẹp ở 2 dòng: mẹo dài làm dải cao lên và lại nuốt mất bản đồ. */
+.rt-card .tip{grid-column:1/-1;margin-top:6px;padding-top:6px;
+  border-top:1px dashed var(--line);font-size:11.5px;line-height:1.4;color:var(--muc-nhat);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rt-card .tip b{color:var(--son-dam);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;margin-right:6px}
+
+/* Trong chế độ tuyến, mốc phụ ẩn hẳn: màn hình này nói về BỐN chặng, thêm
+   tám nhãn mốc nữa thì số thứ tự chìm nghỉm giữa một đám chữ. */
+#v-bigmap.rt .bm-mark.minor{display:none}
+
+/* ── ghim chặng: vòng tròn đánh số ─────────────────────────
+   Cố tình KHÁC hình với ghim giá và ghim tham quan: đây là thứ tự đi, không
+   phải một phán quyết hay một mốc. Số nằm trong vòng tròn là ký hiệu duy
+   nhất đọc được ngay mà không cần chú giải. */
+.bm-stops{position:absolute;inset:0;pointer-events:none;z-index:3}
+.bm-stop{position:absolute;top:0;left:0;pointer-events:auto;
+  width:44px;height:44px;margin:-22px 0 0 -22px;display:grid;place-items:center}
+.bm-stop .num{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;
+  background:var(--then);color:#F6F2E6;border:2px solid #FBF3DE;
+  box-shadow:0 3px 8px -2px rgba(14,43,36,.6);
+  transition:transform .22s cubic-bezier(.22,.61,.36,1)}
+.bm-stop.done .num{background:var(--ngoc-sau);color:#CFE3DA}
+.bm-stop.now .num{background:var(--dong);color:var(--then-sau);
+  transform:scale(1.22);box-shadow:0 0 0 5px rgba(201,146,43,.28),0 4px 10px -2px rgba(0,0,0,.5)}
+.bm-stop:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:50%}
+
+/* ── danh sách chặng ở đáy ─────────────────────────────────── */
+.rt-sheet{position:absolute;left:0;right:0;bottom:0;z-index:12;
+  max-height:31%;overflow-y:auto;padding:10px 12px calc(14px + var(--safe));
+  background:var(--diep);border-radius:26px 26px 0 0;
+  border-top:1.5px solid var(--vien);box-shadow:0 -8px 26px rgba(14,43,36,.18)}
+.rt-list{display:grid;gap:7px}
+.rt-stop{display:grid;grid-template-columns:30px 1fr;gap:11px;align-items:center;
+  width:100%;text-align:left;min-height:52px;padding:8px 10px;border-radius:16px;
+  background:var(--card,#FDFAF3);border:1px solid var(--vien-in)}
+.rt-stop.on{border-color:var(--vien-dam);background:#fff}
+.rt-stop .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  font-size:13px;font-weight:700;background:var(--kem);color:var(--muc-nhat);
+  border:1px solid var(--vien-in);font-variant-numeric:tabular-nums}
+.rt-stop.on .n{background:var(--dong);color:var(--then-sau);border-color:var(--vien-dam)}
+.rt-stop .nm{display:block;font-family:var(--disp);font-size:15px;font-weight:600;
+  color:var(--then);line-height:1.2}
+.rt-stop .mt{display:block;font-size:11.5px;color:var(--muc-nhat);margin-top:2px;
+  font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){
+  .rt-bar i,.bm-stop .num,.walk-teaser{transition:none}
+}
+
+/* ── quy đổi ngoại tệ ────────────────────────────────────
+   Tiền đồng là con số chính; ngoại tệ nhỏ hơn, nhạt hơn, luôn có dấu ≈.
+   Kích cỡ và độ đậm phải nói rõ cái nào là giá thật — đảo lại là app tự
+   nhận mình biết tỉ giá quầy đổi tiền. */
+.fx{display:block;font-size:.72em;font-weight:500;color:var(--muc-nhat);
+  letter-spacing:0;margin-top:1px;font-variant-numeric:tabular-nums}
+.amt .fx{color:var(--dong-chu)}
+.amt[data-l] .fx{color:inherit;opacity:.72}
+
+/* ── bảng so giá từng món ────────────────────────────────
+   Ba cột cố định: món / khoảng giá vùng / giá quán. Không dùng <table>
+   vì trên màn hẹp bảng thật sẽ tràn ngang và người dùng phải cuộn hai
+   chiều để đọc một dòng. */
+.pcmp{border:1.5px solid var(--vien);border-radius:18px;overflow:hidden;
+  background:#fff;margin-top:4px}
+.pcmp-h,.pcmp-r{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);
+  gap:8px;padding:10px 12px;align-items:start}
+.pcmp-h{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muc-nhat);background:var(--kem);border-bottom:1px solid var(--vien-in)}
+.pcmp-r{border-top:1px solid var(--line);font-size:12.5px}
+.pcmp-r:first-of-type{border-top:0}
+.pcmp-r .nm{display:block;font-weight:600;color:var(--then);line-height:1.25}
+.pcmp-r .un{display:block;font-size:11px;color:var(--muc-nhat)}
+.pcmp-r .rg,.pcmp-r .pd{font-variant-numeric:tabular-nums;color:var(--muc)}
+.pcmp-r .pd{font-weight:700}
+.pcmp-r .tag{display:block;font-size:10px;font-weight:600;margin-top:3px;
+  padding:2px 7px;border-radius:var(--pill);width:fit-content}
+/* Trạng thái LUÔN có chữ, không chỉ dựa vào màu — nền hồng nhạt với chữ
+   son đậm đạt 4.5:1, nhưng người mù màu vẫn phải đọc được kết luận. */
+.pcmp-r[data-s="bad"] .pd{color:var(--son-dam)}
+.pcmp-r[data-s="bad"] .tag{background:var(--hong);color:var(--son-dam)}
+.pcmp-r[data-s="ok"] .tag{background:#E6EFE7;color:#14503F}
+.pcmp-r[data-s="low"] .tag{background:var(--kem);color:var(--muc-nhat)}
+.pcmp-r[data-s="none"] .tag{background:var(--kem);color:var(--muc-nhat)}
+
+/* ── ba việc nên làm ── */
+.todo{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-top:4px}
+.todo>div{background:#fff;border:1.5px solid var(--vien);border-radius:18px;padding:12px;
+  display:grid;gap:4px;align-content:start}
+.todo .ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:var(--then);color:var(--dong);margin-bottom:2px}
+.todo .ic svg{width:17px;height:17px}
+.todo b{font-family:var(--disp);font-size:14.5px;color:var(--then);line-height:1.2}
+.todo small{font-size:11.5px;color:var(--muc-nhat);line-height:1.4}

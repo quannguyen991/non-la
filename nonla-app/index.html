@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0E2B24">
+<title>Nón Lá — travel Vietnam without guessing</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="foodmap.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ══ QUÉT ══ -->
+  <section class="view noscroll" id="v-scan" hidden>
+    <div id="camWrap">
+      <video id="cam" playsinline muted autoplay></video>
+      <div id="camFallback">
+        <p><strong>No camera here.</strong><br>Use <em>Enter prices by hand</em> below, or open this page on a phone over HTTPS to scan.</p>
+      </div>
+    </div>
+
+    <div class="modes" role="group" aria-label="Scan mode">
+      <button class="mode" data-mode="menu"  aria-pressed="true">Menu</button>
+      <button class="mode" data-mode="cash"  aria-pressed="false">Cash</button>
+      <button class="mode" data-mode="bill"  aria-pressed="false">Bill</button>
+      <!-- Dish là chế độ DUY NHẤT cần mạng: nhận diện vật thể không có
+           model nào đủ nhỏ để chạy trên máy. Ba chế độ kia chạy offline. -->
+      <button class="mode" data-mode="dish"  aria-pressed="false">Dish</button>
+    </div>
+
+    <div class="offline" id="offlineBadge"><i></i>OFFLINE READY</div>
+    <div class="reticle" id="reticle" aria-hidden="true"></div>
+    <p class="hint" id="hint">Point at a menu and tap the button</p>
+  </section>
+
+  <!-- ══ ĂN GÌ ══ -->
+  <section class="view" id="v-eat" hidden><div class="pad" id="eatBody"></div></section>
+
+  <!-- ══ QUANH ĐÂY ══ -->
+  <section class="view" id="v-map" hidden><div class="pad" id="mapBody"></div></section>
+
+  <!-- ══ NHẬT KÝ ══ -->
+  <section class="view lacquer" id="v-journal" hidden><div class="pad" id="journalBody"></div></section>
+
+  <!-- ══ TÔI ══ -->
+  <section class="view" id="v-me" hidden><div class="pad" id="meBody"></div></section>
+
+  <!-- ══ BẢN ĐỒ CHI TIẾT ══ -->
+  <section id="v-bigmap" hidden aria-label="Detailed map"></section>
+  <section id="v-foodmap" hidden aria-label="Must-Try Food Map"></section>
+
+  <!-- Lớp phủ dùng chung cho MỌI tab. Trước đây chúng nằm trong #v-scan,
+       nên chạm một món ở tab Eat thì thẻ kết quả mở ra bên trong một khối
+       đang hidden — người dùng bấm mà không thấy gì. -->
+  <div class="edge" id="edge"></div>
+
+  <div id="busy">
+    <div style="display:grid;justify-items:center">
+      <div class="lantern" id="lantern"></div>
+      <div id="busyTxt">Reading…</div>
+      <div id="busyPct"></div>
+    </div>
+  </div>
+
+  <div class="sheet" id="sheet" role="dialog" aria-label="Details">
+    <div class="grab"></div>
+    <div class="cloudtop" aria-hidden="true"></div>
+    <div class="inner" id="sheetBody"></div>
+  </div>
+
+  <nav class="tabbar" id="tabbar"></nav>
+  <div id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<canvas id="shot" hidden></canvas>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

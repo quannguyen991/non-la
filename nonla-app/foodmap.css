@@ -1,0 +1,128 @@
+/* ═══ Must-Try Food Map ═══════════════════════════════════════
+   Cùng hệ token với app.css: giấy dó, sơn mài xanh, vàng đèn lồng, viền
+   vàng ba trọng số. Không khai màu mới ở đây — thêm một sắc riêng cho
+   một màn hình là cách nhanh nhất để bộ giao diện rời ra từng mảnh.
+   ═══════════════════════════════════════════════════════════ */
+#v-foodmap{position:absolute;inset:0;z-index:70;background:var(--diep);
+  display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch}
+#v-foodmap[hidden]{display:none}
+
+/* ── header dạng pill ── */
+.fm-head{display:flex;align-items:center;gap:10px;padding:10px 12px 4px;flex:0 0 auto}
+.fm-title{flex:1 1 auto;min-width:0;text-align:center;background:#fff;
+  border:1.5px solid var(--vien);border-radius:26px;padding:10px 14px;
+  box-shadow:0 4px 14px -8px rgba(14,43,36,.3)}
+.fm-title b{display:block;font-family:var(--disp);font-weight:600;color:var(--then);
+  font-size:clamp(18px,5.2vw,24px);line-height:1.15;letter-spacing:-.01em}
+.fm-title small{display:block;font-size:clamp(11px,3.2vw,13px);color:var(--muc-nhat);margin-top:2px}
+
+/* ── hàng lọc ── */
+.fm-filters,.fm-dishes{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+  padding:8px var(--pad-x);margin:0;flex:0 0 auto;overscroll-behavior-x:contain}
+.fm-filters::-webkit-scrollbar,.fm-dishes::-webkit-scrollbar,
+.fm-rail::-webkit-scrollbar{display:none}
+.fm-chip,.fm-dish{flex:0 0 auto;display:grid;justify-items:center;gap:4px;
+  /* 44px là sàn vùng chạm; chip ở đây to hơn vì mockup dùng thẻ lớn. */
+  min-width:76px;min-height:64px;padding:8px 10px;border-radius:18px;
+  background:#fff;border:1.5px solid var(--vien);color:var(--muc);
+  font-size:11.5px;font-weight:600;line-height:1.2;text-align:center;
+  transition:transform .18s cubic-bezier(.22,.61,.36,1)}
+.fm-chip .ic,.fm-dish .ic{width:24px;height:24px;color:var(--dong-chu);display:block}
+.fm-chip .ic svg,.fm-dish .ic svg{width:100%;height:100%;display:block}
+.fm-dish .ic img{width:26px;height:26px;object-fit:contain;display:block}
+.fm-chip[aria-pressed="true"],.fm-dish[aria-pressed="true"]{
+  background:var(--then);border-color:var(--then);color:#F6F2E6}
+.fm-chip[aria-pressed="true"] .ic,.fm-dish[aria-pressed="true"] .ic{color:#EBDFAE}
+/* Chip mờ vì THIẾU DỮ LIỆU, không phải vì khu này không có quán — title
+   trên nút nói lý do; ở đây chỉ làm nó trông rõ là không bấm được. */
+.fm-chip:disabled{opacity:.42}
+.fm-chip:active:not(:disabled),.fm-dish:active{transform:scale(.96)}
+.fm-chip:focus-visible,.fm-dish:focus-visible{outline:2px solid var(--dong);outline-offset:2px}
+/* Mũi nhọn chỉ xuống bản đồ ở chip món đang chọn — dấu hiệu nó đang lọc
+   ghim phía dưới chứ không phải một cái nút rời. */
+.fm-dish[aria-pressed="true"]{position:relative}
+.fm-dish[aria-pressed="true"]::after{content:"";position:absolute;left:50%;bottom:-6px;
+  width:12px;height:12px;background:var(--then);transform:translateX(-50%) rotate(45deg);
+  border-radius:2px}
+
+/* ── khung bản đồ ── */
+.fm-map{position:relative;flex:0 0 auto;height:clamp(300px,46vh,460px);
+  margin:6px var(--pad-x) 0;border-radius:24px;overflow:hidden;
+  border:1.5px solid var(--vien);background:#F4EBD3;
+  box-shadow:0 10px 26px -16px rgba(14,43,36,.5)}
+.fm-art{position:absolute;top:0;left:0;transform-origin:0 0;display:block;max-width:none}
+.fm-map.noart::after{content:"Illustrated map unavailable — pins still show real positions";
+  position:absolute;inset:auto 12px 12px;font-size:12px;color:var(--muc-nhat);
+  background:rgba(251,247,236,.94);border:1px solid var(--vien-in);
+  border-radius:10px;padding:6px 9px}
+.fm-trail{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.fm-pins{position:absolute;inset:0;pointer-events:none;z-index:2}
+
+/* ── ghim: ảnh món trong vòng tròn ── */
+.fm-pin{position:absolute;top:0;left:0;pointer-events:auto;
+  width:60px;margin:-42px 0 0 -30px;display:grid;justify-items:center;gap:2px;padding:0}
+.fm-pin[hidden]{display:none}
+.fm-pin .disc{width:52px;height:52px;border-radius:50%;overflow:hidden;
+  background:var(--kem);border:2.5px solid #fff;
+  box-shadow:0 0 0 2px var(--vien-dam),0 4px 10px -4px rgba(14,43,36,.55)}
+.fm-pin .disc img{width:100%;height:100%;object-fit:cover;display:block}
+.fm-pin .flag{position:absolute;top:-4px;right:2px;width:22px;height:22px;border-radius:50%;
+  display:grid;place-items:center;border:2px solid #fff;color:#fff}
+.fm-pin .flag svg{width:12px;height:12px}
+.fm-pin[data-l="ok"] .flag{background:#0E4A3C}
+.fm-pin[data-l="bad"] .flag{background:var(--son)}
+.fm-pin[data-l="unknown"] .flag{background:#6E6A62}
+.fm-pin .lbl{max-width:84px;font-size:10px;font-weight:700;line-height:1.15;text-align:center;
+  color:var(--then);background:rgba(251,247,236,.94);border:1px solid var(--vien-in);
+  border-radius:7px;padding:2px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fm-pin:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:14px}
+/* Vùng chạm thật: đĩa 52px chưa đạt 44px cả chiều cao khi tính cả nhãn,
+   nên nới bằng một lớp trong suốt thay vì phóng to hình. */
+.fm-pin::before{content:"";position:absolute;left:50%;top:26px;transform:translate(-50%,-50%);
+  width:56px;height:56px;border-radius:50%}
+
+.fm-side{position:absolute;left:10px;bottom:10px;z-index:3;display:grid;gap:6px}
+.fm-toggle{display:flex;align-items:center;gap:7px;min-height:44px;padding:0 12px;
+  border-radius:var(--pill);background:rgba(251,247,236,.95);
+  border:1.5px solid var(--vien);font-size:12.5px;font-weight:600;color:var(--muc)}
+.fm-toggle .ic{width:18px;height:18px;color:var(--dong-chu);flex:0 0 auto}
+.fm-toggle .ic svg{width:100%;height:100%;display:block}
+.fm-toggle[aria-pressed="true"]{background:var(--then);border-color:var(--then);color:#F6F2E6}
+.fm-toggle[aria-pressed="true"] .ic{color:#EBDFAE}
+.fm-count{position:absolute;right:10px;top:10px;z-index:3;font-size:12px;font-weight:600;
+  color:var(--muc);background:rgba(251,247,236,.95);border:1px solid var(--vien-in);
+  border-radius:var(--pill);padding:5px 11px;font-variant-numeric:tabular-nums}
+
+/* ── carousel thẻ quán ── */
+.fm-rail{display:grid;grid-auto-flow:column;grid-auto-columns:min(66%,230px);gap:11px;
+  overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+  padding:12px var(--pad-x) 4px;margin:0}
+.fm-card{scroll-snap-align:center;text-align:left;background:#fff;
+  border:1.5px solid var(--vien);border-radius:20px;padding:10px;
+  display:grid;gap:6px;align-content:start;
+  box-shadow:0 6px 18px -12px rgba(14,43,36,.5)}
+.fm-card .art{display:block;aspect-ratio:16/11;border-radius:14px;overflow:hidden;
+  background:var(--kem);border:1px solid var(--vien-in)}
+.fm-card .art img{width:100%;height:100%;object-fit:cover;display:block}
+.fm-card .nm{font-family:var(--disp);font-size:16px;font-weight:600;color:var(--then);line-height:1.2}
+.fm-card .meta{font-size:11.5px;color:var(--muc-nhat);line-height:1.35}
+.fm-card .scans{font-size:11px;color:var(--muc-nhat);font-variant-numeric:tabular-nums}
+.fm-card .pill{justify-self:start;min-height:32px;padding:0 11px;font-size:12px;gap:5px}
+.fm-card .pill svg{width:14px;height:14px}
+.fm-card:active{transform:scale(.98)}
+
+/* ── banner cuối ── */
+.fm-banner{display:grid;grid-template-columns:44px 1fr auto;gap:11px;align-items:center;
+  margin:12px var(--pad-x) calc(20px + var(--safe));padding:12px;
+  background:#fff;border:1.5px solid var(--vien);border-radius:22px}
+.fm-banner .lant{width:44px;height:44px;color:var(--dong)}
+.fm-banner .lant svg{width:100%;height:100%;display:block}
+.fm-banner .txt b{display:block;font-family:var(--disp);font-size:15px;color:var(--then)}
+.fm-banner .txt small{display:block;font-size:11.5px;color:var(--muc-nhat);line-height:1.35;margin-top:2px}
+.fm-banner .btn{margin:0;min-height:44px;padding:0 14px;white-space:nowrap}
+
+@media (prefers-reduced-motion:reduce){
+  .fm-chip,.fm-dish,.fm-card{transition:none}
+  .fm-chip:active,.fm-dish:active,.fm-card:active{transform:none}
+}

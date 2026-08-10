@@ -1,0 +1,9 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# khoá và cấu hình riêng — anon key của Supabase là công khai, nhưng
+# service_role key thì không bao giờ được vào repo
+.env
+.env.*

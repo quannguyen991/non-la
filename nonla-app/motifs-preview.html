@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<title>Nón Lá — thư viện hoạ tiết</title>
+<style>
+body{margin:0;padding:40px;background:#17130E;color:#F2EADC;font:14px/1.6 system-ui,sans-serif}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.03em}
+p.l{color:#9A8E74;margin:0 0 34px;max-width:70ch}
+h2{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#D9A227;margin:40px 0 14px;font-weight:600}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px}
+.c{background:#F4EDDF;border-radius:14px;padding:18px;display:grid;place-items:center;min-height:180px}
+.c.dark{background:#211A12}
+.c svg{width:100%;height:auto;max-height:150px}
+.cap{font-size:11px;color:#9A8E74;text-align:center;margin-top:7px}
+.band{background:#F4EDDF;border-radius:10px;overflow:hidden;margin-bottom:6px;height:44px;
+  background-repeat:repeat-x;background-position:center}
+.bcap{font-size:11px;color:#9A8E74;margin:0 0 18px}
+.drum{background:#211A12;border-radius:18px;padding:26px;display:grid;place-items:center}
+.drum svg{width:100%;max-width:460px}
+</style></head><body>
+<h1>Thư viện hoạ tiết</h1>
+<p class="l">Dựng lại bằng SVG từ bộ ảnh tham chiếu. Thân hình vẽ bằng nét kép — dải dày màu đồng có đường sáng chạy giữa — đúng lối khắc trên tang trống, thay vì tô đặc.</p>
+<div id="out"></div>
+<script type="module">
+import { birdFlying, birdStanding, deer, cloud, cloudBand, FRIEZE, drumFace, dataURI, wrap } from "./motifs.js";
+const GOLD="#D9A227", RED="#B0201A", IVORY="#F4EDDF", DARK="#211A12";
+const cell=(svg,cap,dark)=>`<div><div class="c ${dark?"dark":""}">${svg}</div><div class="cap">${cap}</div></div>`;
+
+document.getElementById("out").innerHTML = `
+<h2>Linh vật</h2>
+<div class="g">
+  ${cell(wrap(birdFlying(RED,IVORY), "-10 -10 190 150"), "Chim Lạc bay · son")}
+  ${cell(wrap(birdFlying(GOLD,IVORY), "-10 -10 190 150"), "Chim Lạc bay · đồng")}
+  ${cell(wrap(birdFlying(GOLD,DARK), "-10 -10 190 150"), "Chim Lạc trên nền then", true)}
+  ${cell(wrap(birdStanding(GOLD,IVORY), "-16 -10 200 165"), "Chim Lạc đứng")}
+  ${cell(wrap(deer(GOLD,IVORY), "-16 -8 205 172"), "Hươu sao")}
+  ${cell(wrap(deer(RED,IVORY), "-16 -8 205 172"), "Hươu sao · son")}
+</div>
+
+<h2>Mây</h2>
+<div class="g">
+  ${cell(wrap(cloud(RED,IVORY), "20 40 300 145"), "Mây · son")}
+  ${cell(wrap(cloud(GOLD,IVORY), "20 40 300 145"), "Mây · đồng")}
+  ${cell(wrap(cloud(GOLD,DARK), "20 40 300 145"), "Mây trên nền then", true)}
+</div>
+<div class="band" style="background-image:${dataURI(cloudBand(GOLD,IVORY,6))};background-size:auto 100%"></div>
+<p class="bcap">Dải mây viền — dùng ở mép trên thẻ kết quả</p>
+
+<h2>Đường diềm</h2>
+${Object.entries(FRIEZE).map(([k,f])=>
+  `<div class="band" style="background-image:${dataURI(f(GOLD))};background-size:auto 70%"></div>
+   <p class="bcap">${k}</p>`).join("")}
+
+<h2>Mặt trống đồng</h2>
+<div class="drum">${drumFace(GOLD, DARK)}</div>
+`;
+</script></body></html>

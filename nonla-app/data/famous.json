@@ -1,0 +1,143 @@
+{
+  "_note": "Quán được BÁO CHÍ và trang du lịch nhắc tới, gắn với món đặc trưng. ĐÂY KHÔNG PHẢI DỮ LIỆU GIÁ và cũng KHÔNG PHẢI đánh giá của Nón Lá — app chưa quét menu ở những quán này. Tên và món lấy từ nguồn công khai ghi ở trường source; TOẠ ĐỘ lấy từ OpenStreetMap (ODbL) qua eateries.json, không lấy từ Google Maps hay mạng xã hội.",
+  "_fetched": "2026-08",
+  "places": [
+    {
+      "id": "osm-node-7147171785",
+      "name": "Cao lầu Thanh",
+      "osmName": "Quan Cao Lau Thanh noodle shop",
+      "at": [
+        15.88169,
+        108.32839
+      ],
+      "street": "26 Thái Phiên",
+      "dish": "cao-lau",
+      "note": "Quán lâu năm, mở 6h–15h.",
+      "source": "hiddenhoian.com; danangprivatecar.com"
+    },
+    {
+      "id": "osm-node-6892599587",
+      "name": "Cao lầu Bà Lê",
+      "osmName": "Quan Cao Lau Ba Le",
+      "at": [
+        15.8795,
+        108.32944
+      ],
+      "street": "49/3 Trần Hưng Đạo",
+      "dish": "cao-lau",
+      "note": "Sợi mì trộn nước giếng Bá Lễ theo lối cũ.",
+      "source": "hoianmemoriesland.com"
+    },
+    {
+      "id": "press-cao-lau-2",
+      "name": "Trung Bắc",
+      "osmName": null,
+      "at": null,
+      "street": "87 Trần Phú",
+      "dish": "cao-lau",
+      "note": "Nhà hàng lâu đời trên phố Trần Phú.",
+      "source": "danangprivatecar.com"
+    },
+    {
+      "id": "osm-node-4120953690",
+      "name": "Cơm gà Bà Buội",
+      "osmName": "Cơm gà Bà Bụi",
+      "at": [
+        15.87849,
+        108.33043
+      ],
+      "street": "22 Phan Châu Trinh",
+      "dish": "com-ga-hoi-an",
+      "note": "Một trong những hàng cơm gà lâu nhất phố.",
+      "source": "blog.travelhackfun.com; blisshoian.com"
+    },
+    {
+      "id": "osm-node-12640258901",
+      "name": "Cơm gà Bà Vân",
+      "osmName": "Com Ga Ba Van",
+      "at": [
+        15.87838,
+        108.33077
+      ],
+      "street": "Phan Châu Trinh",
+      "dish": "com-ga-hoi-an",
+      "note": "Hàng nhỏ trong phố cổ, chủ yếu khách quen.",
+      "source": "blisshoian.com"
+    },
+    {
+      "id": "osm-node-4279536690",
+      "name": "Bánh mì Phượng",
+      "osmName": "Banh Mi Phuong",
+      "at": [
+        15.87848,
+        108.33201
+      ],
+      "street": "2B Phan Châu Trinh",
+      "dish": "banh-mi",
+      "note": "Nổi lên sau khi Anthony Bourdain ghé.",
+      "source": "culturephamtravel.com; tripadvisor.com"
+    },
+    {
+      "id": "osm-node-9938321717",
+      "name": "Madam Khánh — Bánh Mì Queen",
+      "osmName": "Madam Khanh - Bánh Mi Queen",
+      "at": [
+        15.88063,
+        108.32791
+      ],
+      "street": "115 Trần Cao Vân",
+      "dish": "banh-mi",
+      "note": "Bà chủ bán bánh mì tại đây từ những năm 1990.",
+      "source": "lasiestaresorts.com; hotelroyalhoian.vn"
+    },
+    {
+      "id": "press-banh-bao-banh-vac-7",
+      "name": "White Rose Restaurant",
+      "osmName": null,
+      "at": null,
+      "street": "533 Hai Bà Trưng",
+      "dish": "banh-bao-banh-vac",
+      "note": "Gia đình làm bánh cung cấp cho gần như cả phố.",
+      "source": "hoianfoodtour.com; en.wikipedia.org"
+    },
+    {
+      "id": "osm-node-4703186899",
+      "name": "Mót Hội An",
+      "osmName": "Mót, Hoi An",
+      "at": [
+        15.87716,
+        108.32729
+      ],
+      "street": "150 Trần Phú",
+      "dish": "che",
+      "note": "Trà thảo mộc pha sen, quầy nhỏ ngay góc phố.",
+      "source": "willflyforfood.net"
+    },
+    {
+      "id": "osm-way-632030501",
+      "name": "Reaching Out Tea House",
+      "osmName": "Reaching out Teahouse",
+      "at": [
+        15.87704,
+        108.32724
+      ],
+      "street": "131 Trần Phú",
+      "dish": "ca-phe-sua-da",
+      "note": "Doanh nghiệp xã hội, nhân viên khiếm thính; quán giữ im lặng.",
+      "source": "willflyforfood.net"
+    },
+    {
+      "id": "osm-node-2076855947",
+      "name": "Morning Glory",
+      "osmName": "Morning Glory",
+      "at": [
+        15.87662,
+        108.32779
+      ],
+      "street": "106 Nguyễn Thái Học",
+      "dish": "cao-lau",
+      "note": "Bếp của Ms Vy, nấu món phố cổ theo lối nhà hàng.",
+      "source": "willflyforfood.net; blisshoian.com"
+    }
+  ]
+}

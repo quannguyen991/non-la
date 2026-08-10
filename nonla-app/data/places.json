@@ -1,0 +1,302 @@
+{
+  "_note": "DỮ LIỆU HẠT GIỐNG. Trạng thái Đúng Giá thật phải sinh từ lượt quét tích luỹ, không gán tay. Trường `prices` là giá hạt giống theo từng món tại từng cơ sở, dùng cho thanh so giá ở tab Eat. Trường `at` là [vĩ độ, kinh độ] đặt xấp xỉ trên đúng con phố đã ghi — đủ để định hướng và tính khoảng cách, KHÔNG phải địa chỉ đã khảo sát.",
+  "places": [
+    {
+      "id": "ba-be",
+      "name": "Bà Bé · Cao lầu",
+      "zone": "hoian-oldtown",
+      "tier": "street",
+      "street": "Trần Phú",
+      "fair": true,
+      "scans": 31,
+      "since": "2026-04",
+      "known": [
+        "cao-lau",
+        "mi-quang",
+        "tra-da"
+      ],
+      "prices": {
+        "cao-lau": 48000,
+        "mi-quang": 46000,
+        "tra-da": 3000
+      },
+      "at": [
+        15.87755,
+        108.3278
+      ]
+    },
+    {
+      "id": "co-thao",
+      "name": "Cô Thảo · Cơm gà",
+      "zone": "hoian-oldtown",
+      "tier": "casual",
+      "street": "Phan Châu Trinh",
+      "fair": true,
+      "scans": 24,
+      "since": "2026-05",
+      "known": [
+        "com-ga-hoi-an",
+        "che"
+      ],
+      "prices": {
+        "com-ga-hoi-an": 45000,
+        "che": 15000
+      },
+      "at": [
+        15.8791,
+        108.329
+      ]
+    },
+    {
+      "id": "che-mot",
+      "name": "Chè Mót",
+      "zone": "hoian-oldtown",
+      "tier": "street",
+      "street": "Trần Phú",
+      "fair": true,
+      "scans": 48,
+      "since": "2026-03",
+      "known": [
+        "che",
+        "nuoc-mia"
+      ],
+      "prices": {
+        "che": 18000,
+        "nuoc-mia": 12000
+      },
+      "at": [
+        15.87745,
+        108.3261
+      ]
+    },
+    {
+      "id": "quan-bien",
+      "name": "Quán ven sông",
+      "zone": "hoian-oldtown",
+      "tier": "restaurant",
+      "street": "Bạch Đằng",
+      "fair": false,
+      "scans": 19,
+      "since": null,
+      "known": [
+        "hoanh-thanh",
+        "nuoc-dua",
+        "bia-chai"
+      ],
+      "flag": "Prices above the local range on 11 of 19 scans",
+      "prices": {
+        "hoanh-thanh": 110000,
+        "nuoc-dua": 90000,
+        "bia-chai": 65000
+      },
+      "at": [
+        15.8756,
+        108.3285
+      ]
+    },
+    {
+      "id": "banh-mi-goc",
+      "name": "Bánh mì góc phố",
+      "zone": "hoian-oldtown",
+      "tier": "street",
+      "street": "Hoàng Diệu",
+      "fair": true,
+      "scans": 22,
+      "since": "2026-06",
+      "known": [
+        "banh-mi",
+        "ca-phe-sua-da"
+      ],
+      "prices": {
+        "banh-mi": 25000,
+        "ca-phe-sua-da": 20000
+      },
+      "at": [
+        15.8783,
+        108.3315
+      ]
+    },
+    {
+      "id": "chua-xet",
+      "name": "Quán chưa đủ dữ liệu",
+      "zone": "hoian-oldtown",
+      "tier": "casual",
+      "street": "Nguyễn Thái Học",
+      "fair": null,
+      "scans": 6,
+      "since": null,
+      "known": [
+        "cao-lau",
+        "banh-xeo"
+      ],
+      "prices": {
+        "cao-lau": 52000,
+        "banh-xeo": 45000
+      },
+      "at": [
+        15.87665,
+        108.3272
+      ]
+    },
+    {
+      "id": "pho-suong",
+      "name": "Phở Sướng",
+      "zone": "hanoi-hoankiem",
+      "tier": "casual",
+      "street": "Đinh Liệt",
+      "fair": true,
+      "scans": 37,
+      "since": "2026-02",
+      "known": [
+        "pho-bo",
+        "tra-da"
+      ],
+      "prices": {
+        "pho-bo": 45000,
+        "tra-da": 3000
+      },
+      "at": [
+        21.0333,
+        105.8521
+      ]
+    },
+    {
+      "id": "bun-cha-hd",
+      "name": "Bún chả Hàng Quạt",
+      "zone": "hanoi-hoankiem",
+      "tier": "street",
+      "street": "Hàng Quạt",
+      "fair": true,
+      "scans": 29,
+      "since": "2026-04",
+      "known": [
+        "bun-cha",
+        "nem-ran",
+        "tra-da"
+      ],
+      "prices": {
+        "bun-cha": 45000,
+        "nem-ran": 40000,
+        "tra-da": 3000
+      },
+      "at": [
+        21.034,
+        105.8499
+      ]
+    },
+    {
+      "id": "ca-phe-giang",
+      "name": "Cà phê trứng phố cổ",
+      "zone": "hanoi-hoankiem",
+      "tier": "casual",
+      "street": "Nguyễn Hữu Huân",
+      "fair": true,
+      "scans": 41,
+      "since": "2026-01",
+      "known": [
+        "ca-phe-trung",
+        "ca-phe-sua-da"
+      ],
+      "prices": {
+        "ca-phe-trung": 35000,
+        "ca-phe-sua-da": 22000
+      },
+      "at": [
+        21.0347,
+        105.854
+      ]
+    },
+    {
+      "id": "bia-hoi-corner",
+      "name": "Bia hơi ngã tư",
+      "zone": "hanoi-hoankiem",
+      "tier": "street",
+      "street": "Tạ Hiện",
+      "fair": false,
+      "scans": 26,
+      "since": null,
+      "known": [
+        "bia-hoi",
+        "nem-ran"
+      ],
+      "flag": "Beer priced above the local range on 15 of 26 scans",
+      "prices": {
+        "bia-hoi": 18000,
+        "nem-ran": 75000
+      },
+      "at": [
+        21.0339,
+        105.8512
+      ]
+    },
+    {
+      "id": "com-tam-ba",
+      "name": "Cơm tấm Bảy",
+      "zone": "hcmc-district1",
+      "tier": "street",
+      "street": "Nguyễn Trãi",
+      "fair": true,
+      "scans": 33,
+      "since": "2026-03",
+      "known": [
+        "com-tam",
+        "tra-da"
+      ],
+      "prices": {
+        "com-tam": 48000,
+        "tra-da": 3000
+      },
+      "at": [
+        10.767,
+        106.686
+      ]
+    },
+    {
+      "id": "hu-tieu-nam",
+      "name": "Hủ tiếu Nam Vang",
+      "zone": "hcmc-district1",
+      "tier": "casual",
+      "street": "Võ Văn Tần",
+      "fair": true,
+      "scans": 27,
+      "since": "2026-05",
+      "known": [
+        "hu-tieu",
+        "ca-phe-sua-da"
+      ],
+      "prices": {
+        "hu-tieu": 45000,
+        "ca-phe-sua-da": 25000
+      },
+      "at": [
+        10.7759,
+        106.691
+      ]
+    },
+    {
+      "id": "ben-thanh-stall",
+      "name": "Quầy ăn chợ Bến Thành",
+      "zone": "hcmc-district1",
+      "tier": "casual",
+      "street": "Chợ Bến Thành",
+      "fair": false,
+      "scans": 34,
+      "since": null,
+      "known": [
+        "bun-thit-nuong",
+        "goi-cuon",
+        "nuoc-mia"
+      ],
+      "flag": "Prices above the local range on 21 of 34 scans",
+      "prices": {
+        "bun-thit-nuong": 95000,
+        "goi-cuon": 80000,
+        "nuoc-mia": 40000
+      },
+      "at": [
+        10.7725,
+        106.698
+      ]
+    }
+  ]
+}

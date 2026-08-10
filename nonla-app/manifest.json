@@ -1,0 +1,15 @@
+{
+  "name": "Nón Lá — travel Vietnam without guessing",
+  "short_name": "Nón Lá",
+  "description": "Point your camera at a menu, a bill or a handful of cash. Nón Lá tells you what it is and what it should cost.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E4A3C",
+  "theme_color": "#0E4A3C",
+  "lang": "en",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
