@@ -165,6 +165,69 @@ const civic = svg(`
   <path d="M32 5 h13 v7 h-13Z" fill="${SON}"/>
   <circle cx="38" cy="8.5" r="2" fill="${GOLD}"/>`);
 
+/* ── Biển ─── đường bờ cong, sóng và một cái dù
+   Vùng Mỹ Khê và phần lớn điểm đi trong ngày quanh Đà Nẵng là biển.
+   Không có dáng riêng thì tất cả rơi về hình nón lá và bản đồ ven biển
+   thành một hàng nón giống hệt nhau. */
+const beach = svg(`
+  <rect x="0" y="34" width="64" height="30" fill="${NUOC}"/>
+  ${[38, 45, 52].map((y, i) => `<path d="M${-2 + i * 4} ${y} q9 -4 18 0 t18 0 t18 0"
+    fill="none" stroke="#A9C8CC" stroke-width="1.8"/>`).join("")}
+  <path d="M0 34 q16 -6 32 0 t32 0 v-8 H0Z" fill="#E8D8A8"/>
+  <circle cx="14" cy="14" r="6" fill="${GOLD}"/>
+  <path d="M40 44 V22" stroke="${GO}" stroke-width="2.2"/>
+  <path d="M26 24 q14 -12 28 0 -14 -6 -28 0Z" fill="${SON}"/>`);
+
+/* ── Núi ─── hai đỉnh, một chỏm tuyết-mây và con đường vòng */
+const mountain = svg(`
+  <path d="M2 54 L22 20 L34 38 L44 26 L62 54Z" fill="#7D8B7A"
+    stroke="${GO}" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M22 20 L15 32 q7 4 14 0Z" fill="${GIAY}"/>
+  <path d="M44 26 L38 36 q6 3 12 0Z" fill="${GIAY}"/>
+  <path d="M2 54 h60" stroke="${GO}" stroke-width="2.4"/>
+  <path d="M8 48 q14 -5 26 2 t20 -3" fill="none" stroke="${GIAY}"
+    stroke-width="1.6" opacity=".7"/>`);
+
+/* ── Đảo ─── một hòn nhô lên khỏi mặt nước, có cây */
+const island = svg(`
+  <rect x="0" y="38" width="64" height="26" fill="${NUOC}"/>
+  ${[44, 52].map((y, i) => `<path d="M${1 + i * 5} ${y} q10 -4 20 0 t20 0 t20 0"
+    fill="none" stroke="#A9C8CC" stroke-width="1.6"/>`).join("")}
+  <path d="M10 40 q10 -12 22 -12 t22 12Z" fill="#7D8B7A" stroke="${GO}" stroke-width="1.8"/>
+  <path d="M30 30 v-12" stroke="${GO}" stroke-width="2.2"/>
+  <path d="M30 18 q-12 0 -13 7 6 -4 13 -1Z" fill="#4E7A55"/>
+  <path d="M30 18 q12 0 13 7 -6 -4 -13 -1Z" fill="#4E7A55"/>
+  <path d="M46 40 q6 -8 12 -6" fill="none" stroke="#4E7A55" stroke-width="2.4"/>`);
+
+/* ── Thiên nhiên ─── ruộng bậc thang và một tán cây */
+const nature = svg(`
+  <path d="M2 56 q16 -8 30 -4 t30 -6" fill="none" stroke="#4E7A55" stroke-width="3.2"/>
+  <path d="M2 46 q16 -8 30 -4 t30 -6" fill="none" stroke="#7FA268" stroke-width="3.2"/>
+  <path d="M2 36 q16 -8 30 -4 t30 -6" fill="none" stroke="#9BB484" stroke-width="3"/>
+  <path d="M44 34 v-10" stroke="${GO}" stroke-width="2.4"/>
+  <ellipse cx="44" cy="18" rx="11" ry="9" fill="#4E7A55"/>
+  <ellipse cx="38" cy="22" rx="7" ry="6" fill="#7FA268"/>`);
+
+/* ── Đô thị ─── mấy khối nhà cao thấp, một cái có mái ngói */
+const city = svg(`
+  <rect x="6" y="26" width="14" height="32" fill="${GIAY}" stroke="${GO}" stroke-width="1.8"/>
+  <rect x="24" y="14" width="16" height="44" fill="#E8C36B" stroke="${GO}" stroke-width="1.8"/>
+  <rect x="44" y="32" width="14" height="26" fill="${GIAY}" stroke="${GO}" stroke-width="1.8"/>
+  ${roof(42, 24, 18, 8)}
+  ${[[9, 31], [9, 40], [9, 49], [27, 20], [27, 29], [27, 38], [27, 47], [47, 37], [47, 46]]
+    .map(([x, y]) => `<rect x="${x}" y="${y}" width="8" height="6" fill="${THEN}" opacity=".55"/>`).join("")}
+  <rect x="2" y="58" width="60" height="3" fill="${GO}" opacity=".7"/>`);
+
+/* ── Cổng thành ─── ba lối, tường dày, lầu canh bên trên */
+const gate = svg(`
+  <rect x="4" y="30" width="56" height="28" fill="#CFC3A4" stroke="${GO}" stroke-width="2"/>
+  ${roof(6, 12, 52, 12, SON)}
+  <path d="M4 24 h56" stroke="${GOLD}" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M24 58 V44 a8 8 0 0 1 16 0 v14Z" fill="${THEN}" opacity=".8"/>
+  <path d="M10 58 V46 a4 4 0 0 1 8 0 v12Z" fill="${THEN}" opacity=".6"/>
+  <path d="M46 58 V46 a4 4 0 0 1 8 0 v12Z" fill="${THEN}" opacity=".6"/>
+  <circle cx="32" cy="20" r="2.4" fill="${GOLD}"/>`);
+
 /* ── Mặc định ─── nón lá, dấu chung của cả app */
 const sight = svg(`
   <path d="M6 44 Q32 6 58 44" fill="#DFC98F" stroke="${GO}" stroke-width="2.4"
@@ -178,6 +241,7 @@ const sight = svg(`
 export const SIGHT_SVG = {
   bridge, hall, house, temple, market, pier, well, craft, museum,
   heritage, church, civic, sight,
+  beach, mountain, island, nature, city, gate,
   lake: pier, monument: heritage,
 };
 

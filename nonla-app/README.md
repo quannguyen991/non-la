@@ -30,10 +30,16 @@ Hai tầng, vì chúng bắt hai loại lỗi khác nhau.
 node test.mjs
 ```
 
-141 phép thử: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá,
+230 phép thử: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá,
 đọc mệnh giá tiền, phát hiện nhầm bậc số 0, toàn bộ phép chiếu / khoảng cách /
-khung nhìn của bản đồ, và lõi thuần lớp cộng đồng: gộp sao, khoảng giá, xác
-thực bài, khoảng cách tới quán, kích thước ảnh nén, giãn cách gửi lại hàng chờ.
+khung nhìn của bản đồ, lõi thuần lớp cộng đồng, và cách dựng liên kết ra ngoài.
+
+Tầng này còn kiểm chính DỮ LIỆU, không chỉ mã: món mồ côi không vùng nào bán,
+dòng giá trỏ vào một món không tồn tại, dải p25→p95 ngược, cơ sở mang nhãn
+Đúng Giá khi chưa đủ hai mươi lượt quét, chuyến đi trong ngày nằm lọt vào
+trong khung bản đồ. Lớp kiểm dữ liệu này bắt được ba lỗi ngay lần chạy đầu —
+một trong số đó (`com-tam-ba` bán trà đá ở một vùng không có dòng giá trà đá)
+đã nằm sẵn trong repo và vẫn đang hiện ra màn hình dưới dạng một dấu gạch.
 
 **Đường tương tác** — mở `index.html` rồi dán vào console:
 
@@ -41,10 +47,10 @@ thực bài, khoảng cách tới quán, kích thước ảnh nén, giãn cách 
 import('./audit.js').then(m => m.run())
 ```
 
-105 lời gọi ck(...) trong mã nguồn — con số đếm tĩnh, không phải số phép thử
-thực chạy: vài lời gọi nằm trong vòng lặp nên một lần run() in ra nhiều dòng
-hơn con số này. Kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi
-tab có dọn sạch trạng thái cũ không.
+128 phép thử thực chạy. Kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ
+không, đổi tab có dọn sạch trạng thái cũ không — và một luật riêng cho lớp
+liên kết mới: mọi liên kết mạng xã hội phải là liên kết TÌM KIẾM, không bao
+giờ là đường dẫn tới một tài khoản cụ thể mà app tự đoán là của quán này.
 
 Tầng thứ hai tồn tại vì hai lỗi từng lọt qua tầng thứ nhất — lõi logic đúng
 hoàn toàn mà người dùng vẫn không bấm được:
@@ -57,8 +63,8 @@ hoàn toàn mà người dùng vẫn không bấm được:
 
 | Hạng mục | Kết quả |
 |---|---|
-| Lõi logic | 103/103 pass |
-| Đường tương tác | Chưa đo lại được toàn bộ sau khi thêm phép thử Community — môi trường trình duyệt ở đây quá chậm để chạy hết một bộ cỡ này (`run()` vẫn chưa xong sau 363 giây, còn đứng ở mục Cash Guard; không phải do CDN hay mạng bị chặn). 10 phép thử Community đã chạy riêng, trực tiếp trong trình duyệt, cả 10 đều pass — đó không phải kết quả của cả bộ |
+| Lõi logic | 230/230 pass (`node test.mjs`) |
+| Đường tương tác | 126/128 pass (`audit.js` trong trình duyệt). Hai phép thử trượt đã trượt sẵn trước đợt này — chạy lại đúng bộ đó trên bản HEAD cho 113/115 và trượt đúng hai cái ấy: vùng chạm ghim tham quan (`bm-mark` bị `bm-pin` che), và `.ex-base` rỗng ở Hội An vì màn hình đó dùng lớp tranh thay bản dựng vector |
 | OCR tiếng Việt (Tesseract `vie`) | 92% tin cậy, ~2,6s lần đầu, ~0,4s sau đó |
 | Chuỗi pixel → OCR → khớp → phán quyết | Đúng, kể cả khi OCR đọc nát `Cao lầu` thành `Caolâ\`u` |
 | Chạy khi tắt hẳn server | Boot được, OCR được, phán quyết được |
@@ -92,19 +98,28 @@ cloud.js        chỗ DUY NHẤT biết HTTP của lớp cộng đồng; config.
                 để trống thì Community tự tắt
 community.js    màn hình Cộng đồng: feed đọc được khi chưa đăng nhập, form đăng bài, báo cáo
                 + community.css — kiểu riêng cho feed và form
-audit.js        105 lời gọi ck(...) (đếm tĩnh — vài lời gọi nằm trong vòng lặp,
-                chạy thật ra nhiều dòng hơn con số này): tương tác, bố cục,
-                tương phản, vùng chạm, bản đồ
+audit.js        128 phép thử: tương tác, bố cục, tương phản, vùng chạm, bản đồ,
+                và luật của lớp liên kết (mọi liên kết mạng xã hội phải là tìm kiếm)
 sw.js           offline. network-first cho vỏ app, cache-first cho CDN
-test.mjs        141 phép thử: match.js, geo.js, iso.js, artmap.js, citymap.js,
-                route.js, và lõi thuần lớp cộng đồng (posts.js, photo.js, outbox.js)
+test.mjs        230 phép thử: match.js, geo.js, iso.js, artmap.js, citymap.js,
+                route.js, links.js, lõi thuần lớp cộng đồng — và một lớp
+                kiểm chính DỮ LIỆU (món mồ côi, giá ngược, nhãn Đúng Giá
+                gán sớm, chuyến đi nằm lọt vào trong khung bản đồ)
 assets/         ảnh — sinh bằng ../tools/gen-assets.mjs, xem assets/README.md
   maps/         tranh nền tab Nearby, có khối `art` neo toạ độ trong maps.json
+links.js        liên kết ra bản đồ và mạng xã hội                    ← có test
+tools/
+  fetch-zones.py    tải phố/nước/mốc cho vùng mới từ Overpass, có đệm trên đĩa
+  merge-zones.mjs   gộp mốc tuyển chọn + lộ trình vào maps.json, kiểm trước khi ghi
+  fetch-eateries.py tải quán ăn cho cả sáu vùng, gắn `zone` vào từng bản ghi
+  fetch-osm.py      bản gốc cho ba vùng đầu; merge-maps.py — vòng gộp của chúng
 data/
-  dishes.json   30 món, tri thức + câu gọi món + phiên âm
-  prices.json   phân phối giá p25/p50/p75/p95 cho 3 vùng
-  places.json   13 cơ sở, trạng thái Đúng Giá, toạ độ, giá theo món
-  maps.json     hình học bản đồ 3 vùng: sông, phố, mốc
+  dishes.json   77 món, tri thức + câu gọi món + phiên âm
+  prices.json   phân phối giá p25/p50/p75/p95 cho 6 vùng
+  places.json   37 cơ sở, trạng thái Đúng Giá, toạ độ, giá theo món
+  maps.json     hình học bản đồ 6 vùng: sông, biển, phố, mốc
+  eateries.json 2.481 quán từ OpenStreetMap, mỗi bản ghi gắn sẵn `zone`
+  trips.json    điểm đi trong ngày quanh từng vùng
 design.html     bộ 10 màn hình thiết kế (tài liệu, không phải app)
 ```
 
@@ -166,6 +181,90 @@ Ba con số trên màn hình đều đếm từ `places.json`, không ghi cứng
 **không có sao đánh giá**: dữ liệu của app là số lượt quét và mức lệch giá,
 không phải điểm bình chọn — chỗ đó hiện tháng bắt đầu đạt Đúng Giá thay vì
 một con số 4,8 bịa ra.
+
+## Sáu vùng
+
+| Vùng | Bản đồ | Món có giá | Cơ sở theo dõi | Quán OSM | Đi trong ngày |
+|---|---|---|---|---|---|
+| Hội An · Phố cổ | 167 đoạn phố, 35 mốc, có tranh | 41 | 8 | 370 | 11 |
+| Hà Nội · Hoàn Kiếm | 479 đoạn phố, 27 mốc | 35 | 6 | 562 | 10 |
+| TP.HCM · Quận 1 | 481 đoạn phố, 25 mốc | 35 | 5 | 409 | 7 |
+| Đà Nẵng · Sông Hàn | 547 đoạn phố, 28 mốc | 37 | 7 | 416 | 8 |
+| Đà Nẵng · Biển Mỹ Khê | 423 đoạn phố, 15 mốc | 29 | 5 | 397 | 6 |
+| Huế · Kinh thành | 345 đoạn phố, 27 mốc | 29 | 6 | 327 | 9 |
+
+Ba vùng mới lấy hình học từ cùng một nguồn và cùng một đường ống với ba vùng
+cũ — `tools/fetch-zones.py` (Overpass) rồi `tools/merge-zones.mjs` (gộp lớp
+mốc tuyển chọn tay). Không vùng nào là bản dán tay.
+
+**Biển không phải `natural=water` trong OpenStreetMap.** Nó là
+`natural=coastline`, một đường MỞ chạy dọc bờ với đất ở bên trái, nên vùng Mỹ
+Khê phải tự khép đường bờ thành mảng bằng hai góc ở cạnh đông của khung. Thiếu
+bước đó thì màn hình ra một dải phố treo lơ lửng cạnh một khoảng trắng, và
+không có gì báo lên — bản đồ vẫn vẽ, chỉ là vẽ sai một thứ ai cũng thấy.
+
+Quy ước tên cơ sở giữ nguyên: **tên mô tả, không phải tên quán có thật**. Mỗi
+bản ghi mang một phán quyết giá, và gắn phán quyết hạt giống lên tên một hàng
+quán thật là nói một điều app chưa đo được về một người có thật.
+
+Giá ở dải biển Mỹ Khê cố tình cao hơn trong phố 25–40% cho cùng một món. Đó
+không phải lỗi nhập liệu mà là thông tin: khách nên biết mình đang trả thêm
+bao nhiêu để ngồi nhìn ra biển.
+
+## Đi trong ngày
+
+Bản đồ trong app chỉ phủ vài km quanh chỗ đứng, nhưng câu hỏi thật của khách ở
+Hội An là "mai đi đâu" — và câu trả lời nằm ngoài khung đó. `data/trips.json`
+giữ 51 điểm đến quanh sáu vùng, hiện ở cuối tab Nearby.
+
+**Khoảng cách được TÍNH, thời gian đi thì KHÔNG.** Khoảng cách chạy qua đúng
+hàm haversine của cả app, từ tâm vùng tới toạ độ điểm đến, và được ghi rõ là
+đường **chim bay** — đường bộ lên Bà Nà dài hơn đáng kể, nên để con số trần ra
+mà không nói nó là gì thì app đang nói dối về một quãng đường người ta sắp trả
+tiền. Thời gian đi thì phụ thuộc đèo, phà và giờ cao điểm, không suy ra được
+từ toạ độ, nên nó là chữ do người viết ghi lại và trình bày đúng như thế.
+
+Điểm đến nào app có sẵn dữ liệu — Đà Nẵng, Mỹ Khê, Huế, Hội An — thì thẻ có
+nút chuyển thẳng sang vùng đó. Có một phép thử chặn việc đặt một chỗ vào cả
+hai nơi: cái gì nằm trong khung bản đồ của vùng thì nó là **mốc tham quan**,
+không phải chuyến đi một ngày. Để nó ở cả hai chỗ là app tự mâu thuẫn — một
+bên bảo đi bộ ba phút, một bên bảo bắt taxi. Phép thử này bắt được đúng một ca
+như thế (Bảo tàng Chàm) ngay lần chạy đầu.
+
+## Google Maps, TikTok, Facebook — và ranh giới
+
+Mỗi thẻ quán, thẻ mốc, thẻ chuyến đi và thẻ món giờ có một khối liên kết ra
+ngoài. Ranh giới giữa hai nhóm liên kết trong khối đó chính là ranh giới của
+những gì app thực sự biết:
+
+| Nhóm | App biết gì | Liên kết làm gì |
+|---|---|---|
+| Bản đồ | toạ độ nằm sẵn trong máy | trỏ **thẳng** tới điểm đó — `geo:`, Google Maps, chỉ đường đi bộ, OpenStreetMap |
+| Mạng xã hội | **không biết gì** | mở ô **tìm kiếm** của nền tảng với từ khoá điền sẵn |
+| Trang web riêng | có, khi OSM ghi trường `website` của chính cơ sở đó | mở đúng trang đó |
+
+**Không bịa ra tài khoản.** Nón Lá không biết quán nào có trang Facebook nào,
+kênh TikTok nào. Đoán một handle rồi dựng `facebook.com/<đoán>` là gửi khách
+sang trang của người khác — rất có thể một quán trùng tên ở tỉnh khác — trong
+khi giao diện vẫn trưng ra như thể đó là trang chính chủ. Nên mọi liên kết
+mạng xã hội ở đây là liên kết tìm kiếm, và khối tự khai đúng điều đó ngay dưới
+hàng nút. `audit.js` có một phép thử khoá lại chỗ này: mọi `href` trong hàng
+nền tảng phải chứa một tham số tìm kiếm hoặc một đường hashtag.
+
+Nút Google Maps là một **liên kết**, không phải bản đồ nhúng: không tải tile,
+không cache bản đồ của ai, nên nó không đụng vào điều khoản của bên nào và
+cũng không phá điều kiện chạy offline — mất mạng thì nút này đơn giản là không
+bấm được, còn bản đồ vector trong app vẫn nguyên. Đó cũng là lý do bản đồ
+trong app vẫn tự vẽ từ dữ liệu OSM chứ không nhúng của ai.
+
+Hashtag lấy từ tên **món** trước, tên quán sau: người ta gắn `#caolau` vào
+video chứ gần như không ai gắn tên một hàng quán nhỏ.
+
+Chia sẻ đi qua Web Share API khi máy có; không có thì rơi về danh sách intent
+của từng nền tảng. **TikTok không có liên kết chia sẻ từ web** và Facebook cần
+một URL trang, mà một địa điểm thì không phải một trang — nên hai chỗ đó app
+chép chú thích vào clipboard và **nói tên chúng ra**, thay vì lặng lẽ bỏ nút
+đi để người dùng đi tìm mà không hiểu vì sao nó không có ở đó.
 
 ## Xưởng icon — sinh lúc chạy
 
@@ -252,8 +351,15 @@ Nên bản đồ ở đây là **vector tự vẽ, neo theo toạ độ thật**
 `data/maps.json` — không tile, không thư viện, không gọi mạng. Nó đủ để định
 hướng, và **không giả vờ** là bản đồ dẫn đường: mỗi cơ sở có nút *Open in maps*
 mở sang ứng dụng bản đồ của máy bằng lược đồ `geo:`, rơi về OpenStreetMap trên
-web nếu máy không có app nào nhận. Đó là cách hợp lệ duy nhất để có chỉ đường
-thật mà không vi phạm điều khoản của bên nào.
+web nếu máy không có app nào nhận, và có thêm hai nút mở thẳng Google Maps —
+một cái ghim, một cái chỉ đường đi bộ.
+
+Hai điều đó không mâu thuẫn nhau. Cái bị cấm là **nhúng và cache tile**; mở
+một URL sang ứng dụng của họ thì không tải gì về, không giữ gì lại, và cũng
+không phá điều kiện offline: mất mạng thì nút đó đơn giản là không bấm được,
+còn bản đồ vector trong app vẫn nguyên. Google Maps đứng ở đây vì đó là thứ
+hầu hết khách quốc tế đã quen; OpenStreetMap vẫn ở lại vì nó là nguồn của
+chính toạ độ này.
 
 Ruột bản đồ do `citymap.js` sinh: khối nhà mọc dọc tim đường, mảng cây rải ở
 chỗ trống, bờ cát viền quanh nước. Sinh **một lần** lúc mở bản đồ rồi chỉ chiếu
@@ -274,7 +380,7 @@ co theo `cos(vĩ độ)` — bỏ bước này thì ở vĩ độ 15° bản đ�
 - **Price Lens** — OCR thực đơn → khớp món → so p25/p50/p75/p95 → 🟢🟡🔴
 - **Cash Guard** — đọc mệnh giá polymer, cộng tổng, bắt nhầm một bậc số 0
 - **Bill Check** — đối chiếu hoá đơn với món đã gọi trong phiên, bắt dòng lạ
-- **Eat** — 30 món: món đó là gì, thành phần nhạy cảm, giá phổ biến, nút phát âm gọi món
+- **Eat** — 77 món: món đó là gì, thành phần nhạy cảm, giá phổ biến, nút phát âm gọi món
 - **Nearby** — danh sách Đúng Giá theo vùng
 - **Journal** — mọi lượt quét tự ghi lại, xuất ra được
 - **You** — đổi vùng, định vị, trạng thái cache, giải thích cách phán quyết
@@ -287,6 +393,16 @@ co theo `cos(vĩ độ)` — bỏ bước này thì ở vĩ độ 15° bản đ�
   trước khi đưa cho khách du lịch dùng.
 - Nhận diện mệnh giá dựa vào OCR con số in trên tờ tiền, không phải model thị giác
   huấn luyện riêng. Hoạt động tốt khi tờ tiền phẳng và số hướng lên; kém khi bị gấp.
+- **47 món thêm ở đợt mở rộng chưa có ảnh.** Khung của chúng hiện nền giấy dó có
+  dấu nón lá — đúng trạng thái đã thiết kế, không phải lỗi. Sinh ảnh bằng
+  `_gen_assets.mjs` hoặc Xưởng icon trong tab You; cả hai đều cần khoá API và
+  tính tiền theo từng ảnh, nên không sinh sẵn ở đây.
+- **Ba vùng mới chưa có tranh vẽ tay**, nên tab Nearby và Must-Try Food Map ở đó
+  dùng bản dựng vector. Food Map tự khai điều đó bằng một dòng ở mép dưới thay
+  vì để một khung trống.
+- Giá và cơ sở của ba vùng mới là **hạt giống viết tay**, cùng hạng với ba vùng
+  cũ — không phải khảo sát thực địa, và tên cơ sở là tên mô tả chứ không phải
+  tên quán có thật.
 - Deal Recorder, Culture Lens, Local Compass chưa cài đặt. Đặc tả đầy đủ 28 tính
   năng nằm ở `D:/Non_La_Dac_Ta_San_Pham.docx`.
 - Lớp cộng đồng mới có review + ảnh cho quán CÓ SẴN. Chưa có: địa điểm do người

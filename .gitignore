@@ -10,3 +10,7 @@ Thumbs.db
 # service_role key thì không bao giờ được vào repo
 .env
 .env.*
+
+# bộ nhớ đệm truy vấn Overpass — 1,9 MB JSON thô để chạy lại tools/fetch-*.py
+# mà không phiền máy chủ công cộng. Là giấy nháp, không phải dữ liệu ship.
+nonla-app/data/_overpass_cache/

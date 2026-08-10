@@ -1173,3 +1173,47 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .todo .ic svg{width:17px;height:17px}
 .todo b{font-family:var(--disp);font-size:14.5px;color:var(--then);line-height:1.2}
 .todo small{font-size:11.5px;color:var(--muc-nhat);line-height:1.4}
+
+/* ── ra bên ngoài: bản đồ và mạng xã hội ─────────────────── */
+.outrow{display:grid;gap:8px;margin-top:8px}
+.outrow .btn{margin:0}
+.btn.sec.out{display:flex;align-items:center;justify-content:center;gap:9px;min-height:48px}
+.btn.sec.out svg{width:18px;height:18px;color:var(--dong-chu)}
+
+/* Lưới nền tảng: hai cột trên máy hẹp, tự giãn ra ba khi có chỗ. Mỗi ô là
+   một ĐÍCH CHẠM đủ 48px — đây là hàng nút dễ bị bóp nhỏ nhất trong app vì
+   nội dung mỗi ô ngắn. */
+.netgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  gap:8px;margin-top:9px}
+.netchip{display:flex;align-items:center;gap:10px;min-height:52px;padding:9px 12px;
+  border-radius:16px;background:var(--giay);border:1px solid var(--line);
+  color:var(--muc);text-decoration:none;
+  transition:transform .18s cubic-bezier(.22,.61,.36,1),border-color .18s}
+.netchip:active{transform:scale(.975)}
+.netchip:hover{border-color:var(--vien)}
+.netchip:focus-visible{outline:2px solid var(--ngoc);outline-offset:2px}
+.netchip svg{width:19px;height:19px;flex:0 0 auto;color:var(--then)}
+.netchip span{display:grid;min-width:0}
+.netchip b{font-size:13.5px;font-weight:600;color:var(--then);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.netchip i{font-style:normal;font-size:11px;color:var(--muc-nhat);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── đi trong ngày (tab Nearby) ──────────────────────────── */
+.trip-list{display:grid;gap:8px}
+.trip-card{display:grid;grid-template-columns:44px 1fr 18px;gap:12px;align-items:center;
+  width:100%;text-align:left;padding:11px 13px;border-radius:18px;
+  background:linear-gradient(168deg,#fff 60%,#FDFAF1);
+  border:1.5px solid var(--vien);box-shadow:0 3px 12px rgba(14,43,36,.06);
+  transition:transform .2s cubic-bezier(.22,.61,.36,1)}
+.trip-card:active{transform:scale(.985)}
+.trip-ico{width:44px;height:44px;border-radius:14px;overflow:hidden;
+  background:var(--kem);border:1.5px solid var(--vien-in);display:grid;place-items:center}
+.trip-ico img{width:100%;height:100%;object-fit:cover}
+.trip-body{display:grid;min-width:0}
+.trip-body .nm{font-family:var(--disp);font-size:clamp(15px,4.2vw,17px);
+  font-weight:600;color:var(--then);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trip-body .note{font-size:12px;color:var(--muc-nhat);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trip-meta{font-size:11.5px;color:var(--dong-chu);font-variant-numeric:tabular-nums;
+  margin-top:2px}

@@ -9,6 +9,7 @@ import { buildFabric, drawFabric } from "./citymap.js";
 import { resolveRoute, progressAt, legLabel } from "./route.js";
 import { fitSize } from "./photo.js";
 import { nextAttempt } from "./outbox.js";
+import { mapsLinks, socialLinks, shareTargets, shareText, hashtag } from "./links.js";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
@@ -375,6 +376,122 @@ eq("hỏng 4 lần: chờ 60 phút", nextAttempt({ tries: 4, lastTry: NOW }, NOW
 // dùng bấm tay. Tự thử mãi trên nền là cách âm thầm ăn hết pin của khách.
 eq("quá 5 lần thì thôi tự gửi", nextAttempt({ tries: 5, lastTry: NOW }, NOW), null);
 eq("đã tới hạn thì gửi ngay", nextAttempt({ tries: 1, lastTry: NOW - 120_000 }, NOW), NOW - 60_000);
+
+console.log("\n── links: ra bên ngoài ─────────────────────");
+{
+  const L = mapsLinks("Chợ Hàn", [16.0687, 108.2242]);
+  ok("có toạ độ thì đánh dấu là chính xác", L.exact === true);
+  ok("lược đồ geo: mang đúng toạ độ", L.geo.startsWith("geo:16.0687,108.2242"));
+  ok("Google Maps trỏ tới TOẠ ĐỘ, không phải tên",
+    L.google.includes("query=16.0687%2C108.2242"), L.google);
+  ok("chỉ đường mặc định là đi bộ", L.googleDir.includes("travelmode=walking"));
+  ok("không có điểm đầu thì không gửi origin", !L.googleDir.includes("origin="));
+
+  const F = mapsLinks("Chợ Hàn", [16.0687, 108.2242], [16.06, 108.22]);
+  ok("có vị trí người dùng thì gửi kèm điểm đầu", F.googleDir.includes("origin=16.06%2C108.22"));
+
+  // Không có toạ độ thì KHÔNG được dựng một cái ghim ở đâu đó cho có.
+  const N = mapsLinks("Một nơi nào đó", null);
+  ok("thiếu toạ độ thì không dựng geo:", N.geo === null && N.googleDir === null);
+  ok("thiếu toạ độ thì chuyển sang TÌM theo tên", N.exact === false && N.google.includes("search"));
+  ok("toạ độ hỏng cũng bị coi là thiếu", mapsLinks("x", [NaN, 5]).exact === false);
+
+  eq("hashtag bỏ dấu và bỏ khoảng trắng", hashtag("Cao lầu Hội An"), "caolauhoian");
+  eq("hashtag xử lý chữ đ", hashtag("Bánh đập"), "banhdap");
+
+  /* Luật của cả tệp links.js: KHÔNG BỊA RA TÀI KHOẢN. Mọi liên kết mạng
+     xã hội phải là một truy vấn tìm kiếm hoặc một hashtag — không bao giờ
+     là đường dẫn tới một trang cụ thể mà app tự đoán là của quán này. */
+  const nets = socialLinks("Cao lầu Hội An", ["Cao lầu"]);
+  ok("đủ các nền tảng chính",
+    ["tiktok", "facebook", "instagram", "youtube", "google"].every(
+      (id) => nets.some((n) => n.id === id)));
+  ok("mọi liên kết đều là tìm kiếm hoặc hashtag",
+    nets.every((n) => /[?&](q|search_query)=|\/tag\/|\/explore\/tags\//.test(n.url)),
+    nets.map((n) => n.url).find((u) => !/[?&](q|search_query)=|\/tag\/|\/explore\/tags\//.test(u)) || "");
+  ok("hashtag lấy từ tag đầu tiên, không phải cả câu tìm",
+    nets.find((n) => n.id === "tiktok-tag").url.endsWith("/caolau"));
+  ok("từ khoá được mã hoá URL",
+    nets.find((n) => n.id === "google").url.includes("Cao%20l%E1%BA%A7u"));
+
+  // TikTok không có intent chia sẻ từ web; Facebook cần một URL trang.
+  // Cả hai phải trả về url null để giao diện nói ra thay vì trưng nút chết.
+  const T = shareTargets("Cao lầu · #caolau");
+  ok("không có URL thì Facebook không mở được",
+    T.find((t) => t.id === "facebook").url === null);
+  ok("TikTok không bao giờ có liên kết chia sẻ",
+    T.find((t) => t.id === "tiktok").url === null);
+  ok("vẫn còn ít nhất ba đích chia sẻ mở được",
+    T.filter((t) => t.url).length >= 3);
+  const TU = shareTargets("Cao lầu", "https://example.org/a");
+  ok("có URL thì Facebook mở được", (TU.find((t) => t.id === "facebook").url || "").includes("sharer"));
+
+  eq("câu chia sẻ ghép tên, phụ đề và hashtag",
+    shareText({ name: "Cao lầu", sub: "Cao lau noodles", tags: ["Cao lầu", "Hội An"] }),
+    "Cao lầu · Cao lau noodles · #caolau #hoian");
+}
+
+console.log("\n── dữ liệu: món, giá, vùng ─────────────────");
+{
+  const places = JSON.parse(readFileSync("./data/places.json", "utf8")).places;
+  const maps = JSON.parse(readFileSync("./data/maps.json", "utf8")).zones;
+  const trips = JSON.parse(readFileSync("./data/trips.json", "utf8")).trips;
+  const ids = new Set(dishes.map((d) => d.id));
+
+  ok("id món không trùng nhau", ids.size === dishes.length,
+    `${ids.size}/${dishes.length}`);
+  ok("mọi món có đủ trường bắt buộc",
+    dishes.every((d) => d.id && d.vi && d.en && d.desc && d.say && d.ph && d.unit
+      && Array.isArray(d.aliases) && Array.isArray(d.tags)),
+    dishes.find((d) => !(d.id && d.vi && d.en && d.desc && d.say && d.ph && d.unit))?.id || "");
+
+  /* Món chỉ HIỆN ở tab Eat khi vùng đó có giá cho nó — renderEat lọc theo
+     `zone.items[id]`. Một món không có giá ở vùng nào là món không bao giờ
+     ai nhìn thấy, và không có gì báo lên. */
+  const priced = new Set(Object.values(prices).flatMap((z) => Object.keys(z.items)));
+  const orphan = [...ids].filter((id) => !priced.has(id));
+  ok("mọi món xuất hiện ở ít nhất một vùng", orphan.length === 0, orphan.join(", "));
+  const ghost = [...priced].filter((id) => !ids.has(id));
+  ok("mọi dòng giá trỏ tới một món có thật", ghost.length === 0, ghost.join(", "));
+
+  for (const [zid, z] of Object.entries(prices)) {
+    ok(`${zid}: dải giá tăng dần`,
+      Object.values(z.items).every((v) => v.p25 <= v.p50 && v.p50 <= v.p75 && v.p75 <= v.p95));
+    ok(`${zid}: món đặc trưng có trong bảng giá`, !!z.items[z.signature], z.signature);
+    ok(`${zid}: có bản đồ`, !!maps[zid]);
+    ok(`${zid}: có điểm đi trong ngày`, (trips[zid] || []).length > 0);
+  }
+
+  // Cơ sở phải trỏ tới món có giá ở CHÍNH vùng của nó, không thì thẻ hiện "—".
+  const badKnown = places.flatMap((p) => (p.known || [])
+    .filter((k) => !prices[p.zone]?.items[k]).map((k) => `${p.id}/${k}`));
+  ok("cơ sở chỉ nhận món có giá trong vùng của nó", badKnown.length === 0, badKnown.join(", "));
+  // Đúng Giá là kết quả của lượt quét tích luỹ, không phải nhãn gán tay.
+  ok("không cơ sở nào mang nhãn Đúng Giá khi chưa đủ 20 lượt quét",
+    places.every((p) => p.fair !== true || p.scans >= 20),
+    places.find((p) => p.fair === true && p.scans < 20)?.id || "");
+
+  for (const [zid, list] of Object.entries(trips)) {
+    ok(`${zid}: mọi chuyến đi có toạ độ và cách đi`,
+      list.every((t) => Array.isArray(t.at) && t.at.length === 2 && t.travel && t.blurb && t.tip),
+      list.find((t) => !(t.at && t.travel && t.blurb && t.tip))?.id || "");
+    // `zone` là con trỏ sang một vùng app CÓ dữ liệu. Trỏ sai thì nút
+    // "Switch to…" mở ra một vùng không tồn tại.
+    ok(`${zid}: con trỏ vùng của chuyến đi đều hợp lệ`,
+      list.every((t) => !t.zone || !!prices[t.zone]),
+      list.find((t) => t.zone && !prices[t.zone])?.zone || "");
+    /* Điểm đi trong ngày phải nằm NGOÀI khung bản đồ của vùng. Cái gì đã
+       vẽ trên bản đồ thì nó là mốc tham quan chứ không phải chuyến đi một
+       ngày, và để nó ở cả hai chỗ là app tự mâu thuẫn: một bên bảo đi bộ
+       ba phút, một bên bảo bắt taxi. Đo theo bbox chứ không theo spanM —
+       bbox là đúng cái đang được vẽ. */
+    const [[north, west], [south, east]] = maps[zid].bbox;
+    const inside = list.filter((t) =>
+      t.at[0] <= north && t.at[0] >= south && t.at[1] >= west && t.at[1] <= east);
+    ok(`${zid}: chuyến đi nằm ngoài khung bản đồ`, inside.length === 0,
+      inside.map((t) => t.id).join(", "));
+  }
+}
 
 console.log("\n════════════════════════════════════════════");
 console.log(`${pass} pass · ${fail} fail\n`);

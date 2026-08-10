@@ -1,7 +1,10 @@
 /* Nón Lá — service worker: app chạy được khi không có mạng */
 // v7: thêm lớp quán ăn OSM + bộ icon mốc vẽ tay. Phải bump, không thì máy
 // đã cài bản cũ giữ nguyên cache v6 và không bao giờ thấy eateries.json.
-const CACHE = "nonla-v20";
+// v21: ba vùng mới (Đà Nẵng ×2, Huế), trips.json và links.js. Cùng lý do —
+// không bump thì máy đã cài giữ nguyên maps.json ba vùng và đổi vùng ra
+// một bản đồ trống.
+const CACHE = "nonla-v21";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -14,9 +17,11 @@ const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./route.js",
   "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
+  "./links.js",
   "./manifest.json", "./icon.svg",
   "./data/dishes.json", "./data/prices.json", "./data/places.json",
-  "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./assets/index.json",
+  "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./data/trips.json",
+  "./assets/index.json",
   // Tranh nền tab Nearby. Nằm trong vỏ app chứ không để tải sau: mất mạng
   // giữa phố cổ là đúng lúc người dùng cần màn hình này nhất.
   "./assets/maps/hoian-oldtown.jpg",

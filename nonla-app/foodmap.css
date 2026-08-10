@@ -52,7 +52,7 @@
   border:1.5px solid var(--vien);background:#F4EBD3;
   box-shadow:0 10px 26px -16px rgba(14,43,36,.5)}
 .fm-art{position:absolute;top:0;left:0;transform-origin:0 0;display:block;max-width:none}
-.fm-map.noart::after{content:"Illustrated map unavailable — pins still show real positions";
+.fm-map.noart::after{content:"No illustrated map for this area — pins still show real positions";
   position:absolute;inset:auto 12px 12px;font-size:12px;color:var(--muc-nhat);
   background:rgba(251,247,236,.94);border:1px solid var(--vien-in);
   border-radius:10px;padding:6px 9px}

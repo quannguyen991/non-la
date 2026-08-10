@@ -19,6 +19,7 @@ import * as Cloud from "./cloud.js";
 import * as Outbox from "./outbox.js";
 import { validate as validatePost, farFrom, summarise, priceBand } from "./posts.js";
 import { compress } from "./photo.js";
+import { mapsLinks, socialLinks, shareTargets, shareText } from "./links.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -305,6 +306,43 @@ const I = {
       fill="#fff"/></svg>`,
   starSm: `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
     <path d="m12 2.6 2.9 6.05 6.5.88-4.73 4.62L17.8 21 12 17.9 6.2 21l1.13-6.85L2.6 9.53l6.5-.88Z"/></svg>`,
+  /* Ký hiệu nền tảng: vẽ theo DÁNG chung của từng loại app, không sao lại
+     logo. Ở 16px cái mắt cần nhận ra "đây là video" hay "đây là bản đồ",
+     và dán logo thật của bên khác vào một app phát hành công khai là kéo
+     theo cả một chương điều khoản nhãn hiệu mà tính năng này không cần. */
+  vplay: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="2.5" y="5" width="19" height="14" rx="4"/>
+    <path d="M10.5 9.3v5.4l4.6-2.7Z" fill="currentColor" stroke="none"/></svg>`,
+  note: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M10 18V5.5l8-2V15"/><circle cx="7.5" cy="18" r="2.6"/><circle cx="15.5" cy="15" r="2.6"/></svg>`,
+  speech: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-8L7 21v-4.5H4A1.5 1.5 0 0 1 2.5 15V7A1.5 1.5 0 0 1 4 5.5Z"/></svg>`,
+  camera: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/>
+    <circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>`,
+  hash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+    stroke-linecap="round" aria-hidden="true">
+    <path d="M9 3.5 7 20.5M17 3.5l-2 17M3.5 8.5h17M3 15.5h17"/></svg>`,
+  globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9"/><path d="M3 12h18"/>
+    <path d="M12 3c2.6 2.6 4 5.6 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.6-4-9s1.4-6.4 4-9Z"/></svg>`,
+  route: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="5.5" r="2.5"/>
+    <path d="M8 18.5h6.5a4 4 0 0 0 0-8H9a4 4 0 0 1 0-8h7"/></svg>`,
+  bus: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="4" y="3.5" width="16" height="13" rx="2.5"/><path d="M4 10h16"/>
+    <path d="M7 16.5v2M17 16.5v2"/><path d="M7.5 13.3v.1M16.5 13.3v.1"/></svg>`,
+  ticket: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M3 8.5V6a1.5 1.5 0 0 1 1.5-1.5h15A1.5 1.5 0 0 1 21 6v2.5a3.5 3.5 0 0 0 0 7V18a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18v-2.5a3.5 3.5 0 0 0 0-7Z"/>
+    <path d="M14 5v2M14 11v2M14 17v2"/></svg>`,
 };
 const spkIcon = `<svg viewBox="0 0 20 20"><path d="M4 8v4h3l4 3V5L7 8H4Z"/><path d="M14 7a4 4 0 0 1 0 6"/></svg>`;
 
@@ -936,7 +974,30 @@ function showDish(id) {
         <p class="src">Typical range in ${esc(zone().name)} · ${st.n} places · ${esc(zone().updated)}${st.seed ? " · seed data" : ""}</p></div>` : ""}
     ${whereToEat(id)}
     ${sayBlock(d.say, d.ph)}
+    ${dishLinksHTML(d)}
+    <button class="btn sec" data-act="shareThing" data-name="${esc(d.vi)}"
+      data-sub="${esc(d.en)}" data-tags="${esc([d.vi, d.en].join("|"))}">
+      ${I.share}Share this dish</button>
     <button class="btn sec" data-act="close">Close</button>`);
+}
+
+/* Món không có toạ độ, nên khối liên kết của nó KHÔNG có phần bản đồ —
+   một nút "Open in maps" cho "Cao lầu" sẽ mở ra một cái ghim ở giữa
+   không đâu cả. Cái đúng ở đây là video: người ta học một món lạ bằng
+   cách xem người khác ăn nó, và hashtag là cách nội dung đó được xếp. */
+function dishLinksHTML(d) {
+  const q = `${d.vi} ${d.en || ""}`.trim();
+  const nets = socialLinks(q, [d.vi, d.en || ""]).filter((n) => n.id !== "google");
+  return `
+    <h2 class="sect">See it before you order</h2>
+    <div class="netgrid">
+      ${nets.map((n) => `<a class="netchip" href="${esc(n.url)}" target="_blank"
+        rel="noopener noreferrer">${I[PLATFORM_ICON[n.id]] || I.globe}<span>
+        <b>${esc(n.label)}</b><i>${esc(n.note)}</i></span></a>`).join("")}
+    </div>
+    <p class="seedwarn">Searches on each platform for <strong>${esc(d.vi)}</strong> — not results
+      Nón Lá has checked. Portion sizes and prices in a video are whatever that shop charged
+      that day; the range above is the one measured near you.</p>`;
 }
 
 /* ── "Ăn món này ở đâu" ───────────────────────────────────────
@@ -1131,6 +1192,94 @@ function walkTeaserHTML() {
   </button>`;
 }
 
+/* ── Đi trong ngày ────────────────────────────────────────────
+   Bản đồ trong app chỉ phủ vài km quanh chỗ đứng, nhưng câu hỏi thật
+   của khách ở Hội An là "mai đi đâu" — và câu trả lời nằm ngoài khung
+   đó: Đà Nẵng, Mỹ Sơn, Bà Nà.
+
+   Khoảng cách hiện ở đây được TÍNH bằng haversine từ tâm vùng tới toạ
+   độ điểm đến, không ghi trong trips.json. Và nó được ghi rõ là đường
+   CHIM BAY: đường bộ tới Bà Nà dài gần gấp rưỡi, nên để con số trần ra
+   mà không nói nó là gì thì app đang nói dối về một quãng đường người
+   ta sắp trả tiền. Thời gian đi thì ngược lại — nó phụ thuộc đèo, phà
+   và giờ cao điểm, không suy ra được từ toạ độ, nên nó là chữ do người
+   viết ghi lại và trình bày đúng như thế.                            */
+const TRIP_KIND = {
+  city: "City", beach: "Beach", mountain: "Mountain", island: "Island",
+  heritage: "Heritage site", nature: "Countryside", museum: "Museum",
+  temple: "Temple", craft: "Craft village",
+};
+
+function tripsOf(zoneId = S.zone) {
+  return (S.trips && S.trips[zoneId]) || [];
+}
+
+function tripCardHTML(t) {
+  const m = distance(zone().center, t.at);
+  return `<button class="trip-card" data-trip="${esc(t.id)}">
+    ${/* Icon là NỀN chứ không phải <img>: nó trang trí cho cái tên nằm ngay
+          bên cạnh, nên một thẻ ảnh ở đây chỉ có hai kết cục — alt rỗng thì
+          phép thử alt bắt đúng, alt có chữ thì trình đọc màn hình đọc lại
+          cái tên hai lần. Nền là chỗ đúng của một hình trang trí. */""}
+    <span class="trip-ico" aria-hidden="true"
+      style="background-image:url(&quot;${esc(markIcon(t.t))}&quot;)"></span>
+    <span class="trip-body">
+      <span class="nm">${esc(t.n)}</span>
+      <span class="note">${esc(t.en)}</span>
+      <span class="trip-meta">${esc(fmtDistance(m))} away${t.zone ? " · in this app" : ""}</span>
+    </span>
+    <span class="wt-go" aria-hidden="true">${I.chevron}</span>
+  </button>`;
+}
+
+function tripsSectionHTML() {
+  const list = tripsOf();
+  if (!list.length) return "";
+  return `
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>Day trips from here</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <p class="muted" style="margin:-2px 0 10px;font-size:13px">Places worth a day, outside the
+      map above. Distances are straight-line from the centre of ${esc(zoneEn().replace(" · ", " "))}.</p>
+    <div class="trip-list">${list.map(tripCardHTML).join("")}</div>`;
+}
+
+function showTrip(id) {
+  const t = tripsOf().find((x) => x.id === id);
+  if (!t) return;
+  setEdge(null);
+  const m = distance(zone().center, t.at);
+  const inApp = t.zone && S.prices[t.zone];
+  openSheet(`
+    <h3>${esc(t.n)}</h3>
+    <p class="src">${esc(TRIP_KIND[t.t] || "Day trip")} · ${esc(t.en)} · ${esc(fmtDistance(m))} away</p>
+    ${wave()}
+    <p class="muted" style="font-size:13.5px">${esc(t.blurb)}</p>
+
+    <div class="todo">
+      <div><span class="ic">${I.bus}</span><b>Getting there</b><small>${esc(t.travel)}</small></div>
+      ${t.ticket ? `<div><span class="ic">${I.ticket}</span><b>Entry</b>
+        <small>${esc(t.ticket)}</small></div>` : ""}
+      <div><span class="ic">${I.spark}</span><b>Worth knowing</b><small>${esc(t.tip)}</small></div>
+    </div>
+
+    ${inApp ? `<div class="warnbox infobox">${I.check}<span>Nón Lá has prices and a map for
+      this area. Switch to it to see the local range and the fair-price places.</span></div>
+      <button class="btn pri" data-act="gotoZone" data-zone="${esc(t.zone)}">
+        Switch to ${esc(S.prices[t.zone].en || S.prices[t.zone].name)}</button>` : ""}
+
+    ${outsideHTML({ name: t.n, at: t.at, kind: "place", tags: [t.n, t.en] })}
+    <button class="btn sec" data-act="shareThing" data-name="${esc(t.n)}"
+      data-sub="${esc(t.en)}" data-tags="${esc([t.n, t.en].join("|"))}">
+      ${I.share}Share this trip</button>
+    <p class="seedwarn">Travel times, fares and ticket prices are written down, not measured —
+      treat them as the right order of magnitude, not a quote. Entry tickets in Vietnam change
+      most years. The distance above is straight-line; by road it is always further.</p>
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
 function renderMap() {
   S.exMap?.destroy();
   S.exMap = null;
@@ -1213,6 +1362,8 @@ function renderMap() {
       <span class="note">${I.clock}Still checking…</span>
     </div>
     <div class="mini-grid">${rest.map(miniCardHTML).join("")}</div>` : ""}
+
+    ${tripsSectionHTML()}
 
     <p class="seedwarn">Nón Lá never calls a business dishonest. It reports how a price compares
       with others nearby, shows the sample size, and gives owners a way to contest it.</p>`;
@@ -1311,6 +1462,88 @@ function whatToDo(p) {
       <span class="amt">${fmtDistance(m)}<small>away</small></span></button>`).join("") : ""}`;
 }
 
+/* ── ra bên ngoài: bản đồ và mạng xã hội ──────────────────────
+   Ba nhóm liên kết, và ranh giới giữa chúng là ranh giới của những gì
+   app thực sự biết:
+
+   · Bản đồ  — toạ độ nằm sẵn trong máy, nên trỏ THẲNG tới điểm đó.
+   · Tìm kiếm — app KHÔNG biết quán nào có trang Facebook nào. Nút mở ô
+     tìm của nền tảng với từ khoá điền sẵn, không mở một trang cụ thể.
+     Đoán một handle là gửi khách sang trang của người khác trong khi
+     giao diện vẫn trưng ra như thể đó là trang chính chủ.
+   · Trang web tự khai — chỉ hiện khi OpenStreetMap có trường website
+     của chính cơ sở đó. Đó là dữ liệu, không phải phỏng đoán.
+
+   Nút Google Maps ở đây là một LIÊN KẾT, không phải bản đồ nhúng: không
+   tải tile, không cache, nên nó không đụng vào điều khoản của ai và cũng
+   không phá điều kiện chạy offline — mất mạng thì nút này chỉ là không
+   bấm được, còn bản đồ vector trong app vẫn nguyên. */
+const PLATFORM_ICON = {
+  tiktok: "note", "tiktok-tag": "hash", facebook: "speech",
+  instagram: "camera", youtube: "vplay", google: "globe",
+};
+
+function outsideHTML({ name, at = null, tags = [], web = null, kind = "place" }) {
+  const L = mapsLinks(name, at, S.me);
+  // Từ khoá tìm: tên + tên vùng. Chỉ mỗi "Chợ Hàn" thì TikTok trả về chợ
+  // Hàn của mọi tỉnh; thêm tên vùng vào là khác hẳn.
+  const q = `${name} ${zoneEn().replace(" · ", " ")}`;
+  const nets = socialLinks(q, [...tags, name]);
+  const ext = (href, cls, inner) =>
+    `<a class="${cls}" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${inner}</a>`;
+
+  return `
+    <h2 class="sect">Open in a map app</h2>
+    <div class="outrow">
+      ${L.geo ? `<a class="btn maps" href="${esc(L.geo)}" data-web="${esc(L.osm)}"
+         data-act="openMaps" rel="noopener">${I.external}Open in maps</a>` : ""}
+      ${ext(L.google, "btn sec out", `${I.pinSm}Google Maps`)}
+      ${L.googleDir ? ext(L.googleDir, "btn sec out", `${I.route}Walking directions`) : ""}
+    </div>
+
+    <h2 class="sect">Look it up</h2>
+    <div class="netgrid">
+      ${nets.map((n) => ext(n.url, "netchip",
+        `${I[PLATFORM_ICON[n.id]] || I.globe}<span><b>${esc(n.label)}</b><i>${esc(n.note)}</i></span>`)).join("")}
+    </div>
+    ${web ? `<div class="outrow">${ext(web, "btn sec out", `${I.external}Their own website`)}</div>` : ""}
+    <p class="seedwarn">These open a <strong>search</strong> on each platform, not a verified
+      account. Nón Lá does not know which page belongs to this ${esc(kind)} and will not guess —
+      check the address and the photos before you trust a result.${
+      L.exact ? "" : " No coordinates on record, so the map link searches by name too."}</p>`;
+}
+
+/* Nút chia sẻ. Web Share API là đường chính vì nó mở đúng bộ ứng dụng
+   người dùng đã cài; không có thì rơi về danh sách intent của từng nền
+   tảng. TikTok không có intent chia sẻ từ web nào cả — nên ở đó app chép
+   chú thích vào clipboard và nói thẳng ra, thay vì trưng một nút dẫn về
+   trang chủ TikTok rồi để người dùng tự đoán chuyện gì vừa xảy ra. */
+async function shareThing({ name, sub = "", tags = [] }) {
+  const text = shareText({ name, sub, tags });
+  if (navigator.share) {
+    try { await navigator.share({ title: name, text }); return; }
+    catch (e) { if (e?.name === "AbortError") return; }
+  }
+  const all = shareTargets(text);
+  const nets = all.filter((t) => t.url);
+  // Nền tảng nào KHÔNG mở được thì nói tên ra. Lặng lẽ bỏ nó khỏi lưới là
+  // để người dùng đi tìm nút TikTok mà không hiểu vì sao nó không có ở đây.
+  const off = all.filter((t) => !t.url).map((t) => t.label);
+  openSheet(`
+    <h3>Share ${esc(name)}</h3>
+    <p class="src">${esc(text)}</p>
+    ${wave()}
+    <div class="netgrid">
+      ${nets.map((t) => `<a class="netchip" href="${esc(t.url)}" target="_blank"
+        rel="noopener noreferrer">${I.share}<span><b>${esc(t.label)}</b></span></a>`).join("")}
+    </div>
+    <button class="btn sec" data-act="copyShare" data-text="${esc(text)}">Copy the caption</button>
+    <p class="seedwarn">${off.length ? `${esc(off.join(" and "))} can only share a link to a web
+      page, and this is a place, not a page — ` : ""}copy the caption and paste it into the app
+      when you post.</p>
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
 function showPlace(id, metres = null) {
   const p = S.places.find((x) => x.id === id);
   if (!p) return;
@@ -1340,9 +1573,14 @@ function showPlace(id, metres = null) {
         <span class="amt">${st ? money(st.p50) : "—"}<small>typical</small></span>
       </button>`;
     }).join("")}
-    ${p.at ? `<a class="btn maps" href="${esc(BigMap.mapsLink(p).geo)}"
-       data-web="${esc(BigMap.mapsLink(p).web)}" data-act="openMaps" rel="noopener">
-       ${I.external}Open in maps</a>` : ""}
+    ${/* Hashtag lấy từ MÓN trước, tên quán sau: người ta gắn #caolau vào
+          video chứ gần như không ai gắn tên một hàng quán nhỏ. */""}
+    ${outsideHTML({ name: p.name, at: p.at, kind: "place",
+      tags: [...(p.known || []).map((k) => dishById(k)?.vi || k), p.name] })}
+    <button class="btn sec" data-act="shareThing" data-name="${esc(p.name)}"
+      data-sub="${esc(p.street || "")}"
+      data-tags="${esc((p.known || []).map((k) => dishById(k)?.vi || k).join("|"))}">
+      ${I.share}Share this place</button>
     <p class="seedwarn">Badge status comes from accumulated scans, never assigned by hand.
       A place loses it automatically when prices drift outside the local range.
       ${p.at ? "Coordinates are approximate placements on the named street, not surveyed addresses." : ""}</p>
@@ -1640,8 +1878,12 @@ function openFoodMap() {
   $("#v-foodmap").hidden = false;
   $(".tabbar").hidden = true;
   FoodMap.open({
-    host: $("#v-foodmap"), geo, zoneId: S.zone,
-    places: S.places, dishes: S.dishes, eateries: S.eateries || [],
+    host: $("#v-foodmap"), geo, zoneId: S.zone, zoneName: zoneEn().replace(" · ", " "),
+    places: S.places, dishes: S.dishes,
+    // Chỉ quán của vùng đang mở. Trước đây truyền cả tệp — đúng khi tệp
+    // chỉ có Hội An, nhưng giờ nó có sáu vùng, và bộ lọc "mở buổi tối"
+    // sẽ bật lên nhờ giờ mở cửa của một quán ở Hà Nội.
+    eateries: (S.eateries || []).filter((e) => e.zone === S.zone),
     assets: S.assets?.icons, icons: I,
     onOpenPlace: (id) => showPlace(id),
     onClose: () => { $("#v-foodmap").hidden = true; $(".tabbar").hidden = false; },
@@ -1656,9 +1898,12 @@ function openBigMap() {
   BigMap.open({
     zoneId: S.zone, zone: zone(), geo, places: S.places, icons: I,
     iconOf: markIcon,
-    // Lớp quán ăn mới chỉ nhập cho Hội An. Vùng khác truyền mảng rỗng để
-    // chip Eateries không hiện, thay vì hiện một nút bấm ra danh sách trống.
-    eateries: S.zone === "hoian-oldtown" ? (S.eateries || []) : [],
+    /* Lọc theo TRƯỜNG `zone` của từng bản ghi, không theo một id ghi cứng.
+       Bản trước khoá vào "hoian-oldtown" vì tệp quán ăn chỉ có Hội An; giờ
+       nó có cả sáu vùng, và một điều kiện ghi cứng như thế khiến mọi vùng
+       thêm sau im lặng mất lớp này mà không có gì báo lên. Vùng nào chưa
+       có quán nào thì mảng rỗng, chip Eateries tự không hiện. */
+    eateries: (S.eateries || []).filter((e) => e.zone === S.zone),
     onOpenPlace: (id, m) => showPlace(id, m),
     onOpenMark: (lm, m) => showMark(lm, m),
     onOpenEat: (e, m) => showEatery(e, m),
@@ -1703,9 +1948,8 @@ function showEatery(e, metres = null) {
         <span class="amt">→</span>
       </button>` : ""}
 
-    <a class="btn maps" href="${esc(BigMap.mapsLink({ name: e.name, at: e.at }).geo)}"
-       data-web="${esc(BigMap.mapsLink({ name: e.name, at: e.at }).web)}"
-       data-act="openMaps" rel="noopener">${I.external}Open in maps</a>
+    ${outsideHTML({ name: e.name, at: e.at, kind: "eatery", web: e.web || null,
+      tags: [e.name, e.cuisine || ""] })}
     <p class="seedwarn">Name, address and position from OpenStreetMap contributors (ODbL),
       not from Nón Lá. Details can be out of date — shops in the old town change hands often.</p>
     <button class="btn sec" data-act="close">Close</button>`);
@@ -1750,9 +1994,10 @@ function showMark(lm, metres = null) {
       : `<div class="warnbox infobox">${I.clock}<span>No place near this sight is being
         tracked yet. That means no price data — not that the food here is bad.</span></div>`}
 
-    <a class="btn maps" href="${esc(BigMap.mapsLink({ name: lm.n, at: lm.at }).geo)}"
-       data-web="${esc(BigMap.mapsLink({ name: lm.n, at: lm.at }).web)}"
-       data-act="openMaps" rel="noopener">${I.external}Open in maps</a>
+    ${outsideHTML({ name: lm.n, at: lm.at, kind: "sight", tags: [lm.n, lm.en || ""] })}
+    <button class="btn sec" data-act="shareThing" data-name="${esc(lm.n)}"
+      data-sub="${esc(lm.en || kind)}" data-tags="${esc([lm.n, lm.en || ""].join("|"))}">
+      ${I.share}Share this sight</button>
     <p class="seedwarn">Nón Lá does not rank sights or recommend restaurants. This position is
       unsurveyed seed data — good enough to orient by, not to navigate by.</p>
     <button class="btn sec" data-act="close">Close</button>`);
@@ -2234,7 +2479,45 @@ document.addEventListener("click", async (ev) => {
     setTimeout(() => { if (!document.hidden) window.open(web, "_blank", "noopener"); }, 700);
     return;
   }
-  if (el("[data-act='share']")) return toast("Sharing arrives with the community layer");
+  // ── đi trong ngày ──
+  const tp = el("[data-trip]");
+  if (tp) return showTrip(tp.dataset.trip);
+  const gz = el("[data-act='gotoZone']");
+  if (gz) {
+    const z = gz.dataset.zone;
+    if (!S.prices[z]) return toast("No data for that area yet");
+    S.zone = z;
+    localStorage.setItem("nl.zone", z);
+    closeSheet();
+    go("map");
+    return toast("Now showing " + (S.prices[z].en || S.prices[z].name));
+  }
+
+  // ── chia sẻ ──
+  const sh = el("[data-act='shareThing']");
+  if (sh) {
+    return shareThing({
+      name: sh.dataset.name || "",
+      sub: sh.dataset.sub || "",
+      tags: (sh.dataset.tags || "").split("|").filter(Boolean),
+    });
+  }
+  const cp = el("[data-act='copyShare']");
+  if (cp) {
+    return navigator.clipboard?.writeText(cp.dataset.text || "")
+      .then(() => toast("Caption copied"), () => toast("Could not copy on this device"));
+  }
+  // Nút chia sẻ ở đầu tab Eat: chia sẻ CHỖ đang được tiến cử, không phải
+  // chia sẻ cả ứng dụng. Chưa có chỗ nào được tiến cử thì nói ra, đừng mở
+  // một thẻ chia sẻ trống.
+  if (el("[data-act='share']")) {
+    const f = featured();
+    if (!f) return toast("Nothing badged here yet to share");
+    return shareThing({
+      name: f.place.name, sub: f.place.street,
+      tags: f.place.known.map((k) => dishById(k)?.vi || k),
+    });
+  }
   if (el("[data-act='save']")) return toast("Saved to this device");
   if (el("[data-act='notif']")) return toast("No alerts right now");
 
@@ -2336,7 +2619,7 @@ async function boot() {
   // eateries.json là lớp "quanh đây có gì" lấy từ OpenStreetMap, KHÔNG phải
   // dữ liệu giá. Thiếu nó thì bản đồ vẫn chạy đủ — nên .catch về rỗng chứ
   // không để Promise.all đánh sập cả lượt khởi động vì một lớp phụ.
-  const [d, p, pl, mp, ea, ax, fm] = await Promise.all([
+  const [d, p, pl, mp, ea, ax, fm, tr] = await Promise.all([
     load("data/dishes.json"), load("data/prices.json"), load("data/places.json"),
     load("data/maps.json"),
     load("data/eateries.json").catch(() => ({ eateries: [] })),
@@ -2345,14 +2628,28 @@ async function boot() {
     load("assets/index.json").catch(() => ({ icons: [], photos: [] })),
     // Quán nổi tiếng theo báo chí — thiếu cũng không sao, app vẫn chạy đủ.
     load("data/famous.json").catch(() => ({ places: [] })),
+    // Điểm đi trong ngày. Cũng là lớp phụ: thiếu thì tab Nearby vắng một
+    // khối, không phải đứng hình.
+    load("data/trips.json").catch(() => ({ trips: {} })),
   ]);
   S.assets = { icons: new Set(ax.icons || []), photos: new Set(ax.photos || []) };
   S.famous = fm.places || [];
   S.maps = mp.zones;
   S.dishes = d.dishes; S.prices = p.zones; S.places = pl.places;
   S.fx = p._fx || null;
-  S.eateries = ea.eateries || [];
+  /* Bản ghi quán ăn phải mang `zone`. Bản xuất cũ chỉ có Hội An và không
+     có trường đó — nếu ai đó chạy app với tệp cũ thì lớp này sẽ biến mất
+     lặng lẽ, nên suy ngược `zone` từ khung của từng vùng thay vì bỏ qua. */
+  S.eateries = (ea.eateries || []).map((e) => {
+    if (e.zone || !e.at) return e;
+    const zid = Object.entries(mp.zones).find(([, z]) => {
+      const [[n, w], [s, x]] = z.bbox;
+      return e.at[0] <= n && e.at[0] >= s && e.at[1] >= w && e.at[1] <= x;
+    })?.[0];
+    return zid ? { ...e, zone: zid } : e;
+  });
   S.eatSource = ea._source || "";
+  S.trips = tr.trips || {};
 
   /* Danh mục ảnh sinh từ CHÍNH dữ liệu, không chép tay sang imgsvc.js.
      Thêm một món vào dishes.json là nó tự có mục icon; chép tay thì bản

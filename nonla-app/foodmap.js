@@ -14,6 +14,7 @@
    Trên khoảng / Chưa đủ dữ liệu, kèm số lượt quét đã ghi nhận.
    ═══════════════════════════════════════════════════════════════ */
 import { artTransform, fitArt } from "./artmap.js";
+import { mapsLinks } from "./links.js";
 import { Viewport, distance, fmtDistance } from "./geo.js";
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -205,20 +206,27 @@ function renderChips() {
 }
 
 /* ── API ─────────────────────────────────────────────────── */
-export function open({ host, geo, places, dishes, eateries = [], assets, icons, zoneId, onOpenPlace, onClose }) {
+export function open({ host, geo, places, dishes, eateries = [], assets, icons, zoneId,
+                       zoneName = "", onOpenPlace, onClose }) {
   Object.assign(M, { host, geo, dishes, icons, onOpenPlace, onClose, assets });
   M.places = places.filter((p) => p.zone === zoneId && p.at);
+  /* Tên vùng đi vào tiêu đề và alt của tranh. Trước đây cả hai ghi cứng
+     "Hội An" — đúng khi app chỉ có một vùng có tranh, nhưng mở màn hình
+     này ở Huế thì tiêu đề vẫn khoe hương vị Hội An, và trình đọc màn hình
+     mô tả một tấm bản đồ hoàn toàn khác với thứ đang hiện. */
+  const where = zoneName || geo?.name || "this area";
   M.saved = readSaved();
   M.tf = null; M.fit = null; M.artOK = false;
 
   const cap = capability(eateries);
+  const ML = mapsLinks(where, geo?.center || null);
   const dishChips = [...new Set(M.places.flatMap((p) => p.known || []))]
     .map((id) => M.dishes.find((d) => d.id === id)).filter(Boolean).slice(0, 6);
 
   host.innerHTML = `
     <div class="fm-head">
       <button class="iconbtn" data-fmact="close" aria-label="Back">${icons.back}</button>
-      <span class="fm-title"><b>Must-Try Food Map</b><small>Savor Hội An's flavors</small></span>
+      <span class="fm-title"><b>Must-Try Food Map</b><small>Savor ${esc(where)}'s flavors</small></span>
       <button class="iconbtn" data-fmact="locate" aria-label="Find my location">${icons.crosshair}</button>
     </div>
 
@@ -241,7 +249,7 @@ export function open({ host, geo, places, dishes, eateries = [], assets, icons, 
     </div>
 
     <div class="fm-map">
-      <img class="fm-art" alt="Illustrated map of Hội An old town" hidden>
+      <img class="fm-art" alt="${esc(geo?.art?.alt || `Illustrated map of ${where}`)}" hidden>
       <svg class="fm-trail" aria-hidden="true"></svg>
       <div class="fm-pins">${M.places.map(pinHTML).join("")}</div>
       <div class="fm-side">
@@ -257,9 +265,14 @@ export function open({ host, geo, places, dishes, eateries = [], assets, icons, 
 
     <div class="fm-banner">
       <span class="lant" aria-hidden="true">${icons.lantern || svgIcon("moon")}</span>
-      <span class="txt"><b>Follow the flavors of Hội An</b>
+      <span class="txt"><b>Follow the flavors of ${esc(where)}</b>
         <small>Tap a pin to see what it is known for and what has been scanned there.</small></span>
-      <button class="btn pri" data-fmact="maps">Open in maps</button>
+      ${/* Trước đây đây là một <button data-fmact="maps"> mà tap() rơi thẳng
+            xuống `return true` — nút to nhất màn hình, kiểu primary, và bấm
+            vào thì không có gì xảy ra. Giờ nó là một liên kết thật, mở tâm
+            vùng trong ứng dụng bản đồ của máy. */""}
+      <a class="btn pri" href="${esc(ML.geo || ML.google)}" data-web="${esc(ML.google)}"
+         data-act="openMaps" rel="noopener">Open in maps</a>
     </div>`;
 
   const art = $(".fm-art", host);
@@ -269,7 +282,13 @@ export function open({ host, geo, places, dishes, eateries = [], assets, icons, 
     // Nói ra, đừng để một khung trống: tấm tranh là toàn bộ nền của màn này.
     $(".fm-map", host).classList.add("noart");
   }, { once: true });
+  /* Vùng KHÔNG có tranh phải vào thẳng trạng thái không-tranh. Trước đây
+     `.noart` chỉ được gắn khi ảnh tải HỎNG, nên vùng chưa từng có tranh
+     rơi vào khoảng giữa: không có nền, cũng không có lớp nền thay thế —
+     ghim nổi trên một ô trắng. Ba vùng mới đều chưa có tranh, nên chỗ này
+     từ một ca hiếm thành ca thường. */
   if (geo.art?.src) art.src = geo.art.src;
+  else $(".fm-map", host).classList.add("noart");
 
   renderChips(); renderCards(); layout();
 

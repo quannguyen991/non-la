@@ -1040,16 +1040,10 @@ export function locate() {
   });
 }
 
-/** Liên kết mở sang ứng dụng bản đồ của máy — cách hợp lệ duy nhất
- *  để có chỉ đường thật mà không vi phạm điều khoản của bên nào. */
-export function mapsLink(place) {
-  const [la, lo] = place.at;
-  const q = encodeURIComponent(place.name);
-  return {
-    geo: `geo:${la},${lo}?q=${la},${lo}(${q})`,
-    web: `https://www.openstreetmap.org/?mlat=${la}&mlon=${lo}#map=18/${la}/${lo}`,
-  };
-}
+/* mapsLink() từng sống ở đây. Nó chuyển sang links.js cùng lúc với phần
+   liên kết Google Maps và mạng xã hội: giữ hai chỗ dựng URL bản đồ là cách
+   chắc chắn để một hôm nào đó thẻ quán và thẻ mốc mở ra hai thứ khác nhau
+   cho cùng một toạ độ. */
 
 /* ── bản đồ xem trước, không tương tác cử chỉ ─────────────────
    Tab Nearby cần đúng bản đồ này chứ không phải một hình vẽ khác:

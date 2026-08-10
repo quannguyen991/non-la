@@ -459,8 +459,11 @@ export async function run({ verbose = true } = {}) {
         (lmMaps?.getAttribute("href") || "").startsWith("geo:"));
       // Nón Lá không xếp hạng điểm tham quan và không đề cử quán ăn.
       // Thẻ phải tự khai toạ độ là dữ liệu hạt giống chưa khảo sát.
+      // Đọc HẾT các khối tự khai trong thẻ, không chỉ khối đầu: thẻ giờ có
+      // nhiều hơn một, và bám vào khối đầu là phép thử đỏ lên mỗi lần ai đó
+      // chèn thêm một dòng phía trên, dù lời tự khai vẫn còn nguyên đó.
       ck("thẻ tham quan tự khai dữ liệu hạt giống",
-        /unsurveyed|seed/i.test($("#sheetBody .seedwarn")?.textContent || ""));
+        /unsurveyed|seed/i.test($$("#sheetBody .seedwarn").map((e) => e.textContent).join(" ")));
       click("[data-act='close']"); await wait(320);
     }
 
@@ -480,6 +483,66 @@ export async function run({ verbose = true } = {}) {
   ck("See all mở danh sách đầy đủ", $$("#v-map .mini-card").length > before,
     `trước ${before}, sau ${$$("#v-map .mini-card").length}`);
   click("[data-act='allPlaces']"); await wait(350);
+
+  /* ── đi trong ngày ────────────────────────────────────
+     Khối này sống hay chết theo dữ liệu: vùng nào có mục trong
+     trips.json thì phải có thẻ, và số thẻ phải khớp CHÍNH tệp
+     dữ liệu chứ không phải một con số app tự khai. */
+  {
+    const want = (A.S.trips?.[A.S.zone] || []).length;
+    const cards = $$("#v-map .trip-card");
+    ck("tab Nearby có khối đi trong ngày", cards.length > 0, String(cards.length));
+    ck("số thẻ khớp trips.json", cards.length === want, `${cards.length}/${want}`);
+    const small = cards.filter((e) => e.getBoundingClientRect().height < MIN_TAP);
+    ck("thẻ đi trong ngày đạt vùng chạm", small.length === 0, String(small.length));
+
+    if (cards[0]) {
+      cards[0].click(); await wait(420);
+      ck("chạm thẻ mở thẻ chi tiết chuyến đi", sheetOpen() && !!$("#sheetBody h3"));
+      // Khoảng cách phải là đường CHIM BAY và phải nói ra điều đó — đường
+      // bộ luôn dài hơn, im lặng ở đây là nói dối về quãng đường sắp trả tiền.
+      ck("thẻ chuyến đi khai rõ khoảng cách là đường chim bay",
+        /straight-line/i.test($$("#sheetBody .seedwarn").map((e) => e.textContent).join(" ")));
+      ck("thẻ chuyến đi có cách đi và điều nên biết",
+        $$("#sheetBody .todo > div").length >= 2);
+      click("[data-act='close']"); await wait(320);
+    }
+  }
+
+  /* ── liên kết ra bên ngoài ────────────────────────────
+     Luật của khối này: liên kết mạng xã hội là liên kết TÌM KIẾM.
+     Nếu một ngày ai đó đổi nó thành đường dẫn tới một tài khoản cụ
+     thể thì app đang khẳng định trang đó là của quán này — điều nó
+     không biết. Phép thử dưới đây chặn đúng chỗ ấy. */
+  {
+    const p = A.S.places.find((x) => x.zone === A.S.zone && x.at);
+    if (p) {
+      A.showPlace(p.id); await wait(360);
+      const sb = $("#sheetBody");
+      const chips = $$("#sheetBody .netchip");
+      ck("thẻ quán có hàng nền tảng", chips.length >= 4, String(chips.length));
+      ck("mọi liên kết nền tảng đều mở tab mới, có rel an toàn",
+        chips.every((a) => a.target === "_blank" && /noopener/.test(a.rel)));
+      ck("liên kết nền tảng là TÌM KIẾM, không phải một tài khoản",
+        chips.every((a) => /[?&](q|search_query)=|\/tag\/|\/explore\/tags\//.test(a.href)),
+        chips.map((a) => a.href).find((h) => !/[?&](q|search_query)=|\/tag\/|\/explore\/tags\//.test(h)) || "");
+      const g = $$("#sheetBody a.btn.sec.out").map((a) => a.href);
+      ck("có liên kết Google Maps trỏ đúng toạ độ",
+        g.some((h) => h.includes("google.com/maps") && h.includes(encodeURIComponent(`${p.at[0]},${p.at[1]}`))),
+        g.join(" "));
+      ck("có liên kết chỉ đường đi bộ",
+        g.some((h) => h.includes("/maps/dir/") && h.includes("travelmode=walking")));
+      // Khối phải tự khai đây là ô tìm kiếm chứ không phải trang đã xác minh.
+      // Chuẩn hoá khoảng trắng trước khi so: chuỗi trong mã xuống dòng giữa
+      // câu, nên textContent mang cả xuống dòng lẫn thụt đầu dòng.
+      const flat = sb.textContent.replace(/\s+/g, " ");
+      ck("khối nền tảng tự khai là tìm kiếm",
+        /search/i.test(flat) && /not a verified account/i.test(flat));
+      const small = chips.filter((e) => e.getBoundingClientRect().height < MIN_TAP);
+      ck("chip nền tảng đạt vùng chạm", small.length === 0, String(small.length));
+      click("[data-act='close']"); await wait(300);
+    }
+  }
 
   A.go("scan");
 

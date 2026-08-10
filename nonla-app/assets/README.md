@@ -29,7 +29,10 @@ assets/places/ba-be.jpg
 | Dung lượng | dưới 150KB mỗi ảnh |
 
 ⚠️ Ảnh nằm trong gói offline mà khách phải tải qua wifi khách sạn.
-30 món × 150KB = 4,5MB. Nặng hơn nữa thì phải tách gói ảnh ra khỏi gói lõi.
+77 món × 150KB = 11,5MB — đã vượt ngưỡng gói lõi, nên `sw.js` KHÔNG nhét ảnh
+vào danh sách cài đặt: chúng được cache-first theo nhu cầu, tấm nào đã xem thì
+offline có tấm đó. 47 món thêm ở đợt mở rộng chưa có ảnh; khung của chúng hiện
+nền giấy dó, và đó là trạng thái đúng chứ không phải lỗi.
 
 ## Bản quyền
 

@@ -1,0 +1,561 @@
+{
+  "_note": "Điểm đến trong bán kính một ngày đi về, tính từ tâm mỗi vùng. KHÔNG PHẢI DỮ LIỆU GIÁ và không phải xếp hạng của Nón Lá — app chưa quét menu ở những nơi này. `at` là toạ độ điểm đến, khoảng cách hiện trên giao diện được TÍNH từ toạ độ đó chứ không ghi trong tệp này; `travel` là cách đi và thời gian đi điển hình, do người viết ghi lại, nên nó là ước lượng chứ không phải kết quả đo. `ticket` là giá vé niêm yết tại thời điểm ghi — vé tham quan ở Việt Nam đổi theo năm, hãy coi nó là bậc giá chứ không phải con số để mặc cả. `zone` trỏ sang một vùng mà app có sẵn bản đồ và dữ liệu giá.",
+  "_updated": "2026-08",
+  "trips": {
+    "hoian-oldtown": [
+      {
+        "id": "danang-city",
+        "n": "Đà Nẵng",
+        "en": "Da Nang city",
+        "t": "city",
+        "at": [16.0660, 108.2250],
+        "zone": "danang-hanriver",
+        "travel": "45–60 min by taxi, or the yellow bus from Hội An bus station",
+        "blurb": "The nearest big city: a river cut through the middle of it, six bridges, and a food scene that owes nothing to tourists.",
+        "tip": "The dragon bridge breathes fire and water at 21:00 on Saturday and Sunday. Stand on the east bank, upwind."
+      },
+      {
+        "id": "my-khe",
+        "n": "Biển Mỹ Khê",
+        "en": "My Khe Beach",
+        "t": "beach",
+        "at": [16.0625, 108.2455],
+        "zone": "danang-mykhe",
+        "travel": "50–65 min by taxi from the old town",
+        "blurb": "Thirty kilometres of open sand on the east side of Đà Nẵng, with a seafood strip behind it.",
+        "tip": "Seafood on the beach road is charged by weight. Ask the price per kilo and watch the scale before it goes to the kitchen."
+      },
+      {
+        "id": "ngu-hanh-son",
+        "n": "Ngũ Hành Sơn",
+        "en": "Marble Mountains",
+        "t": "mountain",
+        "at": [16.0028, 108.2632],
+        "travel": "25–35 min by taxi, halfway to Đà Nẵng",
+        "ticket": "40.000₫ entry · 15.000₫ lift",
+        "blurb": "Five limestone outcrops full of caves, with Buddhist shrines cut into the rock and a view over the coast from the top.",
+        "tip": "Go early. The caves are cool, the stairs between them are not, and the marble carving village at the base sells by weight."
+      },
+      {
+        "id": "my-son",
+        "n": "Thánh địa Mỹ Sơn",
+        "en": "My Son Sanctuary",
+        "t": "heritage",
+        "at": [15.7642, 108.1240],
+        "travel": "60–75 min by taxi or tour bus, inland",
+        "ticket": "150.000₫ including the shuttle and dance show",
+        "blurb": "Brick towers the Cham built between the 4th and 13th centuries, half-swallowed by jungle and half-flattened by 1969 bombing.",
+        "tip": "First bus at 05:00 gets you there before the heat and before the crowds. Nothing is shaded."
+      },
+      {
+        "id": "cu-lao-cham",
+        "n": "Cù Lao Chàm",
+        "en": "Cham Islands",
+        "t": "island",
+        "at": [15.9525, 108.5030],
+        "travel": "25 min by speedboat from Cửa Đại pier",
+        "ticket": "70.000₫ marine park fee, plus the boat",
+        "blurb": "A cluster of islands an hour off the coast, with clear water, one main village and a hard ban on plastic bags.",
+        "tip": "Boats stop when the sea gets up, usually October to February. Book the day before and check the morning forecast."
+      },
+      {
+        "id": "ba-na-hills",
+        "n": "Bà Nà Hills · Cầu Vàng",
+        "en": "Ba Na Hills · Golden Bridge",
+        "t": "mountain",
+        "at": [15.9950, 107.9960],
+        "travel": "75–90 min by taxi, then the cable car up",
+        "ticket": "around 900.000₫ for the cable car and park",
+        "blurb": "A French hill station turned theme park at 1,400 m, reached by one of the longest cable cars in the world. The golden hands bridge is here.",
+        "tip": "It is a theme park, not a mountain village — go for the ride up and the temperature drop, and expect queues."
+      },
+      {
+        "id": "rung-dua-bay-mau",
+        "n": "Rừng dừa Bảy Mẫu",
+        "en": "Bay Mau Coconut Forest",
+        "t": "nature",
+        "at": [15.8830, 108.3690],
+        "travel": "15 min by bicycle or taxi east of the old town",
+        "ticket": "30.000₫ entry · 150.000₫ per basket boat",
+        "blurb": "Water coconut palms in the brackish river, worked from round bamboo basket boats.",
+        "tip": "The loud boat-spinning shows come with a tip expectation. Say no at the start if you want the quiet version."
+      },
+      {
+        "id": "an-bang",
+        "n": "Biển An Bàng",
+        "en": "An Bang Beach",
+        "t": "beach",
+        "at": [15.9110, 108.3450],
+        "travel": "15 min by bicycle from the old town",
+        "blurb": "The closest beach to Hội An, with a line of low-key bars on the sand.",
+        "tip": "Sun loungers are usually free if you order a drink. Check before you sit down, not after."
+      },
+      {
+        "id": "thanh-ha",
+        "n": "Làng gốm Thanh Hà",
+        "en": "Thanh Ha Pottery Village",
+        "t": "craft",
+        "at": [15.8790, 108.3070],
+        "travel": "10 min by bicycle west along the river",
+        "ticket": "35.000₫ entry",
+        "blurb": "A working pottery village on the river bank, throwing on foot-turned wheels the way it has for five centuries.",
+        "tip": "The terracotta park at the far end is a separate, more expensive ticket. The village itself is the interesting half."
+      },
+      {
+        "id": "tra-que",
+        "n": "Làng rau Trà Quế",
+        "en": "Tra Que Herb Village",
+        "t": "nature",
+        "at": [15.9010, 108.3320],
+        "travel": "12 min by bicycle north of the old town",
+        "blurb": "The market garden that supplies the old town's herbs, fertilised with lake weed instead of chemicals.",
+        "tip": "Half the herbs on your cao lầu came from these beds. Cooking classes here are cheaper booked at the village than through a hotel."
+      },
+      {
+        "id": "hai-van",
+        "n": "Đèo Hải Vân",
+        "en": "Hai Van Pass",
+        "t": "mountain",
+        "at": [16.1990, 108.1300],
+        "travel": "2 h by car, usually on the way to Huế",
+        "blurb": "The pass over the spur of mountain that splits Vietnam's weather in two. Old French and American bunkers at the top.",
+        "tip": "Cloud sits on the pass most afternoons. Cross in the morning if you want the view you came for."
+      }
+    ],
+    "danang-hanriver": [
+      {
+        "id": "hoi-an",
+        "n": "Hội An",
+        "en": "Hoi An Old Town",
+        "t": "heritage",
+        "at": [15.8801, 108.3280],
+        "zone": "hoian-oldtown",
+        "travel": "45–60 min by taxi, or the yellow bus from Đà Nẵng bus station",
+        "ticket": "120.000₫ for the old-town ticket, five sights",
+        "blurb": "A merchant port that stopped growing in the 19th century and never got rebuilt. Lanterns, tailors and the best cao lầu in the country.",
+        "tip": "The town charges an entry ticket to the protected core. Buy it at a booth, not from someone who approaches you on the street."
+      },
+      {
+        "id": "my-khe",
+        "n": "Biển Mỹ Khê",
+        "en": "My Khe Beach",
+        "t": "beach",
+        "at": [16.0625, 108.2455],
+        "zone": "danang-mykhe",
+        "travel": "10 min by taxi across the Rồng or Trần Thị Lý bridge",
+        "blurb": "The city's own beach, wide and open, five minutes from the centre.",
+        "tip": "Seafood on the beach road runs 25–40% above the same dish in town. That is the view charge, and it is worth knowing before you sit down."
+      },
+      {
+        "id": "son-tra",
+        "n": "Bán đảo Sơn Trà · Chùa Linh Ứng",
+        "en": "Son Tra Peninsula · Linh Ung Pagoda",
+        "t": "mountain",
+        "at": [16.1000, 108.2770],
+        "travel": "25 min by taxi north along the coast road",
+        "blurb": "A forested headland with a 67 m white Guanyin statue looking out to sea, and red-shanked douc langurs in the trees above the road.",
+        "tip": "Motorbike rental shops will rent you a bike for the loop; several of the upper roads are steep enough that they should not. Take a car."
+      },
+      {
+        "id": "ngu-hanh-son",
+        "n": "Ngũ Hành Sơn",
+        "en": "Marble Mountains",
+        "t": "mountain",
+        "at": [16.0028, 108.2632],
+        "travel": "20 min by taxi south along the coast",
+        "ticket": "40.000₫ entry · 15.000₫ lift",
+        "blurb": "Five limestone outcrops full of caves, with Buddhist shrines cut into the rock and a view over the coast from the top.",
+        "tip": "The marble carving shops at the base sell by weight and ship home. Get the shipping quote before you agree the stone price."
+      },
+      {
+        "id": "ba-na-hills",
+        "n": "Bà Nà Hills · Cầu Vàng",
+        "en": "Ba Na Hills · Golden Bridge",
+        "t": "mountain",
+        "at": [15.9950, 107.9960],
+        "travel": "45–60 min by taxi, then the cable car up",
+        "ticket": "around 900.000₫ for the cable car and park",
+        "blurb": "A French hill station turned theme park at 1,400 m, reached by one of the longest cable cars in the world. The golden hands bridge is here.",
+        "tip": "Go on a weekday and get the first cable car. By 11:00 the bridge is a queue with a view."
+      },
+      {
+        "id": "hai-van",
+        "n": "Đèo Hải Vân",
+        "en": "Hai Van Pass",
+        "t": "mountain",
+        "at": [16.1990, 108.1300],
+        "travel": "60–75 min by car north",
+        "blurb": "The pass over the spur of mountain that splits Vietnam's weather in two. Old French and American bunkers at the top.",
+        "tip": "Trucks take the tunnel, so the old road is quiet. Cloud sits on it most afternoons — go in the morning."
+      },
+      {
+        "id": "hue",
+        "n": "Huế",
+        "en": "Hue",
+        "t": "heritage",
+        "at": [16.4700, 107.5830],
+        "zone": "hue-citadel",
+        "travel": "2.5 h by car over Hải Vân, or 3 h by train along the coast",
+        "blurb": "The imperial capital until 1945: a walled citadel, a river, and the most particular food in Vietnam.",
+        "tip": "The coastal train from Đà Nẵng is one of the best rail rides in Asia and costs a fraction of a private car. Sit on the left going north."
+      },
+      {
+        "id": "nui-than-tai",
+        "n": "Suối khoáng nóng Núi Thần Tài",
+        "en": "Than Tai Hot Springs",
+        "t": "nature",
+        "at": [16.0270, 108.0100],
+        "travel": "45 min by taxi west into the hills",
+        "ticket": "around 400.000₫ including the mineral pools",
+        "blurb": "Hot mineral pools in forest at the foot of the Bà Nà range, with a water park attached.",
+        "tip": "Pair it with Bà Nà only if you have a full day and a driver waiting — public transport out here is thin."
+      }
+    ],
+    "danang-mykhe": [
+      {
+        "id": "danang-city",
+        "n": "Trung tâm Đà Nẵng",
+        "en": "Da Nang city centre",
+        "t": "city",
+        "at": [16.0660, 108.2250],
+        "zone": "danang-hanriver",
+        "travel": "10 min by taxi west across the river",
+        "blurb": "The other side of the bridges: markets, the Cham museum, and the same dishes for noticeably less than on the beach road.",
+        "tip": "Chợ Cồn and Chợ Hàn are where the city actually eats. Both close their food sections by early evening."
+      },
+      {
+        "id": "son-tra",
+        "n": "Bán đảo Sơn Trà · Chùa Linh Ứng",
+        "en": "Son Tra Peninsula · Linh Ung Pagoda",
+        "t": "mountain",
+        "at": [16.1000, 108.2770],
+        "travel": "15 min by taxi north along the beach road",
+        "blurb": "A forested headland with a 67 m white Guanyin statue looking out to sea, and rare langurs in the trees above the road.",
+        "tip": "Sunrise from the beach here, then the pagoda before the tour buses arrive at nine."
+      },
+      {
+        "id": "ngu-hanh-son",
+        "n": "Ngũ Hành Sơn",
+        "en": "Marble Mountains",
+        "t": "mountain",
+        "at": [16.0028, 108.2632],
+        "travel": "15 min by taxi south along the beach road",
+        "ticket": "40.000₫ entry · 15.000₫ lift",
+        "blurb": "Five limestone outcrops full of caves, with shrines cut into the rock and a view back over the whole beach.",
+        "tip": "The lift saves the first climb only. Everything after that is stairs — bring water, not flip-flops."
+      },
+      {
+        "id": "hoi-an",
+        "n": "Hội An",
+        "en": "Hoi An Old Town",
+        "t": "heritage",
+        "at": [15.8801, 108.3280],
+        "zone": "hoian-oldtown",
+        "travel": "40–50 min by taxi down the coast road",
+        "ticket": "120.000₫ for the old-town ticket, five sights",
+        "blurb": "A merchant port that stopped growing in the 19th century and never got rebuilt. Lanterns, tailors and the best cao lầu in the country.",
+        "tip": "The coast road passes An Bàng beach — a decent half-day stop on the way back."
+      },
+      {
+        "id": "an-bang",
+        "n": "Biển An Bàng",
+        "en": "An Bang Beach",
+        "t": "beach",
+        "at": [15.9110, 108.3450],
+        "travel": "30 min by taxi south along the coast",
+        "blurb": "Quieter sand than Mỹ Khê with a line of low-key bars, halfway to Hội An.",
+        "tip": "Fewer high-rises, more shade, and the seafood is priced closer to town rates."
+      },
+      {
+        "id": "cu-lao-cham",
+        "n": "Cù Lao Chàm",
+        "en": "Cham Islands",
+        "t": "island",
+        "at": [15.9525, 108.5030],
+        "travel": "50 min to Cửa Đại pier, then 25 min by speedboat",
+        "ticket": "70.000₫ marine park fee, plus the boat",
+        "blurb": "Islands an hour off the coast with clear water, one main village and a hard ban on plastic bags.",
+        "tip": "Sea state closes the crossing from roughly October to February. Check the morning before you commit to a boat."
+      }
+    ],
+    "hue-citadel": [
+      {
+        "id": "thien-mu",
+        "n": "Chùa Thiên Mụ",
+        "en": "Thien Mu Pagoda",
+        "t": "temple",
+        "at": [16.4536, 107.5450],
+        "travel": "15 min by taxi, or 40 min by dragon boat upriver",
+        "blurb": "A seven-storey brick tower over the Perfume River, and the Austin car that carried Thích Quảng Đức to Saigon in 1963.",
+        "tip": "The dragon boats sell a river trip that stops here; agree the full price and the return time before boarding."
+      },
+      {
+        "id": "lang-khai-dinh",
+        "n": "Lăng Khải Định",
+        "en": "Tomb of Khai Dinh",
+        "t": "heritage",
+        "at": [16.3990, 107.5750],
+        "travel": "25 min by taxi south",
+        "ticket": "150.000₫",
+        "blurb": "A concrete-and-mosaic hillside tomb that looks like nothing else in Vietnam — French gothic outside, glass and porcelain inside.",
+        "tip": "The most decorated of the tombs and the smallest. Half an hour is enough."
+      },
+      {
+        "id": "lang-tu-duc",
+        "n": "Lăng Tự Đức",
+        "en": "Tomb of Tu Duc",
+        "t": "heritage",
+        "at": [16.4570, 107.5490],
+        "travel": "20 min by taxi south-west",
+        "ticket": "150.000₫",
+        "blurb": "Less a tomb than a walled garden retreat with a lake, built while the emperor was alive so he could use it.",
+        "tip": "The largest of the three main tombs, and the one worth the most walking time."
+      },
+      {
+        "id": "lang-minh-mang",
+        "n": "Lăng Minh Mạng",
+        "en": "Tomb of Minh Mang",
+        "t": "heritage",
+        "at": [16.4394, 107.5533],
+        "travel": "30 min by taxi south, past the river fork",
+        "ticket": "150.000₫",
+        "blurb": "The most symmetrical of the imperial tombs: one long axis of gates, courtyards and lakes running through pine forest.",
+        "tip": "A combined ticket covering the citadel and three tombs costs less than buying them separately. Ask for it at the first gate."
+      },
+      {
+        "id": "lang-co",
+        "n": "Biển Lăng Cô",
+        "en": "Lang Co Beach",
+        "t": "beach",
+        "at": [16.2600, 108.0800],
+        "travel": "70 min by car south, at the foot of Hải Vân",
+        "blurb": "A sand bar between a lagoon and the sea, usually seen from the train window on the way to Đà Nẵng.",
+        "tip": "The lagoon side has the oyster and mussel places; the sea side has the hotels."
+      },
+      {
+        "id": "bach-ma",
+        "n": "Vườn quốc gia Bạch Mã",
+        "en": "Bach Ma National Park",
+        "t": "nature",
+        "at": [16.1990, 107.8500],
+        "travel": "90 min by car south-west, then a park vehicle up",
+        "ticket": "60.000₫ entry, plus the shuttle up the mountain",
+        "blurb": "Cloud forest rising to 1,450 m, with a five-tier waterfall and the ruins of a French hill station near the summit.",
+        "tip": "Rain is the default here even when Huế is dry. It is a full day, and the last shuttle down leaves earlier than you expect."
+      },
+      {
+        "id": "tam-giang",
+        "n": "Phá Tam Giang",
+        "en": "Tam Giang Lagoon",
+        "t": "nature",
+        "at": [16.5400, 107.6600],
+        "travel": "40 min by car north-east",
+        "blurb": "The largest lagoon in South-East Asia, worked with fish traps and flat-bottomed boats. Best at sunset.",
+        "tip": "Sunset boat trips are arranged in the villages on the shore, not in Huế. Fix the price and the hours before you push off."
+      },
+      {
+        "id": "danang-city",
+        "n": "Đà Nẵng",
+        "en": "Da Nang",
+        "t": "city",
+        "at": [16.0660, 108.2250],
+        "zone": "danang-hanriver",
+        "travel": "2.5 h by car over Hải Vân, or 3 h by train along the coast",
+        "blurb": "The nearest big city, on the far side of the pass: bridges, beaches and cheaper food than the tourist end of Huế.",
+        "tip": "Take the train at least one way. It runs along the cliff between the pass and the sea, and the ticket costs less than a taxi's petrol."
+      },
+      {
+        "id": "hoi-an",
+        "n": "Hội An",
+        "en": "Hoi An Old Town",
+        "t": "heritage",
+        "at": [15.8801, 108.3280],
+        "zone": "hoian-oldtown",
+        "travel": "3–3.5 h by car south, usually with a stop at Hải Vân",
+        "ticket": "120.000₫ for the old-town ticket, five sights",
+        "blurb": "A merchant port that stopped growing in the 19th century and never got rebuilt. The other end of the central Vietnam run.",
+        "tip": "Most people do this as a one-way transfer with stops, not a day trip. Ask for the Hải Vân route, not the tunnel."
+      }
+    ],
+    "hanoi-hoankiem": [
+      {
+        "id": "trang-an",
+        "n": "Tràng An · Ninh Bình",
+        "en": "Trang An · Ninh Binh",
+        "t": "nature",
+        "at": [20.2500, 105.9200],
+        "travel": "2 h by car, or 2.5 h by train to Ninh Bình",
+        "ticket": "250.000₫ for the boat route",
+        "blurb": "Limestone karst standing in flooded rice fields, rowed through by women using their feet on the oars. Halong Bay without the sea.",
+        "tip": "Three boat routes; the longest passes the most caves. Tip the rower at the end — it is expected and they are paid almost nothing per trip."
+      },
+      {
+        "id": "ha-long",
+        "n": "Vịnh Hạ Long",
+        "en": "Ha Long Bay",
+        "t": "island",
+        "at": [20.9100, 107.1830],
+        "travel": "2.5 h by expressway coach from Hà Nội",
+        "blurb": "Two thousand limestone islands in a shallow green sea. The reason most people come to northern Vietnam.",
+        "tip": "A day trip is six hours of bus for four hours of boat. One overnight on the water is the version worth doing."
+      },
+      {
+        "id": "chua-huong",
+        "n": "Chùa Hương",
+        "en": "Perfume Pagoda",
+        "t": "temple",
+        "at": [20.6180, 105.7480],
+        "travel": "2 h by car south-west, then a rowed boat up the stream",
+        "ticket": "80.000₫ entry and boat, plus the cable car",
+        "blurb": "A complex of temples in a river valley, ending in a cave shrine reached by boat and then a climb.",
+        "tip": "The pilgrimage festival runs from the second lunar month for six weeks — spectacular, and impossibly crowded."
+      },
+      {
+        "id": "bat-trang",
+        "n": "Làng gốm Bát Tràng",
+        "en": "Bat Trang Pottery Village",
+        "t": "craft",
+        "at": [20.9740, 105.9130],
+        "travel": "30 min by taxi, or bus 47A from Long Biên",
+        "blurb": "A seven-century-old ceramics village across the Red River, still firing for the whole country.",
+        "tip": "Cheapest half-day out of Hà Nội. Prices in the covered market are a third of the same piece in the old quarter."
+      },
+      {
+        "id": "hoang-thanh",
+        "n": "Hoàng thành Thăng Long",
+        "en": "Thang Long Imperial Citadel",
+        "t": "heritage",
+        "at": [21.0350, 105.8400],
+        "travel": "10 min by taxi west of the lake",
+        "ticket": "70.000₫",
+        "blurb": "A thousand years of capital, layered on one site: Lý foundations, a Nguyễn gate, and the concrete bunker where the 1972 air war was run.",
+        "tip": "The bunker (D67) is the part most people miss. It is behind the main hall and included in the same ticket."
+      },
+      {
+        "id": "bao-tang-dan-toc",
+        "n": "Bảo tàng Dân tộc học",
+        "en": "Museum of Ethnology",
+        "t": "museum",
+        "at": [21.0400, 105.7980],
+        "travel": "20 min by taxi west",
+        "ticket": "40.000₫",
+        "blurb": "The clearest explanation anywhere of Vietnam's 54 ethnic groups, with full-size houses rebuilt in the garden behind.",
+        "tip": "The outdoor section is the good half and takes an hour on its own. Go on a dry day."
+      },
+      {
+        "id": "duong-lam",
+        "n": "Làng cổ Đường Lâm",
+        "en": "Duong Lam Ancient Village",
+        "t": "heritage",
+        "at": [21.1330, 105.4200],
+        "travel": "90 min by car west",
+        "ticket": "20.000₫",
+        "blurb": "A laterite-brick farming village that kept its 17th-century layout, gates and communal house.",
+        "tip": "People still live and farm here. It is not an open-air museum — ask before walking into a courtyard."
+      },
+      {
+        "id": "tam-dao",
+        "n": "Tam Đảo",
+        "en": "Tam Dao",
+        "t": "mountain",
+        "at": [21.4570, 105.6440],
+        "travel": "2 h by car north-west",
+        "blurb": "A French hill station at 900 m, ten degrees cooler than the delta and usually inside a cloud.",
+        "tip": "The view is a lottery. If Hà Nội is clear and dry, the odds are better."
+      },
+      {
+        "id": "mai-chau",
+        "n": "Mai Châu",
+        "en": "Mai Chau",
+        "t": "nature",
+        "at": [20.6600, 105.0500],
+        "travel": "3 h by car south-west",
+        "blurb": "A flat green valley of rice and White Thai stilt houses, ringed by limestone.",
+        "tip": "Worth an overnight rather than a day trip. The homestays in Lác and Pom Coọng are the whole point."
+      },
+      {
+        "id": "sa-pa",
+        "n": "Sa Pa",
+        "en": "Sa Pa",
+        "t": "mountain",
+        "at": [22.3360, 103.8440],
+        "travel": "5–6 h by expressway coach, or the night train to Lào Cai",
+        "blurb": "Terraced rice mountains on the Chinese border, and the Hmong and Dao villages that farm them.",
+        "tip": "Not a day trip — two nights minimum. Book a village guide directly rather than a bus tour if you want to walk rather than shop."
+      }
+    ],
+    "hcmc-district1": [
+      {
+        "id": "cu-chi",
+        "n": "Địa đạo Củ Chi",
+        "en": "Cu Chi Tunnels",
+        "t": "heritage",
+        "at": [11.1430, 106.4640],
+        "travel": "90 min by car north-west, or 2 h by speedboat up the Saigon River",
+        "ticket": "125.000₫ at Bến Dược, 90.000₫ at Bến Đình",
+        "blurb": "Two hundred kilometres of hand-dug tunnel used through the war, part of it widened so visitors can crawl through a stretch.",
+        "tip": "Bến Dược is further out, less rebuilt and much less crowded than Bến Đình. The firing range is optional and loud."
+      },
+      {
+        "id": "my-tho",
+        "n": "Mỹ Tho · Cồn Thới Sơn",
+        "en": "My Tho · Mekong Delta",
+        "t": "nature",
+        "at": [10.3600, 106.3600],
+        "travel": "90 min by car south-west",
+        "blurb": "The closest slice of the Mekong: river islands, coconut candy workshops and sampans down the palm channels.",
+        "tip": "The standard tour is heavily packaged. Cần Thơ is three more hours and a different, better delta."
+      },
+      {
+        "id": "vung-tau",
+        "n": "Vũng Tàu",
+        "en": "Vung Tau",
+        "t": "beach",
+        "at": [10.3460, 107.0840],
+        "travel": "2 h by car, or 90 min by hydrofoil down the river",
+        "blurb": "The city's weekend beach on a headland, with a Christ statue you can climb the inside of.",
+        "tip": "Saturday traffic on the coast road is punishing. The hydrofoil costs more and takes half as long."
+      },
+      {
+        "id": "can-gio",
+        "n": "Rừng ngập mặn Cần Giờ",
+        "en": "Can Gio Mangrove Forest",
+        "t": "nature",
+        "at": [10.4100, 106.9550],
+        "travel": "90 min by car south-east, across the Bình Khánh ferry",
+        "blurb": "A UNESCO biosphere of replanted mangrove — defoliated in the war, put back by hand from the 1970s.",
+        "tip": "The monkey island section is a tourist stop with aggressive macaques. Keep bags shut and phones away."
+      },
+      {
+        "id": "nui-ba-den",
+        "n": "Núi Bà Đen · Tây Ninh",
+        "en": "Ba Den Mountain · Tay Ninh",
+        "t": "mountain",
+        "at": [11.3830, 106.1720],
+        "travel": "2.5 h by car north-west, usually combined with Củ Chi",
+        "blurb": "A single 986 m cone rising out of flat delta, with a cable car to the summit and the Cao Đài Holy See on the way.",
+        "tip": "The Cao Đài midday ceremony at noon is the reason to time the trip. Visitors watch from the balcony, shoes off."
+      },
+      {
+        "id": "can-tho",
+        "n": "Cần Thơ · Chợ nổi Cái Răng",
+        "en": "Can Tho · Cai Rang Floating Market",
+        "t": "nature",
+        "at": [10.0300, 105.7700],
+        "travel": "3.5 h by car or coach south-west",
+        "blurb": "The delta's biggest wholesale market, done boat to boat at dawn, with each trader's goods hung from a pole.",
+        "tip": "It is a wholesale market that empties by eight. On the water before six or not at all — which means staying the night."
+      },
+      {
+        "id": "binh-quoi",
+        "n": "Bán đảo Thanh Đa · Bình Quới",
+        "en": "Thanh Da Peninsula",
+        "t": "nature",
+        "at": [10.8180, 106.7300],
+        "travel": "30 min by taxi north",
+        "blurb": "A loop of the Saigon River still in the city, with garden restaurants and a rural feel ten minutes from a motorway.",
+        "tip": "The weekend buffet places here are the closest thing to delta food without leaving town."
+      }
+    ]
+  }
+}

@@ -621,6 +621,975 @@
       "say": "Không dùng khăn, cảm ơn",
       "ph": "khong yoong khan, gahm uhn",
       "unit": "each"
+    },
+    {
+      "id": "banh-trang-cuon-thit-heo",
+      "vi": "Bánh tráng cuốn thịt heo",
+      "en": "Pork rolls with rice paper",
+      "region": "danang",
+      "aliases": [
+        "banh trang cuon thit heo",
+        "banh trang cuon",
+        "thit heo hai dau da",
+        "banh trang thit heo"
+      ],
+      "desc": "Boiled pork belly with a rim of fat, rolled at the table in rice paper with a fistful of herbs and green banana, then dipped in fermented anchovy sauce. Ordered as a set for two or more.",
+      "spice": "mild",
+      "tags": [
+        "Pork",
+        "Anchovy sauce",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi bánh tráng cuốn thịt heo",
+      "ph": "chaw toy bahn chahng koo-on tit heh-oh",
+      "unit": "per set"
+    },
+    {
+      "id": "bun-cha-ca",
+      "vi": "Bún chả cá",
+      "en": "Fish cake noodle soup",
+      "region": "danang",
+      "aliases": [
+        "bun cha ca",
+        "buncha ca",
+        "cha ca noodle"
+      ],
+      "desc": "Clear broth simmered with pumpkin and bamboo shoot, topped with slices of fried and steamed fish cake. The chilli-garlic paste comes on the side, not in the bowl.",
+      "spice": "medium",
+      "tags": [
+        "Fish",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi bún chả cá",
+      "ph": "chaw toy boon chah kah",
+      "unit": "per bowl"
+    },
+    {
+      "id": "mi-quang-ech",
+      "vi": "Mì Quảng ếch",
+      "en": "Quang noodles with frog",
+      "region": "danang",
+      "aliases": [
+        "mi quang ech",
+        "miquang ech",
+        "ech mi quang"
+      ],
+      "desc": "The turmeric noodles of Quảng Nam served with braised frog legs instead of shrimp and pork — chewier, and cooked with a lot more chilli and lemongrass.",
+      "spice": "hot",
+      "tags": [
+        "Frog",
+        "Peanuts",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi mì Quảng ếch",
+      "ph": "chaw toy mee kwahng ek",
+      "unit": "per bowl"
+    },
+    {
+      "id": "oc-hut",
+      "vi": "Ốc hút",
+      "en": "Sucked river snails",
+      "region": "danang",
+      "aliases": [
+        "oc hut",
+        "ochut",
+        "oc xao",
+        "oc huong"
+      ],
+      "desc": "Small river snails stir-fried with lemongrass, chilli and coconut milk. You suck the meat straight out of the shell — that is where the name comes from — and a plate goes with beer, not rice.",
+      "spice": "hot",
+      "tags": [
+        "Shellfish",
+        "Fish sauce",
+        "Coconut"
+      ],
+      "say": "Cho tôi một đĩa ốc hút",
+      "ph": "chaw toy mot dee-a ock hoot",
+      "unit": "per plate"
+    },
+    {
+      "id": "goi-ca-nam-o",
+      "vi": "Gỏi cá Nam Ô",
+      "en": "Nam O raw herring salad",
+      "region": "danang",
+      "aliases": [
+        "goi ca nam o",
+        "goica nam o",
+        "goi ca"
+      ],
+      "desc": "Raw herring cured in citrus and rolled in roasted rice powder, wrapped in leaves with a thick fish sauce. From the fishing village at the north edge of the city. It is genuinely raw fish — skip it if that is a problem.",
+      "spice": "medium",
+      "tags": [
+        "Raw fish",
+        "Fish sauce",
+        "Peanuts"
+      ],
+      "say": "Cho tôi gỏi cá Nam Ô",
+      "ph": "chaw toy goy kah nahm oh",
+      "unit": "per plate"
+    },
+    {
+      "id": "banh-trang-kep",
+      "vi": "Bánh tráng kẹp",
+      "en": "Grilled rice paper folds",
+      "region": "danang",
+      "aliases": [
+        "banh trang kep",
+        "banhtrangkep",
+        "banh trang nuong kep"
+      ],
+      "desc": "Rice paper folded over dried beef floss, quail egg and spring onion oil, grilled crisp over coals and cut into wedges. Street snack, eaten standing up.",
+      "spice": "medium",
+      "tags": [
+        "Egg",
+        "Beef",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi bánh tráng kẹp",
+      "ph": "chaw toy bahn chahng kep",
+      "unit": "per piece"
+    },
+    {
+      "id": "mit-tron",
+      "vi": "Mít trộn",
+      "en": "Young jackfruit salad",
+      "region": "danang",
+      "aliases": [
+        "mit tron",
+        "mittron",
+        "goi mit"
+      ],
+      "desc": "Boiled young jackfruit shredded and tossed with pork skin, peanuts, herbs and shallot oil, scooped onto sesame rice crackers.",
+      "spice": "medium",
+      "tags": [
+        "Peanuts",
+        "Sesame",
+        "Pork",
+        "Veg version exists"
+      ],
+      "say": "Cho tôi mít trộn",
+      "ph": "chaw toy mit chon",
+      "unit": "per plate"
+    },
+    {
+      "id": "cha-bo",
+      "vi": "Chả bò",
+      "en": "Peppery beef sausage",
+      "region": "danang",
+      "aliases": [
+        "cha bo",
+        "chabo",
+        "gio bo"
+      ],
+      "desc": "Dense steamed beef sausage shot through with cracked pepper, sliced into rounds. The city's souvenir food — sold by weight, so check the price per kilo before they cut.",
+      "spice": "medium",
+      "tags": [
+        "Beef",
+        "Priced by weight"
+      ],
+      "say": "Cho tôi hai lạng chả bò",
+      "ph": "chaw toy hai lahng chah baw",
+      "unit": "per 100 g"
+    },
+    {
+      "id": "tre",
+      "vi": "Tré",
+      "en": "Fermented pork salad",
+      "region": "danang",
+      "aliases": [
+        "tre",
+        "tre tron",
+        "tre ba de"
+      ],
+      "desc": "Shredded pig ear and pork skin cured with galangal, garlic and roasted rice, packed in straw bundles and left to sour for a couple of days.",
+      "spice": "medium",
+      "tags": [
+        "Pork",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi một bịch tré",
+      "ph": "chaw toy mot bik chair",
+      "unit": "per bundle"
+    },
+    {
+      "id": "che-xoa-xoa-hat-luu",
+      "vi": "Chè xoa xoa hạt lựu",
+      "en": "Agar and water-chestnut sweet soup",
+      "region": "danang",
+      "aliases": [
+        "che xoa xoa hat luu",
+        "xoa xoa hat luu",
+        "che xoa xoa"
+      ],
+      "desc": "Agar jelly, mung bean paste and tapioca-coated water chestnut in coconut milk over crushed ice. Cold, cheap and the standard afternoon stop in the heat.",
+      "spice": "none",
+      "tags": [
+        "Vegetarian",
+        "Coconut"
+      ],
+      "say": "Cho tôi chè xoa xoa hạt lựu",
+      "ph": "chaw toy cheh swah swah hat loo",
+      "unit": "per glass"
+    },
+    {
+      "id": "kem-bo",
+      "vi": "Kem bơ",
+      "en": "Avocado ice cream",
+      "region": "danang",
+      "aliases": [
+        "kem bo",
+        "kembo",
+        "bo dam"
+      ],
+      "desc": "Blended ripe avocado poured over coconut ice cream with roasted coconut shavings. Sweet, thick, and nothing like avocado anywhere else.",
+      "spice": "none",
+      "tags": [
+        "Vegetarian",
+        "Dairy",
+        "Coconut"
+      ],
+      "say": "Cho tôi một ly kem bơ",
+      "ph": "chaw toy mot lee kem buh",
+      "unit": "per glass"
+    },
+    {
+      "id": "banh-mi-que",
+      "vi": "Bánh mì que",
+      "en": "Chilli pâté breadstick",
+      "region": "danang",
+      "aliases": [
+        "banh mi que",
+        "banhmique",
+        "banh mi cay"
+      ],
+      "desc": "A finger-thin baguette filled with peppery pâté and chilli. One is a mouthful — people order three or four.",
+      "spice": "hot",
+      "tags": [
+        "Pork",
+        "Contains liver"
+      ],
+      "say": "Cho tôi ba cái bánh mì que",
+      "ph": "chaw toy bah kai bahn mee kwe",
+      "unit": "per piece"
+    },
+    {
+      "id": "banh-beo",
+      "vi": "Bánh bèo",
+      "en": "Water fern rice cakes",
+      "region": "hue",
+      "aliases": [
+        "banh beo",
+        "banhbeo",
+        "banh beo chen"
+      ],
+      "desc": "Thumb-sized steamed rice cakes served in their own little dishes, each dabbed with dried shrimp floss, pork crackling and spring onion oil. Ordered by the tray.",
+      "spice": "mild",
+      "tags": [
+        "Shrimp",
+        "Pork",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi một phần bánh bèo",
+      "ph": "chaw toy mot fun bahn beh-oh",
+      "unit": "per tray"
+    },
+    {
+      "id": "banh-nam",
+      "vi": "Bánh nậm",
+      "en": "Flat steamed rice cake",
+      "region": "hue",
+      "aliases": [
+        "banh nam",
+        "banhnam",
+        "banh nam hue"
+      ],
+      "desc": "Thin rice batter with shrimp and pork spread flat inside a banana leaf and steamed, eaten straight out of the wrapper with sweet fish sauce.",
+      "spice": "mild",
+      "tags": [
+        "Shrimp",
+        "Pork",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi bánh nậm",
+      "ph": "chaw toy bahn num",
+      "unit": "per piece"
+    },
+    {
+      "id": "banh-bot-loc",
+      "vi": "Bánh bột lọc",
+      "en": "Clear tapioca dumplings",
+      "region": "hue",
+      "aliases": [
+        "banh bot loc",
+        "banhbotloc",
+        "bot loc"
+      ],
+      "desc": "Translucent chewy tapioca parcels wrapped around a whole shrimp and a sliver of pork belly, steamed in leaf or served bare with chilli fish sauce.",
+      "spice": "medium",
+      "tags": [
+        "Shrimp",
+        "Pork",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi bánh bột lọc",
+      "ph": "chaw toy bahn bot lock",
+      "unit": "per plate"
+    },
+    {
+      "id": "com-hen",
+      "vi": "Cơm hến",
+      "en": "Baby clam rice",
+      "region": "hue",
+      "aliases": [
+        "com hen",
+        "comhen",
+        "com hen hue"
+      ],
+      "desc": "Room-temperature rice with baby clams, crackling, peanuts, herbs and roasted chilli, with the clam broth in a bowl on the side. Fiercely hot by default — say “ít cay” if that is not what you want.",
+      "spice": "hot",
+      "tags": [
+        "Shellfish",
+        "Peanuts",
+        "Shrimp paste"
+      ],
+      "say": "Cho tôi cơm hến, ít cay",
+      "ph": "chaw toy gum hen, it kai",
+      "unit": "per bowl"
+    },
+    {
+      "id": "banh-uot-thit-nuong",
+      "vi": "Bánh ướt thịt nướng",
+      "en": "Rice sheets with grilled pork",
+      "region": "hue",
+      "aliases": [
+        "banh uot thit nuong",
+        "banh uot",
+        "banhuot thit nuong"
+      ],
+      "desc": "Fresh rice sheets rolled around charcoal-grilled pork and a bundle of herbs, dipped in a thick sesame-peanut sauce.",
+      "spice": "mild",
+      "tags": [
+        "Pork",
+        "Peanuts",
+        "Sesame"
+      ],
+      "say": "Cho tôi bánh ướt thịt nướng",
+      "ph": "chaw toy bahn oo-ut tit nuong",
+      "unit": "per plate"
+    },
+    {
+      "id": "nem-lui",
+      "vi": "Nem lụi",
+      "en": "Lemongrass pork skewers",
+      "region": "hue",
+      "aliases": [
+        "nem lui",
+        "nemlui",
+        "nem lui hue"
+      ],
+      "desc": "Seasoned minced pork moulded onto lemongrass stalks and grilled, then wrapped in rice paper with herbs and dunked in a thick liver-and-peanut sauce.",
+      "spice": "mild",
+      "tags": [
+        "Pork",
+        "Peanuts",
+        "Contains liver"
+      ],
+      "say": "Cho tôi nem lụi",
+      "ph": "chaw toy nem loo-ee",
+      "unit": "per skewer"
+    },
+    {
+      "id": "banh-canh-ca-loc",
+      "vi": "Bánh canh cá lóc",
+      "en": "Thick noodles with snakehead fish",
+      "region": "hue",
+      "aliases": [
+        "banh canh ca loc",
+        "banhcanh ca loc",
+        "banh canh"
+      ],
+      "desc": "Short chewy tapioca-rice noodles in a peppery broth with flaked snakehead fish. Breakfast food, gone by mid-morning.",
+      "spice": "medium",
+      "tags": [
+        "Fish",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi bánh canh cá lóc",
+      "ph": "chaw toy bahn kanh kah lock",
+      "unit": "per bowl"
+    },
+    {
+      "id": "ca-phe-muoi",
+      "vi": "Cà phê muối",
+      "en": "Salt coffee",
+      "region": "hue",
+      "aliases": [
+        "ca phe muoi",
+        "caphemuoi",
+        "salt coffee"
+      ],
+      "desc": "Robusta dripped over lightly salted whipped cream. The salt takes the edge off the bitterness instead of adding sweetness. Started in Huế, now everywhere.",
+      "spice": "none",
+      "tags": [
+        "Dairy",
+        "Caffeine"
+      ],
+      "say": "Cho tôi một ly cà phê muối",
+      "ph": "chaw toy mot lee kah-feh moo-oy",
+      "unit": "per glass"
+    },
+    {
+      "id": "banh-dap",
+      "vi": "Bánh đập",
+      "en": "Smashed rice cracker",
+      "region": "hoian",
+      "aliases": [
+        "banh dap",
+        "banhdap",
+        "banh dap hen tron"
+      ],
+      "desc": "A grilled rice cracker pressed onto a soft steamed rice sheet. You smack it with your palm to shatter it, then tear off pieces and dip them in anchovy sauce.",
+      "spice": "medium",
+      "tags": [
+        "Anchovy sauce",
+        "Veg version exists"
+      ],
+      "say": "Cho tôi bánh đập",
+      "ph": "chaw toy bahn dup",
+      "unit": "per piece"
+    },
+    {
+      "id": "hen-tron",
+      "vi": "Hến trộn",
+      "en": "Tossed baby clams",
+      "region": "hoian",
+      "aliases": [
+        "hen tron",
+        "hentron",
+        "hen xao",
+        "hen cam nam"
+      ],
+      "desc": "Baby clams from the river sandbank at Cẩm Nam, tossed with herbs, peanuts, chilli and shallot oil, scooped up on sesame crackers.",
+      "spice": "hot",
+      "tags": [
+        "Shellfish",
+        "Peanuts",
+        "Sesame"
+      ],
+      "say": "Cho tôi hến trộn",
+      "ph": "chaw toy hen chon",
+      "unit": "per plate"
+    },
+    {
+      "id": "ram-bap",
+      "vi": "Ram bắp",
+      "en": "Corn spring rolls",
+      "region": "hoian",
+      "aliases": [
+        "ram bap",
+        "rambap",
+        "ram bap cam nam"
+      ],
+      "desc": "Sweetcorn paste rolled thin in rice paper and deep-fried until it shatters, eaten with herbs and a dipping sauce. Usually served alongside bánh đập.",
+      "spice": "mild",
+      "tags": [
+        "Vegetarian",
+        "Corn"
+      ],
+      "say": "Cho tôi ram bắp",
+      "ph": "chaw toy ram bup",
+      "unit": "per plate"
+    },
+    {
+      "id": "che-bap",
+      "vi": "Chè bắp",
+      "en": "Sweetcorn pudding",
+      "region": "hoian",
+      "aliases": [
+        "che bap",
+        "chebap",
+        "che bap cam nam"
+      ],
+      "desc": "Young corn grown on the river sandbank cooked into a loose, barely sweet pudding under a spoon of salted coconut cream.",
+      "spice": "none",
+      "tags": [
+        "Vegetarian",
+        "Coconut"
+      ],
+      "say": "Cho tôi chè bắp",
+      "ph": "chaw toy cheh bup",
+      "unit": "per bowl"
+    },
+    {
+      "id": "xi-ma",
+      "vi": "Xí mà",
+      "en": "Black sesame sweet soup",
+      "region": "hoian",
+      "aliases": [
+        "xi ma",
+        "xima",
+        "che me den"
+      ],
+      "desc": "Warm, faintly bitter black sesame porridge sold from a shoulder pole. A Chinese remedy dessert that came with the merchants and stayed.",
+      "spice": "none",
+      "tags": [
+        "Vegetarian",
+        "Sesame"
+      ],
+      "say": "Cho tôi một chén xí mà",
+      "ph": "chaw toy mot chen see mah",
+      "unit": "per bowl"
+    },
+    {
+      "id": "banh-it-la-gai",
+      "vi": "Bánh ít lá gai",
+      "en": "Ramie leaf sticky cake",
+      "region": "hoian",
+      "aliases": [
+        "banh it la gai",
+        "banhit la gai",
+        "banh it"
+      ],
+      "desc": "Black glutinous rice cake scented with ramie leaf, filled with mung bean and coconut and steamed in a banana-leaf pyramid.",
+      "spice": "none",
+      "tags": [
+        "Vegetarian",
+        "Coconut"
+      ],
+      "say": "Cho tôi bánh ít lá gai",
+      "ph": "chaw toy bahn it lah guy",
+      "unit": "per piece"
+    },
+    {
+      "id": "pho-ga",
+      "vi": "Phở gà",
+      "en": "Chicken pho",
+      "region": "hanoi",
+      "aliases": [
+        "pho ga",
+        "phoga",
+        "phở gà"
+      ],
+      "desc": "The same flat rice noodles as phở bò in a lighter chicken broth, with poached chicken, shredded lime leaf and spring onion.",
+      "spice": "mild",
+      "tags": [
+        "Chicken"
+      ],
+      "say": "Cho tôi phở gà",
+      "ph": "chaw toy fuh gah",
+      "unit": "per bowl"
+    },
+    {
+      "id": "bun-bo-nam-bo",
+      "vi": "Bún bò Nam Bộ",
+      "en": "Dry beef noodle salad",
+      "region": "hanoi",
+      "aliases": [
+        "bun bo nam bo",
+        "bunbo nam bo",
+        "bun nam bo"
+      ],
+      "desc": "Cold rice noodles with quick-seared beef, bean sprouts, herbs, peanuts and fried shallots, with a sweet-sour dressing poured over at the table. No broth, despite the name.",
+      "spice": "mild",
+      "tags": [
+        "Beef",
+        "Peanuts",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi bún bò Nam Bộ",
+      "ph": "chaw toy boon baw nahm baw",
+      "unit": "per bowl"
+    },
+    {
+      "id": "banh-tom",
+      "vi": "Bánh tôm",
+      "en": "Sweet potato shrimp fritter",
+      "region": "hanoi",
+      "aliases": [
+        "banh tom",
+        "banhtom",
+        "banh tom ho tay"
+      ],
+      "desc": "Whole prawns in a sweet-potato batter deep-fried into a crisp raft, torn up and eaten with herbs and dipping sauce. The West Lake version is the famous one.",
+      "spice": "mild",
+      "tags": [
+        "Shrimp"
+      ],
+      "say": "Cho tôi bánh tôm",
+      "ph": "chaw toy bahn tom",
+      "unit": "per plate"
+    },
+    {
+      "id": "pho-cuon",
+      "vi": "Phở cuốn",
+      "en": "Rolled pho",
+      "region": "hanoi",
+      "aliases": [
+        "pho cuon",
+        "phocuon",
+        "pho cuon ngu xa"
+      ],
+      "desc": "Uncut sheets of fresh phở noodle wrapped around seared beef and herbs, dipped rather than boiled. Invented in the Ngũ Xã lanes when a shop ran out of broth.",
+      "spice": "mild",
+      "tags": [
+        "Beef",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi phở cuốn",
+      "ph": "chaw toy fuh koo-on",
+      "unit": "per plate"
+    },
+    {
+      "id": "banh-gio",
+      "vi": "Bánh giò",
+      "en": "Pyramid rice dumpling",
+      "region": "hanoi",
+      "aliases": [
+        "banh gio",
+        "banhgio",
+        "banh gio nong"
+      ],
+      "desc": "A warm, soft pyramid of rice flour around minced pork and wood ear mushroom, unwrapped from its banana leaf and eaten with a spoon.",
+      "spice": "mild",
+      "tags": [
+        "Pork"
+      ],
+      "say": "Cho tôi bánh giò",
+      "ph": "chaw toy bahn zaw",
+      "unit": "per piece"
+    },
+    {
+      "id": "nom-bo-kho",
+      "vi": "Nộm bò khô",
+      "en": "Papaya salad with beef jerky",
+      "region": "hanoi",
+      "aliases": [
+        "nom bo kho",
+        "nombokho",
+        "goi du du bo kho",
+        "nom du du"
+      ],
+      "desc": "Shredded green papaya with dried beef, peanuts and herbs under a sweet-sour vinegar dressing, cut to size with scissors in front of you.",
+      "spice": "medium",
+      "tags": [
+        "Beef",
+        "Peanuts"
+      ],
+      "say": "Cho tôi nộm bò khô",
+      "ph": "chaw toy nom baw kaw",
+      "unit": "per plate"
+    },
+    {
+      "id": "bun-mam",
+      "vi": "Bún mắm",
+      "en": "Fermented fish noodle soup",
+      "region": "saigon",
+      "aliases": [
+        "bun mam",
+        "bunmam",
+        "bun mam mien tay"
+      ],
+      "desc": "A dark, pungent broth built on fermented fish, loaded with squid, prawn, roast pork and aubergine. The smell is the point; the taste is deeper than it smells.",
+      "spice": "hot",
+      "tags": [
+        "Fish",
+        "Shellfish",
+        "Pork"
+      ],
+      "say": "Cho tôi bún mắm",
+      "ph": "chaw toy boon mahm",
+      "unit": "per bowl"
+    },
+    {
+      "id": "banh-khot",
+      "vi": "Bánh khọt",
+      "en": "Mini savoury pancakes",
+      "region": "saigon",
+      "aliases": [
+        "banh khot",
+        "banhkhot",
+        "banh khot vung tau"
+      ],
+      "desc": "Coin-sized turmeric rice pancakes fried crisp in a dimpled pan, each with a prawn on top, wrapped in mustard leaf with herbs before dipping.",
+      "spice": "mild",
+      "tags": [
+        "Shrimp",
+        "Coconut"
+      ],
+      "say": "Cho tôi bánh khọt",
+      "ph": "chaw toy bahn kot",
+      "unit": "per plate"
+    },
+    {
+      "id": "bo-kho",
+      "vi": "Bò kho",
+      "en": "Beef stew with bread",
+      "region": "saigon",
+      "aliases": [
+        "bo kho",
+        "bokho",
+        "bo kho banh mi"
+      ],
+      "desc": "Beef and carrot stewed soft in a lemongrass-and-annatto broth, eaten with bread or noodles. Breakfast as often as dinner.",
+      "spice": "medium",
+      "tags": [
+        "Beef"
+      ],
+      "say": "Cho tôi bò kho bánh mì",
+      "ph": "chaw toy baw kaw bahn mee",
+      "unit": "per bowl"
+    },
+    {
+      "id": "nuoc-sam",
+      "vi": "Nước sâm",
+      "en": "Herbal iced tea",
+      "region": "saigon",
+      "aliases": [
+        "nuoc sam",
+        "nuocsam",
+        "sam lanh",
+        "tra sam"
+      ],
+      "desc": "A dark, faintly sweet herbal infusion sold cold from roadside urns. Cools you down without the sugar hit of a soft drink.",
+      "spice": "none",
+      "tags": [
+        "Vegetarian"
+      ],
+      "say": "Cho tôi một ly nước sâm",
+      "ph": "chaw toy mot lee nook sahm",
+      "unit": "per glass"
+    },
+    {
+      "id": "bun-rieu",
+      "vi": "Bún riêu",
+      "en": "Crab noodle soup",
+      "region": "all",
+      "aliases": [
+        "bun rieu",
+        "bunrieu",
+        "bun rieu cua"
+      ],
+      "desc": "Tomato broth with a raft of freshwater crab and egg, fried tofu, and a spoon of shrimp paste stirred in at the table.",
+      "spice": "medium",
+      "tags": [
+        "Crab",
+        "Shrimp paste",
+        "Egg"
+      ],
+      "say": "Cho tôi bún riêu",
+      "ph": "chaw toy boon ree-oh",
+      "unit": "per bowl"
+    },
+    {
+      "id": "chao-long",
+      "vi": "Cháo lòng",
+      "en": "Rice porridge with offal",
+      "region": "all",
+      "aliases": [
+        "chao long",
+        "chaolong",
+        "chao long banh hoi"
+      ],
+      "desc": "Thin rice porridge with sliced pork offal and blood sausage, finished with herbs and a lot of black pepper. Cheap, filling, and not a beginner dish.",
+      "spice": "medium",
+      "tags": [
+        "Pork",
+        "Offal"
+      ],
+      "say": "Cho tôi cháo lòng",
+      "ph": "chaw toy chow long",
+      "unit": "per bowl"
+    },
+    {
+      "id": "bo-la-lot",
+      "vi": "Bò lá lốt",
+      "en": "Beef in wild betel leaf",
+      "region": "all",
+      "aliases": [
+        "bo la lot",
+        "bolalot",
+        "bo nuong la lot"
+      ],
+      "desc": "Minced beef rolled in wild betel leaves and grilled over coals until the leaf goes dark and fragrant. Wrapped in rice paper with herbs before eating.",
+      "spice": "mild",
+      "tags": [
+        "Beef",
+        "Fish sauce"
+      ],
+      "say": "Cho tôi bò lá lốt",
+      "ph": "chaw toy baw lah lot",
+      "unit": "per plate"
+    },
+    {
+      "id": "banh-trang-nuong",
+      "vi": "Bánh tráng nướng",
+      "en": "Grilled rice paper",
+      "region": "all",
+      "aliases": [
+        "banh trang nuong",
+        "banhtrangnuong",
+        "pizza viet nam"
+      ],
+      "desc": "Rice paper grilled over coals with egg, spring onion, dried shrimp and chilli sauce spread across it, then folded or cut into wedges.",
+      "spice": "medium",
+      "tags": [
+        "Egg",
+        "Shrimp"
+      ],
+      "say": "Cho tôi bánh tráng nướng",
+      "ph": "chaw toy bahn chahng nuong",
+      "unit": "per piece"
+    },
+    {
+      "id": "hai-san-can",
+      "vi": "Hải sản cân",
+      "en": "Seafood sold by weight",
+      "region": "all",
+      "aliases": [
+        "hai san can",
+        "haisan",
+        "hai san tuoi song",
+        "seafood kg",
+        "hai san theo kg"
+      ],
+      "desc": "Live seafood picked from the tank and charged by the kilo. Ask for the price per kilo AND the weight of the exact piece before it goes to the kitchen, and ask them to weigh it in front of you — this is where a bill goes wrong faster than anywhere else in Vietnam.",
+      "spice": "mild",
+      "tags": [
+        "Shellfish",
+        "Priced by weight",
+        "Ask before ordering"
+      ],
+      "say": "Bao nhiêu một ký? Cân trước giúp tôi nhé",
+      "ph": "bow nyew mot kee? kun chuok zup toy nyeh",
+      "unit": "per kg"
+    },
+    {
+      "id": "muc-nuong",
+      "vi": "Mực nướng",
+      "en": "Grilled squid",
+      "region": "all",
+      "aliases": [
+        "muc nuong",
+        "mucnuong",
+        "muc nuong sa te",
+        "muc mot nang"
+      ],
+      "desc": "Whole squid grilled over coals and cut into rings, served with a salt-pepper-lime dip. Often priced by weight at seafood places — check before you point.",
+      "spice": "medium",
+      "tags": [
+        "Shellfish",
+        "Priced by weight"
+      ],
+      "say": "Cho tôi mực nướng",
+      "ph": "chaw toy mook nuong",
+      "unit": "per plate"
+    },
+    {
+      "id": "banh-flan",
+      "vi": "Bánh flan",
+      "en": "Vietnamese crème caramel",
+      "region": "all",
+      "aliases": [
+        "banh flan",
+        "banhflan",
+        "kem flan",
+        "caramen"
+      ],
+      "desc": "A small, dense crème caramel served over crushed ice, sometimes with a spoon of coffee poured on top.",
+      "spice": "none",
+      "tags": [
+        "Egg",
+        "Dairy"
+      ],
+      "say": "Cho tôi bánh flan",
+      "ph": "chaw toy bahn flahn",
+      "unit": "per piece"
+    },
+    {
+      "id": "ca-phe-dua",
+      "vi": "Cà phê dừa",
+      "en": "Coconut coffee",
+      "region": "all",
+      "aliases": [
+        "ca phe dua",
+        "caphedua",
+        "coconut coffee",
+        "sinh to ca phe dua"
+      ],
+      "desc": "Coffee blended with frozen coconut cream into a thick slush. Sweeter and colder than cà phê sữa đá, and closer to a dessert.",
+      "spice": "none",
+      "tags": [
+        "Coconut",
+        "Dairy",
+        "Caffeine"
+      ],
+      "say": "Cho tôi một ly cà phê dừa",
+      "ph": "chaw toy mot lee kah-feh zoo-a",
+      "unit": "per glass"
+    },
+    {
+      "id": "tra-sua",
+      "vi": "Trà sữa",
+      "en": "Milk tea",
+      "region": "all",
+      "aliases": [
+        "tra sua",
+        "trasua",
+        "milk tea",
+        "tra sua tran chau"
+      ],
+      "desc": "Iced milk tea with tapioca pearls or jelly. Sold from chains and from carts; the cart version costs about half.",
+      "spice": "none",
+      "tags": [
+        "Dairy",
+        "Caffeine"
+      ],
+      "say": "Cho tôi một ly trà sữa",
+      "ph": "chaw toy mot lee chah sooa",
+      "unit": "per glass"
+    },
+    {
+      "id": "sinh-to",
+      "vi": "Sinh tố",
+      "en": "Fruit smoothie",
+      "region": "all",
+      "aliases": [
+        "sinh to",
+        "sinhto",
+        "smoothie",
+        "sinh to bo",
+        "sinh to xoai"
+      ],
+      "desc": "Fresh fruit blended with ice and condensed milk. Say “không sữa” for no condensed milk and “ít đường” for less sugar.",
+      "spice": "none",
+      "tags": [
+        "Dairy",
+        "Vegetarian"
+      ],
+      "say": "Cho tôi sinh tố, ít đường",
+      "ph": "chaw toy sing taw, it duong",
+      "unit": "per glass"
+    },
+    {
+      "id": "nuoc-ep",
+      "vi": "Nước ép",
+      "en": "Fresh pressed juice",
+      "region": "all",
+      "aliases": [
+        "nuoc ep",
+        "nuocep",
+        "juice",
+        "nuoc ep cam",
+        "nuoc ep dua hau"
+      ],
+      "desc": "Pressed fruit juice, usually orange, watermelon or passion fruit. Ask for it without added sugar syrup if you want the fruit on its own.",
+      "spice": "none",
+      "tags": [
+        "Vegetarian"
+      ],
+      "say": "Cho tôi nước ép, không đường",
+      "ph": "chaw toy nook ep, khong duong",
+      "unit": "per glass"
     }
   ]
 }
