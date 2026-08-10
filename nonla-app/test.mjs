@@ -7,6 +7,7 @@ import { camera, drawTown } from "./iso.js";
 import { artTransform, fitArt } from "./artmap.js";
 import { buildFabric, drawFabric } from "./citymap.js";
 import { resolveRoute, progressAt, legLabel } from "./route.js";
+import { fitSize } from "./photo.js";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
@@ -350,6 +351,17 @@ ok("đứng ngay tại quán", farFrom(baBe, [15.87755, 108.3278]) === false);
 ok("cách 300m vẫn tính là tại chỗ", farFrom(baBe, [15.88025, 108.3278]) === false);
 ok("cách 900m là xa", farFrom(baBe, [15.8856, 108.3278]) === true);
 ok("quán không có toạ độ thì không kết luận", farFrom({}, [15.9, 108.3]) === false);
+
+console.log("\n── photo: kích thước đích ──────────────────");
+eq("ảnh ngang lớn", fitSize(4032, 3024, 1280), { w: 1280, h: 960 });
+eq("ảnh dọc lớn", fitSize(3024, 4032, 1280), { w: 960, h: 1280 });
+eq("ảnh vuông", fitSize(2000, 2000, 1280), { w: 1280, h: 1280 });
+// Ảnh đã nhỏ hơn ngưỡng thì GIỮ NGUYÊN. Phóng to lên 1280 chỉ làm file nặng
+// hơn mà không thêm một chi tiết nào.
+eq("ảnh đã nhỏ thì giữ nguyên", fitSize(800, 600, 1280), { w: 800, h: 600 });
+eq("đúng bằng ngưỡng", fitSize(1280, 720, 1280), { w: 1280, h: 720 });
+eq("làm tròn cạnh còn lại", fitSize(1000, 333, 500), { w: 500, h: 167 });
+eq("cạnh không bao giờ về 0", fitSize(10000, 3, 1280), { w: 1280, h: 1 });
 
 console.log("\n════════════════════════════════════════════");
 console.log(`${pass} pass · ${fail} fail\n`);
