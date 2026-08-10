@@ -41,8 +41,10 @@ thực bài, khoảng cách tới quán, kích thước ảnh nén, giãn cách 
 import('./audit.js').then(m => m.run())
 ```
 
-82 phép thử: mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi tab có
-dọn sạch trạng thái cũ không.
+105 lời gọi ck(...) trong mã nguồn — con số đếm tĩnh, không phải số phép thử
+thực chạy: vài lời gọi nằm trong vòng lặp nên một lần run() in ra nhiều dòng
+hơn con số này. Kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi
+tab có dọn sạch trạng thái cũ không.
 
 Tầng thứ hai tồn tại vì hai lỗi từng lọt qua tầng thứ nhất — lõi logic đúng
 hoàn toàn mà người dùng vẫn không bấm được:
@@ -56,7 +58,7 @@ hoàn toàn mà người dùng vẫn không bấm được:
 | Hạng mục | Kết quả |
 |---|---|
 | Lõi logic | 103/103 pass |
-| Đường tương tác | 103/104 pass — trượt phép thử vùng chạm ghim tham quan (`bm-mark` bị `bm-pin` che) |
+| Đường tương tác | Chưa đo lại được toàn bộ sau khi thêm phép thử Community — môi trường trình duyệt ở đây quá chậm để chạy hết một bộ cỡ này (`run()` vẫn chưa xong sau 363 giây, còn đứng ở mục Cash Guard; không phải do CDN hay mạng bị chặn). 10 phép thử Community đã chạy riêng, trực tiếp trong trình duyệt, cả 10 đều pass — đó không phải kết quả của cả bộ |
 | OCR tiếng Việt (Tesseract `vie`) | 92% tin cậy, ~2,6s lần đầu, ~0,4s sau đó |
 | Chuỗi pixel → OCR → khớp → phán quyết | Đúng, kể cả khi OCR đọc nát `Cao lầu` thành `Caolâ\`u` |
 | Chạy khi tắt hẳn server | Boot được, OCR được, phán quyết được |
@@ -90,7 +92,9 @@ cloud.js        chỗ DUY NHẤT biết HTTP của lớp cộng đồng; config.
                 để trống thì Community tự tắt
 community.js    màn hình Cộng đồng: feed đọc được khi chưa đăng nhập, form đăng bài, báo cáo
                 + community.css — kiểu riêng cho feed và form
-audit.js        104 phép thử: tương tác, bố cục, tương phản, vùng chạm, bản đồ
+audit.js        105 lời gọi ck(...) (đếm tĩnh — vài lời gọi nằm trong vòng lặp,
+                chạy thật ra nhiều dòng hơn con số này): tương tác, bố cục,
+                tương phản, vùng chạm, bản đồ
 sw.js           offline. network-first cho vỏ app, cache-first cho CDN
 test.mjs        141 phép thử: match.js, geo.js, iso.js, artmap.js, citymap.js,
                 route.js, và lõi thuần lớp cộng đồng (posts.js, photo.js, outbox.js)
@@ -290,8 +294,11 @@ co theo `cos(vĩ độ)` — bỏ bước này thì ở vĩ độ 15° bản đ�
 - Kiểm duyệt hiện dựa vào báo cáo của người dùng. Chưa có lọc ảnh nhạy cảm bằng
   AI, chưa dò được ảnh lấy cắp, chưa phát hiện cụm tài khoản đăng bài có tổ chức.
   Ba thứ này cần một edge function và tiền API.
-- Xác thực địa điểm mới là phép đo khoảng cách GPS, không phải so khớp hình ảnh.
-  Ảnh không có EXIF và người dùng không cho phép định vị thì không kiểm được.
+- Xác thực địa điểm mới là phép đo khoảng cách GPS, không phải so khớp hình ảnh,
+  và nó chỉ GẮN NHÃN chứ không CHẶN: bài đăng xa quán vẫn được gửi và hiện lên
+  feed bình thường, chỉ kèm thêm dòng "posted away from the venue" trên thẻ.
+  Ảnh không có EXIF và người dùng không cho phép định vị thì không tính được
+  khoảng cách — bài vẫn đăng, chỉ là không có nhãn đó.
 - Ảnh lưu trong bucket CÔNG KHAI. Trigger kiểm duyệt chỉ đổi `status` của dòng
   trong bảng `posts` — file ảnh vẫn còn nguyên ở URL công khai, ai đã có URL đó
   (đã copy, đã cache) vẫn xem được dù bài đã bị ẩn khỏi feed.
