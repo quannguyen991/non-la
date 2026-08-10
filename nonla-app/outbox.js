@@ -38,6 +38,10 @@ function open() {
     };
     rq.onsuccess = () => res(rq.result);
     rq.onerror = () => rej(rq.error);
+    // Nếu có tab khác giữ kết nối mở khi version tăng, onblocked sẽ bắn thay vì
+    // onsuccess/onerror. Hứa không settle là tệ hơn hứa reject, vì gọi hàm không
+    // có cách nào phục hồi hay báo lỗi được.
+    rq.onblocked = () => rej(new Error("IndexedDB upgrade blocked by another connection"));
   });
 }
 
@@ -45,7 +49,14 @@ const tx = async (mode, fn) => {
   const db = await open();
   return new Promise((res, rej) => {
     const t = db.transaction(STORE, mode);
-    const rq = fn(t.objectStore(STORE));
+    let rq;
+    try {
+      rq = fn(t.objectStore(STORE));
+    } catch (e) {
+      db.close();
+      rej(e);
+      return;
+    }
     t.oncomplete = () => { db.close(); res(rq?.result); };
     t.onerror = () => { db.close(); rej(t.error); };
   });
