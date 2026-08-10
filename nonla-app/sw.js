@@ -2,6 +2,14 @@
 // v7: thêm lớp quán ăn OSM + bộ icon mốc vẽ tay. Phải bump, không thì máy
 // đã cài bản cũ giữ nguyên cache v6 và không bao giờ thấy eateries.json.
 const CACHE = "nonla-v20";
+
+/* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
+   Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
+   dung lượng wifi khách sạn, icon món ăn tốn TIỀN THẬT của người dùng
+   (gọi API trả phí). Vỏ app thì ngược lại — rẻ và phải luôn mới. Liệt kê
+   ở đây để sau này thêm cache thứ ba không ai quên loại nó khỏi dọn dẹp. */
+const VERSIONLESS_CACHES = ["nl-community-img", "nonla-icons-v1"];
+
 const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./route.js",
@@ -35,7 +43,9 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
-      .then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((ks) => Promise.all(
+        ks.filter((k) => k !== CACHE && !VERSIONLESS_CACHES.includes(k)).map((k) => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
   );
 });
@@ -55,8 +65,10 @@ self.addEventListener("fetch", (e) => {
       if (hit) return hit;
       const res = await fetch(e.request);
       if (res.ok) {
-        const keys = await c.keys();
-        if (keys.length >= 60) await c.delete(keys[0]);
+        // Dọn TỚI KHI dưới hạn, không chỉ một lần: hai request cùng lúc chạm
+        // ngưỡng có thể đẩy cache lên 61+ tấm nếu chỉ xoá đúng một tấm mỗi lần.
+        let keys = await c.keys();
+        while (keys.length >= 60) { await c.delete(keys[0]); keys = keys.slice(1); }
         c.put(e.request, res.clone());
       }
       return res;
