@@ -3,7 +3,10 @@
 Trợ lý camera cho khách quốc tế tại Việt Nam. Chĩa máy vào thực đơn, hoá đơn hoặc xấp tiền —
 app đọc, đối chiếu với giá phổ biến của khu vực, và nói cho bạn biết nó có bình thường không.
 
-PWA thuần, không build step, không backend. **Ảnh không rời khỏi máy** — OCR chạy trên thiết bị.
+PWA thuần, không build step. **Ảnh quét không rời khỏi máy** — OCR chạy trên
+thiết bị. Ảnh bạn **chủ động đăng** lên Community thì có, và toạ độ GPS trong
+ảnh bị xoá trước khi gửi: bản gửi đi được vẽ lại qua canvas nên không mang
+theo EXIF.
 
 ## Chạy
 

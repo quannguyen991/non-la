@@ -90,6 +90,43 @@ export async function refresh() {
 export function close() { M.host = null; M.posts = []; }
 
 /**
+ * HTML của form đăng bài. Trả chuỗi chứ không tự gắn vào DOM: app.js mở nó
+ * trong sheet dùng chung, và sheet đó nằm ở cấp #app — chứ KHÔNG nằm trong
+ * #v-community. Đây đúng là cái bẫy README kể: thẻ mở bên trong một khối
+ * đang hidden thì bấm mà không thấy gì.
+ */
+export function composer({ places = [], dishes = [], place = null } = {}) {
+  const opts = places.map((p) =>
+    `<option value="${esc(p.id)}"${place === p.id ? " selected" : ""}>${esc(p.name)}</option>`).join("");
+  const sel = places.find((p) => p.id === place);
+  const dishOpts = (sel?.known || []).map((k) => {
+    const d = dishes.find((x) => x.id === k);
+    return `<option value="${esc(k)}">${esc(d?.vi || k)}</option>`;
+  }).join("");
+  return `
+    <h3>Share a place</h3>
+    <p class="src">Photos you post leave your phone. GPS coordinates inside them do not.</p>
+    <label class="fld"><span>Place</span>
+      <select id="cfPlace"><option value="">Pick one…</option>${opts}</select></label>
+    <label class="fld"><span>Dish <small>optional</small></span>
+      <select id="cfDish"><option value="">—</option>${dishOpts}</select></label>
+    <label class="fld"><span>What you paid <small>optional</small></span>
+      <input id="cfPaid" type="number" inputmode="numeric" placeholder="50000"></label>
+    <label class="fld"><span>Rating <small>optional</small></span>
+      <select id="cfStars"><option value="">—</option>
+        ${[5,4,3,2,1].map((n) => `<option value="${n}">${"★".repeat(n)}</option>`).join("")}
+      </select></label>
+    <label class="fld row2"><input id="cfReturn" type="checkbox"><span>I'd come back</span></label>
+    <label class="fld"><span>Note <small>optional, 600 max</small></span>
+      <textarea id="cfBody" maxlength="600" rows="3"></textarea></label>
+    <label class="fld"><span>Photo <small>optional</small></span>
+      <input id="cfPhoto" type="file" accept="image/*" capture="environment"></label>
+    <p class="cerr" id="cfErr" hidden></p>
+    <button class="btn" data-cact="submit">Post</button>
+    <button class="btn sec" data-act="close">Cancel</button>`;
+}
+
+/**
  * app.js gọi lại khi có click. CHỈ nhận phần tử của feed.
  *
  * Nút trong form đăng bài (`data-cact`) cố ý KHÔNG đi qua đây: form mở được

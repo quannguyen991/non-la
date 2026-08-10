@@ -15,6 +15,10 @@ import * as Auth from "./auth.js";
 import * as FoodMap from "./foodmap.js";
 import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
 import * as Community from "./community.js";
+import * as Cloud from "./cloud.js";
+import * as Outbox from "./outbox.js";
+import { validate as validatePost, farFrom } from "./posts.js";
+import { compress } from "./photo.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -1762,11 +1766,104 @@ function renderCommunity() {
   });
 }
 
-/* Ba hàm này viết ở task sau; khai trước để renderCommunity chạy được ngay. */
-function openComposer() { toast("Coming next"); }
+/* reportPost viết ở Task 11; khai trước để renderCommunity chạy được ngay. */
 function reportPost() { toast("Coming next"); }
-function flushOutbox() { toast("Coming next"); }
-function submitPost() { toast("Coming next"); }
+
+/* app.js chưa có helper bận/rảnh — hai chỗ trong ocr() bật tắt #busy bằng tay.
+   Hai luồng dưới đây cần đúng hành vi đó, nên rút thành một hàm thay vì chép
+   lần thứ ba. KHÔNG sửa ocr(): nó còn cập nhật phần trăm tiến trình, gộp vào
+   đây sẽ kéo theo một tham số chỉ một chỗ dùng. */
+function busy(on, msg = "") {
+  $("#busy").classList.toggle("on", !!on);
+  if (on) { $("#busyTxt").textContent = msg; $("#busyPct").textContent = ""; }
+}
+
+/* Đăng nhập hỏi ĐÚNG lúc cần: người dùng đã gõ xong nhận xét rồi mới thấy ô
+   email, chứ không phải thấy nó trước khi biết mình sẽ được gì. */
+async function needAuth() {
+  if (Auth.signedIn()) return true;
+  const email = prompt("Email to post with:");
+  if (!email) return false;
+  try {
+    await Auth.sendCode(email);
+    const code = prompt("Enter the 6-digit code we emailed you:");
+    if (!code) return false;
+    await Auth.verifyCode(email, code.trim());
+    await Cloud.ensureProfile((email.split("@")[0] || "Traveller").slice(0, 32));
+    return true;
+  } catch (e) { toast(e.message || "Sign-in failed"); return false; }
+}
+
+function openComposer(placeId = "") {
+  openSheet(Community.composer({ places: S.places, dishes: S.dishes, place: placeId }));
+}
+
+function readDraft() {
+  const num = (id) => { const v = $(id)?.value?.trim(); return v ? Number(v) : null; };
+  return {
+    placeId: $("#cfPlace")?.value || "",
+    zone: S.zone,
+    dishId: $("#cfDish")?.value || null,
+    paidVnd: num("#cfPaid"),
+    stars: num("#cfStars"),
+    worthReturn: $("#cfReturn")?.checked || null,
+    body: $("#cfBody")?.value?.trim() || null,
+    photo: $("#cfPhoto")?.files?.[0] || null,
+    coords: null,
+  };
+}
+
+async function submitPost() {
+  const draft = readDraft();
+  const v = validatePost(draft);
+  if (!v.ok) { const e = $("#cfErr"); e.hidden = false; e.textContent = v.errors.join(" · "); return; }
+  if (!(await needAuth())) return;
+
+  busy(true, "Posting…");
+  try {
+    let photoPath = null, photoHash = null, coords = null;
+    if (draft.photo) {
+      const c = await compress(draft.photo);
+      coords = c.coords;
+      photoHash = c.hash;
+      photoPath = await Cloud.uploadPhoto(c.blob, Auth.user().id, c.hash.slice(0, 24));
+    }
+    const place = S.places.find((p) => p.id === draft.placeId);
+    const far = farFrom(place, coords || S.me);
+    await Cloud.createPost({ ...draft, photo: null }, { photoPath, photoHash, far });
+    closeSheet();
+    toast("Posted — thank you");
+    renderCommunity();
+  } catch (e) {
+    // Vượt rate limit là lỗi RLS, không phải lỗi mạng — nói đúng chuyện.
+    if (e.status === 403 || e.code === "42501") {
+      toast("You've posted 5 times this hour. Try again later.");
+    } else {
+      await Outbox.queue({ ...draft, photo: draft.photo });
+      toast("No connection — saved to send later");
+      closeSheet();
+      renderCommunity();
+    }
+  } finally { busy(false); }
+}
+
+async function flushOutbox() {
+  busy(true, "Sending…");
+  const r = await Outbox.flush(async (d) => {
+    let photoPath = null, photoHash = null, coords = null;
+    if (d.photo) {
+      const c = await compress(d.photo);
+      coords = c.coords; photoHash = c.hash;
+      photoPath = await Cloud.uploadPhoto(c.blob, Auth.user().id, c.hash.slice(0, 24));
+    }
+    const place = S.places.find((p) => p.id === d.placeId);
+    await Cloud.createPost({ ...d, photo: null },
+      { photoPath, photoHash, far: farFrom(place, coords || S.me) });
+  }, { force: true });
+  busy(false);
+  toast(r.sent ? `Sent ${r.sent}` : "Still no connection");
+  renderCommunity();
+}
 function go(tab) {
   // Thẻ kết quả và viền cảnh báo nằm ở cấp #app nên chúng KHÔNG tự biến mất
   // khi đổi tab nữa. Trước đây chúng nằm trong #v-scan và được `hidden` che hộ;
