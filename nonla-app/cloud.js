@@ -88,7 +88,10 @@ export async function uploadPhoto(blob, userId, name) {
     headers: headers({ "Content-Type": "image/jpeg", "x-upsert": "true" }),
     body: blob,
   });
-  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+  // Gắn .status giống hệt rest(): app.js cần phân biệt một lỗi 4xx CỐ ĐỊNH
+  // (Storage từ chối tệp — thử lại y hệt sẽ hỏng y hệt) với mất mạng thật sự,
+  // để không đẩy loại đầu vào hàng chờ rồi để nó hỏng lại mãi trong im lặng.
+  if (!res.ok) throw Object.assign(new Error(`Upload failed (${res.status})`), { status: res.status });
   return path;
 }
 

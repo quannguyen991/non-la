@@ -1796,6 +1796,14 @@ async function needAuth() {
 
 function openComposer(placeId = "") {
   openSheet(Community.composer({ places: S.places, dishes: S.dishes, place: placeId }));
+  /* composer() chỉ dựng #cfDish MỘT LẦN lúc mở, theo đúng placeId truyền vào lúc
+     đó. Đường vào từ tab Community luôn mở với placeId="", nên nếu không nghe
+     sự kiện đổi Place thì #cfDish đứng yên ở "—" mãi mãi — đúng cái làm mất hẳn
+     đường ghi giá theo món cho bất kỳ ai không mở form từ thẻ quán. */
+  const sel = $("#cfPlace");
+  if (sel) sel.onchange = () => {
+    $("#cfDish").innerHTML = Community.dishOptionsFor(sel.value, { places: S.places, dishes: S.dishes });
+  };
 }
 
 function readDraft() {
@@ -1823,7 +1831,18 @@ async function submitPost() {
   try {
     let photoPath = null, photoHash = null, coords = null;
     if (draft.photo) {
-      const c = await compress(draft.photo);
+      let c;
+      try {
+        c = await compress(draft.photo);
+      } catch {
+        // compress() ném ĐÚNG một lý do: trình duyệt không giải mã nổi file
+        // này. Thử lại trong hàng chờ sẽ ném lại y hệt, mãi mãi — không phải
+        // lỗi mạng nên không được đẩy vào hàng chờ. Nói thẳng và dừng ở đây,
+        // sheet vẫn mở, draft vẫn nguyên: người dùng chọn ảnh khác rồi bấm
+        // Post lại.
+        toast("That photo could not be read");
+        return;
+      }
       coords = c.coords;
       photoHash = c.hash;
       photoPath = await Cloud.uploadPhoto(c.blob, Auth.user().id, c.hash.slice(0, 24));
@@ -1835,11 +1854,21 @@ async function submitPost() {
     toast("Posted — thank you");
     renderCommunity();
   } catch (e) {
-    // Vượt rate limit là lỗi RLS, không phải lỗi mạng — nói đúng chuyện.
-    if (e.status === 403 || e.code === "42501") {
+    // Vượt rate limit là lỗi RLS, không phải lỗi mạng — nói đúng chuyện. Khớp
+    // CẢ status lẫn code Postgres, không chỉ status: uploadPhoto giờ cũng gắn
+    // .status (xem cloud.js), và một lỗi 403 từ Storage không liên quan gì tới
+    // giới hạn đăng bài — gộp chung sẽ báo sai lý do.
+    if (e.status === 403 && e.code === "42501") {
       toast("You've posted 5 times this hour. Try again later.");
+    } else if (e.status != null && e.status >= 400 && e.status < 500) {
+      // 4xx còn lại là lỗi CỐ ĐỊNH của chính yêu cầu (Storage từ chối tệp,
+      // token hỏng…) — thử lại y hệt trong hàng chờ sẽ hỏng y hệt. Nói thẳng,
+      // đừng chôn nó vào hàng chờ chỉ để nó âm thầm hỏng lần nữa.
+      toast("Could not post that — please try again.");
     } else {
-      await Outbox.queue({ ...draft, photo: draft.photo });
+      // Còn lại mới thật sự là "có thể tự khỏi": mất mạng, hoặc máy chủ lỗi
+      // tạm thời (5xx). Chỉ nhóm này đáng để hàng chờ thử lại giúp.
+      await Outbox.queue({ ...draft });
       toast("No connection — saved to send later");
       closeSheet();
       renderCommunity();

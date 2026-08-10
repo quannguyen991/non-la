@@ -28,6 +28,9 @@
 .coutbox { margin-top: 12px; padding: 10px 12px; border-radius: 12px;
            border: 1px solid rgba(232,163,61,.35); color: #E8A33D;
            display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+/* Hỏng đủ MAX_TRIES lần khác hẳn "đang chờ tới lượt" — màu đỏ nhẹ để mắt
+   không lẫn hai trạng thái, không phải để doạ. */
+.coutbox.stuck { border-color: rgba(192,57,43,.4); color: #C0392B; }
 
 .cempty { margin-top: 16px; color: #A99B80; line-height: 1.5; }
 

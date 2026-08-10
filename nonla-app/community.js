@@ -11,7 +11,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 import { listPosts, photoUrl, ready } from "./cloud.js";
-import { pending } from "./outbox.js";
+import { pending, drop, MAX_TRIES } from "./outbox.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -54,19 +54,36 @@ function postHtml(p) {
 }
 
 async function paint() {
-  const queued = await pending().catch(() => []);
+  const all = await pending().catch(() => []);
+  // Một bài đã hỏng đủ MAX_TRIES lần sẽ hỏng y hệt ở lần thử kế tiếp — auto-flush
+  // đã thôi tự đụng vào nó, nên nó phải tách khỏi "đang chờ" và có lối thoát,
+  // không thì nó nằm mãi trong hàng chờ mà người dùng không biết vì sao.
+  const stuck = all.filter((q) => q.tries >= MAX_TRIES);
+  const waiting = all.length - stuck.length;
   M.host.innerHTML = `
     <p class="kicker">Travellers</p>
     <h1 class="title">Community</h1>
-    ${queued.length ? `<div class="coutbox">
-      <span>${queued.length} post${queued.length > 1 ? "s" : ""} waiting to send</span>
+    ${waiting ? `<div class="coutbox">
+      <span>${waiting} post${waiting > 1 ? "s" : ""} waiting to send</span>
       <button class="btn sec" data-cact="flush">Send now</button></div>` : ""}
+    ${stuck.length ? `<div class="coutbox stuck">
+      <span>${stuck.length} post${stuck.length > 1 ? "s" : ""} could not be sent</span>
+      <button class="btn sec" data-cdiscard>Discard</button></div>` : ""}
     <button class="btn" data-cact="compose">Share a place</button>
     ${M.posts.length
       ? `<div class="cfeed">${M.posts.map(postHtml).join("")}</div>`
       : `<p class="cempty">${ready()
           ? "No posts here yet. Be the first — photograph what you ate, and what you paid for it."
           : "Community is switched off in this build."}</p>`}`;
+}
+
+/** Vứt mọi bài đã hỏng đủ MAX_TRIES lần. Gọi từ nút Discard trong banner hàng chờ. */
+async function discardStuck() {
+  const all = await pending().catch(() => []);
+  for (const item of all) {
+    if (item.tries >= MAX_TRIES) await drop(item.id).catch(() => { /* đã mất thì thôi */ });
+  }
+  await paint();
 }
 
 export async function open({ host, zone, places = [], onOpenPlace, onCompose, onReport }) {
@@ -90,6 +107,23 @@ export async function refresh() {
 export function close() { M.host = null; M.posts = []; }
 
 /**
+ * Options HTML cho <select id="cfDish">, theo món "known" của MỘT quán.
+ *
+ * Xuất riêng vì composer() chỉ dựng HTML một lần lúc mở form — nó không tự
+ * nghe sự kiện gì cả. Khi người dùng đổi Place sau khi form đã mở (đường vào
+ * từ tab Community luôn bắt đầu với place=""), app.js phải gọi lại hàm này
+ * để nạp #cfDish, và nó dùng LẠI đúng logic ở đây thay vì chép lần hai.
+ */
+export function dishOptionsFor(placeId, { places = [], dishes = [] } = {}) {
+  const sel = places.find((p) => p.id === placeId);
+  const opts = (sel?.known || []).map((k) => {
+    const d = dishes.find((x) => x.id === k);
+    return `<option value="${esc(k)}">${esc(d?.vi || k)}</option>`;
+  }).join("");
+  return `<option value="">—</option>${opts}`;
+}
+
+/**
  * HTML của form đăng bài. Trả chuỗi chứ không tự gắn vào DOM: app.js mở nó
  * trong sheet dùng chung, và sheet đó nằm ở cấp #app — chứ KHÔNG nằm trong
  * #v-community. Đây đúng là cái bẫy README kể: thẻ mở bên trong một khối
@@ -98,18 +132,13 @@ export function close() { M.host = null; M.posts = []; }
 export function composer({ places = [], dishes = [], place = null } = {}) {
   const opts = places.map((p) =>
     `<option value="${esc(p.id)}"${place === p.id ? " selected" : ""}>${esc(p.name)}</option>`).join("");
-  const sel = places.find((p) => p.id === place);
-  const dishOpts = (sel?.known || []).map((k) => {
-    const d = dishes.find((x) => x.id === k);
-    return `<option value="${esc(k)}">${esc(d?.vi || k)}</option>`;
-  }).join("");
   return `
     <h3>Share a place</h3>
     <p class="src">Photos you post leave your phone. GPS coordinates inside them do not.</p>
     <label class="fld"><span>Place</span>
       <select id="cfPlace"><option value="">Pick one…</option>${opts}</select></label>
     <label class="fld"><span>Dish <small>optional</small></span>
-      <select id="cfDish"><option value="">—</option>${dishOpts}</select></label>
+      <select id="cfDish">${dishOptionsFor(place, { places, dishes })}</select></label>
     <label class="fld"><span>What you paid <small>optional</small></span>
       <input id="cfPaid" type="number" inputmode="numeric" placeholder="50000"></label>
     <label class="fld"><span>Rating <small>optional</small></span>
@@ -139,5 +168,8 @@ export function handleClick(target) {
   if (place) return M.cb.onOpenPlace?.(place.dataset.cplace), true;
   const rep = target.closest("[data-creport]");
   if (rep) return M.cb.onReport?.(rep.dataset.creport), true;
+  // Nút Discard trong banner hàng chờ: hoàn toàn nội bộ community.js, không
+  // cần callback ra app.js — chỉ vứt bài đã hỏng đủ MAX_TRIES rồi vẽ lại.
+  if (target.closest("[data-cdiscard]")) return discardStuck(), true;
   return false;
 }
