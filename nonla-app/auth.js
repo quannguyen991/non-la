@@ -162,3 +162,39 @@ export async function signOut() {
   S.access = ""; S.user = null; S.profile = null; S.status = "idle"; S.error = "";
   emit();
 }
+
+/* ── đăng nhập bằng mã 6 số ────────────────────────────────────
+   Chọn mã thay vì magic link vì link mở ra trình duyệt HỆ THỐNG, còn
+   người dùng đang đứng trong PWA đã cài ra màn hình chính — phiên rơi
+   ra ngoài và họ quay lại thấy mình vẫn chưa đăng nhập.
+
+   Chọn mã thay vì mật khẩu vì không ai muốn nghĩ ra một mật khẩu mới
+   giữa chuyến đi, và mật khẩu quên được thì lại phải làm chính cái
+   luồng email này.
+
+   Cả hai hàm KHÔNG dọn phiên khi hỏng: người gõ nhầm một số phải được
+   gõ lại, không phải bắt đầu lại từ đầu. */
+
+export async function sendCode(email) {
+  S.status = "busy"; S.error = ""; emit();
+  try {
+    // create_user: true để người mới không phải qua một màn đăng ký riêng.
+    await api("otp", { body: { email, create_user: true } });
+    S.status = "idle"; emit();
+    return true;
+  } catch (e) {
+    S.status = "error"; S.error = e.message; emit();
+    throw e;
+  }
+}
+
+export async function verifyCode(email, code) {
+  S.status = "busy"; S.error = ""; emit();
+  try {
+    adopt(await api("verify", { body: { type: "email", email, token: code } }));
+    return S.user;
+  } catch (e) {
+    S.status = "error"; S.error = e.message; emit();
+    throw e;
+  }
+}
