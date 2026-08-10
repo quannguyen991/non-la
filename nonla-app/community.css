@@ -1,0 +1,37 @@
+/* community.css — kiểu riêng của màn hình Cộng đồng.
+   Tách khỏi app.css vì app.css đã 1175 dòng; foodmap.css đã lập tiền lệ
+   một màn hình một file. */
+
+.cfeed { display: grid; gap: 14px; margin-top: 14px; }
+
+.cpost {
+  border: 1px solid rgba(201,162,39,.18);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,.03);
+}
+.cpost img { width: 100%; display: block; aspect-ratio: 4/3; object-fit: cover; }
+.cpost .cbody { padding: 11px 13px 13px; display: grid; gap: 6px; }
+.cpost .cwho { font-size: 12px; color: #A99B80; display: flex; gap: 6px; align-items: center; }
+.cpost .cplace { font-weight: 600; color: #EDE4D2; text-align: left; }
+.cpost .cnote { font-size: 14px; line-height: 1.45; color: #CFC4AE; }
+.cpost .cpaid { font-variant-numeric: tabular-nums; color: #C9A227; font-weight: 600; }
+
+.cstars { letter-spacing: 1px; color: #C9A227; }
+.cstars[data-empty="1"] { color: rgba(201,162,39,.28); }
+
+/* Nhãn "đăng xa quán" phải đọc được nhưng KHÔNG được trông như lời tố cáo —
+   nó là chú thích, không phải cảnh báo. */
+.cfar { font-size: 11px; color: #A99B80; border: 1px solid rgba(169,155,128,.3);
+        border-radius: 999px; padding: 2px 8px; }
+
+.coutbox { margin-top: 12px; padding: 10px 12px; border-radius: 12px;
+           border: 1px solid rgba(232,163,61,.35); color: #E8A33D;
+           display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+
+.cempty { margin-top: 16px; color: #A99B80; line-height: 1.5; }
+
+/* Vùng chạm 44px là ngưỡng audit.js kiểm — đừng hạ xuống cho gọn mắt. */
+.cpost .cplace, .creport { min-height: 44px; }
+.creport { background: none; border: 0; color: #7D7565; font-size: 12px;
+           padding: 0 6px; min-width: 44px; }

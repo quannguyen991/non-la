@@ -1541,6 +1541,11 @@ function renderMe() {
     <p class="kicker">Settings</p>
     <h1 class="title">You</h1>
 
+    <button class="row" data-act="openJournal">
+      <span><span class="nm">Scan history</span>
+        <span class="note">Every scan you make, saved on this phone</span></span>
+    </button>
+
     ${accountHTML()}
 
     <h2 class="sect">Where you are</h2>
@@ -1734,7 +1739,10 @@ const TABS = [
   { id: "map", label: "Nearby", icon: '<path d="M8 2 2 4v12l6-2 6 2 6-2V2l-6 2Z"/><path d="M8 2v12M14 4v12"/>' },
   { id: "eat", label: "Eat", icon: '<path d="M2.5 9.5h13a6.5 6.5 0 0 1-13 0Z"/><path d="M5.8 7c0-1.1.9-1.1.9-2.2M9 6.6c0-1.1.9-1.1.9-2.2"/><path d="M12.4 8.4 18.6 3M13.6 9.4 19.4 4.6"/>' },
   { id: "scan", label: "", icon: "" },
-  { id: "journal", label: "Journal", icon: '<path d="M3 3h6a3 3 0 0 1 3 3v11a2 2 0 0 0-2-2H3Z"/><path d="M17 3h-2a3 3 0 0 0-3 3v11a2 2 0 0 1 2-2h3Z"/>' },
+  // Journal chuyển vào tab You. Nó là lịch sử của riêng người dùng, cùng bản
+  // chất "về tôi" với You — gộp vào đó là đúng chỗ, không phải chữa cháy vì
+  // hết ô trống. Sáu tab trên máy 360px thì phải cắt chữ mới vừa.
+  { id: "community", label: "Community", icon: '<circle cx="7" cy="7" r="2.8"/><circle cx="14" cy="6" r="2.2"/><path d="M2.5 16a4.5 4.5 0 0 1 9 0"/><path d="M12.5 16a4 4 0 0 1 5-3.6"/>' },
   { id: "me", label: "You", icon: '<circle cx="10" cy="6.5" r="3.5"/><path d="M3.5 17a6.5 6.5 0 0 1 13 0"/>' },
 ];
 function renderTabs() {
@@ -1742,6 +1750,11 @@ function renderTabs() {
     ? `<button class="scanbtn" id="scanBtn" aria-label="Scan">${sunStar(25, GOLD)}</button>`
     : `<button class="tab" data-tab="${t.id}"${S.tab === t.id ? ' aria-current="page"' : ""}>
         <svg viewBox="0 0 20 20" aria-hidden="true">${t.icon}</svg><span>${t.label}</span></button>`).join("");
+}
+/* Ruột thật nằm ở community.js, gắn vào ở task sau. Chỗ này chỉ giữ khung để
+   thanh nav đổi được ngay mà không để lại một tab trắng trơn. */
+function renderCommunity() {
+  $("#communityBody").innerHTML = `<p class="kicker">Travellers</p><h1 class="title">Community</h1>`;
 }
 function go(tab) {
   // Thẻ kết quả và viền cảnh báo nằm ở cấp #app nên chúng KHÔNG tự biến mất
@@ -1752,7 +1765,7 @@ function go(tab) {
   // quay lại lại chồng thêm một cái nữa và khung vẽ lại nhiều lần mỗi frame.
   if (tab !== "map") { S.exMap?.destroy(); S.exMap = null; }
   S.tab = tab;
-  for (const t of ["scan", "eat", "map", "journal", "me"]) $("#v-" + t).hidden = t !== tab;
+  for (const t of ["scan", "eat", "map", "journal", "community", "me"]) $("#v-" + t).hidden = t !== tab;
   renderTabs();
   if (tab === "scan") {
     startCam();                            // không await: xin quyền có thể treo
@@ -1770,6 +1783,7 @@ function go(tab) {
   if (tab === "eat") renderEat();
   if (tab === "map") renderMap();
   if (tab === "journal") renderJournal();
+  if (tab === "community") renderCommunity();
   if (tab === "me") renderMe();
 }
 
@@ -2038,6 +2052,8 @@ document.addEventListener("click", async (ev) => {
       () => toast("Could not get your location"), { timeout: 8000 });
     return;
   }
+
+  if (el("[data-act='openJournal']")) return go("journal");
 
   if (el("[data-act='clearJournal']")) { journal.clear(); renderJournal(); return toast("Journal cleared"); }
 
