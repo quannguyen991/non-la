@@ -14,6 +14,7 @@ import { iconOf as sightIcon } from "./sights.js";
 import * as Auth from "./auth.js";
 import * as FoodMap from "./foodmap.js";
 import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
+import * as Community from "./community.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -1751,11 +1752,21 @@ function renderTabs() {
     : `<button class="tab" data-tab="${t.id}"${S.tab === t.id ? ' aria-current="page"' : ""}>
         <svg viewBox="0 0 20 20" aria-hidden="true">${t.icon}</svg><span>${t.label}</span></button>`).join("");
 }
-/* Ruột thật nằm ở community.js, gắn vào ở task sau. Chỗ này chỉ giữ khung để
-   thanh nav đổi được ngay mà không để lại một tab trắng trơn. */
 function renderCommunity() {
-  $("#communityBody").innerHTML = `<p class="kicker">Travellers</p><h1 class="title">Community</h1>`;
+  Community.open({
+    host: $("#communityBody"),
+    zone: S.zone,
+    places: S.places,
+    onOpenPlace: (id) => showPlace(id),
+    onReport: (id) => reportPost(id),
+  });
 }
+
+/* Ba hàm này viết ở task sau; khai trước để renderCommunity chạy được ngay. */
+function openComposer() { toast("Coming next"); }
+function reportPost() { toast("Coming next"); }
+function flushOutbox() { toast("Coming next"); }
+function submitPost() { toast("Coming next"); }
 function go(tab) {
   // Thẻ kết quả và viền cảnh báo nằm ở cấp #app nên chúng KHÔNG tự biến mất
   // khi đổi tab nữa. Trước đây chúng nằm trong #v-scan và được `hidden` che hộ;
@@ -1790,6 +1801,17 @@ function go(tab) {
 /* ── sự kiện ──────────────────────────────────────────────── */
 document.addEventListener("click", async (ev) => {
   const el = (s) => ev.target.closest(s);
+
+  // Phần tử của feed đi qua community.js…
+  if (S.tab === "community" && Community.handleClick(ev.target)) return;
+  // …còn nút của form đăng bài thì KHÔNG phụ thuộc tab nào đang mở, vì form
+  // mở được cả từ thẻ quán khi tab đang là `map`.
+  const ca = el("[data-cact]");
+  if (ca) {
+    if (ca.dataset.cact === "flush") return flushOutbox();
+    if (ca.dataset.cact === "submit") return submitPost();
+    return openComposer();
+  }
 
   if (el("#scanBtn")) {
     if (S.tab !== "scan") return go("scan");

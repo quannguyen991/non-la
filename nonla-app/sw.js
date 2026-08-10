@@ -5,7 +5,7 @@ const CACHE = "nonla-v20";
 const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./route.js",
-  "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js",
+  "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
   "./manifest.json", "./icon.svg",
   "./data/dishes.json", "./data/prices.json", "./data/places.json",
   "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./assets/index.json",
@@ -43,6 +43,26 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
+  const url = new URL(req.url);
+
+  /* Ảnh cộng đồng: cache-first và KHÔNG bao giờ dọn theo phiên bản vỏ app.
+     Chúng bất biến — mỗi bài một path riêng — nên bản đã tải về luôn đúng.
+     Giới hạn 60 tấm để một chuyến đi dài không ăn hết dung lượng máy. */
+  if (url.pathname.includes("/storage/v1/object/public/posts/")) {
+    e.respondWith((async () => {
+      const c = await caches.open("nl-community-img");
+      const hit = await c.match(e.request);
+      if (hit) return hit;
+      const res = await fetch(e.request);
+      if (res.ok) {
+        const keys = await c.keys();
+        if (keys.length >= 60) await c.delete(keys[0]);
+        c.put(e.request, res.clone());
+      }
+      return res;
+    })());
+    return;
+  }
 
   // Fonts, Tesseract runtime và traineddata: cache-first rồi mới ra mạng.
   // Nhờ đó lần chạy thứ hai không cần mạng nữa.
