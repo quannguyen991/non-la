@@ -8,6 +8,7 @@ import { artTransform, fitArt } from "./artmap.js";
 import { buildFabric, drawFabric } from "./citymap.js";
 import { resolveRoute, progressAt, legLabel } from "./route.js";
 import { fitSize } from "./photo.js";
+import { nextAttempt } from "./outbox.js";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
@@ -362,6 +363,16 @@ eq("ảnh đã nhỏ thì giữ nguyên", fitSize(800, 600, 1280), { w: 800, h: 
 eq("đúng bằng ngưỡng", fitSize(1280, 720, 1280), { w: 1280, h: 720 });
 eq("làm tròn cạnh còn lại", fitSize(1000, 333, 500), { w: 500, h: 167 });
 eq("cạnh không bao giờ về 0", fitSize(10000, 3, 1280), { w: 1280, h: 1 });
+
+console.log("\n── outbox: giãn cách gửi lại ───────────────");
+const NOW = 1_000_000;
+eq("chưa thử lần nào thì gửi ngay", nextAttempt({ tries: 0, lastTry: 0 }, NOW), NOW);
+eq("hỏng 1 lần: chờ 1 phút", nextAttempt({ tries: 1, lastTry: NOW }, NOW), NOW + 60_000);
+eq("hỏng 2 lần: chờ 5 phút", nextAttempt({ tries: 2, lastTry: NOW }, NOW), NOW + 300_000);
+eq("hỏng 3 lần: chờ 15 phút", nextAttempt({ tries: 3, lastTry: NOW }, NOW), NOW + 900_000);
+eq("hỏng 4 lần: chờ 60 phút", nextAttempt({ tries: 4, lastTry: NOW }, NOW), NOW + 3_600_000);
+eq("quá 5 lần thì thôi tự gửi", nextAttempt({ tries: 5, lastTry: NOW }, NOW), null);
+eq("đã tới hạn thì gửi ngay", nextAttempt({ tries: 1, lastTry: NOW - 120_000 }, NOW), NOW - 60_000);
 
 console.log("\n════════════════════════════════════════════");
 console.log(`${pass} pass · ${fail} fail\n`);
