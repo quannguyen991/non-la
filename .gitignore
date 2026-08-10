@@ -1,5 +1,8 @@
 node_modules/
 *.log
+
+# sổ ghi tiến độ và bản nháp của quy trình subagent — là giấy nháp, không phải lịch sử
+.superpowers/
 .DS_Store
 Thumbs.db
 
