@@ -30,9 +30,10 @@ Hai tầng, vì chúng bắt hai loại lỗi khác nhau.
 node test.mjs
 ```
 
-55 phép thử: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá,
-đọc mệnh giá tiền, phát hiện nhầm bậc số 0, và toàn bộ phép chiếu / khoảng
-cách / khung nhìn của bản đồ.
+141 phép thử: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá,
+đọc mệnh giá tiền, phát hiện nhầm bậc số 0, toàn bộ phép chiếu / khoảng cách /
+khung nhìn của bản đồ, và lõi thuần lớp cộng đồng: gộp sao, khoảng giá, xác
+thực bài, khoảng cách tới quán, kích thước ảnh nén, giãn cách gửi lại hàng chờ.
 
 **Đường tương tác** — mở `index.html` rồi dán vào console:
 
@@ -61,6 +62,9 @@ hoàn toàn mà người dùng vẫn không bấm được:
 | Chạy khi tắt hẳn server | Boot được, OCR được, phán quyết được |
 | Service worker | 14 tệp vỏ app + traineddata `vie`/`eng` + font |
 | Bản đồ chi tiết khi tắt server | Mở được, kéo/phóng/lọc được, chạm ghim ra thẻ |
+| Lớp cộng đồng — lõi thuần | 38/38 pass |
+| Đăng bài khi tắt mạng | Bài vào hàng chờ, gửi lại được khi có sóng |
+| Kiểm duyệt | 3 người khác nhau báo cáo thì bài tự ẩn, kiểm bằng SQL |
 
 ## Cấu trúc
 
@@ -78,9 +82,18 @@ artmap.js       neo tranh vẽ tay vào toạ độ thật (georeference)      �
 citymap.js      kết cấu đô thị cho bản đồ chi tiết: khối nhà, mảng cây ← có test
 route.js        tuyến đi bộ: giải chặng, đo quãng đường, tiến trình     ← có test
 imgsvc.js       sinh icon lúc chạy bằng API ảnh, có lối lui SVG
+posts.js        lõi thuần lớp cộng đồng: gộp sao, khoảng giá, xác thực bài, khoảng cách tới quán  ← có test
+photo.js        nén ảnh 1280px/q0,72, đọc EXIF GPS rồi xoá khi vẽ lại qua canvas       ← có test
+outbox.js       hàng chờ IndexedDB cho bài gửi hỏng, giãn cách gửi lại theo số lần thử ← có test
+auth.js         đăng nhập bằng mã 6 số qua email, gọi thẳng REST Supabase Auth, không SDK
+cloud.js        chỗ DUY NHẤT biết HTTP của lớp cộng đồng; config.js giữ URL + anon key,
+                để trống thì Community tự tắt
+community.js    màn hình Cộng đồng: feed đọc được khi chưa đăng nhập, form đăng bài, báo cáo
+                + community.css — kiểu riêng cho feed và form
 audit.js        104 phép thử: tương tác, bố cục, tương phản, vùng chạm, bản đồ
 sw.js           offline. network-first cho vỏ app, cache-first cho CDN
-test.mjs        34 phép thử cho match.js
+test.mjs        141 phép thử: match.js, geo.js, iso.js, artmap.js, citymap.js,
+                route.js, và lõi thuần lớp cộng đồng (posts.js, photo.js, outbox.js)
 assets/         ảnh — sinh bằng ../tools/gen-assets.mjs, xem assets/README.md
   maps/         tranh nền tab Nearby, có khối `art` neo toạ độ trong maps.json
 data/
@@ -270,8 +283,21 @@ co theo `cos(vĩ độ)` — bỏ bước này thì ở vĩ độ 15° bản đ�
   trước khi đưa cho khách du lịch dùng.
 - Nhận diện mệnh giá dựa vào OCR con số in trên tờ tiền, không phải model thị giác
   huấn luyện riêng. Hoạt động tốt khi tờ tiền phẳng và số hướng lên; kém khi bị gấp.
-- Deal Recorder, Culture Lens, Local Compass và lớp cộng đồng chưa cài đặt.
-  Đặc tả đầy đủ 28 tính năng nằm ở `D:/Non_La_Dac_Ta_San_Pham.docx`.
+- Deal Recorder, Culture Lens, Local Compass chưa cài đặt. Đặc tả đầy đủ 28 tính
+  năng nằm ở `D:/Non_La_Dac_Ta_San_Pham.docx`.
+- Lớp cộng đồng mới có review + ảnh cho quán CÓ SẴN. Chưa có: địa điểm do người
+  dùng tự thêm, hồ sơ công khai, theo dõi, nhắn tin, bản đồ ảnh, điểm đóng góp.
+- Kiểm duyệt hiện dựa vào báo cáo của người dùng. Chưa có lọc ảnh nhạy cảm bằng
+  AI, chưa dò được ảnh lấy cắp, chưa phát hiện cụm tài khoản đăng bài có tổ chức.
+  Ba thứ này cần một edge function và tiền API.
+- Xác thực địa điểm mới là phép đo khoảng cách GPS, không phải so khớp hình ảnh.
+  Ảnh không có EXIF và người dùng không cho phép định vị thì không kiểm được.
+- Ảnh lưu trong bucket CÔNG KHAI. Trigger kiểm duyệt chỉ đổi `status` của dòng
+  trong bảng `posts` — file ảnh vẫn còn nguyên ở URL công khai, ai đã có URL đó
+  (đã copy, đã cache) vẫn xem được dù bài đã bị ẩn khỏi feed.
+- Bộ đọc EXIF bỏ qua đúng các marker không có trường độ dài (SOI, EOI,
+  RST0–RST7) nhưng chưa xử lý marker TEM — hiếm gặp trong ảnh chụp từ điện
+  thoại, chưa gây lỗi nào ghi nhận được, nhưng vẫn là một khoảng trống chưa vá.
 
 ## Nguyên tắc không đổi
 

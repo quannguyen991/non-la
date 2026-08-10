@@ -184,6 +184,47 @@ export async function run({ verbose = true } = {}) {
     ck("tìm kiếm lọc được", after < total, `trước ${total}, sau ${after}`);
   }
 
+  /* ── Cộng đồng ──────────────────────────────────────── */
+  A.go("community"); await wait(300);
+  ck("tab Community hiện", !$("#v-community").hidden);
+  ck("tab Journal đã rời thanh nav", !$("[data-tab='journal']"));
+  ck("có nút đăng bài", !!$("[data-cact='compose']"));
+
+  // Đúng cái bẫy README kể: thẻ mở bên trong một khối đang hidden thì bấm mà
+  // không thấy gì. Sheet phải nằm ở cấp #app, KHÔNG nằm trong #v-community.
+  click("[data-cact='compose']"); await wait(300);
+  ck("form đăng bài mở ra", sheetOpen());
+  ck("form KHÔNG nằm trong khối community",
+     !$("#v-community")?.contains($("#sheet")), "sheet bị lồng trong tab");
+  ck("form có ô chọn quán", !!$("#cfPlace"));
+
+  // Bài đang soạn dở không được sống sót qua một lần đổi tab.
+  if ($("#cfBody")) $("#cfBody").value = "draft in progress";
+  A.go("eat"); await wait(250);
+  ck("đổi tab thì đóng form", !sheetOpen());
+  A.go("community"); await wait(300);
+  click("[data-cact='compose']"); await wait(300);
+  ck("form mở lại là form trắng", ($("#cfBody")?.value || "") === "",
+     "nhận xét cũ còn sót lại");
+
+  // Vùng chạm của nút Report — 44px là ngưỡng của cả file này.
+  const rep = $(".creport");
+  if (rep) {
+    const r = rep.getBoundingClientRect();
+    ck("nút Report đủ vùng chạm", r.height >= MIN_TAP && r.width >= MIN_TAP,
+       `${r.width.toFixed(1)}×${r.height.toFixed(1)}`);
+  }
+
+  // Feed rỗng phải ra một câu, không phải một vòng xoay vĩnh viễn.
+  A.go("community"); await wait(400);
+  ck("feed rỗng có lời nhắn", !!$(".cempty") || !!$(".cfeed"),
+     "không có cả feed lẫn màn hình trống");
+
+  A.go("me"); await wait(200);
+  ck("tab You có lối vào Journal", !!$("[data-act='openJournal']"));
+  click("[data-act='openJournal']"); await wait(250);
+  ck("lối vào Journal mở đúng màn hình", !$("#v-journal").hidden);
+
   /* ── các tab còn nội dung ───────────────────────────── */
   A.go("journal"); await wait(230);
   ck("Journal dựng được", !!$("#v-journal h1"));
