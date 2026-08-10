@@ -1294,7 +1294,8 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 - Modify: `nonla-app/sw.js` (cache ảnh cộng đồng)
 
 **Interfaces:**
-- Consumes: `listPosts`, `photoUrl` từ `./cloud.js`; `summarise` từ `./posts.js`
+- Consumes: `listPosts`, `photoUrl`, `ready` từ `./cloud.js`; `pending` từ `./outbox.js`.
+  KHÔNG dùng `summarise` — hàm đó chỉ xuất hiện ở Task 10, trên thẻ quán.
 - Produces:
   ```js
   open({ host, zone, places, onOpenPlace, onCompose, onReport }) → Promise<void>
