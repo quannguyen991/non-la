@@ -45,11 +45,21 @@ export async function readExifGps(file) {
     const buf = new DataView(await file.slice(0, 128 * 1024).arrayBuffer());
     if (buf.getUint16(0) !== 0xffd8) return null;           // không phải JPEG
     let off = 2;
-    while (off + 4 < buf.byteLength) {
+    while (off + 4 <= buf.byteLength) {
       const marker = buf.getUint16(off);
+
+      // Skip markers without length field: SOI, EOI, RST0-RST7
+      if (marker === 0xffd8 || marker === 0xffd9 || (marker >= 0xffd0 && marker <= 0xffd7)) {
+        off += 2;
+        if (marker === 0xffd9) return null; // EOI reached, no APP1 found
+        continue;
+      }
+
+      // If not a valid JPEG marker, stop
+      if ((marker & 0xff00) !== 0xff00) return null;
+
       const size = buf.getUint16(off + 2);
       if (marker === 0xffe1) return parseApp1(buf, off + 4, size - 2);
-      if ((marker & 0xff00) !== 0xff00) return null;
       off += 2 + size;
     }
   } catch { /* ảnh hỏng hoặc bị cắt — coi như không có toạ độ */ }
@@ -58,28 +68,78 @@ export async function readExifGps(file) {
 
 function parseApp1(buf, start, len) {
   const s = start;
+  const end = s + len; // APP1 segment boundary — offsets must not exceed this
+
+  // Bounds-check helper: validates that an offset+length fits within the APP1 segment.
+  // Corrupt offset fields could point past segment end but still within the 128 KB scratch
+  // buffer, yielding a finite-but-wrong [lat, lng]. Returning null is safer.
+  const canRead = (off, bytes) => off >= s && off + bytes <= end;
+
+  if (!canRead(s, 4)) return null;
   if (buf.getUint32(s) !== 0x45786966) return null;         // "Exif"
+
   const tiff = s + 6;
+  if (!canRead(tiff, 8)) return null;
+
   const le = buf.getUint16(tiff) === 0x4949;                // Intel hay Motorola
-  const u16 = (o) => buf.getUint16(o, le);
-  const u32 = (o) => buf.getUint32(o, le);
-  let ifd = tiff + u32(tiff + 4);
+
+  // Validate TIFF magic number (0x002A) before deriving IFD offset
+  if (buf.getUint16(tiff + 2, le) !== 0x002A) return null;
+
+  const u16 = (o) => canRead(o, 2) ? buf.getUint16(o, le) : null;
+  const u32 = (o) => canRead(o, 4) ? buf.getUint32(o, le) : null;
+
+  const ifdOffset = u32(tiff + 4);
+  if (ifdOffset === null) return null;
+
+  let ifd = tiff + ifdOffset;
+  if (!canRead(ifd, 2)) return null;
+
   let gpsOff = 0;
-  for (let i = 0, n = u16(ifd); i < n; i++) {
+  const nEntries = u16(ifd);
+  if (nEntries === null) return null;
+
+  for (let i = 0; i < nEntries; i++) {
     const e = ifd + 2 + i * 12;
-    if (u16(e) === 0x8825) { gpsOff = tiff + u32(e + 8); break; }
+    if (!canRead(e, 12)) return null;
+    if (u16(e) === 0x8825) {
+      const offset = u32(e + 8);
+      if (offset !== null) {
+        gpsOff = tiff + offset;
+      }
+      break;
+    }
   }
-  if (!gpsOff) return null;
+  if (!gpsOff || !canRead(gpsOff, 2)) return null;
 
   const vals = {};
-  for (let i = 0, n = u16(gpsOff); i < n; i++) {
+  const nGpsEntries = u16(gpsOff);
+  if (nGpsEntries === null) return null;
+
+  for (let i = 0; i < nGpsEntries; i++) {
     const e = gpsOff + 2 + i * 12;
+    if (!canRead(e, 12)) return null;
     const tag = u16(e), type = u16(e + 2), cnt = u32(e + 4);
+    if (tag === null || type === null || cnt === null) continue;
     if (tag === 1 || tag === 3) {                            // N/S, E/W
-      vals[tag] = String.fromCharCode(buf.getUint8(e + 8));
+      if (canRead(e + 8, 1)) {
+        vals[tag] = String.fromCharCode(buf.getUint8(e + 8));
+      }
     } else if ((tag === 2 || tag === 4) && type === 5 && cnt === 3) {
-      const p = tiff + u32(e + 8);
-      vals[tag] = [0, 1, 2].map((k) => u32(p + k * 8) / u32(p + k * 8 + 4));
+      const ratOffset = u32(e + 8);
+      if (ratOffset !== null) {
+        const p = tiff + ratOffset;
+        if (canRead(p, 24)) { // 3 rationals = 24 bytes
+          vals[tag] = [0, 1, 2].map((k) => {
+            const num = u32(p + k * 8);
+            const denom = u32(p + k * 8 + 4);
+            return num !== null && denom !== null ? num / denom : null;
+          }).filter(x => x !== null);
+          if (vals[tag].length !== 3) {
+            delete vals[tag];
+          }
+        }
+      }
     }
   }
   if (!vals[2] || !vals[4]) return null;
