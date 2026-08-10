@@ -17,7 +17,7 @@ import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
 import * as Community from "./community.js";
 import * as Cloud from "./cloud.js";
 import * as Outbox from "./outbox.js";
-import { validate as validatePost, farFrom } from "./posts.js";
+import { validate as validatePost, farFrom, summarise, priceBand } from "./posts.js";
 import { compress } from "./photo.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
@@ -1346,7 +1346,48 @@ function showPlace(id, metres = null) {
     <p class="seedwarn">Badge status comes from accumulated scans, never assigned by hand.
       A place loses it automatically when prices drift outside the local range.
       ${p.at ? "Coordinates are approximate placements on the named street, not surveyed addresses." : ""}</p>
+    <div id="placeCommunity"></div>
+    <button class="btn sec" data-act="review" data-place="${esc(p.id)}">Write a review</button>
     <button class="btn sec" data-act="close">Close</button>`);
+  // Nạp sau khi thẻ đã mở: chờ mạng xong mới vẽ thẻ thì người dùng nhìn màn
+  // hình đứng yên sau cú chạm, mà phần quan trọng nhất — giá và Đúng Giá —
+  // vốn đã có sẵn trong máy.
+  paintPlaceCommunity(p);
+}
+
+/* Sao trung bình chỉ hiện khi summarise() cho phép — dưới 3 đánh giá thì
+   giấu hẳn. Một quán "5,0 ★" từ đúng một người là con số nói dối, và nó nói
+   dối theo hướng có lợi cho bất kỳ ai chịu khó tự khen mình.
+   Sao KHÔNG dùng để sắp xếp hay lọc ở bất cứ đâu: Đúng Giá vẫn là trục chính. */
+async function paintPlaceCommunity(place) {
+  const host = $("#placeCommunity");
+  if (!host || !Cloud.ready()) return;
+  let posts = [];
+  try { posts = await Cloud.listPosts({ placeId: place.id, limit: 20 }); }
+  catch { return; }                      // mất mạng thì khối này vắng mặt, không báo lỗi
+  if (!$("#placeCommunity")) return;     // người dùng đã đóng thẻ trong lúc chờ
+  // …và nếu đã mở SANG QUÁN KHÁC trong lúc chờ: openSheet() ghi đè innerHTML
+  // của #sheetBody nên #placeCommunity giờ là một nút MỚI dù trùng id — so
+  // sánh THAM CHIẾU bắt được cả hai trường hợp, không chỉ trường hợp đã đóng.
+  // Không bắt được ca này thì giá của quán cũ bị gắn nhầm vào hàng món quán mới.
+  if ($("#placeCommunity") !== host) return;
+
+  const s = summarise(posts);
+  const shots = posts.filter((p) => p.photoPath).slice(0, 8);
+  host.innerHTML = `
+    ${s.show ? `<p class="src">${s.avg.toFixed(1)} ★ · ${s.count} ratings from travellers</p>` : ""}
+    ${shots.length ? `<div class="cshots">${shots.map((p) =>
+      `<img src="${esc(Cloud.photoUrl(p.photoPath))}" alt="" loading="lazy">`).join("")}</div>` : ""}`;
+
+  // Giá cộng đồng hiện SONG SONG với giá hạt giống, không thay nó. Một người
+  // gõ nhầm một số không không được phép kéo lệch phán quyết của cả app.
+  for (const row of $$("#sheetBody .row[data-dish]")) {
+    const band = priceBand(posts, row.dataset.dish);
+    if (!band) continue;
+    const note = row.querySelector(".note");
+    if (note) note.insertAdjacentHTML("afterend",
+      `<span class="note">${band.n} travellers paid ${Math.round(band.lo/1000)}k–${Math.round(band.hi/1000)}k₫</span>`);
+  }
 }
 
 /* ── màn hình: Nhật ký ────────────────────────────────────── */
@@ -1958,6 +1999,11 @@ document.addEventListener("click", async (ev) => {
   }
 
   if (el("[data-act='close']")) return closeSheet();
+
+  // Kiểm trước [data-place]: nút này mang cả hai thuộc tính, nên phải chặn
+  // ở đây trước khi rơi xuống nhánh mở lại thẻ quán.
+  const rv = el("[data-act='review']");
+  if (rv) { closeSheet(); return openComposer(rv.dataset.place); }
 
   const sy = el("[data-say]"); if (sy) return say(sy.dataset.say);
 

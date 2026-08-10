@@ -49,3 +49,6 @@
 .fld.row2 { grid-auto-flow: column; justify-content: start; align-items: center; gap: 9px; }
 .fld.row2 input { width: 22px; min-height: 22px; }
 .cerr { color: #C0392B; font-size: 13px; margin-top: 9px; }
+
+.cshots { display: flex; gap: 8px; overflow-x: auto; margin-top: 10px; padding-bottom: 4px; }
+.cshots img { width: 108px; height: 108px; flex: 0 0 auto; border-radius: 10px; object-fit: cover; }
