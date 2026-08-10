@@ -1807,8 +1807,27 @@ function renderCommunity() {
   });
 }
 
-/* reportPost viết ở Task 11; khai trước để renderCommunity chạy được ngay. */
-function reportPost() { toast("Coming next"); }
+const REASONS = [
+  ["spam", "Spam or advertising"],
+  ["offensive", "Offensive content"],
+  ["wrong-place", "Wrong place"],
+  ["fake-price", "Made-up price"],
+  ["other", "Something else"],
+];
+
+/* Ba người KHÁC NHAU báo cáo thì trigger bên Postgres tự ẩn bài. Client không
+   biết ngưỡng đó và cũng không cần biết — để nó ở một chỗ nghĩa là không có
+   hai con số phải giữ cho khớp nhau. */
+async function reportPost(id) {
+  if (!(await needAuth())) return;
+  openSheet(`
+    <h3>Report this post</h3>
+    <p class="src">Reports are private. Nobody, including us, can see who sent one.</p>
+    ${REASONS.map(([v, label]) =>
+      `<button class="row" data-report="${esc(id)}" data-reason="${v}">
+        <span><span class="nm">${esc(label)}</span></span></button>`).join("")}
+    <button class="btn sec" data-act="close">Cancel</button>`);
+}
 
 /* app.js chưa có helper bận/rảnh — hai chỗ trong ocr() bật tắt #busy bằng tay.
    Hai luồng dưới đây cần đúng hành vi đó, nên rút thành một hàm thay vì chép
@@ -2256,6 +2275,21 @@ document.addEventListener("click", async (ev) => {
       `${new Date(e.ts).toLocaleString("en-GB")}  ${e.label}  ${fmtVND(e.price)}  ${e.level}`).join("\n");
     navigator.clipboard?.writeText(txt).then(() => toast("Journal copied to clipboard"),
       () => toast("Copy failed — long-press to select"));
+    return;
+  }
+
+  // ── báo cáo bài: nút lý do trong sheet mở từ reportPost() ──
+  const rp = el("[data-report]");
+  if (rp) {
+    closeSheet();
+    try {
+      await Cloud.report(rp.dataset.report, rp.dataset.reason);
+      toast("Reported — thank you");
+    } catch (e) {
+      // 409 = unique(post_id, reporter): người này đã báo cáo bài đó rồi.
+      // Nói thật thay vì giả vờ nhận thêm một lần nữa.
+      toast(e.status === 409 ? "You already reported this post" : "Could not send report");
+    }
     return;
   }
 });
