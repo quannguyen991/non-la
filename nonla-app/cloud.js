@@ -1,0 +1,115 @@
+/* ═══════════════════════════════════════════════════════════════
+   cloud.js — chỗ DUY NHẤT trong app biết tới HTTP của lớp cộng đồng
+
+   Mọi màn hình gọi qua đây. Gom lại một chỗ vì khi Supabase đổi cách
+   trả lỗi — nó đã đổi vài lần — ta sửa một file chứ không đi lùng
+   trong ba màn hình.
+
+   Ánh xạ snake_case của Postgres sang camelCase ngay tại biên: để tên
+   cột rò rỉ vào giao diện thì mỗi lần đổi lược đồ lại phải sửa cả chỗ
+   vẽ HTML.
+   ═══════════════════════════════════════════════════════════════ */
+
+import * as Auth from "./auth.js";
+
+const cfg = () => Auth.config();
+export const ready = () => !!(cfg().url && cfg().anon);
+
+const headers = (extra = {}) => {
+  const { anon } = cfg();
+  const tok = Auth.accessToken?.() || "";
+  return { apikey: anon, Authorization: `Bearer ${tok || anon}`, ...extra };
+};
+
+async function rest(path, { method = "GET", body, prefer } = {}) {
+  if (!ready()) throw Object.assign(new Error("Community is not configured"), { code: "no-config" });
+  const res = await fetch(`${cfg().url}/rest/v1/${path}`, {
+    method,
+    headers: headers({
+      "Content-Type": "application/json",
+      ...(prefer ? { Prefer: prefer } : {}),
+    }),
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await res.text();
+  let j = null;
+  try { j = text ? JSON.parse(text) : null; } catch { /* máy chủ trả không phải JSON */ }
+  if (!res.ok) {
+    throw Object.assign(new Error(j?.message || j?.error || `HTTP ${res.status}`), {
+      status: res.status,
+      code: j?.code || "",
+    });
+  }
+  return j;
+}
+
+const toPost = (r) => ({
+  id: r.id, author: r.author, zone: r.zone,
+  placeId: r.place_id, dishId: r.dish_id,
+  paidVnd: r.paid_vnd, stars: r.stars, worthReturn: r.worth_return,
+  body: r.body, photoPath: r.photo_path, far: r.far,
+  createdAt: r.created_at,
+  authorName: r.profiles?.name || "Traveller",
+  authorCountry: r.profiles?.country || "",
+});
+
+export async function listPosts({ zone, placeId, limit = 20, before } = {}) {
+  const q = new URLSearchParams();
+  q.set("select", "*,profiles(name,country)");
+  q.set("order", "created_at.desc");
+  q.set("limit", String(limit));
+  if (zone)    q.set("zone", `eq.${zone}`);
+  if (placeId) q.set("place_id", `eq.${placeId}`);
+  if (before)  q.set("created_at", `lt.${before}`);
+  return (await rest(`posts?${q}`) || []).map(toPost);
+}
+
+export async function createPost(draft, { photoPath = null, photoHash = null, far = false } = {}) {
+  const rows = await rest("posts", {
+    method: "POST",
+    prefer: "return=representation",
+    body: [{
+      author: Auth.user()?.id,
+      zone: draft.zone, place_id: draft.placeId, dish_id: draft.dishId,
+      paid_vnd: draft.paidVnd, stars: draft.stars, worth_return: draft.worthReturn,
+      body: draft.body || null,
+      photo_path: photoPath, photo_hash: photoHash, far,
+    }],
+  });
+  return toPost(rows[0]);
+}
+
+/** Trả về path trong bucket, không phải URL — URL sinh lúc vẽ. */
+export async function uploadPhoto(blob, userId, name) {
+  if (!ready()) throw new Error("Community is not configured");
+  const path = `${userId}/${name}.jpg`;
+  const res = await fetch(`${cfg().url}/storage/v1/object/posts/${path}`, {
+    method: "POST",
+    headers: headers({ "Content-Type": "image/jpeg", "x-upsert": "true" }),
+    body: blob,
+  });
+  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+  return path;
+}
+
+export const photoUrl = (path) =>
+  path ? `${cfg().url}/storage/v1/object/public/posts/${path}` : "";
+
+export const report = (postId, reason) =>
+  rest("reports", { method: "POST", body: [{ post_id: postId, reporter: Auth.user()?.id, reason }] })
+    .then(() => undefined);
+
+export const deletePost = (id) =>
+  rest(`posts?id=eq.${id}`, { method: "DELETE" }).then(() => undefined);
+
+/**
+ * Bảo đảm có một dòng trong `profiles` trước khi đăng bài đầu tiên.
+ * `posts.author` tham chiếu `profiles`, nên thiếu dòng này thì insert bài
+ * hỏng với một thông báo khoá ngoại mà người dùng không hiểu nổi.
+ */
+export const ensureProfile = (name, country = null) =>
+  rest("profiles", {
+    method: "POST",
+    prefer: "resolution=merge-duplicates",
+    body: [{ id: Auth.user()?.id, name, country }],
+  }).then(() => undefined);

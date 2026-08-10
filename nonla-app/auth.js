@@ -58,6 +58,9 @@ export const profile = () => S.profile;
 export const statusOf = () => S.status;
 export const errorOf = () => S.error;
 export const signedIn = () => !!S.user;
+/* cloud.js cần token này để PostgREST biết auth.uid() là ai. Chỉ đọc,
+   và vẫn chỉ sống trong bộ nhớ như trước. */
+export const accessToken = () => S.access;
 
 async function api(path, { method = "POST", body, auth = false } = {}) {
   if (!isConfigured()) throw Object.assign(new Error("chưa cấu hình dịch vụ"), { code: "no-config" });

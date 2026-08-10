@@ -13,6 +13,7 @@ import * as Img from "./imgsvc.js";
 import { iconOf as sightIcon } from "./sights.js";
 import * as Auth from "./auth.js";
 import * as FoodMap from "./foodmap.js";
+import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -2134,6 +2135,10 @@ async function boot() {
   // onChange bên trong restore() đã tự vẽ lại Icon Studio nếu đang mở.
   Img.restore();
   // Phiên đăng nhập: khôi phục ngầm, không bao giờ chặn khởi động.
+  /* Cấu hình nhúng sẵn thắng ô dán tay: khách du lịch không bao giờ dán một
+     Project URL vào Settings. Ô đó giữ lại để test, nên chỉ ghi đè khi
+     config.js có giá trị thật. */
+  if (SUPABASE_URL && SUPABASE_ANON) Auth.configure(SUPABASE_URL, SUPABASE_ANON);
   Auth.restore().then(() => { if (S.tab === "me") renderMe(); });
   if (!S.prices[S.zone]) S.zone = Object.keys(S.prices)[0];
   S.ready = true;
