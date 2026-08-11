@@ -16,9 +16,28 @@ cd "D:/Claude/nón lá/nonla-app" && python -m http.server 8899 --bind 127.0.0.1
 
 Mở `http://127.0.0.1:8899`. Camera cần HTTPS hoặc localhost — `127.0.0.1` thoả điều kiện.
 
-Chạy trên điện thoại thật: đưa thư mục lên bất kỳ hosting tĩnh nào có HTTPS
-(GitHub Pages, Netlify, Cloudflare Pages), mở bằng trình duyệt điện thoại rồi
-**Add to Home Screen**. Sau lần mở đầu tiên là dùng được offline.
+## Bản đang chạy
+
+<https://nonla-app.vercel.app>
+
+Mở bằng trình duyệt điện thoại rồi **Add to Home Screen**. Sau lần mở đầu tiên
+là dùng được offline. Camera cần HTTPS — bản deploy có sẵn, còn `127.0.0.1`
+thì được miễn.
+
+Deploy lại sau khi sửa:
+
+```bash
+vercel deploy --prod --cwd "D:/Claude/nón lá/nonla-app"
+```
+
+`.vercelignore` giữ script dựng dữ liệu, `test.mjs`, `tools/` và chính README
+này ở lại repo — máy chủ chỉ nhận đúng thứ app cần lúc chạy. Không có bước
+build nào, nên đổi sang hosting tĩnh khác (GitHub Pages, Netlify, Cloudflare
+Pages) chỉ là đẩy nguyên thư mục `nonla-app/` lên.
+
+Lớp cộng đồng trên bản đang chạy **chưa nối máy chủ**: `config.js` còn rỗng
+nên tab Community chạy ở chế độ sổ tay riêng trên máy. Xem `supabase/README.md`
+để bật lớp thật.
 
 ## Kiểm thử
 
