@@ -237,8 +237,15 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .row .amt[data-l="high"]{color:var(--son)}
 
 /* ── nút ───────────────────────────────────────────────── */
-.btn{display:block;width:100%;text-align:center;border-radius:14px;padding:13px;
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;width:100%;text-align:center;border-radius:14px;padding:13px;
   font-size:14px;font-weight:600;margin-top:10px}
+/* Icon trong nút phải được ĐẶT KÍCH THƯỚC. Một <svg> có viewBox mà không có
+   width/height thì trình duyệt cho nó cỡ mặc định 300×150 — nút "Share this
+   dish" đo được 383px cao vì đúng chuyện đó. Ba nút có icon trước đây tự khai
+   cỡ riêng (.btn.maps, .btn.save, .btn.sec.out), nên lỗi chỉ lộ ra ở nút thứ
+   tư; đặt luật chung ở đây để nút thứ năm không phải phát hiện lại. */
+.btn svg{width:18px;height:18px;flex:0 0 auto}
 .btn.pri{background:var(--ngoc);color:#fff}
 .btn.sec{border:1px solid var(--line);color:var(--muc)}
 .btn.dark{background:var(--muc);color:#F3F1E9}
@@ -1217,3 +1224,86 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .trip-meta{font-size:11.5px;color:var(--dong-chu);font-variant-numeric:tabular-nums;
   margin-top:2px}
+
+/* ── màn mở đầu: giới thiệu + tài khoản ──────────────────────
+   Phủ TOÀN màn hình và nằm trên tabbar: trong lúc chưa xong bước này thì
+   không có tab nào để bấm, nên để lộ thanh nav ra dưới chỉ mời người dùng
+   bấm vào một thứ chưa sẵn sàng. */
+#v-welcome{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;
+  background:var(--then);color:#F3EFE2;overflow:hidden}
+#v-welcome[hidden]{display:none}
+
+/* Nền giấy: một mảng sáng bo tròn ở nửa dưới, để chữ đọc trên nền sáng
+   còn phần hình vẫn nổi trên nền sơn mài. */
+.wc-sheetpaper{position:absolute;left:0;right:0;bottom:0;height:64%;
+  background:var(--giay);border-radius:34px 34px 0 0;
+  box-shadow:0 -12px 40px rgba(0,0,0,.28)}
+
+.wc-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + 18px) var(--pad-x)
+          calc(env(safe-area-inset-bottom,0px) + 18px);
+  overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+.wc-slide{flex:1;display:flex;flex-direction:column;justify-content:flex-end;min-height:0}
+.wc-slide.tight{justify-content:flex-start;padding-top:6px}
+
+.wc-art{display:grid;place-items:center;padding:6px 0 14px;flex:0 1 auto;min-height:0}
+.wc-art svg{width:min(58vw,224px);height:auto;max-height:26vh}
+.wc-art.small svg{width:min(34vw,132px);max-height:15vh}
+
+.wc-kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dong-chu);font-weight:600;margin-bottom:4px}
+.wc-title{font-family:var(--disp);font-size:clamp(26px,7.4vw,34px);line-height:1.1;
+  letter-spacing:-.015em;color:var(--then);margin-bottom:8px}
+.wc-body{font-size:15px;line-height:1.55;color:var(--muc)}
+.wc-note{font-size:12.5px;line-height:1.5;color:var(--muc-nhat);margin-top:10px;
+  padding-left:11px;border-left:2px solid var(--vien)}
+
+.wc-dots{display:flex;gap:7px;justify-content:center;margin:18px 0 12px;position:relative;z-index:2}
+.wc-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:width .25s}
+.wc-dots i.on{width:22px;border-radius:4px;background:var(--vang-la)}
+
+.wc-actions{display:grid;gap:8px;position:relative;z-index:2;margin-top:2px}
+.wc-actions .btn{margin:0}
+/* Nút Skip ở màn cuối không còn chữ — ẩn hẳn thay vì để một ô trống bấm được. */
+.wc-actions .btn:empty{display:none}
+
+.wc-slide .fld{display:grid;gap:5px;margin-top:12px}
+.wc-slide .fld>span{font-size:12.5px;color:var(--muc-nhat)}
+.wc-slide .fld>span small{color:var(--muc-nhat);opacity:.8}
+.wc-slide .fld input{border:1px solid var(--line);border-radius:12px;padding:12px;
+  font-size:15px;background:#fff;color:var(--muc);width:100%;min-height:48px}
+.wc-slide .fld input:focus-visible{outline:2px solid var(--ngoc);outline-offset:1px}
+
+.wc-err{color:var(--son-dam);font-size:13px;margin-top:9px}
+.wc-err[hidden]{display:none}
+
+/* Hộp nói thẳng bản build này không có máy chủ. Dùng nền hổ phách chứ
+   không phải nền đỏ: đây là một sự thật về cấu hình, không phải một lỗi. */
+.wc-offbox{display:grid;gap:5px;margin-top:14px;padding:13px 14px;border-radius:16px;
+  background:#FBF2E2;border:1px solid rgba(200,121,31,.35)}
+.wc-offbox b{font-family:var(--disp);font-size:14.5px;color:var(--then)}
+.wc-offbox span{font-size:12.5px;line-height:1.5;color:var(--muc-nhat)}
+.wc-offbox em{font-style:normal;font-weight:600;color:var(--muc)}
+
+.wc-frieze{position:absolute;left:0;right:0;bottom:0;height:22px;z-index:3;
+  background-repeat:repeat-x;background-size:auto 22px;opacity:.5;pointer-events:none}
+
+/* Bài lưu trên máy: nhãn phải khác hẳn bài trên máy chủ, nếu không người
+   dùng tưởng mình vừa đăng cho cả thế giới xem. */
+.clocal{display:flex;align-items:center;gap:8px;margin:2px 0 12px;padding:10px 12px;
+  border-radius:14px;background:#FBF2E2;border:1px solid rgba(200,121,31,.35);
+  font-size:12.5px;color:var(--muc-nhat);line-height:1.45}
+.clocal b{font-family:var(--disp);font-size:13px;color:var(--then);white-space:nowrap}
+.cpost .conly{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:var(--pill);
+  background:#FBF2E2;border:1px solid rgba(200,121,31,.4);
+  font-size:10.5px;font-weight:600;color:#8A5A16}
+
+/* Ghi chép của chính mình trên thẻ quán — khác feed công khai: không sao
+   trung bình, không cỡ mẫu, chỉ là những gì người này đã viết. */
+.cnote-mine{display:grid;grid-template-columns:auto 1fr;gap:11px;align-items:start;
+  padding:11px 0;border-bottom:1px solid var(--line)}
+.cnote-mine:last-of-type{border-bottom:0}
+.cnote-mine img{width:56px;height:56px;border-radius:12px;object-fit:cover;
+  border:1px solid var(--line)}
+.cnote-mine>div{min-width:0}

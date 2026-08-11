@@ -20,6 +20,8 @@ import * as Outbox from "./outbox.js";
 import { validate as validatePost, farFrom, summarise, priceBand } from "./posts.js";
 import { compress } from "./photo.js";
 import { mapsLinks, socialLinks, shareTargets, shareText } from "./links.js";
+import * as Local from "./localdb.js";
+import * as Welcome from "./welcome.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -1599,10 +1601,16 @@ function showPlace(id, metres = null) {
    Sao KHÔNG dùng để sắp xếp hay lọc ở bất cứ đâu: Đúng Giá vẫn là trục chính. */
 async function paintPlaceCommunity(place) {
   const host = $("#placeCommunity");
-  if (!host || !Cloud.ready()) return;
+  if (!host) return;
   let posts = [];
-  try { posts = await Cloud.listPosts({ placeId: place.id, limit: 20 }); }
-  catch { return; }                      // mất mạng thì khối này vắng mặt, không báo lỗi
+  try {
+    // Cùng luật với feed: một nguồn mỗi lần, chọn theo cấu hình. Bài trong
+    // sổ tay riêng vẫn phải hiện ở đây — đó là chỗ người dùng ghi giá mình
+    // đã trả, và giấu nó đi thì việc ghi lại chẳng để làm gì.
+    posts = Cloud.ready()
+      ? await Cloud.listPosts({ placeId: place.id, limit: 20 })
+      : await Local.listPosts({ placeId: place.id, limit: 20 });
+  } catch { return; }                    // mất mạng thì khối này vắng mặt, không báo lỗi
   if (!$("#placeCommunity")) return;     // người dùng đã đóng thẻ trong lúc chờ
   // …và nếu đã mở SANG QUÁN KHÁC trong lúc chờ: openSheet() ghi đè innerHTML
   // của #sheetBody nên #placeCommunity giờ là một nút MỚI dù trùng id — so
@@ -1610,12 +1618,40 @@ async function paintPlaceCommunity(place) {
   // Không bắt được ca này thì giá của quán cũ bị gắn nhầm vào hàng món quán mới.
   if ($("#placeCommunity") !== host) return;
 
+  const shots = posts.filter((p) => p.photoPath || p.photo).slice(0, 8);
+  const img = (p) => esc(p.local ? Local.photoUrl(p) : Cloud.photoUrl(p.photoPath));
+
+  /* SỔ TAY RIÊNG chơi theo luật khác hẳn feed công khai.
+
+     Ngưỡng "ba đánh giá mới hiện sao" tồn tại để một người tự khen mình
+     không đẩy được một con số 5,0 lên trước mặt người lạ. Trong sổ tay
+     riêng thì không có người lạ nào cả — đây là ghi chép của chính người
+     đang đọc, về chỗ chính họ đã ăn. Giấu nó đi sau một ngưỡng thống kê
+     là biến việc ghi lại thành công cốc: người ta ghi giá mình đã trả
+     đúng để lần sau mở ra xem lại. */
+  if (!Cloud.ready()) {
+    host.innerHTML = posts.length ? `
+      <h2 class="sect">Your notes here</h2>
+      ${posts.map((p) => `<div class="cnote-mine">
+        ${p.photo ? `<img src="${img(p)}" alt="" loading="lazy">` : ""}
+        <div>
+          <span class="src">${esc(fmtWhen(p.createdAt))}${
+            p.paidVnd ? ` · paid ${fmtVND(p.paidVnd)}` : ""}${
+            Number.isFinite(p.stars) ? ` · ${"★".repeat(p.stars)}` : ""}</span>
+          ${p.body ? `<p class="muted" style="font-size:13px">${esc(p.body)}</p>` : ""}
+        </div>
+      </div>`).join("")}
+      <p class="seedwarn">Kept on this phone only. Nothing here has been sent anywhere,
+        and it never touches the price verdicts above — those come from the reference
+        range, not from what you wrote.</p>` : "";
+    return;
+  }
+
   const s = summarise(posts);
-  const shots = posts.filter((p) => p.photoPath).slice(0, 8);
   host.innerHTML = `
     ${s.show ? `<p class="src">${s.avg.toFixed(1)} ★ · ${s.count} ratings from travellers</p>` : ""}
     ${shots.length ? `<div class="cshots">${shots.map((p) =>
-      `<img src="${esc(Cloud.photoUrl(p.photoPath))}" alt="" loading="lazy">`).join("")}</div>` : ""}`;
+      `<img src="${img(p)}" alt="" loading="lazy">`).join("")}</div>` : ""}`;
 
   // Giá cộng đồng hiện SONG SONG với giá hạt giống, không thay nó. Một người
   // gõ nhầm một số không không được phép kéo lệch phán quyết của cả app.
@@ -1626,6 +1662,13 @@ async function paintPlaceCommunity(place) {
     if (note) note.insertAdjacentHTML("afterend",
       `<span class="note">${band.n} travellers paid ${Math.round(band.lo/1000)}k–${Math.round(band.hi/1000)}k₫</span>`);
   }
+}
+
+/** "12 Aug" — ngày ngắn, cùng cách Journal đang dùng. */
+function fmtWhen(iso) {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? ""
+    : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
 }
 
 /* ── màn hình: Nhật ký ────────────────────────────────────── */
@@ -1764,11 +1807,20 @@ function accountHTML() {
   const err = Auth.errorOf();
 
   if (!cfg) {
+    /* Không có máy chủ thì vẫn có MỘT thứ tài khoản thật sự làm: cái tên
+       gắn lên bài trong sổ tay riêng. Bỏ ô đó đi thì mọi bài ký tên "You"
+       và người dùng không có cách nào sửa. */
     return `<div class="card" id="acct">
       <h2 class="sect" style="margin-top:0">Account</h2>
       <p class="src">Accounts are off. Everything below works without one — scans,
         map and journal all live on this device.</p>
       <div class="manual" style="grid-template-columns:1fr">
+        <input id="localName" maxlength="32" placeholder="Display name"
+          value="${esc(Local.name())}">
+      </div>
+      <button class="btn sec" data-act="saveLocalName">Save this name</button>
+      <p class="src">Used on anything you write in Community. It stays on this phone.</p>
+      <div class="manual" style="grid-template-columns:1fr;margin-top:12px">
         <input id="sbUrl" type="url" inputmode="url" autocomplete="off"
           placeholder="https://xxxx.supabase.co">
         <input id="sbKey" type="password" autocomplete="off"
@@ -1849,6 +1901,11 @@ function renderMe() {
 
     <h2 class="sect">Illustrated icons</h2>
     ${iconStudioHTML()}
+
+    <button class="row" data-act="replayIntro">
+      <span><span class="nm">Replay the tour</span>
+        <span class="note">The four screens from the first launch</span></span>
+    </button>
 
     <h2 class="sect">How verdicts work</h2>
     <div class="card"><p class="muted" style="font-size:13px">
@@ -2069,7 +2126,7 @@ async function reportPost(id) {
     <h3>Report this post</h3>
     <p class="src">Reports are private. Nobody, including us, can see who sent one.</p>
     ${REASONS.map(([v, label]) =>
-      `<button class="row" data-report="${esc(id)}" data-reason="${v}">
+      `<button class="row" data-report="${esc(id)}" data-reason="${esc(v)}">
         <span><span class="nm">${esc(label)}</span></span></button>`).join("")}
     <button class="btn sec" data-act="close">Cancel</button>`);
 }
@@ -2085,18 +2142,38 @@ function busy(on, msg = "") {
 
 /* Đăng nhập hỏi ĐÚNG lúc cần: người dùng đã gõ xong nhận xét rồi mới thấy ô
    email, chứ không phải thấy nó trước khi biết mình sẽ được gì. */
-async function needAuth() {
-  if (Auth.signedIn()) return true;
-  const email = prompt("Email to post with:");
-  if (!email) return false;
-  try {
-    await Auth.sendCode(email);
-    const code = prompt("Enter the 6-digit code we emailed you:");
-    if (!code) return false;
-    await Auth.verifyCode(email, code.trim());
-    await Cloud.ensureProfile((email.split("@")[0] || "Traveller").slice(0, 32));
-    return true;
-  } catch (e) { toast(e.message || "Sign-in failed"); return false; }
+/* Đăng nhập giữa chừng, khi một hành động THẬT SỰ cần máy chủ.
+
+   Bản trước dùng prompt() hai lần. prompt() BỊ CHẶN trong PWA đã cài ra
+   màn hình chính và trong nhiều trình duyệt nhúng — nó không trả null mà
+   NÉM "prompt() is not supported", nên cả nhánh này chết lặng: người dùng
+   bấm nút và không có gì xảy ra, không có cả một dòng báo lỗi. Đã dựng
+   lại thành form thật trong màn tài khoản, dùng chung với màn mở đầu.
+
+   Trả về Promise<boolean>: true khi đã đăng nhập xong, false khi người
+   dùng đi ra bằng cửa khác — và nhánh false phải im lặng, vì thoát ra là
+   một lựa chọn hợp lệ chứ không phải một lỗi. */
+function needAuth() {
+  if (Auth.signedIn()) return Promise.resolve(true);
+  if (!Auth.isConfigured()) {
+    toast("Accounts are off in this build — it saved to this phone instead");
+    return Promise.resolve(false);
+  }
+  return new Promise((resolve) => {
+    closeSheet();
+    Welcome.open({
+      host: $("#v-welcome"),
+      step: Welcome.ACCOUNT_STEP,
+      onDone: async () => {
+        if (Auth.signedIn()) {
+          const em = Auth.profile()?.email || "";
+          await Cloud.ensureProfile((em.split("@")[0] || "Traveller").slice(0, 32))
+            .catch(() => { /* hồ sơ tạo sau cũng được, đừng chặn hành động */ });
+        }
+        resolve(Auth.signedIn());
+      },
+    });
+  });
 }
 
 function openComposer(placeId = "") {
@@ -2130,6 +2207,13 @@ async function submitPost() {
   const draft = readDraft();
   const v = validatePost(draft);
   if (!v.ok) { const e = $("#cfErr"); e.hidden = false; e.textContent = v.errors.join(" · "); return; }
+
+  /* Chưa có máy chủ thì bài KHÔNG rơi vào hư không. Trước đây nhánh này đi
+     thẳng vào needAuth() → prompt("Email…") → Auth.sendCode() → ném "chưa
+     cấu hình dịch vụ", và người dùng vừa gõ xong nhận xét thì mất trắng.
+     Nhận dữ liệu của ai đó rồi vứt đi là lỗi tệ nhất một form có thể mắc. */
+  if (!Cloud.ready()) return submitPostLocally(draft);
+
   if (!(await needAuth())) return;
 
   busy(true, "Posting…");
@@ -2178,6 +2262,38 @@ async function submitPost() {
       closeSheet();
       renderCommunity();
     }
+  } finally { busy(false); }
+}
+
+/* Đường đi khi không có máy chủ: nén ảnh, xoá EXIF, ghi xuống IndexedDB.
+   Dùng LẠI đúng compress() của đường đi lên máy chủ — cùng một lời hứa về
+   quyền riêng tư phải đúng ở cả hai nhánh, và một bản nén thứ hai viết
+   riêng cho nhánh này là chỗ để hai lời hứa trôi khỏi nhau. */
+async function submitPostLocally(draft) {
+  busy(true, "Saving…");
+  try {
+    let blob = null, coords = null;
+    if (draft.photo) {
+      try {
+        const c = await compress(draft.photo);
+        blob = c.blob; coords = c.coords;
+      } catch {
+        toast("That photo could not be read");
+        return;
+      }
+    }
+    const place = S.places.find((p) => p.id === draft.placeId);
+    const far = farFrom(place, coords || S.me);
+    await Local.savePost({ ...draft, zone: S.zone, photo: null }, { photo: blob, far });
+    closeSheet();
+    toast("Saved to this phone");
+    renderCommunity();
+  } catch (e) {
+    // IndexedDB đầy hoặc bị chặn (chế độ riêng tư). Nói ra chứ đừng im lặng
+    // — người dùng phải biết bài vừa gõ không được giữ lại.
+    toast(e?.name === "QuotaExceededError"
+      ? "This phone is out of storage for photos"
+      : "Could not save that on this device");
   } finally { busy(false); }
 }
 
@@ -2232,6 +2348,10 @@ function go(tab) {
 /* ── sự kiện ──────────────────────────────────────────────── */
 document.addEventListener("click", async (ev) => {
   const el = (s) => ev.target.closest(s);
+
+  // Màn mở đầu phủ toàn màn hình: nó phải được hỏi TRƯỚC mọi định tuyến
+  // khác, không thì một cú chạm xuyên qua nó rơi vào tab đang nằm dưới.
+  if (await Welcome.handleClick(ev.target)) return;
 
   // Phần tử của feed đi qua community.js…
   if (S.tab === "community" && Community.handleClick(ev.target)) return;
@@ -2368,6 +2488,17 @@ document.addEventListener("click", async (ev) => {
     return;
   }
   if (el("[data-act='authOut']")) { await Auth.signOut(); renderMe(); return toast("Signed out"); }
+  if (el("[data-act='saveLocalName']")) {
+    const n = Local.setName($("#localName")?.value || "");
+    renderMe();
+    return toast(n ? `Saved — you're ${n}` : "Name cleared");
+  }
+  if (el("[data-act='replayIntro']")) {
+    // Mở lại từ màn ĐẦU: người bấm vào đây muốn xem lại phần giới thiệu,
+    // không phải nhảy thẳng tới ô nhập tên.
+    Welcome.forget();
+    return Welcome.open({ host: $("#v-welcome"), onDone: () => go("me") });
+  }
 
   // ── xưởng icon ──
   if (el("[data-act='aiSave']")) {
@@ -2697,7 +2828,18 @@ async function boot() {
     } catch (e) { console.warn("SW register failed:", e); }
   }
 
-  go("scan");
+  /* Màn mở đầu chạy SAU khi dữ liệu đã nạp và service worker đã đăng ký:
+     người dùng đọc bốn màn giới thiệu trong lúc phần còn lại đã sẵn sàng,
+     nên bấm "Get started" là vào thẳng, không phải chờ thêm lần nữa.
+
+     Chạy đúng một lần. Đặt nó trước boot() thì nó chặn cả lượt khởi động
+     sau một cú chạm của người dùng — và trên một app hứa chạy offline,
+     thứ chặn đường vào phải là ít nhất có thể. */
+  if (!Welcome.seen()) {
+    Welcome.open({ host: $("#v-welcome"), onDone: () => go("scan") });
+  } else {
+    go("scan");
+  }
   window.addEventListener("offline", () => toast("Offline — everything still works"));
 }
 

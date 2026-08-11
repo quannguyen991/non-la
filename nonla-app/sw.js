@@ -4,20 +4,29 @@
 // v21: ba vùng mới (Đà Nẵng ×2, Huế), trips.json và links.js. Cùng lý do —
 // không bump thì máy đã cài giữ nguyên maps.json ba vùng và đổi vùng ra
 // một bản đồ trống.
-const CACHE = "nonla-v21";
+// v22: màn mở đầu (welcome.js) và kho bài trên máy (localdb.js). Thiếu hai
+// tệp này trong SHELL thì máy đang offline mở app ra sẽ chết ở dòng import.
+// v23: community.css — index.html nạp BA stylesheet, SHELL mới liệt kê hai.
+// Thiếu tệp này thì offline request nó trượt cache và rơi vào nhánh dự phòng
+// cuối, tức là nhận về index.html cho một request CSS: trình duyệt bỏ qua vì
+// sai kiểu nội dung, và tab Community mở ra không còn chút style nào. Phải
+// bump, không thì máy đã cài bản cũ giữ nguyên cache v22 và không bao giờ
+// nạp thêm tệp mới trong danh sách.
+const CACHE = "nonla-v23";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
    dung lượng wifi khách sạn, icon món ăn tốn TIỀN THẬT của người dùng
    (gọi API trả phí). Vỏ app thì ngược lại — rẻ và phải luôn mới. Liệt kê
    ở đây để sau này thêm cache thứ ba không ai quên loại nó khỏi dọn dẹp. */
-const VERSIONLESS_CACHES = ["nl-community-img", "nonla-icons-v1"];
+const IMG_CACHE = "nl-community-img";
+const VERSIONLESS_CACHES = [IMG_CACHE, "nonla-icons-v1"];
 
 const SHELL = [
-  "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css",
+  "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css", "./community.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./route.js",
   "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
-  "./links.js",
+  "./links.js", "./localdb.js", "./welcome.js",
   "./manifest.json", "./icon.svg",
   "./data/dishes.json", "./data/prices.json", "./data/places.json",
   "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./data/trips.json",
@@ -65,7 +74,7 @@ self.addEventListener("fetch", (e) => {
      Giới hạn 60 tấm để một chuyến đi dài không ăn hết dung lượng máy. */
   if (url.pathname.includes("/storage/v1/object/public/posts/")) {
     e.respondWith((async () => {
-      const c = await caches.open("nl-community-img");
+      const c = await caches.open(IMG_CACHE);
       const hit = await c.match(e.request);
       if (hit) return hit;
       const res = await fetch(e.request);

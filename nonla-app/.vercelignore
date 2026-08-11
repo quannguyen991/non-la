@@ -1,0 +1,29 @@
+# Những thứ KHÔNG ship lên web công khai.
+#
+# Ứng dụng là static thuần: index.html nạp app.js, các module còn lại và
+# data/*.json. Mọi thứ dưới đây là công cụ dựng dữ liệu, bài kiểm thử và
+# trang xem thử — chúng không được file nào trong luồng chạy tham chiếu tới
+# (đã kiểm), nên loại ra cho bản deploy gọn và không lộ giấy nháp.
+
+.netlify
+node_modules
+
+# Script dựng dữ liệu và ảnh, chạy tay trên máy — không phải mã của app
+_gen_assets.mjs
+_import_eateries.mjs
+_link_famous.mjs
+_normalize_landmarks.mjs
+_shrink.py
+tools/
+
+# Bộ nhớ đệm Overpass thô, 138 KB, chỉ dùng để chạy lại script nhập quán ăn
+_osm_raw_eateries.json
+data/_overpass_cache/
+
+# Kiểm thử và trang xem thử trong lúc phát triển
+test.mjs
+design.html
+motifs-preview.html
+
+# Tài liệu dự án — thuộc về repo, không thuộc về máy chủ web
+README.md

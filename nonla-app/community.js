@@ -12,6 +12,7 @@
 
 import { listPosts, photoUrl, ready } from "./cloud.js";
 import { pending, drop, MAX_TRIES } from "./outbox.js";
+import * as Local from "./localdb.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -35,20 +36,27 @@ const stars = (n) => Number.isFinite(n)
 
 function postHtml(p) {
   const place = M.places.find((x) => x.id === p.placeId);
+  /* Ảnh của bài trên máy chủ là một đường dẫn; ảnh của bài trên máy là một
+     Blob. Hỏi đúng nguồn cho đúng loại bài — gọi photoUrl() của cloud.js
+     cho một Blob sẽ ra một URL vô nghĩa và khung ảnh trống không báo gì. */
+  const img = p.local ? Local.photoUrl(p) : (p.photoPath ? photoUrl(p.photoPath) : "");
   return `<article class="cpost">
-    ${p.photoPath ? `<img src="${esc(photoUrl(p.photoPath))}" alt="" loading="lazy">` : ""}
+    ${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ""}
     <div class="cbody">
       <div class="cwho">
         <span>${esc(p.authorName)}</span>
         ${p.authorCountry ? `<span>· ${esc(p.authorCountry)}</span>` : ""}
         <span>· ${esc(ago(p.createdAt))}</span>
+        ${p.local ? `<span class="conly">this phone only</span>` : ""}
         ${p.far ? `<span class="cfar">posted away from the venue</span>` : ""}
       </div>
       <button class="cplace" data-cplace="${esc(p.placeId)}">${esc(place?.name || p.placeId)}</button>
       ${stars(p.stars)}
       ${p.paidVnd ? `<div class="cpaid">Paid ${esc(money(p.paidVnd))}</div>` : ""}
       ${p.body ? `<p class="cnote">${esc(p.body)}</p>` : ""}
-      <button class="creport" data-creport="${esc(p.id)}">Report</button>
+      ${p.local
+        ? `<button class="creport" data-cdel="${esc(p.id)}">Delete</button>`
+        : `<button class="creport" data-creport="${esc(p.id)}">Report</button>`}
     </div>
   </article>`;
 }
@@ -69,12 +77,15 @@ async function paint() {
     ${stuck.length ? `<div class="coutbox stuck">
       <span>${stuck.length} post${stuck.length > 1 ? "s" : ""} could not be sent</span>
       <button class="btn sec" data-cdiscard>Discard</button></div>` : ""}
+    ${ready() ? "" : `<div class="clocal"><b>Notebook mode</b>
+      <span>No server is connected, so what you write here stays on this phone.
+        It is yours to keep, not a feed anyone else can see.</span></div>`}
     <button class="btn" data-cact="compose">Share a place</button>
     ${M.posts.length
       ? `<div class="cfeed">${M.posts.map(postHtml).join("")}</div>`
       : `<p class="cempty">${ready()
           ? "No posts here yet. Be the first — photograph what you ate, and what you paid for it."
-          : "Community is switched off in this build."}</p>`}`;
+          : "Nothing written down yet. Photograph what you ate and what you paid — it saves to this phone."}</p>`}`;
 }
 
 /** Vứt mọi bài đã hỏng đủ MAX_TRIES lần. Gọi từ nút Discard trong banner hàng chờ. */
@@ -97,9 +108,13 @@ export async function open({ host, zone, places = [], onOpenPlace, onCompose, on
 export async function refresh() {
   if (!M.host) return;
   try {
-    // Mất mạng thì listPosts ném; giữ nguyên M.posts để bản cache còn trên
-    // màn hình thay vì thay bằng một màn hình trống.
-    M.posts = await listPosts({ zone: M.zone, limit: 20 });
+    /* Một nguồn duy nhất mỗi lần, chọn theo cấu hình. KHÔNG trộn hai nguồn
+       vào một feed: bài trên máy chủ và bài trong sổ tay riêng có mức
+       hiển-thị-với-ai khác hẳn nhau, và một danh sách trộn lẫn sẽ khiến
+       người dùng đọc cả hai như thể chúng cùng loại. */
+    M.posts = ready()
+      ? await listPosts({ zone: M.zone, limit: 20 })
+      : await Local.listPosts({ zone: M.zone, limit: 20 });
   } catch { /* im lặng — Community là lớp tuỳ chọn */ }
   await paint();
 }
@@ -168,6 +183,14 @@ export function handleClick(target) {
   if (place) return M.cb.onOpenPlace?.(place.dataset.cplace), true;
   const rep = target.closest("[data-creport]");
   if (rep) return M.cb.onReport?.(rep.dataset.creport), true;
+  /* Xoá bài của CHÍNH MÌNH trên máy — không cần callback ra app.js vì
+     không có gì ngoài kia phải biết. Báo cáo thì ngược lại: nó đi lên máy
+     chủ, nên nó phải qua app.js. */
+  const del = target.closest("[data-cdel]");
+  if (del) {
+    Local.removePost(Number(del.dataset.cdel)).then(refresh).catch(() => {});
+    return true;
+  }
   // Nút Discard trong banner hàng chờ: hoàn toàn nội bộ community.js, không
   // cần callback ra app.js — chỉ vứt bài đã hỏng đủ MAX_TRIES rồi vẽ lại.
   if (target.closest("[data-cdiscard]")) return discardStuck(), true;

@@ -48,8 +48,8 @@ export async function readExifGps(file) {
     while (off + 4 <= buf.byteLength) {
       const marker = buf.getUint16(off);
 
-      // Skip markers without length field: SOI, EOI, RST0-RST7
-      if (marker === 0xffd8 || marker === 0xffd9 || (marker >= 0xffd0 && marker <= 0xffd7)) {
+      // Skip markers without length field: SOI, EOI, TEM, RST0-RST7
+      if (marker === 0xffd8 || marker === 0xffd9 || marker === 0xff01 || (marker >= 0xffd0 && marker <= 0xffd7)) {
         off += 2;
         if (marker === 0xffd9) return null; // EOI reached, no APP1 found
         continue;

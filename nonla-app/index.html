@@ -80,6 +80,11 @@
 
   <nav class="tabbar" id="tabbar"></nav>
   <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Màn mở đầu: giới thiệu rồi tài khoản. Nằm ở CẤP #app và phủ toàn
+       màn hình, sau tabbar trong thứ tự DOM nên nó che được cả thanh nav —
+       trong lúc chưa xong bước này thì không có tab nào để bấm. -->
+  <section id="v-welcome" hidden aria-label="Welcome"></section>
 </div>
 
 <canvas id="shot" hidden></canvas>

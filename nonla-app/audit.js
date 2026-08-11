@@ -233,7 +233,16 @@ export async function run({ verbose = true } = {}) {
   A.go("map"); await wait(360);
   ck("Nearby có thẻ số liệu 2 ô", $$("#v-map .ex-stat").length === 2);
   ck("Nearby có khối bản đồ", !!$("#v-map .ex-map"));
-  ck("nền bản đồ có vẽ hình", ($("#v-map .ex-base")?.children.length || 0) > 5);
+  /* Vùng CÓ tranh vẽ tay đã neo toạ độ thì nền chính LÀ tấm tranh, và
+     `.ex-base` cố ý để rỗng — vẽ cả hai là chồng phố vector lên mái ngói
+     (bigmap.js, `artOK`). Phép thử cũ chỉ đếm nút trong `.ex-base` nên nó
+     đỏ ở đúng những vùng đẹp nhất, `hoian-oldtown` — vùng MẶC ĐỊNH — là
+     một trong số đó. Đạt khi có MỘT trong hai nền, không phải cả hai. */
+  const exArt = $("#v-map .ex-art");
+  const exVec = $("#v-map .ex-base")?.children.length || 0;
+  const artOn = !!exArt && !exArt.hidden && exArt.naturalWidth > 0;
+  ck("nền bản đồ có vẽ hình", artOn || exVec > 5,
+     artOn ? "tranh vẽ tay" : `${exVec} nút vector`);
   ck("bản đồ có ghim", $$("#v-map .ex-pin").length > 0);
   ck("có thẻ trong khay dưới", $$("#v-map .ex-card").length > 0);
   ck("có thẻ cảnh báo vượt khoảng", $$("#v-map .alert-card").length > 0);
@@ -434,15 +443,32 @@ export async function run({ verbose = true } = {}) {
     });
     ck("ghim tham quan đạt vùng chạm 44px", markSmall.length === 0, String(markSmall.length));
 
-    // Đây là phép thử mà nếu có từ đầu thì pointer-events:none đã không
-    // sống sót: nút phải thực sự NHẬN được cú chạm, không chỉ tồn tại.
-    if (marks[0]) {
-      const r = marks[0].getBoundingClientRect();
+    /* Đây là phép thử mà nếu có từ đầu thì pointer-events:none đã không
+       sống sót: nút phải thực sự NHẬN được cú chạm, không chỉ tồn tại.
+
+       Xét MỌI ghim đang trong khung, không chỉ `marks[0]`. Ở một số mức
+       phóng, ghim đầu danh sách nằm đúng dưới một ghim giá — hai điểm gần
+       nhau ngoài đời thì chồng nhau trên bản đồ, đó là chuyện thường, không
+       phải lỗi — và bản cũ đỏ lên vì đúng chuyện thường đó.
+
+       Thứ KHÔNG được phép là cú chạm rơi vào một thứ không phải ghim: nền,
+       lớp phủ, hay chính lớp ghim đã bị tắt con trỏ. Chuỗi MARKER liệt kê
+       đủ bốn loại ghim của bản đồ, nên `pointer-events:none` quay lại là
+       mọi ghim trong khung cùng đỏ — vẫn bắt được đúng lỗi cũ. */
+    const MARKER = ".bm-mark, .bm-pin, .bm-eat, .bm-stop";
+    const onScreen = marks.filter((e) => {
+      const r = e.getBoundingClientRect();
+      return r.width > 0 && r.bottom > 0 && r.top < innerHeight
+        && r.right > 0 && r.left < innerWidth;
+    });
+    const stolen = onScreen.filter((m) => {
+      const r = m.getBoundingClientRect();
       const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-      ck("ghim tham quan thực sự nhận cú chạm",
-        !!hit && (hit === marks[0] || marks[0].contains(hit)),
-        hit ? hit.className || hit.tagName : "null");
-    }
+      return !(hit && (m.contains(hit) || hit.closest(MARKER)));
+    });
+    ck("ghim tham quan thực sự nhận cú chạm",
+      onScreen.length > 0 && stolen.length === 0,
+      `${onScreen.length - stolen.length}/${onScreen.length} ghim trong khung nhận được chạm`);
 
     click('[data-bmf="fair"]'); await wait(260);
     ck("lọc giá KHÔNG ẩn điểm tham quan",
@@ -541,6 +567,84 @@ export async function run({ verbose = true } = {}) {
       const small = chips.filter((e) => e.getBoundingClientRect().height < MIN_TAP);
       ck("chip nền tảng đạt vùng chạm", small.length === 0, String(small.length));
       click("[data-act='close']"); await wait(300);
+    }
+  }
+
+  /* ── màn mở đầu ───────────────────────────────────────
+     Mở lại bằng CHÍNH đường người dùng đi (nút trong tab You), không gọi
+     thẳng Welcome.open() — phép thử phải đi qua đúng lối đó, nếu không nó
+     bỏ lọt đúng cái nút bị hỏng. */
+  {
+    const W = await import("./welcome.js");
+    A.go("me"); await wait(300);
+    const replay = $("[data-act='replayIntro']");
+    ck("tab You có nút xem lại phần giới thiệu", !!replay);
+    if (replay) {
+      replay.click(); await wait(420);
+      const wv = $("#v-welcome");
+      ck("màn mở đầu mở ra", wv && !wv.hidden);
+      // Nó phủ toàn màn hình và phải nằm TRÊN thanh nav: để lộ tabbar ra
+      // dưới là mời người dùng bấm vào một thứ chưa sẵn sàng.
+      ck("màn mở đầu phủ trên thanh nav",
+        Number(cs(wv).zIndex) > Number(cs($(".tabbar")).zIndex || 0),
+        `${cs(wv).zIndex} vs ${cs($(".tabbar")).zIndex}`);
+      ck("có hình, tiêu đề và chấm chỉ trang",
+        !!$(".wc-art svg") && !!$(".wc-title") && $$(".wc-dots i").length >= 3);
+
+      const nextBtn = $("[data-wc='next']");
+      ck("nút đi tiếp đạt vùng chạm",
+        nextBtn && nextBtn.getBoundingClientRect().height >= MIN_TAP);
+
+      // Bỏ qua phải nhảy THẲNG tới bước tài khoản, không phải đóng luôn:
+      // người bấm Skip muốn qua phần giới thiệu, không phải qua cả bước
+      // đặt tên mà sau đó không có đường nào quay lại.
+      $("[data-wc='skip']")?.click(); await wait(360);
+      ck("Skip đi tới bước tài khoản", !!$("#wcName"));
+      ck("bước tài khoản luôn có lối đi tiếp không cần tài khoản",
+        !!$("[data-wc='local']"));
+      // Không cấu hình máy chủ thì KHÔNG được trưng ô email dẫn tới lỗi.
+      ck("không có máy chủ thì không trưng ô email",
+        A.S && !$("#wcEmail") ? !!$(".wc-offbox") : true);
+
+      $("#wcName").value = "Audit";
+      $("[data-wc='local']").click(); await wait(420);
+      ck("đi tiếp thì đóng màn mở đầu", $("#v-welcome").hidden);
+      ck("tên hiển thị được ghi lại", W.seen() && localStorage.getItem("nl.local.name") === "Audit");
+    }
+  }
+
+  /* ── chế độ sổ tay: bấm Post phải LƯU ĐƯỢC ─────────────
+     Đây là phép thử của đúng lỗi người dùng báo: form nhận dữ liệu, bấm
+     Post, và không có gì xảy ra cả. */
+  {
+    const Cloud = await import("./cloud.js");
+    const Local = await import("./localdb.js");
+    if (!Cloud.ready()) {
+      const before = await Local.count();
+      A.go("community"); await wait(420);
+      ck("Community nói rõ đang ở chế độ sổ tay", !!$(".clocal"));
+      click("[data-cact]"); await wait(420);
+      ck("mở được form đăng bài", !!$("#cfPlace"));
+
+      const place = A.S.places.find((p) => p.zone === A.S.zone);
+      $("#cfPlace").value = place.id;
+      $("#cfPlace").dispatchEvent(new Event("change"));
+      await wait(200);
+      $("#cfPaid").value = "45000";
+      $("#cfBody").value = "audit note";
+      click("[data-cact='submit']"); await wait(900);
+
+      ck("bấm Post thì thẻ đóng lại", !sheetOpen());
+      const after = await Local.count();
+      ck("bấm Post ghi được một bài xuống máy", after === before + 1, `${before} → ${after}`);
+      ck("bài hiện trong feed", $$(".cpost").length > 0);
+      ck("bài mang nhãn chỉ-nằm-trên-máy", !!$(".cpost .conly"));
+      // Bài của chính mình thì phải xoá được, không phải báo cáo.
+      ck("bài trên máy có nút xoá, không phải báo cáo",
+        !!$(".cpost [data-cdel]") && !$(".cpost [data-creport]"));
+
+      $(".cpost [data-cdel]").click(); await wait(700);
+      ck("xoá được bài vừa ghi", (await Local.count()) === before, String(await Local.count()));
     }
   }
 

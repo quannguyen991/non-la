@@ -47,10 +47,15 @@ một trong số đó (`com-tam-ba` bán trà đá ở một vùng không có d�
 import('./audit.js').then(m => m.run())
 ```
 
-128 phép thử thực chạy. Kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ
-không, đổi tab có dọn sạch trạng thái cũ không — và một luật riêng cho lớp
-liên kết mới: mọi liên kết mạng xã hội phải là liên kết TÌM KIẾM, không bao
-giờ là đường dẫn tới một tài khoản cụ thể mà app tự đoán là của quán này.
+Kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi tab có dọn sạch
+trạng thái cũ không, cộng ba luật riêng:
+
+- mọi liên kết mạng xã hội phải là liên kết **tìm kiếm**, không bao giờ là
+  đường dẫn tới một tài khoản cụ thể mà app tự đoán là của quán này;
+- màn mở đầu phải phủ **trên** thanh nav và luôn có lối đi tiếp không cần
+  tài khoản;
+- bấm **Post** trong chế độ sổ tay phải thực sự ghi thêm một bài xuống máy —
+  phép thử của đúng lỗi "bấm mà không có gì xảy ra".
 
 Tầng thứ hai tồn tại vì hai lỗi từng lọt qua tầng thứ nhất — lõi logic đúng
 hoàn toàn mà người dùng vẫn không bấm được:
@@ -64,11 +69,11 @@ hoàn toàn mà người dùng vẫn không bấm được:
 | Hạng mục | Kết quả |
 |---|---|
 | Lõi logic | 230/230 pass (`node test.mjs`) |
-| Đường tương tác | 126/128 pass (`audit.js` trong trình duyệt). Hai phép thử trượt đã trượt sẵn trước đợt này — chạy lại đúng bộ đó trên bản HEAD cho 113/115 và trượt đúng hai cái ấy: vùng chạm ghim tham quan (`bm-mark` bị `bm-pin` che), và `.ex-base` rỗng ở Hội An vì màn hình đó dùng lớp tranh thay bản dựng vector |
+| Đường tương tác | 146/146 pass (`audit.js` trong trình duyệt, 22 giây). Hai phép thử từng trượt nay đã sửa — sửa ở TẦNG PHÉP THỬ chứ không phải ở app, vì cả hai đều bắt nhầm: `.ex-base` rỗng là ĐÚNG với vùng có tranh vẽ tay như Hội An (nền là tấm tranh, vẽ thêm phố vector là chồng hai lớp), còn ghim tham quan nằm dưới một ghim giá là chồng ghim bình thường của bản đồ. Phép thử nền nay nhận cả hai loại nền; phép thử vùng chạm nay xét MỌI ghim trong khung và chỉ đỏ khi cú chạm rơi vào thứ không phải ghim — `pointer-events:none` quay lại thì cả loạt cùng đỏ, vẫn bắt được đúng lỗi cũ. Tab bị ẩn thì bộ này kéo dài tới ~8 phút: trình duyệt bóp `setTimeout` về ~1 giây, mà audit có khoảng chín mươi lần chờ |
 | OCR tiếng Việt (Tesseract `vie`) | 92% tin cậy, ~2,6s lần đầu, ~0,4s sau đó |
 | Chuỗi pixel → OCR → khớp → phán quyết | Đúng, kể cả khi OCR đọc nát `Cao lầu` thành `Caolâ\`u` |
 | Chạy khi tắt hẳn server | Boot được, OCR được, phán quyết được |
-| Service worker | 14 tệp vỏ app + traineddata `vie`/`eng` + font |
+| Service worker | 38 tệp trong danh sách cài đặt — vỏ app, ba stylesheet, dữ liệu sáu vùng, tranh nền Hội An — cộng traineddata `vie`/`eng` và font, hai thứ sau nạp theo nhu cầu rồi nằm lại trong cache |
 | Bản đồ chi tiết khi tắt server | Mở được, kéo/phóng/lọc được, chạm ghim ra thẻ |
 | Lớp cộng đồng — lõi thuần | 38/38 pass |
 | Đăng bài khi tắt mạng | Bài vào hàng chờ, gửi lại được khi có sóng |
@@ -98,8 +103,8 @@ cloud.js        chỗ DUY NHẤT biết HTTP của lớp cộng đồng; config.
                 để trống thì Community tự tắt
 community.js    màn hình Cộng đồng: feed đọc được khi chưa đăng nhập, form đăng bài, báo cáo
                 + community.css — kiểu riêng cho feed và form
-audit.js        128 phép thử: tương tác, bố cục, tương phản, vùng chạm, bản đồ,
-                và luật của lớp liên kết (mọi liên kết mạng xã hội phải là tìm kiếm)
+audit.js        tương tác, bố cục, tương phản, vùng chạm, bản đồ, lớp liên kết,
+                màn mở đầu, và đường Post của chế độ sổ tay
 sw.js           offline. network-first cho vỏ app, cache-first cho CDN
 test.mjs        230 phép thử: match.js, geo.js, iso.js, artmap.js, citymap.js,
                 route.js, links.js, lõi thuần lớp cộng đồng — và một lớp
@@ -108,6 +113,8 @@ test.mjs        230 phép thử: match.js, geo.js, iso.js, artmap.js, citymap.js
 assets/         ảnh — sinh bằng ../tools/gen-assets.mjs, xem assets/README.md
   maps/         tranh nền tab Nearby, có khối `art` neo toạ độ trong maps.json
 links.js        liên kết ra bản đồ và mạng xã hội                    ← có test
+welcome.js      màn mở đầu: bốn màn giới thiệu rồi bước tài khoản
+localdb.js      bài đăng nằm trên MÁY khi chưa có máy chủ (IndexedDB)
 tools/
   fetch-zones.py    tải phố/nước/mốc cho vùng mới từ Overpass, có đệm trên đĩa
   merge-zones.mjs   gộp mốc tuyển chọn + lộ trình vào maps.json, kiểm trước khi ghi
@@ -266,6 +273,77 @@ một URL trang, mà một địa điểm thì không phải một trang — nê
 chép chú thích vào clipboard và **nói tên chúng ra**, thay vì lặng lẽ bỏ nút
 đi để người dùng đi tìm mà không hiểu vì sao nó không có ở đó.
 
+## Mở app lần đầu
+
+Hai bước, và **cả hai đều bỏ qua được**:
+
+1. **Bốn màn giới thiệu** — mỗi màn nói đúng một việc app làm được, bằng câu
+   người dùng sẽ tự nói ra chứ không phải tên tính năng. "Price Lens" không có
+   nghĩa gì với người chưa dùng; *"cái này có đắt không"* thì có. Chạy đúng một
+   lần, ghi lại trong `localStorage`. Xem lại bất cứ lúc nào ở **You → Replay
+   the tour**.
+
+2. **Bước tài khoản** — đặt tên hiển thị, và một lối đi tiếp không cần tài khoản.
+
+### Vì sao lối đi tiếp không cần tài khoản luôn có ở đó
+
+Toàn bộ giá trị của Nón Lá — quét thực đơn, soi giá, bản đồ, nhật ký — là dữ
+liệu nằm sẵn trong máy và chạy được khi tắt hẳn mạng. Một bức tường đăng nhập
+trước những thứ đó chặn đúng người dùng mà app viết ra để phục vụ: khách vừa
+xuống sân bay, eSIM chưa kích hoạt, đang đứng trước một thực đơn không đọc
+được. Tài khoản chỉ mở thêm **một** thứ — đăng bài lên máy chủ chung — nên nó
+xin ở đây, không ép.
+
+### Màn tài khoản đổi hình theo cấu hình
+
+| `config.js` | Màn hình hiện gì |
+|---|---|
+| có dự án Supabase | ô email → gửi mã 6 số → đăng nhập thật |
+| để trống (bản build này) | nói thẳng "không có máy chủ phía sau", chỉ xin tên hiển thị |
+
+Dựng một ô *Email / Mật khẩu* đẹp đẽ rồi để nó luôn báo lỗi vì phía sau không
+có gì cả — đó là thứ tệ hơn cả việc không có màn đăng nhập.
+
+## Chế độ sổ tay — vì sao nút Post từng không làm gì
+
+Lớp cộng đồng gọi thẳng Supabase. `config.js` để trống thì `Cloud.ready()` trả
+false, và trước đây điều đó nghĩa là: feed hiện dòng *"Community is switched
+off in this build"*, còn nút **Post** thì vẫn bấm được, vẫn hỏi email qua
+`prompt()`, rồi chết lặng ở lỗi "chưa cấu hình dịch vụ". Người dùng gõ xong
+nhận xét, bấm Post, và không có gì xảy ra cả.
+
+Hai lỗi chồng lên nhau, và cái thứ hai còn tệ hơn:
+
+- **Form nhận dữ liệu rồi vứt đi.** Không lưu, không báo, không có đường quay lại.
+- **`prompt()` bị chặn trong PWA đã cài ra màn hình chính** và trong nhiều
+  trình duyệt nhúng. Nó KHÔNG trả `null` mà **ném** `prompt() is not
+  supported`, nên cả nhánh đăng nhập chết lặng — không có cả một dòng báo lỗi.
+  Console của bản build này in đúng chuỗi đó sáu lần.
+
+Cách chữa:
+
+- Không có máy chủ → bài **ở lại đúng cái máy vừa gõ ra nó**, trong IndexedDB
+  (`localdb.js`), hiện trong feed như một bài thật và mang nhãn *this phone
+  only*. Nó dùng **lại** đúng `compress()` của đường đi lên máy chủ, nên lời
+  hứa "ảnh rời máy nhưng toạ độ GPS thì không" đúng ở cả hai nhánh.
+- `needAuth()` bỏ hẳn `prompt()`, mở form thật ở bước tài khoản.
+
+**Sổ tay chơi theo luật khác feed công khai.** Ngưỡng *"ba đánh giá mới hiện
+sao"* tồn tại để một người tự khen mình không đẩy được con số 5,0 lên trước
+mặt người lạ. Trong sổ tay riêng không có người lạ nào — nên thẻ quán hiện
+thẳng **ghi chép của chính người đang đọc**, kèm ngày và số tiền đã trả. Giấu
+nó sau một ngưỡng thống kê là biến việc ghi lại thành công cốc.
+
+Ghi chép trong sổ tay **không bao giờ** chạm vào phán quyết giá. Chúng hiện
+song song với dải giá tham chiếu, không thay nó.
+
+| | Feed máy chủ | Sổ tay trên máy |
+|---|---|---|
+| Ai đọc được | mọi người | chỉ máy này |
+| Nút trên bài | Report | Delete |
+| Sao trung bình | từ 3 đánh giá trở lên | không có, hiện thẳng ghi chép |
+| Ảnh | Storage của Supabase | Blob trong IndexedDB, trần 60 bài |
+
 ## Xưởng icon — sinh lúc chạy
 
 Tab **You → Illustrated icons**: dán khoá API, bấm *Draw all icons*, 27 icon
@@ -383,7 +461,8 @@ co theo `cos(vĩ độ)` — bỏ bước này thì ở vĩ độ 15° bản đ�
 - **Eat** — 77 món: món đó là gì, thành phần nhạy cảm, giá phổ biến, nút phát âm gọi món
 - **Nearby** — danh sách Đúng Giá theo vùng
 - **Journal** — mọi lượt quét tự ghi lại, xuất ra được
-- **You** — đổi vùng, định vị, trạng thái cache, giải thích cách phán quyết
+- **Community** — đăng bài kèm ảnh và giá; chưa nối máy chủ thì bài nằm lại trên máy
+- **You** — đổi vùng, tên hiển thị, xem lại phần giới thiệu, định vị, trạng thái cache
 - Nhập tay ở mọi màn hình — không bao giờ để người dùng bí
 
 ## Chưa làm
