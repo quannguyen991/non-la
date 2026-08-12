@@ -65,7 +65,7 @@
 
 <script type="module">
 import { chrome, paintZoneName, load, zoneId, I, esc, money, photo, placePhoto,
-         dishPhoto } from "./web.js";
+         dishPhoto, signedIn, gate } from "./web.js";
 
 chrome("community.html");
 paintZoneName();
@@ -120,6 +120,15 @@ kbox.onclick = (e) => {
 const kindOf = (p) => (p.question ? "question" : p.paidVnd ? "price" : "tip");
 
 function paint() {
+  /* Feed là bài của NGƯỜI KHÁC. Chưa đăng nhập thì để trống và nói cần
+     đăng nhập — không đổ bài mẫu vào cho đỡ trống, vì một người mới đến
+     sẽ đọc chúng như thể đó là chuyện thật của quán thật. */
+  if (!signedIn()) {
+    document.getElementById("feed").innerHTML = gate("The feed needs an account",
+      "Posts are written by other travellers and locals. Reading them, and adding what you paid, "
+      + "both go through your account.");
+    return;
+  }
   const list = posts.filter((p) => kind === "all" || kindOf(p) === kind);
   document.getElementById("feed").innerHTML = list.length ? list.map((p) => {
     const pl = placeOf(p.placeId), d = dishOf(p.dishId);
@@ -165,7 +174,10 @@ document.getElementById("askNote").textContent =
 
 const byAuthor = {};
 for (const p of posts) byAuthor[p.authorName] = (byAuthor[p.authorName] || 0) + 1;
-document.getElementById("contrib").innerHTML = Object.entries(byAuthor)
+document.getElementById("contrib").innerHTML = !signedIn()
+  ? `<p class="small muted">Who is contributing in this area is part of the community layer —
+     it appears once you are signed in.</p>`
+  : Object.entries(byAuthor)
   .sort((a, b) => b[1] - a[1]).slice(0, 6)
   .map(([name, n]) => `<div class="r"><span class="avatar">${esc(name.slice(0, 1))}</span>
     <span><b style="font-size:14.5px">${esc(name)}</b>

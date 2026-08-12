@@ -15,8 +15,14 @@ export const DEFAULT_ZONE = "hoian-oldtown";
 
 /* Bộ ký hiệu vẽ tay. Không dùng emoji làm icon: emoji đổi hình theo hệ
    điều hành, và trên Windows thì nửa bộ ra hình vuông đen. */
-const S = (d, extra = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-  stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+/* width/height ĐI KÈM ngay trong thẻ, không phó mặc cho CSS.
+   Một <svg> không khai kích thước thì mặc định giãn bằng bề rộng khối cha:
+   đặt icon ghim vào một dòng chữ trong thẻ cơ sở là được một cái ghim cao
+   600px nằm giữa trang. Chỗ nào có luật CSS riêng (.nav, .btn, .pill) thì
+   luật đó vẫn thắng thuộc tính này, nên không mất gì. */
+const S = (d, extra = "") => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none"
+  stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+  aria-hidden="true" ${extra}>${d}</svg>`;
 export const I = {
   compass: S('<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5.5-5.5 2 2-5.5z"/>'),
   scan: S('<path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><path d="M7.5 12h9"/>'),
@@ -95,6 +101,32 @@ export const setZone = (z) => localStorage.setItem(ZONE_KEY, z);
 export function photo(src, alt, cls = "") {
   return `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async"
     class="${cls}" onerror="this.style.display='none';this.parentElement.classList.add('noimg')">`;
+}
+
+/* ── cổng đăng nhập ──────────────────────────────────────────
+   Bản này CHƯA có máy chủ tài khoản (config.js còn rỗng), nên hàm dưới
+   luôn trả false. Nó vẫn tồn tại như một chỗ duy nhất để hỏi "đã đăng
+   nhập chưa": khi nào lớp tài khoản bật lên thì sửa đúng một hàm, không
+   phải đi lùng bảy trang.
+
+   Nguyên tắc: khối nào SỐNG BẰNG DỮ LIỆU CỦA NGƯỜI DÙNG — sổ tay, nơi đã
+   lưu, bài của người khác, bảng xếp hạng — thì lúc chưa đăng nhập phải
+   để TRỐNG và nói thẳng là cần đăng nhập. Đổ dữ liệu mẫu vào đó cho đỡ
+   trống là dạy người ta tin vào một thứ không phải của họ. */
+export const signedIn = () => false;
+
+export function gate(title, why, cta = "Log in to continue") {
+  return `<div class="gatebox">
+    <span class="gicon">${I.lock}</span>
+    <b>${esc(title)}</b>
+    <p>${esc(why)}</p>
+    <div class="grow">
+      <a class="btn pri" href="login.html">${I.shield}${esc(cta)}</a>
+      <a class="btn sec" href="signup.html">${I.userPlus}Create account</a>
+    </div>
+    <span class="small muted">Tài khoản chưa nối máy chủ ở bản này — trang đăng nhập nói rõ
+      điều đó trước khi bạn gõ gì vào.</span>
+  </div>`;
 }
 
 export const verdictPill = (fair) => fair === true

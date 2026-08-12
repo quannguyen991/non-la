@@ -28,19 +28,18 @@
     <div style="display:flex;flex-direction:column;gap:22px">
       <section class="panel pad">
         <div class="sect-head"><span class="spark"></span><h2>Leaderboard</h2>
-          <span class="pill seed" style="margin-left:auto">Sample authors — accounts not connected</span>
+          <span class="pill seed" style="margin-left:auto" data-seedflag>Sample authors — accounts not connected</span>
         </div>
         <div class="podium" id="podium"></div>
-        <p class="small muted" style="margin-top:16px">Ranking counts sample posts shipped with
-          the app. A real leaderboard needs the community server; until then this shows the shape
-          of the page, not standings of real people.</p>
+        <p class="small muted" style="margin-top:16px">Ranking counts recorded contributions —
+          menu checks, answers, verified spots — never money and never how loud someone is.</p>
       </section>
 
       <section class="panel pad">
         <div class="sect-head"><span class="spark"></span><h2>Badges</h2></div>
         <div class="badges" id="badges"></div>
-        <p class="small muted" style="margin-top:16px">Badges unlock from your own recorded
-          activity in this browser — none are granted by an account.</p>
+        <p class="small muted" style="margin-top:16px">Badges unlock from recorded activity on
+          your account, so they cannot be bought or handed out.</p>
       </section>
     </div>
 
@@ -64,7 +63,8 @@
 </main>
 
 <script type="module">
-import { chrome, paintZoneName, load, zoneId, I, esc, photo, placePhoto, webArt } from "./web.js";
+import { chrome, paintZoneName, load, zoneId, I, esc, photo, placePhoto, webArt,
+         signedIn, gate } from "./web.js";
 
 chrome("helpers.html");
 paintZoneName();
@@ -83,7 +83,18 @@ for (const p of posts) {
 }
 const rank = Object.values(by).sort((x, y) => y.n - x.n).slice(0, 5);
 const order = [1, 0, 2, 3, 4].filter((i) => rank[i]);      // hạng nhì – nhất – ba, như bục
-document.getElementById("podium").innerHTML = order.map((i) => {
+
+/* Bảng xếp hạng là người thật đóng góp thật. Chưa đăng nhập thì không
+   dựng nó lên bằng tác giả của mấy bài mẫu — làm thế là bịa ra một cộng
+   đồng để trang trông đông vui. */
+if (!signedIn()) {
+  document.querySelector('[data-seedflag]')?.remove();
+  document.getElementById("podium").outerHTML = gate("The leaderboard needs an account",
+    "Contributions are counted per person: menu checks, answers and verified spots. That count "
+    + "only exists once there is an account to attach it to.");
+  document.getElementById("progress").innerHTML = gate("Your progress needs an account",
+    "Badges follow recorded activity, so they travel with the account rather than with this browser.");
+} else document.getElementById("podium").innerHTML = order.map((i) => {
   const h = rank[i];
   return `<article class="helper${i === 0 ? " first" : ""}">
     <span class="rank">${i + 1}</span>
@@ -126,7 +137,7 @@ document.getElementById("steps").innerHTML = [
   <div><b>${t}</b><p>${s}</p></div></div>`).join("");
 
 const done = journal.length, goal = 20;
-document.getElementById("progress").innerHTML = `
+if (signedIn()) document.getElementById("progress").innerHTML = `
   <div style="display:flex;justify-content:space-between;font-size:13px">
     <span class="muted">Menu checks recorded here</span><b class="tnum">${done} / ${goal}</b></div>
   <div class="progress" style="margin-top:8px"><i style="width:${Math.min(100, (done / goal) * 100)}%"></i></div>

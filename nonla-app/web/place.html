@@ -17,7 +17,7 @@
 
 <script type="module">
 import { chrome, paintZoneName, load, I, esc, money, km, distance, photo,
-         placePhoto, dishPhoto, verdictPill } from "./web.js";
+         placePhoto, dishPhoto, verdictPill, signedIn, gate } from "./web.js";
 
 chrome("place.html");
 paintZoneName();
@@ -143,9 +143,12 @@ if (!p) {
     <aside style="display:flex;flex-direction:column;gap:18px">
       <div class="panel pad">
         <h3 style="font-size:19px">Save this spot</h3>
-        <p class="small muted" style="margin:8px 0 14px">Saved spots stay on this device —
-          this build has no account server behind it.</p>
-        <button class="btn pri wide" id="saveBtn">${I.bookmark}Save to my journal</button>
+        ${signedIn() ? `<p class="small muted" style="margin:8px 0 14px">Saved spots sit in your
+            journal and follow your account.</p>
+          <button class="btn pri wide" id="saveBtn">${I.bookmark}Save to my journal</button>`
+          : `<p class="small muted" style="margin:8px 0 14px">Saving a place writes it into your
+            journal, so it needs an account to write into.</p>
+          <a class="btn pri wide" href="login.html">${I.lock}Log in to save</a>`}
       </div>
 
       <div class="panel pad">
@@ -170,6 +173,7 @@ if (!p) {
 
   /* Lưu vào cùng khoá localStorage mà app dùng, để hai bản không có hai
      danh sách "đã lưu" khác nhau trên cùng một máy. */
+  if (signedIn()) {
   const KEY = "nl.saved";
   const saved = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } };
   const btn = document.getElementById("saveBtn");
@@ -186,6 +190,7 @@ if (!p) {
     sync();
   };
   sync();
+  }
 }
 </script>
 </body>

@@ -45,12 +45,27 @@
 </main>
 
 <script type="module">
-import { chrome, paintZoneName, load, I, esc, money, photo, placePhoto, dishPhoto } from "./web.js";
+import { chrome, paintZoneName, load, I, esc, money, photo, placePhoto, dishPhoto,
+         signedIn, gate } from "./web.js";
 
 chrome("journal.html");
 paintZoneName();
 document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
 document.getElementById("newNote").innerHTML = `${I.plus}New note`;
+
+/* Cả trang này là sổ tay của MỘT người. Chưa đăng nhập thì không có
+   "người" nào để mở sổ, nên ba khối để trống và nói thẳng — thay vì bịa
+   ra vài thẻ mẫu cho đỡ trống. */
+if (!signedIn()) {
+  document.getElementById("newNote").remove();
+  document.getElementById("saved").innerHTML = gate("Saved spots need an account",
+    "Your saved places travel with the account, so the list on this laptop is the same one your phone shows.");
+  document.getElementById("scans").innerHTML = gate("Menu checks are yours alone",
+    "Every scan you make is written into your own journal. Nobody else's checks appear here, and yours appear nowhere else.");
+  document.getElementById("notes").innerHTML = gate("Notes need an account",
+    "Opening hours, a price someone quoted, which alley the good bánh mì is down — kept under your account.");
+  document.querySelector("#tabs").remove();
+} else {
 
 /* Ba khoá localStorage này do CHÍNH app ghi. Bản web đọc cùng khoá chứ
    không dựng kho riêng: mở app trên điện thoại rồi mở web trên máy tính
@@ -146,6 +161,7 @@ document.getElementById("newNote").onclick = () => {
   save();
 };
 paintNotes();
+}   /* hết nhánh đã đăng nhập */
 </script>
 </body>
 </html>

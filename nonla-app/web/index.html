@@ -101,7 +101,7 @@
 
 <script type="module">
 import { chrome, paintZoneName, zonePicker, load, zoneId, I, esc, money,
-         placePhoto, dishPhoto, photo, verdictPill } from "./web.js";
+         placePhoto, dishPhoto, photo, verdictPill, signedIn, gate } from "./web.js";
 
 chrome("index.html");
 paintZoneName();
@@ -140,9 +140,16 @@ document.getElementById("topSpots").innerHTML = top.map((p) => `
 
 /* Feed rút gọn: bài mẫu ship kèm app, và mỗi bài PHẢI mang nhãn sample —
    community.json nói rõ chúng không phải bài của người dùng thật. */
-const com = await load("community").catch(() => ({ posts: {} }));
+/* Khối này là bài của người khác — chưa đăng nhập thì để trống và nói
+   cần đăng nhập, thay vì mượn bài mẫu để trang chủ trông có người. */
+const com = signedIn() ? await load("community").catch(() => ({ posts: {} })) : { posts: {} };
+if (!signedIn()) {
+  document.getElementById("homeFeed").innerHTML = gate("Community posts need an account",
+    "What other people paid, and what they warn you about, comes from their accounts — so "
+    + "reading it needs yours.");
+}
 const posts = (com.posts?.[zid] || []).slice(0, 3);
-document.getElementById("homeFeed").innerHTML = posts.length
+if (signedIn()) document.getElementById("homeFeed").innerHTML = posts.length
   ? `<div class="rowlist">${posts.map((p) => `
       <a class="r" href="community.html">
         <span class="avatar">${esc((p.authorName || "?").slice(0, 1))}</span>

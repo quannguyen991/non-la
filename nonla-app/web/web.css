@@ -480,3 +480,26 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:600;letter-spacing:-.015em;line-
 /* Nút "Phone app" ở thanh trên: dưới 1180px thì chỉ còn icon — ba nút chữ
    trong một hàng ngang là thứ đầu tiên đẩy thanh nav xuống dòng. */
 @media (max-width:1180px){ .hide-sm{display:none} }
+
+/* ── icon trong dòng chữ ────────────────────────────────────
+   Mọi icon nay tự khai 18×18 trong thẻ svg. Vài chỗ cần cỡ khác thì
+   khai ở đây, và chỉ ở đây — rải kích thước icon khắp nơi là cách chắc
+   chắn nhất để mỗi trang có một cỡ ghim khác nhau. */
+.crumb svg{width:14px;height:14px;color:var(--muc-nhat);vertical-align:-2px}
+.fact b svg{width:17px;height:17px}
+.dhero .inner p svg{width:15px;height:15px;vertical-align:-2px}
+.value svg{width:26px;height:26px}
+.post .foot svg{width:15px;height:15px;vertical-align:-2px}
+
+/* ── cổng đăng nhập ─────────────────────────────────────────
+   Dùng cho mọi khối sống bằng dữ liệu người dùng. Cùng một hình dạng ở
+   mọi trang: người ta nhận ra "chỗ này cần đăng nhập" mà không phải đọc. */
+.gatebox{display:grid;justify-items:center;text-align:center;gap:10px;
+  padding:34px 26px;border:1px dashed var(--vien);border-radius:var(--r);
+  background:var(--diep)}
+.gatebox .gicon{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+  background:var(--tam);border:1px solid var(--vien);color:var(--dong-chu)}
+.gatebox .gicon svg{width:22px;height:22px}
+.gatebox b{font-family:var(--disp);font-size:18px}
+.gatebox p{font-size:13.5px;color:var(--muc-nhat);max-width:46ch}
+.gatebox .grow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
