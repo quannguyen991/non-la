@@ -115,7 +115,13 @@ const NAV = [
 ];
 
 export function chrome(current) {
-  const here = (f) => (f === current ? ' aria-current="page"' : "");
+  /* Bản đồ và trang cơ sở KHÔNG có mục riêng trên nav — chúng là con của
+     Explore. Không quy về đây thì đứng ở hai trang đó cả năm mục đều trơ
+     icon và không mục nào sáng, tức là thanh nav không trả lời được câu
+     "tôi đang ở đâu". */
+  const CHILD = { "map.html": "index.html", "place.html": "index.html" };
+  const at = CHILD[current] || current;
+  const here = (f) => (f === at ? ' aria-current="page"' : "");
   document.body.insertAdjacentHTML("afterbegin", `
     <header class="top">
       <div class="wrap">
