@@ -491,13 +491,17 @@ co theo `cos(vĩ độ)` — bỏ bước này thì ở vĩ độ 15° bản đ�
   trước khi đưa cho khách du lịch dùng.
 - Nhận diện mệnh giá dựa vào OCR con số in trên tờ tiền, không phải model thị giác
   huấn luyện riêng. Hoạt động tốt khi tờ tiền phẳng và số hướng lên; kém khi bị gấp.
-- **47 món thêm ở đợt mở rộng chưa có ảnh.** Khung của chúng hiện nền giấy dó có
-  dấu nón lá — đúng trạng thái đã thiết kế, không phải lỗi. Sinh ảnh bằng
-  `_gen_assets.mjs` hoặc Xưởng icon trong tab You; cả hai đều cần khoá API và
-  tính tiền theo từng ảnh, nên không sinh sẵn ở đây.
-- **Ba vùng mới chưa có tranh vẽ tay**, nên tab Nearby và Must-Try Food Map ở đó
-  dùng bản dựng vector. Food Map tự khai điều đó bằng một dòng ở mép dưới thay
-  vì để một khung trống.
+- **Cả sáu vùng đã có tranh vẽ tay**, nhưng KHÔNG cùng một mức tin cậy. Bốn vùng
+  đầu neo vào vật mốc chấm được (hai đầu hồ Hoàn Kiếm, Chợ Bến Thành ↔ Nhà thờ
+  Đức Bà, Đại Nội ↔ cầu Trường Tiền, hai cây cầu sông Hàn). Riêng **Mỹ Khê neo
+  bằng ước lượng**: cả vùng là một dải bờ gần thẳng, không vật mốc nào chấm chắc
+  được, và `data/maps.json` chỉ có đường bờ của một phần ba phía nam — hai mốc
+  đặt trên cùng một kinh tuyến dọc mép nước rồi căng cho phủ trọn dải ghim
+  3,15km, sai số ngang ước chừng ±100m. Chi tiết nằm trong `art._note` của từng
+  vùng. Kiểm lại mốc sau khi sửa tranh: `python tools/check-anchors.py`.
+- **Tranh Huế không bắc-ở-trên**: người vẽ quay cảnh 56° cho Kinh thành vuông góc
+  khung. Phép neo hai mốc mang sẵn góc quay nên ghim vẫn đúng chỗ — đừng "sửa"
+  cho thẳng bắc.
 - Giá và cơ sở của ba vùng mới là **hạt giống viết tay**, cùng hạng với ba vùng
   cũ — không phải khảo sát thực địa, và tên cơ sở là tên mô tả chứ không phải
   tên quán có thật.
