@@ -8,14 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="web.css">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 <main class="wrap" id="main">
   <div style="display:flex;align-items:flex-end;gap:22px;padding:34px 0 20px;flex-wrap:wrap">
     <div>
       <h1 style="font-size:46px">Scan Menu</h1>
-      <p class="muted" style="margin-top:10px;max-width:56ch">Drop a menu photo in, then check
-        any dish against what this neighbourhood actually pays.</p>
+      <p class="muted" style="margin-top:10px;max-width:56ch">Drop a menu photo in. The reading
+        happens inside your browser, and every line found is compared with what this
+        neighbourhood actually pays.</p>
     </div>
     <div class="panel pad" style="margin-left:auto;max-width:420px">
       <div style="display:flex;gap:12px;align-items:flex-start">
@@ -49,14 +51,15 @@
       <input type="file" id="file" accept="image/*" hidden>
 
       <div class="warn" style="margin-top:16px" id="ocrNote"></div>
+      <div id="ocrOut" style="margin-top:16px"></div>
     </div>
 
     <div>
       <div class="panel pad">
         <div class="sect-head"><h2>Check a dish by hand</h2></div>
-        <p class="small muted" style="margin-bottom:12px">Reading the numbers off a menu photo
-          needs the phone app and an API key. The comparison below needs neither — pick the dish
-          and type the price on the menu.</p>
+        <p class="small muted" style="margin-bottom:12px">When the photo is blurred, handwritten
+          or in a script the recogniser trips over, do it the short way: pick the dish and type
+          the price printed on the menu.</p>
 
         <div style="display:grid;grid-template-columns:1fr 160px;gap:12px">
           <label class="field" style="margin:0">
@@ -81,6 +84,10 @@
 
 <script type="module">
 import { chrome, paintZoneName, load, zoneId, I, esc, money, photo, dishPhoto } from "./web.js";
+/* Dùng ĐÚNG bộ khớp món và luật phán quyết của app (../match.js). Viết
+   lại cho web là mở đường cho hai bản nói hai kết quả khác nhau về cùng
+   một dòng thực đơn. */
+import { parseMenu, matchDish, verdict } from "../match.js";
 
 chrome("scan.html");
 paintZoneName();
@@ -88,10 +95,9 @@ for (const [id, ico] of [["shieldIco", "shield"], ["upIco", "upload"], ["i1", "u
   ["i2", "clipboard"], ["i3", "camera"], ["i4", "bowl"]]) {
   document.getElementById(id).innerHTML = I[ico];
 }
-document.getElementById("ocrNote").innerHTML = `${I.alert}<span><b>This page does not read the
-  menu for you.</b> OCR and dish matching run in the phone app, where the API key stays in
-  memory on the device. Here the photo is only shown back to you — nothing is uploaded
-  anywhere.</span>`;
+document.getElementById("ocrNote").innerHTML = `${I.shield}<span><b>The photo never leaves this
+  computer.</b> Reading the menu runs inside your browser — no upload, no server, no API key.
+  The first scan downloads the recogniser (~5MB) and takes longer than the ones after it.</span>`;
 
 const zid = zoneId();
 const [prices, dishes] = await Promise.all([load("prices"), load("dishes")]);
@@ -100,11 +106,83 @@ const dishOf = (k) => dishes.dishes.find((d) => d.id === k);
 
 /* ── ảnh thực đơn: chỉ hiện lại, không gửi đi đâu ────────────── */
 const drop = document.getElementById("drop");
-const show = (file) => {
+const out = document.getElementById("ocrOut");
+let worker = null;
+
+const show = async (file) => {
   if (!file || !file.type.startsWith("image/")) return;
   const url = URL.createObjectURL(file);
   drop.innerHTML = `<img class="shot" src="${url}" alt="The menu photo you picked">`;
+  await readMenu(url);
 };
+
+/* Một worker cho cả phiên: mỗi lần dựng lại là một lần tải model tiếng
+   Việt ~5MB, và người ta thường quét vài tấm liền nhau. */
+async function readMenu(url) {
+  if (typeof Tesseract === "undefined") {
+    out.innerHTML = `<div class="warn">${I.alert}<span>The recogniser did not load — check the
+      network and reload. You can still use the by-hand check on the right.</span></div>`;
+    return;
+  }
+  out.innerHTML = `<div class="panel pad"><b style="font-family:var(--disp)">Reading the menu…</b>
+    <div class="progress" style="margin-top:10px"><i id="ocrBar" style="width:6%"></i></div>
+    <p class="small muted" style="margin-top:8px" id="ocrStep">Starting the recogniser</p></div>`;
+  const bar = document.getElementById("ocrBar"), step = document.getElementById("ocrStep");
+  try {
+    if (!worker) {
+      worker = await Tesseract.createWorker(["vie", "eng"], 1, {
+        logger: (m) => {
+          if (bar && m.progress != null) bar.style.width = `${Math.round(m.progress * 100)}%`;
+          if (step && m.status) step.textContent = m.status;
+        },
+      });
+    }
+    const { data } = await worker.recognize(url);
+    render(parseMenu(data.text || ""));
+  } catch (e) {
+    out.innerHTML = `<div class="warn">${I.alert}<span>Could not read that image
+      (${esc(e.message || "unknown error")}). A flat, well-lit photo of the printed menu works
+      best.</span></div>`;
+  }
+}
+
+/* Mỗi dòng đọc được: khớp về một món của app, rồi so với dải giá CỦA
+   VÙNG ĐANG CHỌN. Dòng không khớp được vẫn hiện — giấu đi thì người đọc
+   tưởng máy đã đọc hết thực đơn. */
+function render(lines) {
+  if (!lines.length) {
+    out.innerHTML = `<div class="warn">${I.alert}<span>No priced line came out of that photo.
+      Try a straighter, closer shot — or type the price by hand on the right.</span></div>`;
+    return;
+  }
+  const rows = lines.map((l) => {
+    const m = matchDish(l.name, dishes.dishes);
+    const it = m ? zone.items[m.dish.id] : null;
+    const v = verdict(l.price, it);
+    const pill = v.level === "ok" ? `<span class="pill ok soft">${I.shield}${esc(v.label)}</span>`
+      : v.level === "warn" ? `<span class="pill unknown">${I.clock}${esc(v.label)}</span>`
+      : v.level === "high" ? `<span class="pill bad">${I.alert}${esc(v.label)}</span>`
+      : `<span class="pill unknown">${I.clock}Not priced in this area</span>`;
+    return `<div class="spotrow" style="grid-template-columns:56px 1fr auto">
+      <span class="ph" style="width:56px;height:56px;border-radius:12px">
+        ${m ? photo(dishPhoto(m.dish.id), m.dish.vi) : ""}</span>
+      <span>
+        <h4>${esc(m ? m.dish.vi : l.name)}</h4>
+        <span class="meta">${m ? `read as “${esc(l.name)}”` : "no dish matched this line"}${
+          it ? ` · local ${money(it.p25)}–${money(it.p75)}` : ""}</span>
+        <span class="r2">${pill}</span>
+      </span>
+      <span class="amt tnum" style="font-size:16px">${money(l.price)}</span>
+    </div>`;
+  }).join("");
+  out.innerHTML = `<div class="panel pad">
+    <div class="sect-head"><h2>${lines.length} priced line${lines.length > 1 ? "s" : ""} found</h2>
+      <span class="more" style="cursor:default">${esc(zone.en || zone.name)}</span></div>
+    ${rows}
+    <p class="small muted" style="margin-top:12px">Matching is fuzzy and OCR misreads happen —
+      check the line it read before trusting the verdict. Ranges are seed data, not a survey.</p>
+  </div>`;
+}
 document.getElementById("file").addEventListener("change", (e) => show(e.target.files[0]));
 document.getElementById("pickBtn").onclick = () => document.getElementById("file").click();
 document.getElementById("pasteBtn").onclick = () => drop.focus();
@@ -129,7 +207,7 @@ sel.innerHTML = ids.map((id) => `<option value="${esc(id)}"${id === zone.signatu
   ${esc(dishOf(id)?.vi || id)}${dishOf(id)?.en ? ` — ${esc(dishOf(id).en)}` : ""}</option>`).join("");
 
 const amt = document.getElementById("amt");
-const out = document.getElementById("verdict");
+const hand = document.getElementById("verdict");
 
 function judge() {
   const id = sel.value, it = zone.items[id], d = dishOf(id);
@@ -140,7 +218,7 @@ function judge() {
     : level === "bad" ? `<span class="pill bad">${I.alert}Above the local range</span>`
     : `<span class="pill unknown">${I.clock}Type the menu price</span>`;
   const pct = v ? Math.max(2, Math.min(98, ((v - it.p25) / Math.max(1, it.p95 - it.p25)) * 100)) : null;
-  out.innerHTML = `
+  hand.innerHTML = `
     <div style="display:flex;align-items:center;gap:14px">
       <span class="ph" style="width:74px;height:74px;border-radius:14px;overflow:hidden;
         border:1px solid var(--vien-in);background:var(--kem)">${photo(dishPhoto(id), d?.vi || id)}</span>
