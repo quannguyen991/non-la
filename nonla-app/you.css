@@ -1,0 +1,199 @@
+/* ═══════════════════════════════════════════════════════════════
+   you.css — tab You
+
+   TÁCH KHỎI app.css cùng lý do với welcome.css: màn này là một trang
+   chân dung, không dùng chung một khối vốn từ nào với thẻ món hay
+   bản đồ. Nhốt chung vào 1300 dòng của bốn tab kia thì mỗi lần sửa
+   một vòng vàng ở đây lại phải đọc qua toàn bộ hệ thẻ giá.
+
+   MỘT TRANG GIẤY, KHÔNG PHẢI MỘT DANH SÁCH CÀI ĐẶT
+   Bản trước là bảy khối xếp dọc: một tiêu đề, một dòng, một thẻ tài
+   khoản, một <select>, một lưới 74 ô icon. Nó đọc ra là trang Settings
+   của một app bất kỳ — không có chỗ nào nói "đây là chuyến đi của bạn".
+   Bản này theo bộ mockup, và mượn đúng vốn từ của màn mở đầu:
+
+     dòng thương hiệu → huy chương tròn viền vàng → tên → nơi đang ở
+     → ba ô số liệu → huy hiệu → các hàng cài đặt gộp thành phiến
+
+   SỐ TRÊN MÀN NÀY LÀ SỐ THẬT
+   Ba ô số liệu và bốn huy hiệu đều đọc từ nhật ký quét và kho bài
+   trên máy. Không có ô nào là số trang trí: một app nói về giá tiền
+   mà bịa ra "24 địa điểm đã lưu" thì mất luôn quyền nói câu nào khác.
+   Chưa quét lần nào thì số là 0 và huy hiệu khoá lại kèm ngưỡng thật.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Hoa văn tròn chìm ở góc trên phải, cắt mất một phần ngoài mép — cùng
+   dấu chìm với màn mở đầu, nên hai màn đọc ra là một bộ.
+
+   KHÔNG cho khối này thò ra ngoài mép phải. `.view` khai overflow-x:hidden
+   nên người dùng không kéo ngang được, nhưng một khối tràn vẫn làm trang tự
+   khai rộng thêm gần 90px, và một cú focus() vào ô nhập tên ở cuối màn đủ để
+   trình duyệt đẩy ngang cả trang đi tìm phần tử — giao diện lệch sang trái
+   mà không ai chạm vào gì.
+
+   Nên khung thì nằm gọn trong mép (right:0), còn ẢNH NỀN mới là thứ lớn hơn
+   khung và bị chính khung cắt mất phần bên phải. Mắt vẫn đọc ra một vòng hoa
+   văn chạy khuất ra ngoài màn hình, mà bề rộng trang không nhúc nhích. Khung
+   phải cao đủ chứa trọn đường kính vòng, nếu không mép dưới bị cắt ngang
+   thành một vệt thẳng giữa trang. */
+.you-mandala{
+  position:absolute;z-index:0;pointer-events:none;
+  top:-9vw;right:0;
+  width:min(48vw,236px);height:min(72vw,344px);
+  background-image:url("assets/motifs/hoa-van-tron.webp");
+  background-repeat:no-repeat;background-position:left top;
+  background-size:min(72vw,344px) min(72vw,344px);
+  opacity:.11;
+}
+
+/* ── dòng thương hiệu ──────────────────────────────────────── */
+.you-brand{position:relative;z-index:1;display:flex;align-items:center;gap:9px;min-height:34px}
+.you-brand img{width:24px;height:24px;object-fit:contain;flex:0 0 auto}
+.you-brand b{font-weight:700;font-size:11px;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--then);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── chân dung ─────────────────────────────────────────────── */
+.you-hero{position:relative;z-index:1;display:grid;justify-items:center;text-align:center;
+  padding:14px 0 2px}
+
+/* Vòng vàng kép quanh huy chương dựng bằng box-shadow chứ không phải
+   viền lồng nhau: box-shadow không chiếm chỗ nên đổi độ dày vòng ngoài
+   không đẩy lệch tên bên dưới. */
+.you-medal{
+  position:relative;width:clamp(104px,30vw,124px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;
+  background:
+    radial-gradient(circle at 32% 26%,rgba(217,162,39,.20),transparent 58%),
+    var(--giay);
+  border:2px solid var(--vien-dam);
+  box-shadow:0 0 0 1.5px #fff,0 0 0 5px rgba(201,162,39,.26),
+             0 12px 28px -16px rgba(14,43,36,.65);
+}
+.you-medal img{width:64%;height:64%;object-fit:contain;opacity:.92}
+/* Không có ảnh đại diện thì chữ cái đầu của tên là dấu riêng — một
+   khung ảnh vỡ hay một hình người xám là hai cách tệ hơn. */
+.you-medal .ini{font-family:var(--disp);font-size:clamp(38px,11vw,46px);font-weight:600;
+  color:var(--then);line-height:1}
+
+/* Nút sửa tên nằm đè mép huy chương, đúng chỗ mockup đặt. Viền trắng
+   dày để nó tách khỏi vòng vàng chứ không dính thành một khối.
+   44px chứ không 40: đây là ngưỡng vùng chạm của cả app (xem audit.js),
+   và một nút tròn nhỏ nằm đè lên mép một hình tròn khác là đúng loại nút
+   dễ bấm trượt nhất. */
+.you-edit{position:absolute;right:-4px;bottom:0;width:44px;height:44px;border-radius:50%;
+  background:var(--ngoc-sau);border:2.5px solid #FDFAF1;color:var(--dong);
+  display:grid;place-items:center;
+  box-shadow:0 4px 12px -4px rgba(14,43,36,.55)}
+.you-edit svg{width:17px;height:17px}
+.you-edit:active{transform:scale(.94)}
+.you-edit:focus-visible{outline:2px solid var(--dong);outline-offset:3px}
+
+.you-name{font-family:var(--disp);font-size:clamp(25px,7.2vw,31px);font-weight:600;
+  letter-spacing:-.012em;color:var(--then);margin-top:13px;line-height:1.15}
+.you-where{display:inline-flex;align-items:center;gap:5px;margin-top:5px;
+  font-size:12.5px;color:var(--muc-nhat);font-weight:400}
+.you-where svg{width:14px;height:14px;flex:0 0 auto;color:var(--dong-chu)}
+.you-lede{margin-top:11px;max-width:34ch;font-size:13px;line-height:1.62;
+  color:var(--muc-nhat);font-weight:300}
+
+/* ── ba ô số liệu ──────────────────────────────────────────── */
+.you-stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);
+  gap:9px;margin-top:20px}
+.you-stat{background:var(--giay);border:1px solid var(--vien-in);border-radius:18px;
+  padding:14px 8px 12px;display:grid;justify-items:center;gap:7px;text-align:center;min-width:0}
+.you-stat .ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
+.you-stat .ic svg{width:18px;height:18px}
+.you-stat .ic[data-t="a"]{background:var(--ngoc-sau);color:#F1E7CB}
+.you-stat .ic[data-t="b"]{background:var(--vang-la);color:#33280A}
+.you-stat .ic[data-t="c"]{background:var(--then);color:var(--dong)}
+.you-stat b{font-family:var(--disp);font-size:clamp(23px,6.6vw,28px);font-weight:600;
+  color:var(--then);line-height:1;font-variant-numeric:tabular-nums}
+.you-stat small{font-size:9.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muc-nhat);line-height:1.35}
+
+/* Một dòng rút ra từ chính nhật ký — chỗ duy nhất trên màn này nói
+   được điều gì đó riêng của người dùng mà không cần máy chủ nào. */
+.you-note{display:flex;align-items:flex-start;gap:9px;margin-top:11px;
+  font-size:12.5px;line-height:1.55;color:var(--muc-nhat);font-weight:300}
+.you-note svg{width:16px;height:16px;flex:0 0 auto;color:var(--dong);margin-top:1px}
+.you-note b{font-weight:600;color:var(--muc)}
+
+/* ── huy hiệu ──────────────────────────────────────────────── */
+.you-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+.you-badge{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;
+  background:var(--giay);border:1px solid var(--line);border-radius:18px;padding:13px 14px;min-width:0}
+.you-badge[data-on="1"]{border-color:var(--vien);
+  background:linear-gradient(160deg,#FDFAF1,var(--giay))}
+
+/* Lục giác dựng bằng hai lớp clip-path lồng nhau: clip-path cắt mất
+   border, nên lớp ngoài LÀ đường viền vàng và lớp trong lùi vào 2px. */
+.you-hex{width:44px;height:50px;flex:0 0 auto;display:grid;place-items:center;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  background:var(--vien-dam)}
+.you-hex i{width:calc(100% - 4px);height:calc(100% - 4.6px);display:grid;place-items:center;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  background:var(--then);color:var(--dong)}
+.you-hex svg{width:19px;height:19px}
+.you-badge[data-on="0"] .you-hex{background:var(--line)}
+.you-badge[data-on="0"] .you-hex i{background:var(--kem);color:#A99F88}
+
+.you-badge .bn{display:block;font-family:var(--disp);font-size:14.5px;font-weight:600;
+  line-height:1.25;color:var(--then)}
+.you-badge[data-on="0"] .bn{color:var(--muc-nhat)}
+.you-badge .bs{display:block;font-size:10.5px;font-weight:300;color:var(--muc-nhat);margin-top:3px;
+  font-variant-numeric:tabular-nums}
+
+/* Thanh tiến độ của huy hiệu chưa mở: nói còn bao xa, không chỉ nói
+   "chưa có". Ẩn hẳn khi đã mở — một thanh đầy 100% là mực thừa. */
+.you-badge .bp{display:block;height:3px;border-radius:3px;background:var(--line);margin-top:7px;overflow:hidden}
+.you-badge .bp i{display:block;height:100%;background:var(--dong);border-radius:3px}
+.you-badge[data-on="1"] .bp{display:none}
+
+/* ── phiến cài đặt ─────────────────────────────────────────── */
+.you-list{background:var(--giay);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;margin-top:10px}
+.you-row{position:relative;display:grid;grid-template-columns:24px 1fr auto;gap:13px;
+  align-items:center;width:100%;text-align:left;min-height:60px;padding:13px 15px;
+  border-top:1px solid var(--line);background:none}
+.you-row:first-child{border-top:0}
+.you-row>svg{width:21px;height:21px;color:var(--then);justify-self:center}
+.you-row .lb{display:block;font-size:14px;font-weight:500;line-height:1.3;color:var(--muc)}
+.you-row .sub{display:block;font-size:10.5px;font-weight:300;color:var(--muc-nhat);margin-top:3px}
+.you-row .val{display:inline-flex;align-items:center;gap:7px;justify-self:end;
+  font-size:12.5px;color:var(--muc-nhat);text-align:right;min-width:0}
+.you-row .val span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:38vw}
+.you-row .val svg{width:15px;height:15px;flex:0 0 auto;color:var(--dong-chu);opacity:.85}
+.you-row:active{background:rgba(201,162,39,.07)}
+.you-row:focus-visible,.you-row:focus-within{outline:2px solid var(--ngoc);outline-offset:-2px}
+
+/* Chọn vùng: <select> THẬT phủ kín hàng và trong suốt. Vẽ lại một trình
+   chọn bằng div thì mất bánh xe chọn của hệ điều hành, mất bàn phím và
+   mất cả trình đọc màn hình — đổi lấy một mũi tên đẹp hơn. */
+.you-row select{position:absolute;inset:0;width:100%;height:100%;opacity:0;
+  appearance:none;-webkit-appearance:none;border:0;background:none;font-size:16px}
+
+/* Xưởng icon và cách đọc phán quyết gấp lại sau một hàng. Chúng dài hơn
+   phần còn lại của cả màn cộng lại; mở sẵn thì mọi thứ bên dưới rơi khỏi
+   tầm cuộn. */
+.you-fold{border-top:1px solid var(--line)}
+.you-fold:first-child{border-top:0}
+.you-fold>summary{list-style:none;cursor:pointer}
+.you-fold>summary::-webkit-details-marker{display:none}
+.you-fold>summary .you-row{border-top:0}
+.you-fold[open]>summary .val svg{transform:rotate(90deg)}
+.you-fold .fold-in{padding:0 15px 15px}
+.you-fold .fold-in>.card:first-child,.you-fold .fold-in>.ic-sect:first-child{margin-top:0}
+.you-fold .fold-in .card{background:#FDFAF1}
+
+@media (prefers-reduced-motion:no-preference){
+  .you-fold>summary .val svg{transition:transform .2s cubic-bezier(.22,.61,.36,1)}
+}
+
+/* Máy hẹp: ba ô số liệu vẫn phải là BA ô — xuống một cột thì chúng
+   chiếm hết màn và phần huy hiệu rơi khỏi tầm nhìn đầu tiên. Thu chữ
+   thay vì đổi lưới. */
+@media (max-width:340px){
+  .you-stat{padding:12px 5px 10px}
+  .you-stat small{font-size:8.5px;letter-spacing:.06em}
+  .you-badges{grid-template-columns:1fr}
+}

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Community — Nón Lá</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+
+  <section class="panel" style="margin:26px 0 22px;overflow:hidden;display:grid;
+    grid-template-columns:1.05fr 1fr;align-items:center">
+    <div style="padding:38px 40px">
+      <span class="kicker">Together for fairer travel</span>
+      <h1 style="font-size:42px;margin-top:10px">Community-powered<br>fair travel</h1>
+      <p class="muted" style="margin-top:12px;max-width:46ch">Share what you paid, ask before you
+        order, and keep the local ranges honest for whoever eats here tomorrow.</p>
+      <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
+        <a class="btn pri" href="scan.html" id="ctaShare"></a>
+        <a class="btn sec" href="#guide" id="ctaGuide"></a>
+      </div>
+    </div>
+    <figure style="height:100%"><img src="../assets/web/banner-community.jpg" alt=""
+      style="width:100%;height:100%;object-fit:cover;min-height:280px"></figure>
+  </section>
+
+  <section class="cards3" id="stats"></section>
+
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:start;
+    padding-bottom:40px">
+    <div>
+      <div class="sect-head">
+        <span class="spark"></span><h2>Community feed</h2>
+        <span class="pill seed" style="margin-left:auto" id="seedFlag"></span>
+      </div>
+      <div class="chiprow" style="margin-bottom:16px" id="kinds"></div>
+      <div class="feed" id="feed"></div>
+    </div>
+
+    <aside class="rail">
+      <div class="panel pad">
+        <div class="sect-head"><h2 style="font-size:19px">Most talked-about dishes</h2></div>
+        <div class="tagcloud" id="tags"></div>
+      </div>
+
+      <div class="panel pad" id="guide">
+        <div class="sect-head"><h2 style="font-size:19px">Ask the community</h2></div>
+        <p class="small muted">Not sure whether a quoted price is normal? Post what you were
+          told, with the street and the dish — that is the part other people can act on.</p>
+        <button class="btn pri wide" style="margin-top:14px" id="askBtn"></button>
+        <p class="small muted" style="margin-top:10px" id="askNote"></p>
+      </div>
+
+      <div class="panel pad">
+        <div class="sect-head"><h2 style="font-size:19px">Contributors</h2></div>
+        <div class="rowlist" id="contrib"></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, load, zoneId, I, esc, money, photo, placePhoto,
+         dishPhoto } from "./web.js";
+
+chrome("community.html");
+paintZoneName();
+document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
+document.getElementById("ctaShare").innerHTML = `${I.scan}Share a scan`;
+document.getElementById("ctaGuide").innerHTML = `${I.shield}Community guidelines`;
+document.getElementById("askBtn").innerHTML = `${I.chat}Ask a question`;
+document.getElementById("seedFlag").textContent = "Sample posts — not real user posts";
+
+const zid = zoneId();
+const [com, places, dishes, prices] = await Promise.all([
+  load("community").catch(() => ({ posts: {} })), load("places"), load("dishes"), load("prices")]);
+const posts = com.posts?.[zid] || [];
+const zone = prices.zones[zid];
+const placeOf = (id) => places.places.find((p) => p.id === id);
+const dishOf = (id) => dishes.dishes.find((d) => d.id === id);
+
+/* Ba con số này ĐẾM THẬT từ dữ liệu ship kèm, không phải số trang trí:
+   một trang cộng đồng khoe "128 shared scans" mà máy chủ chưa nối là
+   con số bịa, và nó bịa đúng thứ người đọc dùng để quyết định tin hay không. */
+const mine = places.places.filter((p) => p.zone === zid);
+const scans = mine.reduce((n, p) => n + (p.scans || 0), 0);
+document.getElementById("stats").innerHTML = [
+  [I.scan, scans, "recorded scans", "Seed scan counts behind the badges in this area"],
+  [I.people, posts.length, "sample posts", "Shipped with the app so the feed is readable offline"],
+  [I.shield, mine.filter((p) => p.fair === true).length, "fair-price spots",
+    "Places whose prices sit inside the local range"],
+].map(([ico, n, label, sub]) => `
+  <article class="panel pad" style="display:flex;gap:16px;align-items:center">
+    <span style="width:52px;height:52px;border-radius:50%;background:var(--kem);display:grid;
+      place-items:center;color:var(--ngoc-sau);flex:0 0 auto">${ico}</span>
+    <span><b style="font-family:var(--disp);font-size:28px;display:block">${n}</b>
+      <b style="font-size:14px">${label}</b>
+      <span class="small muted" style="display:block">${sub}</span></span>
+  </article>`).join("");
+
+/* ── bộ lọc theo loại bài ────────────────────────────────────── */
+const KINDS = [["all", "All", "grid"], ["price", "Price reports", "shield"],
+  ["tip", "Tips", "spark"], ["question", "Questions", "chat"]];
+let kind = "all";
+const kbox = document.getElementById("kinds");
+kbox.innerHTML = KINDS.map(([k, l, ic]) =>
+  `<button class="chip" data-k="${k}" aria-pressed="${k === kind}">${I[ic]}${l}</button>`).join("");
+kbox.onclick = (e) => {
+  const b = e.target.closest("[data-k]");
+  if (!b) return;
+  kind = b.dataset.k;
+  for (const el of kbox.children) el.setAttribute("aria-pressed", String(el.dataset.k === kind));
+  paint();
+};
+
+const kindOf = (p) => (p.question ? "question" : p.paidVnd ? "price" : "tip");
+
+function paint() {
+  const list = posts.filter((p) => kind === "all" || kindOf(p) === kind);
+  document.getElementById("feed").innerHTML = list.length ? list.map((p) => {
+    const pl = placeOf(p.placeId), d = dishOf(p.dishId);
+    const img = d ? dishPhoto(d.id) : pl ? placePhoto(pl) : null;
+    const label = kindOf(p) === "question" ? "Question" : kindOf(p) === "price" ? "Price report" : "Tip";
+    return `<article class="post">
+      <div class="ph">${img ? photo(img, d?.vi || pl?.name || "") : ""}
+        <span class="tagpos pill tag">${label}</span></div>
+      <div class="body">
+        <div class="byline">
+          <span class="avatar">${esc((p.authorName || "?").slice(0, 1))}</span>
+          <span><b style="color:var(--muc)">${esc(p.authorName || "Someone")}</b>
+            ${p.authorCountry ? ` · ${esc(p.authorCountry)}` : ""} · ${p.hoursAgo}h ago</span>
+          <span class="pill seed" style="margin-left:auto">sample</span>
+        </div>
+        <h3>${esc(pl?.name || d?.vi || "A note from the area")}</h3>
+        <p>${esc(p.body)}</p>
+        <div class="foot">
+          ${p.paidVnd ? `<span>${I.shield}Paid ${money(p.paidVnd)}</span>` : ""}
+          ${p.stars ? `<span>${I.star}${p.stars}.0</span>` : ""}
+          ${pl ? `<a href="place.html?id=${encodeURIComponent(pl.id)}">${I.pin}${esc(pl.street)}</a>` : ""}
+        </div>
+      </div>
+    </article>`;
+  }).join("") : `<div class="empty"><b>Nothing of that kind here yet</b>
+    <p>Sample posts only cover a few kinds. Real posts need the community server, which this
+    build does not have configured.</p></div>`;
+}
+paint();
+
+/* Thẻ món nói lên chủ đề đang được nhắc nhiều nhất — đếm từ chính các bài,
+   không phải danh sách viết tay. */
+const count = {};
+for (const p of posts) if (p.dishId) count[p.dishId] = (count[p.dishId] || 0) + 1;
+const tags = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 10);
+document.getElementById("tags").innerHTML = tags.length
+  ? tags.map(([id, n]) => `<span class="pill tag">${esc(dishOf(id)?.vi || id)} ${n}</span>`).join("")
+  : `<span class="small muted">No dish tags in this area yet.</span>`;
+
+document.getElementById("askNote").textContent =
+  "Posting needs the community server. This build ships with config.js empty, so the app keeps "
+  + "anything you write in a private notebook on your own device.";
+
+const byAuthor = {};
+for (const p of posts) byAuthor[p.authorName] = (byAuthor[p.authorName] || 0) + 1;
+document.getElementById("contrib").innerHTML = Object.entries(byAuthor)
+  .sort((a, b) => b[1] - a[1]).slice(0, 6)
+  .map(([name, n]) => `<div class="r"><span class="avatar">${esc(name.slice(0, 1))}</span>
+    <span><b style="font-size:14.5px">${esc(name)}</b>
+      <span class="small muted" style="display:block">sample author</span></span>
+    <span class="amt">${n} post${n > 1 ? "s" : ""}</span></div>`).join("")
+  || `<span class="small muted">No sample authors for this area.</span>`;
+</script>
+</body>
+</html>

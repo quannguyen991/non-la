@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create your account — Nón Lá</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+  <div class="authwrap">
+    <section class="authform">
+      <h1>Create your<br>account</h1>
+      <p class="lede">Join the fair-price community and keep your scans across devices.</p>
+
+      <div class="warn" style="margin-top:22px" id="note"></div>
+
+      <form id="form" style="margin-top:20px" novalidate>
+        <label class="field"><span id="i0"></span>
+          <input id="name" type="text" autocomplete="nickname" placeholder="Display name"
+            aria-label="Display name"></label>
+        <label class="field"><span id="i1"></span>
+          <input id="email" type="email" autocomplete="email" placeholder="Email"
+            aria-label="Email"></label>
+        <label class="field"><span id="i2"></span>
+          <input id="pw" type="password" autocomplete="new-password" placeholder="Password"
+            aria-label="Password">
+          <button class="eye" type="button" id="eye" aria-label="Show password"></button></label>
+        <label class="check"><input type="checkbox" id="agree">
+          <span>I agree to the <a href="#" style="color:var(--dong-chu);font-weight:600">Terms &amp;
+            Privacy Policy</a> — including that prices shown are seed data, not a survey.</span></label>
+        <button class="btn pri wide" style="margin-top:18px" type="submit">Create account</button>
+      </form>
+
+      <div class="or">OR</div>
+      <button class="btn sec wide" id="google">Continue with Google</button>
+
+      <p class="small muted" style="margin-top:22px">Already have an account?
+        <a href="login.html" style="color:var(--dong-chu);font-weight:600">Log in</a></p>
+    </section>
+
+    <figure class="authart"><img src="../assets/web/auth-boats.jpg"
+      alt="Watercolour of boats carrying candle lanterns on the river at night"></figure>
+  </div>
+
+  <section class="panel pad" style="max-width:1180px;margin:0 auto 60px">
+    <div class="sect-head"><h2 style="font-size:19px">What works without an account</h2></div>
+    <div class="cards3" style="margin:0">
+      <article style="display:flex;gap:12px"><span id="k1"></span><span><b>Price checks</b>
+        <span class="small muted" style="display:block">Compare any menu price against the local range.</span></span></article>
+      <article style="display:flex;gap:12px"><span id="k2"></span><span><b>Saved spots &amp; notes</b>
+        <span class="small muted" style="display:block">Stored in this browser, exportable, never uploaded.</span></span></article>
+      <article style="display:flex;gap:12px"><span id="k3"></span><span><b>Maps and sights</b>
+        <span class="small muted" style="display:block">All six areas, offline in the phone app.</span></span></article>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, I } from "./web.js";
+
+chrome("");
+paintZoneName();
+for (const [id, k] of [["i0", "user"], ["i1", "mail"], ["i2", "lock"], ["eye", "eye"],
+  ["k1", "shield"], ["k2", "bookmark"], ["k3", "pin"]]) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = I[k];
+}
+
+/* Cùng lý do với trang đăng nhập: chưa có máy chủ tài khoản thì không
+   được dựng một cái form trông như thật rồi nuốt mật khẩu của người ta. */
+document.getElementById("note").innerHTML = `${I.alert}<span><b>Sign-up is not open on this
+  build.</b> There is no account server behind this form: nothing is sent, and no password is
+  kept. Everything on the site already works without an account.</span>`;
+
+const pw = document.getElementById("pw");
+document.getElementById("eye").onclick = () => {
+  pw.type = pw.type === "password" ? "text" : "password";
+};
+
+const say = (msg) => {
+  let box = document.getElementById("said");
+  if (!box) {
+    box = document.createElement("p");
+    box.id = "said";
+    box.className = "small";
+    box.style.cssText = "margin-top:14px;color:var(--son-dam);font-weight:600";
+    document.getElementById("form").after(box);
+  }
+  box.textContent = msg;
+};
+document.getElementById("form").onsubmit = (e) => {
+  e.preventDefault();
+  pw.value = "";
+  say("No account server is configured, so no account was created and nothing was sent.");
+};
+document.getElementById("google").onclick = () =>
+  say("Single sign-on is not wired up on this build — nothing was sent.");
+</script>
+</body>
+</html>

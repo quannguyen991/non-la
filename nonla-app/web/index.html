@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nón Lá — fair prices in Vietnam</title>
+<meta name="description" content="Live scan insights, local tips and honest prices from people who love Vietnam. Eat well, spend smart, support locals.">
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+
+  <section class="hero">
+    <div>
+      <h1>Ready to explore<br>fair prices in <span id="heroZone">Hội An</span>?</h1>
+      <p class="lede">Live scan insights, local tips and honest prices from people who love
+        this place. Eat well, spend smart, and support the people who cook.</p>
+      <div class="hero-tools">
+        <span class="select" id="langPick"></span>
+        <span class="small muted" id="statLine"></span>
+      </div>
+      <p class="kicker" style="margin-top:24px">What are you after?</p>
+      <div class="chiprow" style="margin-top:10px">
+        <a class="chip" href="map.html?f=street" id="c1"></a>
+        <a class="chip" href="map.html?f=cafe" id="c2"></a>
+        <a class="chip" href="map.html?f=sit" id="c3"></a>
+        <a class="chip" href="map.html?f=fair" id="c4"></a>
+      </div>
+      <p class="kicker" style="margin-top:22px">Which area?</p>
+      <div class="chiprow" style="margin-top:10px" id="zonePick"></div>
+    </div>
+    <figure class="hero-art bleed">
+      <img src="../assets/web/hero-riverside.jpg" alt="Watercolour of the Hội An riverfront at golden hour">
+    </figure>
+  </section>
+
+  <section class="cards3">
+    <article class="panel acard">
+      <div class="art"><img src="../assets/web/card-scan.jpg" alt=""></div>
+      <div>
+        <h3>Scan a menu</h3>
+        <p>Check any menu against what this neighbourhood actually pays.</p>
+        <a class="btn pri" href="scan.html" id="ctaScan">Start scanning</a>
+      </div>
+    </article>
+    <article class="panel acard">
+      <div class="art"><img src="../assets/web/card-map.jpg" alt=""></div>
+      <div>
+        <h3>Explore by map</h3>
+        <p>See tracked places on the hand-painted map and their price ranges.</p>
+        <a class="btn pri" href="map.html">Open map</a>
+      </div>
+    </article>
+    <article class="panel acard">
+      <div class="art"><img src="../assets/web/card-community.jpg" alt=""></div>
+      <div>
+        <h3>Join the community</h3>
+        <p>Share what you paid, ask before you order, keep the ranges honest.</p>
+        <a class="btn pri" href="community.html">Go to community</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="home-grid">
+    <div class="panel pad">
+      <div class="sect-head">
+        <span class="spark" aria-hidden="true"></span>
+        <h2>Top tracked spots</h2>
+        <a class="more" href="map.html">See all</a>
+      </div>
+      <div class="spots3" id="topSpots"></div>
+      <p class="small muted" style="margin-top:14px">Badge status comes from accumulated scans,
+        never assigned by hand — a place loses it automatically when prices drift outside the
+        local range.</p>
+    </div>
+
+    <div class="panel pad">
+      <div class="sect-head">
+        <span class="spark" aria-hidden="true"></span>
+        <h2>From the community</h2>
+        <a class="more" href="community.html">See all</a>
+      </div>
+      <div id="homeFeed"></div>
+    </div>
+  </section>
+
+  <section class="panel pad" style="margin-bottom:34px">
+    <div class="sect-head">
+      <span class="spark" aria-hidden="true"></span>
+      <h2>What a dish costs here</h2>
+      <a class="more" href="scan.html">Check a menu</a>
+    </div>
+    <div class="dishes3" id="dishStrip"></div>
+  </section>
+
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, zonePicker, load, zoneId, I, esc, money,
+         placePhoto, dishPhoto, photo, verdictPill } from "./web.js";
+
+chrome("index.html");
+paintZoneName();
+zonePicker("zonePick");
+document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
+document.getElementById("langPick").innerHTML = `${I.globe}English`;
+for (const [id, ico, label] of [["c1", "bowl", "Street food"], ["c2", "coffee", "Coffee"],
+  ["c3", "bag", "Sit-down"], ["c4", "shield", "Fair price only"]]) {
+  document.getElementById(id).innerHTML = `${I[ico]}${label}`;
+}
+
+const zid = zoneId();
+
+/* Số liệu trên đầu trang phải ĐẾM THẬT từ dữ liệu, không viết tay: một
+   con số trang trí sai lệch là thứ đầu tiên phá niềm tin của cả trang. */
+const [places, prices, maps] = await Promise.all([load("places"), load("prices"), load("maps")]);
+const mine = places.places.filter((p) => p.zone === zid);
+const zone = prices.zones[zid];
+const sights = (maps.zones[zid]?.landmarks || []).filter((l) => l.note).length;
+document.getElementById("heroZone").textContent = (zone.en || zone.name).split(" · ")[0];
+document.getElementById("statLine").innerHTML =
+  `<b>${mine.length}</b> tracked places · <b>${Object.keys(zone.items).length}</b> dishes priced ·
+   <b>${sights}</b> sights · updated ${esc(zone.updated || "")}`;
+
+/* Ba chỗ đứng đầu = nhiều lượt quét nhất, không phải "được chọn". */
+const top = [...mine].sort((a, b) => (b.scans || 0) - (a.scans || 0)).slice(0, 3);
+document.getElementById("topSpots").innerHTML = top.map((p) => `
+  <a class="spot" href="place.html?id=${encodeURIComponent(p.id)}">
+    <span class="ph">${photo(placePhoto(p, true), p.name)}</span>
+    <span>
+      <h4>${esc(p.name)}</h4>
+      <span class="meta">${I.pin}${esc(p.street)} · ${esc(p.tier)}</span>
+      <span class="row2"><span class="scans">${p.scans} scans</span>${verdictPill(p.fair)}</span>
+    </span>
+  </a>`).join("");
+
+/* Feed rút gọn: bài mẫu ship kèm app, và mỗi bài PHẢI mang nhãn sample —
+   community.json nói rõ chúng không phải bài của người dùng thật. */
+const com = await load("community").catch(() => ({ posts: {} }));
+const posts = (com.posts?.[zid] || []).slice(0, 3);
+document.getElementById("homeFeed").innerHTML = posts.length
+  ? `<div class="rowlist">${posts.map((p) => `
+      <a class="r" href="community.html">
+        <span class="avatar">${esc((p.authorName || "?").slice(0, 1))}</span>
+        <span>
+          <b style="font-family:var(--disp);font-size:15px">${esc(p.body).slice(0, 58)}…</b>
+          <span class="small muted" style="display:block">${esc(p.authorName)} ·
+            ${esc(p.authorCountry || "")} · ${p.hoursAgo}h ago</span>
+        </span>
+        <span class="amt">${money(p.paidVnd)}</span>
+      </a>`).join("")}</div>
+    <p class="pill seed" style="margin-top:14px">Sample posts shipped with the app — not real
+      user posts</p>`
+  : `<div class="empty"><b>No posts in this area yet</b>
+      <p>The community layer is not connected to a server on this build, so posts stay on the
+      device that wrote them.</p></div>`;
+
+/* Dải món: lấy món đặc trưng của vùng + hai món có ảnh, kèm khoảng giá thật. */
+const dishes = (await load("dishes")).dishes;
+const ids = [zone.signature, ...Object.keys(zone.items).filter((k) => k !== zone.signature)]
+  .slice(0, 6);
+const pick = ids.map((id) => ({ d: dishes.find((x) => x.id === id), it: zone.items[id] }))
+  .filter((x) => x.d && x.it).slice(0, 3);
+document.getElementById("dishStrip").innerHTML = pick.map(({ d, it }) => `
+  <article class="dish">
+    <span class="ph">${photo(dishPhoto(d.id), d.vi)}</span>
+    <span>
+      <h4>${esc(d.vi)}</h4>
+      <span class="amt">${money(it.p25)} – ${money(it.p75)}</span>
+      <p>${esc(d.en)} · typical ${money(it.p50)} ${esc(d.unit || "")}</p>
+    </span>
+  </article>`).join("");
+</script>
+</body>
+</html>

@@ -12,6 +12,8 @@
 <link rel="stylesheet" href="app.css">
 <link rel="stylesheet" href="foodmap.css">
 <link rel="stylesheet" href="community.css">
+<link rel="stylesheet" href="welcome.css">
+<link rel="stylesheet" href="you.css">
 </head>
 <body>
 
@@ -86,6 +88,16 @@
        trong lúc chưa xong bước này thì không có tab nào để bấm. -->
   <section id="v-welcome" hidden aria-label="Welcome"></section>
 </div>
+
+<!-- Cầu nối sang bản web máy tính. Nằm NGOÀI #app có chủ đích: #app khoá
+     520px và cuộn riêng, còn dải này thuộc về cửa sổ trình duyệt chứ không
+     thuộc về app. CSS chỉ cho nó hiện khi cửa sổ rộng hơn 900px — trên điện
+     thoại, gợi ý "mở bản máy tính" là một dòng vô nghĩa chiếm chỗ. -->
+<a class="deskhint" href="web/index.html">
+  <b>You're on a wide screen.</b>
+  <span>Nón Lá has a desktop layout with the map, the price ranges and the community side by side.</span>
+  <i>Open it</i>
+</a>
 
 <canvas id="shot" hidden></canvas>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>

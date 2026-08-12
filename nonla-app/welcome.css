@@ -1,0 +1,500 @@
+/* ═══════════════════════════════════════════════════════════════
+   welcome.css — màn mở đầu: giới thiệu rồi tài khoản
+
+   TÁCH KHỎI app.css có chủ đích. Màn này chỉ chạy MỘT LẦN trong đời một
+   lần cài app, và nó là khối duy nhất phủ kín cả tabbar. Nhốt chung vào
+   bảng kiểu của bốn tab thường trực thì mỗi lần sửa cái này lại phải đọc
+   qua 1300 dòng không liên quan.
+
+   BỐ CỤC LÀ MỘT TRANG GIẤY, KHÔNG PHẢI HAI TẦNG
+   Bản trước chia màn làm đôi: nửa trên nền sơn mài tối đặt hoạ tiết, nửa
+   dưới một tấm giấy bo góc trượt đè lên. Cách đó an toàn — chữ luôn nằm
+   trên nền sáng — nhưng nó đọc ra là một hộp thoại, không phải một trang.
+   Bản này theo bộ mockup: MỘT nền giấy ngà chạy suốt từ mép trên xuống
+   mép dưới, và mọi thứ khác đặt lên trên nó:
+
+     dòng thương hiệu  → tiêu đề serif → dải mây → đoạn dẫn
+     → TRANH tràn hết bề ngang, mép tan vào giấy
+     → chấm trang → nút chính → dòng bỏ qua
+
+   Chữ vẫn nằm trên giấy như cũ, chỉ khác là bây giờ tranh nằm DƯỚI chữ
+   chứ không phải trên, nên phần chữ luôn ở nửa trên màn hình — chỗ ngón
+   cái không che và mắt nhìn tới trước.
+
+   TRANH TAN MÉP CHỨ KHÔNG BO GÓC
+   Không có một khung ảnh nào trong màn này. Ảnh trong assets/intro/ đã
+   được soften-scene.py cắt mép thành alpha, và mép trên còn được phủ thêm
+   một mask dốc để nó tan hẳn vào chữ phía trên. Một khung bo góc 16px sẽ
+   biến tranh thành "một tấm ảnh minh hoạ trong bài"; không khung thì nó là
+   nền của chính màn hình.
+
+   NHÃN DÁN LÀ HTML, KHÔNG PHẢI PHẦN CỦA TRANH
+   Những tấm thẻ nhỏ nổi trên tranh — "Fair price", "40.000₫ – 60.000₫",
+   ghim bản đồ — dựng bằng thẻ HTML thật. Vẽ chúng vào tranh thì chữ nhoè
+   ở mọi mật độ điểm ảnh khác với lúc sinh, không dịch được, và số tiền in
+   chết vào ảnh sẽ sai ngay khi dữ liệu giá đổi.
+   ═══════════════════════════════════════════════════════════════ */
+
+#v-welcome{
+  position:fixed;inset:0;z-index:80;
+  /* Cùng khung với #app: trên máy rộng, màn mở đầu tràn hết bề ngang
+     trong khi app thu về 520px sẽ lộ ra là hai giao diện khác nhau. */
+  max-width:520px;margin:0 auto;
+  overflow:hidden;
+  /* Giấy ngà ấm hơn --giay một chút, và có một quầng sáng lệch về góc trên
+     phải để trang không phẳng lì như một khối màu tô đặc. */
+  background:
+    radial-gradient(120% 62% at 82% 0%,#FDF9EF 0%,rgba(253,249,239,0) 58%),
+    radial-gradient(90% 50% at 0% 100%,#F6EEDC 0%,rgba(246,238,220,0) 60%),
+    #FAF3E5;
+  color:var(--muc);
+  --wc-pad:22px;
+  --wc-gold:#C9A227;
+  --wc-ink:#3F5149;          /* chữ thân — xám xanh, ấm hơn --muc-nhat */
+}
+#v-welcome[hidden]{display:none}
+
+/* Hoa văn tròn làm dấu chìm góc trên phải, cắt mất một phần ngoài mép
+   màn. Một vòng tròn đầy đủ nằm gọn trong khung sẽ đọc ra là logo thứ hai
+   tranh chỗ với dòng thương hiệu ngay bên dưới nó. */
+#v-welcome::before{
+  content:"";position:absolute;z-index:0;pointer-events:none;
+  top:-13vw;right:-24vw;width:74vw;max-width:380px;aspect-ratio:1;
+  background:no-repeat center/contain url("assets/motifs/hoa-van-tron.webp");
+  /* .12 chứ không .2: nó chạy NGAY SAU tiêu đề, và ở .2 những vòng hoa văn
+     mảnh cắt ngang qua chân chữ serif làm chữ trông như bị nhiễu. */
+  opacity:.12;
+}
+
+.wc-page{
+  position:relative;z-index:1;
+  height:100%;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + 14px) var(--wc-pad)
+          calc(env(safe-area-inset-bottom,0px) + 12px);
+}
+
+/* ── dòng thương hiệu ────────────────────────────────────────
+   Dấu chùa Cầu + tên vùng, cỡ nhỏ và giãn chữ rộng. Nó không phải tiêu đề;
+   việc của nó là nói "vẫn đang trong cùng một app" ở mọi màn, nên nó đứng
+   yên một chỗ trong khi mọi thứ dưới nó thay đổi. */
+.wc-brand{
+  flex:0 0 auto;display:flex;align-items:center;gap:9px;
+  min-height:38px;
+}
+.wc-brand img{width:26px;height:26px;object-fit:contain;flex:0 0 auto}
+.wc-brand b{
+  font-weight:700;font-size:12px;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--then);
+}
+/* Huy hiệu tròn cuối dòng — hoa gió ở màn giới thiệu, chuông ở màn tài
+   khoản. Viền vàng mảnh và nền trắng ngà: cùng ngôn ngữ với các thẻ nổi
+   trên tranh, nên nó đọc ra là một phần của bộ chứ không phải nút lạ. */
+.wc-crest{
+  margin-left:auto;flex:0 0 auto;
+  width:42px;height:42px;border-radius:50%;
+  display:grid;place-items:center;
+  background:#FDFAF1;border:1px solid rgba(201,162,39,.55);
+  box-shadow:0 2px 10px rgba(93,72,20,.10);
+}
+.wc-crest img{width:22px;height:22px;object-fit:contain}
+
+/* ── chữ ─────────────────────────────────────────────────────── */
+
+.wc-copy{flex:0 0 auto;padding-top:10px}
+
+.wc-title{
+  font-family:var(--disp);font-weight:600;
+  font-size:clamp(29px,8.6vw,41px);line-height:1.06;letter-spacing:-.018em;
+  color:var(--then);
+  /* Tiêu đề hai ba dòng là bố cục CHUẨN của bộ mockup, không phải sự cố.
+     Giới hạn bề ngang để nó xuống dòng ở chỗ mình chọn thay vì chỗ mà bề
+     ngang máy tình cờ quyết định. 13ch chứ không 11: ở 11 thì "Travel
+     without guessing" rơi xuống BỐN dòng và đẩy tranh xuống mất một phần
+     tư chiều cao của nó. */
+  max-width:13ch;
+}
+/* Dải mây thay cho một đường kẻ ngang. Đặt sát dưới tiêu đề và lệch trái
+   theo mép chữ — căn giữa thì nó thành một dấu trang trí rời rạc. */
+.wc-may{
+  display:block;width:76px;height:auto;margin:12px 0 13px;
+  opacity:.92;
+}
+.wc-text{
+  font-size:15.5px;line-height:1.5;color:var(--wc-ink);max-width:31ch;
+}
+.wc-note{
+  margin-top:11px;padding-left:11px;border-left:2px solid rgba(201,162,39,.42);
+  font-size:12.5px;line-height:1.48;color:#6B7A70;max-width:33ch;
+}
+
+/* ── tranh ───────────────────────────────────────────────────
+   Tràn hết bề ngang bằng lề âm, và nuốt luôn phần đệm dưới: tranh chạy
+   xuống tận sau hàng chấm và nút, đúng như bộ mockup. Chồng lớp thì tranh
+   nằm DƯỚI cùng — mọi nhãn dán và nút đều đè lên nó. */
+.wc-art{
+  position:relative;flex:1 1 auto;min-height:0;
+  margin:6px calc(var(--wc-pad) * -1) 0;
+}
+.wc-art>img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center 34%;
+  /* Mép trên tan tiếp một lần nữa ở đây. soften-scene.py đã cắt mép ảnh,
+     nhưng object-fit:cover thì cắt mất phần mép đó ở cạnh dài — mask này
+     dựng lại nó, và lần này đo bằng chiều cao khung thật. */
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 15%,#000 82%,rgba(0,0,0,.55) 100%);
+  mask-image:linear-gradient(to bottom,transparent 0,#000 15%,#000 82%,rgba(0,0,0,.55) 100%);
+}
+/* Tranh khổ vuông (màn cộng đồng) bị khung dọc cắt mất hai bên nếu dùng
+   cover. contain giữ nguyên bố cục bốn người — thứ duy nhất màn đó nói. */
+.wc-art.fit>img{object-fit:contain;object-position:center 38%}
+
+/* ── nhãn dán nổi trên tranh ─────────────────────────────────
+   Một loại thẻ duy nhất cho mọi nhãn: nền trắng ngà, viền vàng mảnh, bo
+   16px, bóng đổ rất nhạt. Bộ mockup dùng đúng một dạng thẻ này cho cả giá,
+   cả huy hiệu, cả thống kê — thay hình dạng theo nội dung là cách nhanh
+   nhất làm màn hình trông như ghép từ ba app. */
+.wc-tag{
+  position:absolute;z-index:3;max-width:62%;
+  display:flex;align-items:center;gap:9px;
+  padding:9px 12px;border-radius:15px;
+  background:rgba(253,250,242,.95);
+  border:1px solid rgba(201,162,39,.42);
+  box-shadow:0 6px 20px rgba(58,42,10,.14);
+  backdrop-filter:blur(2px);
+}
+.wc-tag i{
+  flex:0 0 auto;width:32px;height:32px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--then);color:#F6D77A;
+}
+.wc-tag i.gold{background:linear-gradient(160deg,#E0B93F,#B98C16);color:#22140A}
+.wc-tag i.warn{background:#C0421C;color:#FFE9D6}
+.wc-tag svg{width:17px;height:17px;display:block}
+.wc-tag b{
+  display:block;font-size:12px;font-weight:700;color:var(--then);
+  line-height:1.25;white-space:nowrap;
+}
+.wc-tag span{
+  display:block;font-size:10.5px;line-height:1.3;color:#6B7A70;
+  white-space:nowrap;
+}
+/* Hai vị trí của màn giá, đặt bằng CSS chứ KHÔNG bằng style="" trong JS:
+   kiểu nội tuyến thắng mọi media query, nên một tấm nhãn neo bằng inline
+   sẽ đứng nguyên chỗ cũ trên máy thấp — đúng lúc nó cần dịch đi nhất.
+
+   Nhãn dưới neo theo CÔNG THỨC chứ không theo một phần trăm: mép trên của
+   tấm thực đơn là 35% chiều cao khung tranh (27% của khung máy, mà khung
+   máy cao 130% khung tranh), còn chiều cao tấm thực đơn thì tính bằng PX
+   vì cỡ chữ trong đó là px — nó không đổi theo màn hình. Cộng hai thứ đó
+   ra đúng mép dưới thực đơn ở mọi cỡ máy; lấy một con số phần trăm duy
+   nhất thì máy cao nhãn rơi giữa thực đơn, máy thấp nhãn rơi ra ngoài. */
+.wc-tag.tl{left:0;top:8%}
+.wc-tag.br{right:0;top:calc(35% + 152px)}   /* 144px thực đơn + 8px thở */
+
+.wc-tag.mini{padding:7px 10px;border-radius:12px;gap:7px}
+.wc-tag.mini i{width:24px;height:24px}
+.wc-tag.mini svg{width:13px;height:13px}
+
+/* ── màn giá: khung điện thoại và thực đơn ───────────────────
+   Khung máy vẽ bằng CSS chứ không phải một tấm ảnh khung máy: ảnh khung
+   thì bo góc, tỉ lệ và độ dày viền in chết vào file, và tới màn hình nào
+   khác cỡ là lệch ngay.
+
+   VÌ SAO MÁY CHÌA XUỐNG DƯỚI MÉP
+   Khung tranh chỉ cao chừng 380px. Một cái máy NGUYÊN CON trong ngần ấy
+   chiều cao thì bề ngang chỉ còn 180px, và ở đó dòng "Cơm gà Hội An
+   40.000₫" gãy làm ba dòng — thực đơn không còn đọc ra là thực đơn. Nên
+   máy cao hơn khung 30% và phần chân chui xuống dưới dải chân màn: bề
+   ngang lên 235px, chữ nằm gọn một dòng, và một cái máy bị mép dưới cắt
+   ngang là hình quen thuộc chứ không phải một lỗi tràn. */
+.wc-phone{
+  position:absolute;z-index:1;left:50%;translate:-50% 0;top:0;
+  height:130%;aspect-ratio:1000/1900;
+  border-radius:34px;padding:5px;
+  background:linear-gradient(150deg,#E7C863,#A67C12 42%,#E7C863 78%,#8E6A0E);
+  box-shadow:0 18px 44px rgba(38,26,6,.32);
+}
+.wc-screen{
+  position:relative;width:100%;height:100%;overflow:hidden;
+  border-radius:29px;background:var(--then-sau);
+}
+.wc-screen>img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Thực đơn trong ống kính. Nghiêng một góc rất nhỏ và có bóng đổ: một tấm
+   giấy nằm thẳng băng giữa khung hình đọc ra là một lớp giao diện dán đè,
+   chứ không phải một vật đang được chĩa máy vào. */
+.wc-menu{
+  position:absolute;left:6%;right:6%;top:27%;
+  padding:11px 11px 13px;border-radius:6px;
+  background:linear-gradient(#FDF6E4,#F4E9CE);
+  box-shadow:0 14px 30px rgba(0,0,0,.42);
+  rotate:-1.1deg;
+}
+.wc-menu h4{
+  font-family:var(--disp);font-size:10px;font-weight:600;text-align:center;
+  letter-spacing:.16em;text-transform:uppercase;color:#7A5F16;
+  padding-bottom:6px;margin-bottom:5px;border-bottom:1px solid rgba(122,95,22,.3);
+}
+.wc-mrow{
+  display:flex;align-items:baseline;gap:6px;
+  padding:3.5px 5px;border-radius:4px;
+  font-size:10.5px;color:#3A2E14;
+}
+/* Tên món KHÔNG được xuống dòng: một thực đơn mà mỗi món chiếm ba dòng thì
+   không còn giống thực đơn, và cả điểm mấu chốt của màn này — cột giá
+   thẳng hàng bên phải — biến mất. Dài quá thì cắt bằng dấu ba chấm. */
+.wc-mrow em{
+  flex:1;min-width:0;font-style:normal;font-weight:500;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.wc-mrow small{
+  display:block;font-size:8px;color:#8A7440;font-weight:400;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.wc-mrow b{font-weight:600;font-variant-numeric:tabular-nums}
+/* Dòng đang được soi: nền ngọc rất nhạt và một chỉ xanh bên trái. Không
+   dùng viền quanh cả dòng — viền kín làm nó thành một cái nút bấm được. */
+.wc-mrow.on{
+  background:rgba(31,138,112,.16);
+  box-shadow:inset 2px 0 0 var(--ngoc);
+}
+
+/* Khung ngắm bốn góc trong ống kính — dấu hiệu duy nhất nói đây là camera. */
+.wc-recticle{
+  position:absolute;left:4%;right:4%;top:24%;height:30%;
+  pointer-events:none;
+}
+.wc-recticle i{
+  position:absolute;width:20px;height:20px;
+  border:2.5px solid rgba(255,255,255,.92);border-radius:3px;
+}
+.wc-recticle i:nth-child(1){top:0;left:0;border-right:0;border-bottom:0}
+.wc-recticle i:nth-child(2){top:0;right:0;border-left:0;border-bottom:0}
+.wc-recticle i:nth-child(3){bottom:0;left:0;border-right:0;border-top:0}
+.wc-recticle i:nth-child(4){bottom:0;right:0;border-left:0;border-top:0}
+
+/* ── màn bản đồ: ghim và thẻ quán ────────────────────────────── */
+.wc-pin{
+  position:absolute;z-index:2;width:26px;height:34px;
+  display:grid;place-items:center;
+  color:#F6EFD9;
+  filter:drop-shadow(0 4px 7px rgba(30,20,4,.45));
+}
+.wc-pin svg{width:100%;height:100%}
+/* Hàng thẻ quán chạy ngang dưới bản đồ, cuộn được. Ba thẻ nhét vừa bề
+   ngang máy hẹp nhất chỉ còn cách bóp chữ tới mức không đọc được. */
+.wc-strip{
+  position:absolute;z-index:2;left:0;right:0;bottom:0;
+  display:flex;gap:9px;padding:0 var(--wc-pad) 4px;
+  overflow-x:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.wc-strip::-webkit-scrollbar{display:none}
+.wc-spot{
+  flex:0 0 auto;width:132px;
+  border-radius:14px;overflow:hidden;
+  background:rgba(253,250,242,.96);
+  border:1px solid rgba(201,162,39,.42);
+  box-shadow:0 6px 18px rgba(58,42,10,.16);
+}
+.wc-spot img{width:100%;height:56px;object-fit:cover;display:block}
+.wc-spot div{padding:7px 8px 8px}
+.wc-spot b{
+  display:block;font-family:var(--disp);font-size:12.5px;font-weight:600;
+  color:var(--then);line-height:1.2;
+}
+.wc-spot span{
+  display:flex;align-items:center;gap:4px;margin-top:5px;
+  font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  color:#1F6B54;
+}
+.wc-spot span svg{width:11px;height:11px;flex:0 0 auto}
+
+/* ── màn cộng đồng: hàng số liệu ─────────────────────────────── */
+.wc-stats{
+  position:absolute;z-index:2;left:var(--wc-pad);right:var(--wc-pad);bottom:2px;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-radius:16px;padding:11px 6px;
+  background:rgba(253,250,242,.95);
+  border:1px solid rgba(201,162,39,.42);
+  box-shadow:0 6px 20px rgba(58,42,10,.14);
+}
+.wc-stats div{text-align:center;position:relative}
+.wc-stats div+div::before{
+  content:"";position:absolute;left:0;top:12%;bottom:12%;
+  border-left:1px solid rgba(201,162,39,.3);
+}
+.wc-stats b{
+  display:block;font-family:var(--disp);font-size:20px;font-weight:600;
+  color:var(--then);font-variant-numeric:tabular-nums;line-height:1.1;
+}
+.wc-stats span{display:block;font-size:10px;color:#6B7A70;margin-top:2px}
+
+/* ── chân màn ────────────────────────────────────────────────
+   Nền chuyển sang giấy đục để tranh chui xuống dưới nút mà chữ trên nút
+   vẫn đọc được. Không có dải này thì "Skip" nằm đè lên chỗ sáng tối bất
+   kỳ của tranh và biến mất ở đúng những màn tranh sáng nhất. */
+.wc-foot{
+  position:relative;z-index:3;flex:0 0 auto;
+  padding-top:28px;
+  /* Đục hẳn từ 18% chứ không 32%: hàng chấm nằm ngay đầu dải này, và ở 32%
+     nó rơi đúng vào đoạn còn trong suốt — trên màn có tranh sáng thì ba
+     chấm chưa chọn biến mất, chỉ còn lại đúng cái chấm đang sáng. */
+  background:linear-gradient(rgba(250,243,229,0),#FAF3E5 18%,#FAF3E5);
+  margin:0 calc(var(--wc-pad) * -1);
+  padding-left:var(--wc-pad);padding-right:var(--wc-pad);
+}
+
+.wc-dots{display:flex;gap:7px;justify-content:center;padding-bottom:16px}
+.wc-dots button{
+  width:8px;height:8px;border-radius:50%;background:rgba(201,162,39,.34);
+  transition:width .26s cubic-bezier(.22,.61,.36,1),background-color .26s;
+}
+.wc-dots button.on{width:26px;border-radius:4px;background:#1F6B54}
+.wc-dots button:focus-visible{outline:2px solid var(--ngoc);outline-offset:3px}
+
+/* Nút chính. Viên thuốc xanh then, chỉ vàng bao ngoài, và một vòng tròn
+   vàng ở đầu bên phải mang mũi tên. Vòng tròn đó KHÔNG phải nút thứ hai:
+   nó nằm trong cùng một <button>, chỉ chạm vào đâu trên viên thuốc cũng
+   đi tiếp — tách ra thành hai vùng bấm là bẫy ngón tay. */
+.wc-cta{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:60px;padding:0 62px;
+  border-radius:var(--pill);
+  background:linear-gradient(168deg,#12483A,#0B2A22 62%,#0E3428);
+  border:1.5px solid rgba(201,162,39,.85);
+  box-shadow:0 10px 26px rgba(11,42,34,.34),inset 0 1px 0 rgba(255,255,255,.10);
+  color:#FBF7EC;font-size:19px;font-weight:600;letter-spacing:.005em;
+}
+.wc-cta:active{transform:translateY(1px)}
+.wc-cta:focus-visible{outline:2px solid var(--dong);outline-offset:3px}
+.wc-cta i{
+  position:absolute;top:50%;right:8px;translate:0 -50%;
+  width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(160deg,#EFCE63,#BE9018);
+  box-shadow:0 2px 6px rgba(30,20,4,.28);
+}
+.wc-cta i svg{width:20px;height:20px;color:#12352C}
+
+.wc-skip{
+  display:block;width:100%;padding:14px 0 6px;
+  font-size:15.5px;font-weight:600;color:#1F6B54;
+}
+.wc-skip:active{opacity:.7}
+.wc-skip:focus-visible{outline:2px solid var(--ngoc);outline-offset:2px;border-radius:8px}
+.wc-skip[hidden]{display:none}
+
+/* ── màn tài khoản ───────────────────────────────────────────
+   Cùng một trang giấy, chỉ khác: tranh thu về một khung TRÒN có viền vàng
+   và một huy hiệu hoa gió ở đáy — đúng dạng của màn "Welcome back" trong
+   bộ mockup — rồi nhường phần lớn chiều cao cho ô nhập. */
+.wc-round{
+  position:relative;flex:0 0 auto;
+  width:min(46vw,190px);aspect-ratio:1;margin:14px auto 26px;
+}
+.wc-round img{
+  width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;
+  border:2px solid rgba(201,162,39,.8);
+  box-shadow:0 12px 30px rgba(58,42,10,.22);
+}
+.wc-round::after{
+  content:"";position:absolute;left:50%;bottom:-19px;translate:-50% 0;
+  width:38px;height:38px;border-radius:50%;
+  background:#FDFAF1 no-repeat center/20px url("assets/motifs/hoa-gio.webp");
+  border:1px solid rgba(201,162,39,.6);
+  box-shadow:0 3px 10px rgba(93,72,20,.16);
+}
+
+.wc-form{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+.wc-fld{display:grid;gap:6px;margin-top:14px}
+.wc-fld>span{font-size:12.5px;font-weight:600;color:var(--then)}
+.wc-fld>span small{font-weight:400;color:#6B7A70}
+.wc-fld input{
+  border:1px solid rgba(201,162,39,.45);border-radius:14px;padding:13px 14px;
+  font-size:16px;                          /* dưới 16px là iOS tự phóng to trang */
+  background:#FDFAF1;color:var(--muc);width:100%;min-height:52px;
+}
+.wc-fld input:focus-visible{outline:2px solid var(--ngoc);outline-offset:1px}
+/* Ô mã 6 số: chữ số to, giãn đều, để đối chiếu với email bằng mắt cho nhanh. */
+.wc-fld input.code{
+  font-size:22px;letter-spacing:.34em;text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+
+.wc-err{color:var(--son-dam);font-size:13px;margin-top:10px;line-height:1.45}
+.wc-err[hidden]{display:none}
+
+/* Thẻ "sổ tay riêng". Nói ra sự thật rằng bản build này không có máy chủ,
+   nhưng nói bằng giọng của một TÍNH NĂNG — bài viết nằm lại trên máy —
+   chứ không phải giọng của một lỗi cấu hình ở màn hình đầu tiên. */
+.wc-card{
+  display:flex;gap:12px;align-items:flex-start;
+  margin-top:16px;padding:14px;border-radius:16px;
+  background:rgba(253,250,242,.9);border:1px solid rgba(201,162,39,.35);
+}
+.wc-card img{width:34px;height:34px;flex:0 0 auto;object-fit:contain;opacity:.95}
+.wc-card b{display:block;font-family:var(--disp);font-size:15px;color:var(--then);margin-bottom:3px}
+.wc-card span{font-size:12.5px;line-height:1.5;color:#6B7A70}
+.wc-card em{font-style:normal;font-weight:600;color:var(--muc)}
+
+/* Nút phụ trên màn tài khoản: viền vàng trên nền giấy, không nền đặc. Hai
+   nút cùng nền đặc đứng cạnh nhau thì không nút nào là nút chính nữa. */
+.wc-sec{
+  display:block;width:100%;min-height:54px;margin-top:10px;
+  border-radius:var(--pill);
+  border:1.5px solid rgba(201,162,39,.7);background:rgba(253,250,242,.7);
+  font-size:16px;font-weight:600;color:var(--then);
+}
+.wc-sec:active{background:rgba(244,234,212,.9)}
+.wc-sec:focus-visible{outline:2px solid var(--ngoc);outline-offset:2px}
+.wc-sec[disabled]{opacity:.55}
+
+/* ── chuyển màn ──────────────────────────────────────────────
+   Tranh và chữ vào lệch pha nhau một nhịp ngắn: tranh trước, chữ sau.
+   Cùng lúc thì cả màn hình nhảy một cái như bị giật. */
+@keyframes wc-in-art{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:none}}
+@keyframes wc-in-fwd{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes wc-in-back{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+@keyframes wc-in-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.wc-anim .wc-art{animation:wc-in-art .42s cubic-bezier(.22,.61,.36,1) both}
+.wc-anim .wc-copy{animation:wc-in-fwd .32s cubic-bezier(.22,.61,.36,1) .05s both}
+.wc-anim.back .wc-copy{animation-name:wc-in-back}
+.wc-anim .wc-tag,.wc-anim .wc-spot,.wc-anim .wc-stats,.wc-anim .wc-pin{
+  animation:wc-in-up .4s cubic-bezier(.22,.61,.36,1) both;
+}
+.wc-anim .wc-round{animation:wc-in-art .42s cubic-bezier(.22,.61,.36,1) both}
+
+@media (prefers-reduced-motion:reduce){
+  .wc-anim .wc-art,.wc-anim .wc-copy,.wc-anim .wc-tag,.wc-anim .wc-spot,
+  .wc-anim .wc-stats,.wc-anim .wc-pin,.wc-anim .wc-round{animation:none}
+  .wc-dots button{transition:none}
+}
+
+/* ── máy thấp ────────────────────────────────────────────────
+   iPhone SE, hoặc bất kỳ máy nào đang bật bàn phím. Thứ nhường chỗ trước
+   là TRANH và dòng ghi chú, vì chữ chính và nút mới là thứ phải bấm được.
+   Nhãn dán nhỏ cũng rút bớt: ba tấm thẻ chồng lên nhau trên một khung
+   tranh cao 150px thì không tấm nào đọc được. */
+@media (max-height:680px){
+  #v-welcome{--wc-pad:18px}
+  .wc-title{font-size:clamp(25px,7.4vw,31px)}
+  .wc-may{width:46px;margin:8px 0 9px}
+  .wc-text{font-size:14.5px}
+  .wc-note{display:none}
+  .wc-cta{min-height:54px;font-size:17.5px}
+  .wc-cta i{width:40px;height:40px}
+  .wc-round{width:min(34vw,140px);margin:8px auto 24px}
+}
+/* Dưới 700px chiều cao thì khung tranh chỉ còn chừng 260px, và tấm thực
+   đơn một mình đã chiếm gần hết. Tấm nhãn thứ hai ở đó không có chỗ nào
+   đứng mà không đè lên cột giá — thứ mà chính nó đang chú thích. Bỏ hẳn
+   nó đi còn hơn để nó che mất điều nó nói. */
+@media (max-height:700px){
+  .wc-tag.opt{display:none}
+}
+@media (max-height:600px){
+  .wc-recticle{display:none}
+}

@@ -68,12 +68,32 @@ input,select{font:inherit}
 .view.noscroll{overflow:hidden}
 .pad{padding:18px 18px calc(96px + var(--safe));position:relative;z-index:1}
 
-/* KHÔNG có lớp dấu chìm mặt trống đồng sau các màn hình.
-   Đã thử và đã gỡ: ảnh hoạ tiết sinh sẵn trong assets/icons/ lưu bằng
-   WEBP không kênh alpha (_shrink.py convert("RGB")), nên dùng làm
-   background-image chồng lên nền thì cái hiện ra là một KHỐI CHỮ NHẬT
-   đục, không phải hoạ tiết. Muốn dựng lại lớp này thì phải sinh ảnh có
-   nền trong suốt trước, chứ không phải chỉnh opacity cho nhạt bớt. */
+/* Dấu chìm sau màn hình: CÓ, nhưng chỉ ở tab Nearby và chỉ dùng hoạ tiết
+   trong assets/motifs/.
+   Lần đầu thử lớp này đã phải gỡ, vì ảnh hoạ tiết trong assets/icons/ lưu
+   bằng WEBP KHÔNG có kênh alpha (_shrink.py convert("RGB")): dùng làm
+   background-image thì cái hiện ra là một khối chữ nhật đục. Bộ trong
+   assets/motifs/ thì khác — clean-glyph.py dựng lại alpha từ độ sáng nên
+   nền trong suốt thật, và đó là điều kiện đủ để dựng lại lớp này.
+
+   Vì sao chỉ tab Nearby: dưới khối bản đồ là một mảng giấy trơn cao gần
+   nửa màn, không có gì trong đó. Ba tab kia kín nội dung từ trên xuống,
+   thêm dấu chìm vào chỉ làm chữ khó đọc hơn. */
+#v-map::before{
+  content:"";position:absolute;z-index:0;pointer-events:none;
+  top:-14vw;right:-26vw;width:78vw;max-width:420px;aspect-ratio:1;
+  background:no-repeat center/contain url("assets/motifs/hoa-van-tron.webp");
+  opacity:.12;
+}
+/* Dải sóng nước chạy ngang ở cuối trang, chỗ nội dung đã hết. Lặp ngang
+   nên bề ngang máy nào cũng khít, và nó đóng trang lại thay cho một
+   khoảng trắng cụt. */
+#v-map::after{
+  content:"";position:absolute;z-index:0;pointer-events:none;
+  left:0;right:0;bottom:calc(84px + var(--safe));height:46px;
+  background:repeat-x center/auto 46px url("assets/motifs/song-nuoc.webp");
+  opacity:.16;
+}
 
 /* dải hoạ tiết chạy ngang — dùng làm đường phân cách và chân trang */
 /* background-size:contain giữ đúng tỉ lệ ô hoạ tiết rồi mới lặp ngang.
@@ -236,6 +256,14 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .row .amt small{display:block;font-size:9.5px;font-weight:400;color:var(--muc-nhat)}
 .row .amt[data-l="high"]{color:var(--son)}
 
+/* Dòng đoán món: tên món LÀ câu trả lời, nên nó phải đọc được từ xa một
+   sải tay — người dùng đang cầm máy chĩa vào bát, không cúi sát màn hình. */
+.row.guess{padding:15px 0}
+.row.guess .nm{font-family:var(--disp);font-size:26px;font-weight:600;
+  letter-spacing:-.015em;line-height:1.15}
+.row.guess .note{font-size:11.5px;margin-top:5px}
+.row.guess .amt{font-size:14px}
+
 /* ── nút ───────────────────────────────────────────────── */
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;
   min-height:48px;width:100%;text-align:center;border-radius:14px;padding:13px;
@@ -303,9 +331,12 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .nb-topbar .pag{width:24px;height:24px;flex:0 0 auto;color:var(--then)}
 .nb-topbar .kick{font-size:clamp(11px,3vw,13px);font-weight:700;letter-spacing:.14em;
   text-transform:uppercase;color:var(--muc);line-height:1.2}
+/* Chuông lấy viền vàng và mực ngọc, không phải viền xám mực đen: nó là
+   nút duy nhất ở hàng trên cùng, và trên nền giấy ngà một viền xám nhạt
+   làm nó biến mất hẳn. */
 .nb-bell{position:absolute;top:0;right:0;width:48px;height:48px;border-radius:50%;
-  background:#fff;border:1px solid var(--line);display:grid;place-items:center;
-  box-shadow:0 2px 8px -3px rgba(14,43,36,.18);color:var(--then);z-index:5}
+  background:#FDFAF1;border:1.5px solid var(--vien);display:grid;place-items:center;
+  box-shadow:0 3px 10px -3px rgba(93,72,20,.24);color:var(--ngoc-sau);z-index:5}
 .nb-bell svg{width:21px;height:21px}
 
 .nb-h1{font-family:var(--disp);font-weight:600;color:var(--then);
@@ -341,6 +372,56 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   font-size:clamp(11px,3.1vw,12.5px);line-height:1.3;color:var(--muc-nhat)}
 .ex-div{width:1px;flex:0 0 auto;background:var(--line);margin:2px 0}
 
+/* ── chọn vùng ─────────────────────────────────────
+   Cuộn ngang và tràn ra hai mép rồi tự đệm lại, cùng khuôn với .ex-chips:
+   sáu vùng không bao giờ vừa một màn 360px, và cắt cụt thẻ cuối ở mép
+   phải là cách chắc chắn nhất để người dùng tưởng chỉ có bốn vùng. */
+.zone-row{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;
+  padding:14px var(--pad-x) 2px;margin:0 calc(-1 * var(--pad-x));
+  scrollbar-width:none;overscroll-behavior-x:contain;position:relative;z-index:2}
+.zone-row::-webkit-scrollbar{display:none}
+.zone-chip{display:grid;gap:1px;flex:0 0 auto;text-align:left;
+  min-height:52px;padding:8px 14px;border-radius:16px;
+  background:var(--giay);border:1.5px solid var(--vien-in);
+  transition:transform .2s cubic-bezier(.22,.61,.36,1)}
+.zone-chip b{font-family:var(--disp);font-size:15px;font-weight:600;color:var(--then);
+  white-space:nowrap;line-height:1.15}
+.zone-chip span{font-size:11px;color:var(--muc-nhat);white-space:nowrap}
+.zone-chip:active{transform:scale(.97)}
+.zone-chip[aria-pressed="true"]{background:var(--then);border-color:var(--vien-dam);
+  box-shadow:0 6px 16px -8px rgba(14,43,36,.7)}
+.zone-chip[aria-pressed="true"] b{color:#F6F2E6}
+.zone-chip[aria-pressed="true"] span{color:var(--dong)}
+.zone-chip:focus-visible{outline:2px solid var(--dong);outline-offset:2px}
+
+/* ── khay điểm tham quan ───────────────────────────── */
+.sight-rail{display:flex;gap:11px;overflow-x:auto;overflow-y:hidden;
+  padding:2px var(--pad-x) 6px;margin:0 calc(-1 * var(--pad-x));
+  scrollbar-width:none;overscroll-behavior-x:contain}
+.sight-rail::-webkit-scrollbar{display:none}
+.sight-card{flex:0 0 auto;width:148px;display:grid;gap:3px;text-align:left}
+/* Dấu nón lá nằm DƯỚI ảnh nền, không phải một lớp phủ bật/tắt: ô nào có
+   tranh thì tranh che nó đi, ô nào chưa có — hoặc ảnh 404 — thì nó lộ ra.
+   Không cần onerror, không cần cờ trạng thái nào cả.
+   background-size/position là BẮT BUỘC: thiếu chúng thì ảnh 1024px nằm
+   nguyên cỡ trong ô 148px và chỉ lộ ra góc trên trái. Đúng lỗi đã làm ô
+   tròn của thẻ chuyến đi trống trơn. */
+.sight-art{position:relative;display:block;width:148px;height:100px;border-radius:14px;
+  overflow:hidden;border:1px solid var(--vien-in);
+  background:var(--kem) no-repeat center/cover}
+.sight-art::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:no-repeat center/40px
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 70'%3E%3Cpath d='M8 60 Q60 -8 112 60' fill='none' stroke='%235F6E64' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
+  opacity:.3}
+.sight-star{position:absolute;top:7px;left:7px;width:24px;height:24px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(14,43,36,.88);color:var(--dong)}
+.sight-star svg{width:14px;height:14px}
+.sight-card b{font-family:var(--disp);font-size:13.5px;font-weight:600;color:var(--then);
+  line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sight-en{font-size:11px;color:var(--muc-nhat);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sight-hero{margin-top:10px}
+
 /* ── hàng bộ lọc ───────────────────────────────────── */
 /* Tràn ra hai mép rồi tự đệm lại: chip cuối không bị cắt cụt ở mép phải,
    và người dùng thấy được là hàng này còn cuộn tiếp. */
@@ -354,12 +435,30 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   font-size:clamp(12.5px,3.5vw,14px);font-weight:600;
   transition:transform .2s cubic-bezier(.22,.61,.36,1)}
 .ex-chip:active{transform:scale(.96)}
-.ex-chip svg{width:17px;height:17px;flex:0 0 auto;color:var(--ngoc-sau)}
-.ex-chip[data-lvl="bad"] svg{color:var(--son)}
+/* Icon nằm trong một đĩa màu riêng của từng bộ lọc, không phải một nét
+   vẽ trần. Bản trước bốn chip là bốn viên trắng giống hệt nhau, icon
+   cùng một sắc xanh — cả hàng đọc ra là một dải xám và không chip nào
+   nói được nó lọc cái gì trước khi người dùng đọc chữ. Mỗi bộ lọc một
+   sắc, lấy từ đúng bảng màu app đã dùng ở chỗ khác: ngọc cho "giá
+   thường", son cho "vượt khoảng", nâu cà phê, vàng đồng cho hàng rong. */
+.ex-chip svg{width:26px;height:26px;flex:0 0 auto;padding:4.5px;border-radius:50%;
+  color:var(--ngoc-sau);background:rgba(31,138,112,.15);
+  box-shadow:inset 0 0 0 1px rgba(31,138,112,.22)}
+.ex-chip[data-exf="over"] svg{color:var(--son);background:rgba(176,32,26,.12);
+  box-shadow:inset 0 0 0 1px rgba(176,32,26,.2)}
+.ex-chip[data-exf="coffee"] svg{color:#6E4517;background:rgba(110,69,23,.13);
+  box-shadow:inset 0 0 0 1px rgba(110,69,23,.2)}
+.ex-chip[data-exf="street"] svg{color:#8A5A16;background:rgba(201,162,39,.2);
+  box-shadow:inset 0 0 0 1px rgba(201,162,39,.34)}
 .ex-chip[aria-pressed="true"]{background:var(--then);color:#F6F2E6;
   border-color:var(--vien-dam);box-shadow:0 6px 16px -8px rgba(14,43,36,.7)}
-.ex-chip[aria-pressed="true"] svg{color:var(--dong)}
+/* Chip đang chọn: nền then nuốt hết mọi đĩa màu nhạt, nên icon quay về
+   vàng đồng trên nền trong — sắc duy nhất đọc được trên nền tối đó. */
+.ex-chip[aria-pressed="true"] svg{color:var(--dong);background:rgba(217,162,39,.16);
+  box-shadow:inset 0 0 0 1px rgba(217,162,39,.34)}
 .ex-chip.round{width:48px;padding:0;justify-content:center}
+.ex-chip.round svg{background:none;box-shadow:none;color:var(--muc-nhat);padding:0;
+  width:19px;height:19px}
 .ex-chip:focus-visible{outline:2px solid var(--dong);outline-offset:2px}
 
 /* ── khối bản đồ ───────────────────────────────────── */
@@ -377,11 +476,27 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
    gộp vào clamp ở trên thì cả khai báo hỏng và khối bản đồ cao 0. */
 @supports (height:1svh){ .ex-map{height:clamp(230px,36svh,340px)} }
 .ex-canvas{position:absolute;inset:0;overflow:hidden}
-.ex-canvas .ex-base{width:100%;height:100%;display:block}
+/* Lớp lót: chính tấm tranh của vùng, phóng phủ kín và làm mờ hẳn. Biến
+   --ex-art do bigmap.js đặt sau khi biết vùng này có tranh nào.
+
+   VÌ SAO CẦN LỚP NÀY
+   fitArt cố phủ kín khung, nhưng có cụm cơ sở mà không mức phóng nào vừa
+   phủ kín vừa chứa hết ghim — cụm bờ tây sông Hàn chẳng hạn, dài dọc mà
+   tranh thì vuông. Lúc đó nó nhường chỗ cho việc hiện đủ ghim, và chỗ hở
+   ra là một mảng giấy phẳng lì: người dùng đọc ngay ra "ảnh tải hỏng".
+   Một lớp mờ của chính tấm tranh thì không bao giờ đọc ra là lỗi.
+   Vùng chưa có tranh không đặt biến này, nên lớp lót tự tắt. */
+.ex-canvas::before{
+  content:"";position:absolute;inset:-8%;z-index:0;
+  background:var(--ex-art,none) center/cover no-repeat;
+  filter:blur(16px) saturate(.86) brightness(1.04);
+  opacity:.85;pointer-events:none;
+}
+.ex-canvas .ex-base{position:relative;z-index:1;width:100%;height:100%;display:block}
 /* Tranh vẽ tay đã neo toạ độ. Kích thước và độ lệch do JS đặt theo phép
    georeference, nên KHÔNG dùng object-fit — object-fit tự cắt theo ý nó
    và mọi ghim lệch khỏi mái nhà của nó ngay. */
-.ex-art{position:absolute;left:0;top:0;transform-origin:0 0;
+.ex-art{position:absolute;left:0;top:0;z-index:1;transform-origin:0 0;
   max-width:none;display:block;image-rendering:auto}
 .ex-art[hidden]{display:none}
 .ex-pins{position:absolute;inset:0;z-index:3;pointer-events:none}
@@ -399,6 +514,12 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
    hidden nhưng ghim vẫn nằm nguyên trên bản đồ — phép thử đếm theo thuộc
    tính vẫn xanh trong khi mắt thấy sai. */
 .ex-pin[hidden]{display:none}
+/* Ghim của cơ sở nằm NGOÀI mép tranh, bị bigmap.js kéo về sát viền. Phải
+   trông khác hẳn ghim thường: nó không chỉ vào mái nhà nào cả, chỉ nói
+   "còn một chỗ nữa, về phía này". Mờ đi và nhỏ lại là đủ — thêm mũi tên
+   hướng thì lại phải tính hướng, mà hướng đó cũng đã bị phép kẹp làm sai. */
+.ex-pin[data-off]{opacity:.62;filter:none}
+.ex-pin[data-off] svg{width:24px;height:32px}
 .ex-pin:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:8px}
 .ex-me{position:absolute;left:0;top:0;z-index:2;width:0;height:0}
 .ex-me i{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;
@@ -407,21 +528,47 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 /* Nút phủ kín bản đồ: chạm chỗ trống mở bản đồ chi tiết. Nằm DƯỚI lớp
    ghim (z-index 1 so với 3) nên không nuốt cú chạm vào ghim. */
 .ex-open{position:absolute;inset:0;z-index:1;display:block}
-.ex-open span{position:absolute;left:12px;bottom:12px;
-  display:inline-flex;align-items:center;min-height:38px;padding:0 14px;
-  border-radius:var(--pill);background:rgba(14,43,36,.92);color:#F6F2E6;
+/* Cách đáy 26px chứ không 12: khay thẻ bên dưới trượt đè lên mép dưới bản
+   đồ, và ở 12px thì nó cắt ngang viên "Open full map" làm đôi — nút đọc ra
+   là một mảnh chữ bị xén. Cùng lý do với hai nút tròn bên phải. */
+/* z-index 5 — TRÊN cả lớp ghim (3). Nhãn là chữ, bị một cái ghim đè lên
+   là mất nghĩa; ghim bị nhãn đè lên thì vẫn còn 5 cái khác cùng loại.
+   pointer-events:none để cú chạm rơi xuống .ex-open nằm dưới. */
+.ex-openlabel{position:absolute;left:12px;bottom:26px;z-index:5;pointer-events:none;
+  display:inline-flex;align-items:center;min-height:38px;padding:0 15px;
+  border-radius:var(--pill);background:rgba(14,43,36,.94);color:#F6F2E6;
+  border:1px solid var(--vien);
   font-size:clamp(11.5px,3.2vw,13px);font-weight:600;
   box-shadow:0 8px 20px -8px rgba(14,43,36,.8)}
-.ex-fabs{position:absolute;right:12px;bottom:12px;z-index:4;display:grid;gap:10px}
-.ex-fab{width:52px;height:52px;border-radius:50%;background:#fff;
-  border:1px solid var(--line);display:grid;place-items:center;color:var(--then);
+/* Khung chứa KHÔNG nhận chạm, chỉ hai cái đĩa tròn nhận. Khung là một ô
+   lưới 52×114 kể cả khe hở giữa hai nút, và ở trạng thái nhận chạm nó
+   nuốt luôn cú chạm vào cái ghim nằm lọt phía sau khe đó — đo được thật:
+   ghim banh-mi-goc trả về DIV.ex-fabs thay vì chính nó. */
+.ex-fabs{position:absolute;right:12px;bottom:26px;z-index:4;display:grid;gap:10px;
+  pointer-events:none}
+.ex-fabs>*{pointer-events:auto}
+.ex-fab{width:52px;height:52px;border-radius:50%;background:#FDFAF1;
+  border:1.5px solid var(--vien);display:grid;place-items:center;color:var(--ngoc-sau);
   box-shadow:0 6px 18px -6px rgba(14,43,36,.45);
   transition:transform .2s cubic-bezier(.22,.61,.36,1)}
 .ex-fab:active{transform:scale(.94)}
 .ex-fab svg{width:22px;height:22px}
+/* HAI nút tròn cạnh nhau, hai việc khác hẳn nhau: một cái tìm chỗ đang
+   đứng, một cái mở bản đồ chi tiết. Bản trước cả hai đều là đĩa trắng
+   icon đen — nhìn ra là một cặp nút song sinh, và không cái nào nói được
+   rằng mở bản đồ mới là việc chính ở đây. Nút chính lấy nền then + chỉ
+   vàng của nút chính toàn app; nút phụ giữ nền giấy. */
+.ex-fab[data-act="bigMap"]{
+  background:linear-gradient(165deg,#12483A,#0B2A22);
+  border-color:var(--vien-dam);color:var(--dong);
+  box-shadow:0 8px 20px -6px rgba(11,42,34,.62)}
 
 /* ── khay thẻ dưới ─────────────────────────────────── */
-.ex-sheet{position:relative;z-index:2;margin-top:-26px;
+/* Trượt đè lên mép dưới bản đồ 14px, không phải 26. Ở 26 thì khay cắt
+   ngang viên "Open full map" và hai nút tròn nằm cách đáy bản đồ 12px —
+   người dùng thấy một nút bị xén mất nửa dưới. Hai con số này đi cặp với
+   `bottom:26px` của .ex-open và .ex-fabs: 26 − 14 = 12px hở thật. */
+.ex-sheet{position:relative;z-index:2;margin-top:-14px;
   padding:10px 14px 14px;border-radius:26px;
   background:var(--diep);border:1.5px solid var(--vien);
   box-shadow:0 -6px 24px rgba(14,43,36,.10)}
@@ -967,6 +1114,10 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 
 .warnbox{display:flex;gap:9px;background:#FCEEEB;border-radius:13px;padding:11px 13px;
   margin-top:11px;font-size:12.5px;color:var(--son);font-weight:500;line-height:1.45}
+/* Các icon trong I không mang width/height, nên làm con trực tiếp của một
+   flex container chúng nở ra bằng cả hộp — 292px trên khung 360px. Phải
+   ghim cỡ ở đây, không ở từng chỗ gọi: có 10 chỗ dựng .warnbox. */
+.warnbox>svg{width:17px;height:17px;flex:0 0 auto;margin-top:1px}
 .okbox{background:#E7F3EC;color:#166B52}
 .infobox{background:#EEF1F7;color:var(--cham)}
 
@@ -1214,8 +1365,16 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   border:1.5px solid var(--vien);box-shadow:0 3px 12px rgba(14,43,36,.06);
   transition:transform .2s cubic-bezier(.22,.61,.36,1)}
 .trip-card:active{transform:scale(.985)}
+/* background-size/position/repeat là BẮT BUỘC, không phải trang trí thêm.
+   tripCardHTML đặt background-image bằng style nội tuyến, còn icon ship
+   kèm app là ảnh 256×256. Thiếu ba dòng này thì ảnh nằm nguyên cỡ và ô
+   44px chỉ lộ ra góc trên trái của nó — với "heritage" (phế tích giữa
+   khung) và "craft" (xưởng đèn lồng giữa khung) thì góc đó là nền kem
+   trắng trơn, nên hai thẻ Mỹ Sơn và Thanh Hà hiện ra một ô TRỐNG.
+   Trông y hệt thiếu ảnh, mà ảnh vẫn nằm đó, đủ nét, đúng tên. */
 .trip-ico{width:44px;height:44px;border-radius:14px;overflow:hidden;
-  background:var(--kem);border:1.5px solid var(--vien-in);display:grid;place-items:center}
+  background:var(--kem) no-repeat center/cover;
+  border:1.5px solid var(--vien-in);display:grid;place-items:center}
 .trip-ico img{width:100%;height:100%;object-fit:cover}
 .trip-body{display:grid;min-width:0}
 .trip-body .nm{font-family:var(--disp);font-size:clamp(15px,4.2vw,17px);
@@ -1225,69 +1384,14 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .trip-meta{font-size:11.5px;color:var(--dong-chu);font-variant-numeric:tabular-nums;
   margin-top:2px}
 
-/* ── màn mở đầu: giới thiệu + tài khoản ──────────────────────
-   Phủ TOÀN màn hình và nằm trên tabbar: trong lúc chưa xong bước này thì
-   không có tab nào để bấm, nên để lộ thanh nav ra dưới chỉ mời người dùng
-   bấm vào một thứ chưa sẵn sàng. */
-#v-welcome{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;
-  background:var(--then);color:#F3EFE2;overflow:hidden}
-#v-welcome[hidden]{display:none}
-
-/* Nền giấy: một mảng sáng bo tròn ở nửa dưới, để chữ đọc trên nền sáng
-   còn phần hình vẫn nổi trên nền sơn mài. */
-.wc-sheetpaper{position:absolute;left:0;right:0;bottom:0;height:64%;
-  background:var(--giay);border-radius:34px 34px 0 0;
-  box-shadow:0 -12px 40px rgba(0,0,0,.28)}
-
-.wc-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
-  padding:calc(env(safe-area-inset-top,0px) + 18px) var(--pad-x)
-          calc(env(safe-area-inset-bottom,0px) + 18px);
-  overflow-y:auto;-webkit-overflow-scrolling:touch}
-
-.wc-slide{flex:1;display:flex;flex-direction:column;justify-content:flex-end;min-height:0}
-.wc-slide.tight{justify-content:flex-start;padding-top:6px}
-
-.wc-art{display:grid;place-items:center;padding:6px 0 14px;flex:0 1 auto;min-height:0}
-.wc-art svg{width:min(58vw,224px);height:auto;max-height:26vh}
-.wc-art.small svg{width:min(34vw,132px);max-height:15vh}
-
-.wc-kicker{font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--dong-chu);font-weight:600;margin-bottom:4px}
-.wc-title{font-family:var(--disp);font-size:clamp(26px,7.4vw,34px);line-height:1.1;
-  letter-spacing:-.015em;color:var(--then);margin-bottom:8px}
-.wc-body{font-size:15px;line-height:1.55;color:var(--muc)}
-.wc-note{font-size:12.5px;line-height:1.5;color:var(--muc-nhat);margin-top:10px;
-  padding-left:11px;border-left:2px solid var(--vien)}
-
-.wc-dots{display:flex;gap:7px;justify-content:center;margin:18px 0 12px;position:relative;z-index:2}
-.wc-dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:width .25s}
-.wc-dots i.on{width:22px;border-radius:4px;background:var(--vang-la)}
-
-.wc-actions{display:grid;gap:8px;position:relative;z-index:2;margin-top:2px}
-.wc-actions .btn{margin:0}
-/* Nút Skip ở màn cuối không còn chữ — ẩn hẳn thay vì để một ô trống bấm được. */
-.wc-actions .btn:empty{display:none}
-
-.wc-slide .fld{display:grid;gap:5px;margin-top:12px}
-.wc-slide .fld>span{font-size:12.5px;color:var(--muc-nhat)}
-.wc-slide .fld>span small{color:var(--muc-nhat);opacity:.8}
-.wc-slide .fld input{border:1px solid var(--line);border-radius:12px;padding:12px;
-  font-size:15px;background:#fff;color:var(--muc);width:100%;min-height:48px}
-.wc-slide .fld input:focus-visible{outline:2px solid var(--ngoc);outline-offset:1px}
-
-.wc-err{color:var(--son-dam);font-size:13px;margin-top:9px}
-.wc-err[hidden]{display:none}
-
-/* Hộp nói thẳng bản build này không có máy chủ. Dùng nền hổ phách chứ
-   không phải nền đỏ: đây là một sự thật về cấu hình, không phải một lỗi. */
-.wc-offbox{display:grid;gap:5px;margin-top:14px;padding:13px 14px;border-radius:16px;
-  background:#FBF2E2;border:1px solid rgba(200,121,31,.35)}
-.wc-offbox b{font-family:var(--disp);font-size:14.5px;color:var(--then)}
-.wc-offbox span{font-size:12.5px;line-height:1.5;color:var(--muc-nhat)}
-.wc-offbox em{font-style:normal;font-weight:600;color:var(--muc)}
-
-.wc-frieze{position:absolute;left:0;right:0;bottom:0;height:22px;z-index:3;
-  background-repeat:repeat-x;background-size:auto 22px;opacity:.5;pointer-events:none}
+/* ── màn mở đầu ──────────────────────────────────────────────
+   Kiểu của nó nằm HẲN trong welcome.css, không còn một dòng nào ở đây.
+   Màn đó chạy đúng một lần trong đời một lần cài app và là khối duy nhất
+   phủ kín cả tabbar — nó không dùng chung một token nào với bốn tab
+   thường trực, nên để lẫn vào đây chỉ khiến mỗi lần sửa nó phải đọc qua
+   1300 dòng không liên quan. Bản trước để cả hai nơi cùng khai .wc-title
+   và .wc-art, và luật nào thắng thì tuỳ thứ tự <link> trong index.html —
+   một cách hỏng rất khó lần ra. */
 
 /* Bài lưu trên máy: nhãn phải khác hẳn bài trên máy chủ, nếu không người
    dùng tưởng mình vừa đăng cho cả thế giới xem. */
@@ -1307,3 +1411,48 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .cnote-mine img{width:56px;height:56px;border-radius:12px;object-fit:cover;
   border:1px solid var(--line)}
 .cnote-mine>div{min-width:0}
+
+/* ── lớp tile bản đồ thật ───────────────────────────────────
+   Nằm DƯỚI mọi lớp khác của bản đồ: ghim, mốc và tuyến là dữ liệu của
+   app, tile chỉ là nền. pointer-events:none để cú chạm rơi xuống
+   .bm-canvas bên dưới — nếu không, kéo bản đồ trên chỗ có tile thì
+   trình duyệt tưởng người dùng đang kéo một tấm ảnh đi. */
+.bm-tiles{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bm-tiles img{
+  position:absolute;left:0;top:0;transform-origin:0 0;
+  display:block;max-width:none;
+  /* Tile OSM gốc xanh đỏ rực; app này là giấy dó và mực nho. Một lượt
+     ngả nâu nhẹ kéo nó về đúng bảng màu mà không làm mất chữ trên bản
+     đồ — sepia mạnh hơn .4 là nhãn phố bắt đầu chìm. */
+  filter:sepia(.32) saturate(.82) brightness(1.04) contrast(.96);
+}
+/* Tile đã lên thì nền vector tắt hẳn: hai lớp cùng vẽ phố sẽ lệch nhau
+   một hai điểm ảnh và cả bản đồ đọc ra là bị nhoè. */
+#bmBase.thin{display:none}
+
+/* ── cầu nối sang bản web máy tính ──────────────────────────
+   App khoá bề ngang 520px, nên mở trên màn hình 1440px là hai bên toàn
+   nền tối. Dải này nằm ở khoảng trống đó và chỉ hiện từ 900px trở lên —
+   dưới ngưỡng ấy nó vừa vô nghĩa vừa cướp chỗ của nội dung. */
+.deskhint{display:none}
+/* 1200px chứ không phải 900px, và nằm trong LỀ TRÁI chứ không giữa màn:
+   cột app rộng 520px, nên dưới 1200px hai bên chỉ còn ~190px — một dải
+   ngang đặt giữa sẽ nằm ĐÈ LÊN nút chính của app (đã thử: nó che đúng
+   nút "Next" của màn mở đầu). Chỗ trống thật sự là hai lề tối hai bên. */
+@media (min-width:1200px){
+  .deskhint{
+    display:grid;gap:8px;
+    position:fixed;left:24px;bottom:24px;width:320px;z-index:5;
+    padding:16px 18px;border-radius:16px;
+    background:rgba(251,247,236,.96);border:1px solid var(--vien);
+    box-shadow:0 10px 40px rgba(0,0,0,.28);
+    font-size:13px;color:var(--muc);text-decoration:none;
+  }
+  .deskhint b{font-family:var(--disp);font-size:15.5px}
+  .deskhint span{color:var(--muc-nhat)}
+  .deskhint i{
+    font-style:normal;font-weight:600;justify-self:start;
+    padding:9px 16px;border-radius:999px;background:var(--ngoc-sau);color:#FBF7EC;
+  }
+  .deskhint:hover{border-color:var(--vien-dam)}
+}

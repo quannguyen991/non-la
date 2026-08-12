@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scan Menu — Nón Lá</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+  <div style="display:flex;align-items:flex-end;gap:22px;padding:34px 0 20px;flex-wrap:wrap">
+    <div>
+      <h1 style="font-size:46px">Scan Menu</h1>
+      <p class="muted" style="margin-top:10px;max-width:56ch">Drop a menu photo in, then check
+        any dish against what this neighbourhood actually pays.</p>
+    </div>
+    <div class="panel pad" style="margin-left:auto;max-width:420px">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span id="shieldIco"></span>
+        <div>
+          <b style="font-family:var(--disp);font-size:15px">Compared with local ranges</b>
+          <p class="small muted" style="margin-top:4px">Street stalls, casual eateries and
+            sit-down restaurants are priced separately.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="scanlayout" style="padding-bottom:40px">
+    <div>
+      <div class="dropzone" id="drop">
+        <div id="dropInner">
+          <span id="upIco"></span>
+          <b style="display:block;font-family:var(--disp);font-size:22px;margin-top:10px">Drop a menu photo here</b>
+          <p class="muted" style="margin-top:6px">JPG or PNG · or paste with Ctrl + V</p>
+        </div>
+      </div>
+      <div class="uploads">
+        <button class="upl" id="pickBtn"><span id="i1"></span><span><b>Upload image</b>
+          <span>JPG, PNG up to 10MB</span></span></button>
+        <button class="upl" id="pasteBtn"><span id="i2"></span><span><b>Paste image</b>
+          <span>Ctrl + V from clipboard</span></span></button>
+        <a class="upl" href="../index.html"><span id="i3"></span><span><b>Use the camera</b>
+          <span>Open the phone app</span></span></a>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+
+      <div class="warn" style="margin-top:16px" id="ocrNote"></div>
+    </div>
+
+    <div>
+      <div class="panel pad">
+        <div class="sect-head"><h2>Check a dish by hand</h2></div>
+        <p class="small muted" style="margin-bottom:12px">Reading the numbers off a menu photo
+          needs the phone app and an API key. The comparison below needs neither — pick the dish
+          and type the price on the menu.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 160px;gap:12px">
+          <label class="field" style="margin:0">
+            <span id="i4"></span>
+            <select id="dishSel" style="flex:1;border:0;background:none;outline:none;padding:16px 0"></select>
+          </label>
+          <label class="field" style="margin:0">
+            <input id="amt" type="number" inputmode="numeric" placeholder="45000" min="0" step="1000">
+          </label>
+        </div>
+
+        <div id="verdict" style="margin-top:18px"></div>
+      </div>
+
+      <div class="panel pad" style="margin-top:18px">
+        <div class="sect-head"><h2>What this area pays</h2></div>
+        <div class="rowlist" id="ranges"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, load, zoneId, I, esc, money, photo, dishPhoto } from "./web.js";
+
+chrome("scan.html");
+paintZoneName();
+for (const [id, ico] of [["shieldIco", "shield"], ["upIco", "upload"], ["i1", "upload"],
+  ["i2", "clipboard"], ["i3", "camera"], ["i4", "bowl"]]) {
+  document.getElementById(id).innerHTML = I[ico];
+}
+document.getElementById("ocrNote").innerHTML = `${I.alert}<span><b>This page does not read the
+  menu for you.</b> OCR and dish matching run in the phone app, where the API key stays in
+  memory on the device. Here the photo is only shown back to you — nothing is uploaded
+  anywhere.</span>`;
+
+const zid = zoneId();
+const [prices, dishes] = await Promise.all([load("prices"), load("dishes")]);
+const zone = prices.zones[zid];
+const dishOf = (k) => dishes.dishes.find((d) => d.id === k);
+
+/* ── ảnh thực đơn: chỉ hiện lại, không gửi đi đâu ────────────── */
+const drop = document.getElementById("drop");
+const show = (file) => {
+  if (!file || !file.type.startsWith("image/")) return;
+  const url = URL.createObjectURL(file);
+  drop.innerHTML = `<img class="shot" src="${url}" alt="The menu photo you picked">`;
+};
+document.getElementById("file").addEventListener("change", (e) => show(e.target.files[0]));
+document.getElementById("pickBtn").onclick = () => document.getElementById("file").click();
+document.getElementById("pasteBtn").onclick = () => drop.focus();
+drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("hot"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("hot"));
+drop.addEventListener("drop", (e) => {
+  e.preventDefault(); drop.classList.remove("hot");
+  show(e.dataTransfer.files[0]);
+});
+window.addEventListener("paste", (e) => {
+  const item = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith("image/"));
+  if (item) show(item.getAsFile());
+});
+
+/* ── so giá bằng tay ─────────────────────────────────────────
+   Cùng luật phán quyết với app: ≤p75 là bình thường, trên p95 là đắt rõ,
+   ở giữa là hơi cao. Không phát minh thang riêng cho web. */
+const sel = document.getElementById("dishSel");
+const ids = Object.keys(zone.items).sort((a, b) =>
+  (dishOf(a)?.vi || a).localeCompare(dishOf(b)?.vi || b, "vi"));
+sel.innerHTML = ids.map((id) => `<option value="${esc(id)}"${id === zone.signature ? " selected" : ""}>
+  ${esc(dishOf(id)?.vi || id)}${dishOf(id)?.en ? ` — ${esc(dishOf(id).en)}` : ""}</option>`).join("");
+
+const amt = document.getElementById("amt");
+const out = document.getElementById("verdict");
+
+function judge() {
+  const id = sel.value, it = zone.items[id], d = dishOf(id);
+  const v = Number(amt.value || 0);
+  const level = !v ? "none" : v <= it.p75 ? "ok" : v <= it.p95 ? "warn" : "bad";
+  const pill = level === "ok" ? `<span class="pill ok soft">${I.shield}Inside local range</span>`
+    : level === "warn" ? `<span class="pill unknown">${I.clock}Top of the range</span>`
+    : level === "bad" ? `<span class="pill bad">${I.alert}Above the local range</span>`
+    : `<span class="pill unknown">${I.clock}Type the menu price</span>`;
+  const pct = v ? Math.max(2, Math.min(98, ((v - it.p25) / Math.max(1, it.p95 - it.p25)) * 100)) : null;
+  out.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="ph" style="width:74px;height:74px;border-radius:14px;overflow:hidden;
+        border:1px solid var(--vien-in);background:var(--kem)">${photo(dishPhoto(id), d?.vi || id)}</span>
+      <div style="flex:1">
+        <h3 style="font-size:22px">${esc(d?.vi || id)}</h3>
+        <p class="small muted">${esc(d?.en || "")}${d?.unit ? ` · ${esc(d.unit)}` : ""}</p>
+      </div>
+      ${pill}
+    </div>
+    <div class="verdict">
+      <div class="v"><b>Listed price</b><span>${v ? money(v) : "—"}</span></div>
+      <div class="v"><b>Typical local range</b><span>${money(it.p25)} – ${money(it.p75)}</span></div>
+      <div class="v"><b>Local high</b><span>${money(it.p95)}</span></div>
+    </div>
+    ${pct != null ? `<div class="meter"><div class="bar"><span class="dot" style="left:${pct}%"></span></div>
+      <div class="ends"><span>${money(it.p25)}</span><span>typical ${money(it.p50)}</span>
+      <span>${money(it.p95)}</span></div></div>` : ""}
+    <p class="small muted" style="margin-top:12px">${esc(zone.en || zone.name)} · ranges are seed
+      data updated ${esc(zone.updated || "")}, not a field survey.</p>`;
+}
+sel.onchange = judge; amt.oninput = judge; judge();
+
+/* ── bảng khoảng giá của vùng ────────────────────────────────── */
+document.getElementById("ranges").innerHTML = ids.slice(0, 12).map((id) => {
+  const it = zone.items[id], d = dishOf(id);
+  return `<div class="r"><span class="avatar" style="background:var(--kem);color:var(--dong-chu)">
+      ${esc((d?.vi || id).slice(0, 1))}</span>
+    <span><b style="font-size:14.5px">${esc(d?.vi || id)}</b>
+      <span class="small muted" style="display:block">${esc(d?.en || "")}</span></span>
+    <span class="amt tnum">${money(it.p25)} – ${money(it.p75)}</span></div>`;
+}).join("");
+</script>
+</body>
+</html>

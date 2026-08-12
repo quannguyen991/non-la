@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Log in — Nón Lá</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+  <div class="authwrap">
+    <figure class="authart"><img src="../assets/web/auth-street.jpg"
+      alt="Watercolour of a lantern-lit street in the old town at dusk"></figure>
+
+    <section class="authform">
+      <h1>Log in</h1>
+      <p class="lede">Log in to sync saved spots and scans across devices.</p>
+
+      <div class="warn" style="margin-top:22px" id="note"></div>
+
+      <form id="form" style="margin-top:20px" novalidate>
+        <label class="field">
+          <span id="i1"></span>
+          <input id="email" type="email" autocomplete="username" placeholder="Email"
+            aria-label="Email">
+        </label>
+        <label class="field">
+          <span id="i2"></span>
+          <input id="pw" type="password" autocomplete="current-password" placeholder="Password"
+            aria-label="Password">
+          <button class="eye" type="button" id="eye" aria-label="Show password"></button>
+        </label>
+        <div style="text-align:right;margin-top:10px">
+          <a class="small" style="color:var(--dong-chu);font-weight:600" href="#" id="forgot">Forgot password?</a>
+        </div>
+        <button class="btn pri wide" style="margin-top:16px" type="submit">Log in</button>
+      </form>
+
+      <div class="or">OR</div>
+      <button class="btn sec wide" id="google">Continue with Google</button>
+      <button class="btn sec wide" style="margin-top:10px" id="apple">Continue with Apple</button>
+
+      <p class="small muted" style="margin-top:22px">Don't have an account?
+        <a href="signup.html" style="color:var(--dong-chu);font-weight:600">Create account</a></p>
+    </section>
+  </div>
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, I } from "./web.js";
+
+chrome("");
+paintZoneName();
+document.getElementById("i1").innerHTML = I.mail;
+document.getElementById("i2").innerHTML = I.lock;
+document.getElementById("eye").innerHTML = I.eye;
+
+/* Không giả vờ đăng nhập. `config.js` của bản này còn rỗng — chưa có máy
+   chủ tài khoản nào — nên form phải nói thẳng điều đó TRƯỚC khi người ta
+   gõ mật khẩu vào, chứ không phải sau khi bấm nút. Mật khẩu không được
+   lưu, không được gửi đi đâu, kể cả để "thử". */
+document.getElementById("note").innerHTML = `${I.alert}<span><b>Accounts are not connected on
+  this build.</b> The form below is the finished screen, but nothing is sent anywhere and no
+  password is stored. Saved spots, scans and notes already work without an account — they live
+  in this browser.</span>`;
+
+const eye = document.getElementById("eye");
+const pw = document.getElementById("pw");
+eye.onclick = () => {
+  pw.type = pw.type === "password" ? "text" : "password";
+  eye.setAttribute("aria-label", pw.type === "password" ? "Show password" : "Hide password");
+};
+
+const say = (msg) => {
+  let box = document.getElementById("said");
+  if (!box) {
+    box = document.createElement("p");
+    box.id = "said";
+    box.className = "small";
+    box.style.cssText = "margin-top:14px;color:var(--son-dam);font-weight:600";
+    document.getElementById("form").after(box);
+  }
+  box.textContent = msg;
+};
+document.getElementById("form").onsubmit = (e) => {
+  e.preventDefault();
+  pw.value = "";
+  say("No account server is configured, so there is nothing to log in to yet. Your journal works without one.");
+};
+for (const id of ["google", "apple", "forgot"]) {
+  document.getElementById(id).onclick = (e) => {
+    e.preventDefault();
+    say("Single sign-on is not wired up on this build either — nothing was sent.");
+  };
+}
+</script>
+</body>
+</html>

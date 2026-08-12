@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trusted helpers — Nón Lá</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+
+  <section class="panel" style="margin:26px 0 22px;overflow:hidden;display:grid;
+    grid-template-columns:1fr 1fr;align-items:center">
+    <div style="padding:36px 40px">
+      <h1 style="font-size:46px">Trusted helpers</h1>
+      <p class="muted" style="margin-top:10px;max-width:44ch">The people who move the price
+        ranges: every badge below is earned by scans and answers, never handed out.</p>
+    </div>
+    <figure style="height:100%"><img src="../assets/web/banner-helpers.jpg" alt=""
+      style="width:100%;height:100%;object-fit:cover;min-height:230px"></figure>
+  </section>
+
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:start;
+    padding-bottom:44px">
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <section class="panel pad">
+        <div class="sect-head"><span class="spark"></span><h2>Leaderboard</h2>
+          <span class="pill seed" style="margin-left:auto">Sample authors — accounts not connected</span>
+        </div>
+        <div class="podium" id="podium"></div>
+        <p class="small muted" style="margin-top:16px">Ranking counts sample posts shipped with
+          the app. A real leaderboard needs the community server; until then this shows the shape
+          of the page, not standings of real people.</p>
+      </section>
+
+      <section class="panel pad">
+        <div class="sect-head"><span class="spark"></span><h2>Badges</h2></div>
+        <div class="badges" id="badges"></div>
+        <p class="small muted" style="margin-top:16px">Badges unlock from your own recorded
+          activity in this browser — none are granted by an account.</p>
+      </section>
+    </div>
+
+    <aside style="display:flex;flex-direction:column;gap:22px">
+      <section class="panel pad">
+        <div class="sect-head"><h2 style="font-size:19px">How to become a trusted helper</h2></div>
+        <div class="steps" id="steps"></div>
+      </section>
+
+      <section class="panel pad">
+        <div class="sect-head"><h2 style="font-size:19px">Your progress</h2></div>
+        <div id="progress"></div>
+      </section>
+
+      <section class="panel pad">
+        <div class="sect-head"><h2 style="font-size:19px">Recently verified spots</h2></div>
+        <div class="rowlist" id="verified"></div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, load, zoneId, I, esc, photo, placePhoto, webArt } from "./web.js";
+
+chrome("helpers.html");
+paintZoneName();
+document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
+
+const zid = zoneId();
+const [com, places] = await Promise.all([
+  load("community").catch(() => ({ posts: {} })), load("places")]);
+const posts = com.posts?.[zid] || [];
+
+/* ── bảng xếp hạng: đếm bài mẫu, và nói thẳng đó là bài mẫu ──── */
+const by = {};
+for (const p of posts) {
+  const a = (by[p.authorName] ||= { name: p.authorName, country: p.authorCountry, n: 0, paid: 0 });
+  a.n++; if (p.paidVnd) a.paid++;
+}
+const rank = Object.values(by).sort((x, y) => y.n - x.n).slice(0, 5);
+const order = [1, 0, 2, 3, 4].filter((i) => rank[i]);      // hạng nhì – nhất – ba, như bục
+document.getElementById("podium").innerHTML = order.map((i) => {
+  const h = rank[i];
+  return `<article class="helper${i === 0 ? " first" : ""}">
+    <span class="rank">${i + 1}</span>
+    <span class="av">${esc(h.name.slice(0, 1))}</span>
+    <h4>${esc(h.name)}</h4>
+    <p class="role">${esc(h.country || "traveller")}</p>
+    <span class="count">${h.n} sample post${h.n > 1 ? "s" : ""}</span>
+  </article>`;
+}).join("") || `<div class="empty" style="grid-column:1/-1"><b>No sample authors in this area</b>
+  <p>Switch area on the map, or connect the community server to see real contributors.</p></div>`;
+
+/* ── huy hiệu: điều kiện mở khoá đọc từ hoạt động THẬT trong máy ── */
+const read = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || d); } catch { return JSON.parse(d); } };
+const journal = read("nl.journal", "[]");
+const saved = read("nl.saved", "[]");
+const notes = read("nl.notes", "[]");
+
+const BADGES = [
+  ["badge-fair-price", "Fair-price champion", "Record 20 menu checks", journal.length >= 20],
+  ["badge-street-food", "Street food scout", "Save 5 street stalls", saved.length >= 5],
+  ["badge-local-guide", "Local guide", "Write 5 travel notes", notes.length >= 5],
+  ["badge-photo-spotter", "Photo spotter", "Attach a photo to a check", false],
+  ["badge-menu-detective", "Menu detective", "Check a menu with 5+ items", journal.length >= 1],
+  ["badge-community", "Community builder", "Post to the community server", false],
+  ["badge-trusted-advisor", "Trusted advisor", "Answer 10 questions", false],
+  ["badge-spot-verifier", "Spot verifier", "Verify 10 places on the map", saved.length >= 10],
+];
+document.getElementById("badges").innerHTML = BADGES.map(([img, name, how, on]) => `
+  <article class="badge${on ? "" : " locked"}">
+    <img src="${webArt(img, "png")}" alt="" onerror="this.remove()">
+    <b>${esc(name)}</b><span>${on ? "Earned" : esc(how)}</span>
+  </article>`).join("");
+
+document.getElementById("steps").innerHTML = [
+  ["Scan and share", "Check menus as you eat. Each scan feeds the local range."],
+  ["Answer what you know", "Someone asks whether 100k is normal — you already know."],
+  ["Keep it verifiable", "A price with a street and a date beats an opinion."],
+  ["Earn the badge", "Badges follow recorded activity, so they cannot be bought."],
+].map(([t, s], i) => `<div class="step"><span class="n">${i + 1}</span>
+  <div><b>${t}</b><p>${s}</p></div></div>`).join("");
+
+const done = journal.length, goal = 20;
+document.getElementById("progress").innerHTML = `
+  <div style="display:flex;justify-content:space-between;font-size:13px">
+    <span class="muted">Menu checks recorded here</span><b class="tnum">${done} / ${goal}</b></div>
+  <div class="progress" style="margin-top:8px"><i style="width:${Math.min(100, (done / goal) * 100)}%"></i></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;
+    text-align:center">
+    ${[[journal.length, "checks"], [saved.length, "saved"], [notes.length, "notes"]]
+      .map(([n, l]) => `<div><b style="font-family:var(--disp);font-size:22px;display:block">${n}</b>
+        <span class="small muted">${l}</span></div>`).join("")}
+  </div>
+  <p class="small muted" style="margin-top:12px">Counted from this browser only. Nón Lá has no
+    account server on this build, so nothing here follows you to another device.</p>`;
+
+/* ── nơi đã đạt nhãn Đúng Giá, xếp theo lượt quét ───────────── */
+const fair = places.places.filter((p) => p.zone === zid && p.fair === true)
+  .sort((a, b) => (b.scans || 0) - (a.scans || 0)).slice(0, 5);
+document.getElementById("verified").innerHTML = fair.map((p) => `
+  <a href="place.html?id=${encodeURIComponent(p.id)}">
+    <span class="ph" style="width:44px;height:44px;border-radius:10px;overflow:hidden;
+      background:var(--kem);flex:0 0 auto">${photo(placePhoto(p, true), p.name)}</span>
+    <span><b style="font-size:14.5px">${esc(p.name)}</b>
+      <span class="small muted" style="display:block">${esc(p.street)}</span></span>
+    <span class="amt"><span class="pill ok soft">${I.shield}${p.scans}</span></span>
+  </a>`).join("") || `<span class="small muted">No badged place in this area yet.</span>`;
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Journal — Nón Lá</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+
+  <section class="panel" style="margin:26px 0 20px;overflow:hidden;display:grid;
+    grid-template-columns:1fr 1fr;align-items:center">
+    <div style="padding:36px 40px">
+      <h1 style="font-size:46px">Journal</h1>
+      <p class="muted" style="margin-top:10px;max-width:44ch">Your saved places, menu checks and
+        travel notes. Everything on this page lives on this device only.</p>
+      <div class="chiprow" style="margin-top:18px" id="tabs"></div>
+    </div>
+    <figure style="height:100%"><img src="../assets/web/banner-journal.jpg" alt=""
+      style="width:100%;height:100%;object-fit:cover;min-height:230px"></figure>
+  </section>
+
+  <section class="jgrid" style="padding-bottom:44px">
+    <div class="panel pad" data-pane="saved">
+      <div class="sect-head"><span class="spark"></span><h2>Saved spots</h2>
+        <a class="more" href="map.html">Find more</a></div>
+      <div id="saved"></div>
+    </div>
+
+    <div class="panel pad" data-pane="scans">
+      <div class="sect-head"><span class="spark"></span><h2>Recent menu checks</h2></div>
+      <div id="scans"></div>
+    </div>
+
+    <div class="panel pad" data-pane="notes">
+      <div class="sect-head"><span class="spark"></span><h2>Travel notes</h2>
+        <button class="more" id="newNote"></button></div>
+      <div id="notes"></div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, load, I, esc, money, photo, placePhoto, dishPhoto } from "./web.js";
+
+chrome("journal.html");
+paintZoneName();
+document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
+document.getElementById("newNote").innerHTML = `${I.plus}New note`;
+
+/* Ba khoá localStorage này do CHÍNH app ghi. Bản web đọc cùng khoá chứ
+   không dựng kho riêng: mở app trên điện thoại rồi mở web trên máy tính
+   cùng một trình duyệt thì phải thấy cùng một cuốn sổ. */
+const read = (k, dflt) => { try { return JSON.parse(localStorage.getItem(k) || dflt); } catch { return JSON.parse(dflt); } };
+const savedIds = read("nl.saved", "[]");
+const journal = read("nl.journal", "[]");
+const notes = read("nl.notes", "[]");
+
+const TABS = [["all", "All", "grid"], ["saved", "Saved spots", "bookmark"],
+  ["scans", "Menu checks", "scan"], ["notes", "Notes", "note"]];
+let tab = "all";
+const tb = document.getElementById("tabs");
+tb.innerHTML = TABS.map(([k, l, ic]) =>
+  `<button class="chip" data-t="${k}" aria-pressed="${k === tab}">${I[ic]}${l}</button>`).join("");
+tb.onclick = (e) => {
+  const b = e.target.closest("[data-t]");
+  if (!b) return;
+  tab = b.dataset.t;
+  for (const el of tb.children) el.setAttribute("aria-pressed", String(el.dataset.t === tab));
+  for (const pane of document.querySelectorAll("[data-pane]")) {
+    pane.hidden = !(tab === "all" || tab === pane.dataset.pane);
+  }
+};
+
+const [places, dishes] = await Promise.all([load("places"), load("dishes")]);
+const placeOf = (id) => places.places.find((p) => p.id === id);
+const dishOf = (id) => dishes.dishes.find((d) => d.id === id);
+
+/* ── nơi đã lưu ─────────────────────────────────────────────── */
+const saved = savedIds.map(placeOf).filter(Boolean);
+document.getElementById("saved").innerHTML = saved.length
+  ? `<div class="jspots">${saved.map((p) => `
+      <a class="jspot" href="place.html?id=${encodeURIComponent(p.id)}">
+        <span class="ph">${photo(placePhoto(p), p.name)}</span>
+        <span class="b"><h4>${esc(p.name)}</h4>
+          <span class="small muted">${esc(p.street)} · ${esc(p.tier)}</span></span>
+      </a>`).join("")}</div>`
+  : `<div class="empty"><b>Nothing saved yet</b>
+      <p>Open a place and press <b>Save to my journal</b>. Saved spots stay in this browser —
+      nothing is sent to a server.</p>
+      <a class="btn pri" style="margin-top:14px" href="map.html">Open the map</a></div>`;
+
+/* ── lượt quét đã ghi ───────────────────────────────────────── */
+const fmtWhen = (t) => {
+  const d = new Date(t);
+  return Number.isNaN(+d) ? "" : d.toLocaleString("vi-VN", { day: "2-digit", month: "2-digit",
+    hour: "2-digit", minute: "2-digit" });
+};
+document.getElementById("scans").innerHTML = journal.length
+  ? `<div class="timeline">${journal.slice(0, 10).map((j) => {
+      const d = dishOf(j.dish || j.dishId);
+      const lvl = j.level || j.verdict;
+      return `<div class="tl">
+        <span class="when">${esc(fmtWhen(j.at || j.time))}</span>
+        <span class="ph">${d ? photo(dishPhoto(d.id), d.vi) : ""}</span>
+        <span><h4>${esc(d?.vi || j.title || "Menu check")}</h4>
+          <span class="small muted">${esc(j.place || "")}
+            ${j.price ? ` · ${money(j.price)}` : ""}</span></span>
+        ${lvl ? `<span class="pill ${lvl === "ok" ? "ok soft" : lvl === "bad" ? "bad" : "unknown"}"
+          style="justify-self:end">${esc(lvl)}</span>` : ""}
+      </div>`;
+    }).join("")}</div>`
+  : `<div class="empty"><b>No menu checks recorded</b>
+      <p>Every scan the app makes is written here automatically, and can be exported. This
+      browser has none yet.</p>
+      <a class="btn pri" style="margin-top:14px" href="scan.html">Check a price</a></div>`;
+
+/* ── ghi chú ────────────────────────────────────────────────── */
+function paintNotes() {
+  const host = document.getElementById("notes");
+  host.innerHTML = notes.length
+    ? notes.map((n, i) => `<div class="note">
+        <span class="ph" style="display:grid;place-items:center;background:var(--kem);
+          color:var(--dong-chu)">${I.note}</span>
+        <span><h4>${esc(n.title || "Note")}</h4><p>${esc(n.body || "")}</p>
+          <span class="small muted">${esc(n.date || "")}</span></span>
+        <button class="btn ghost" data-del="${i}" aria-label="Delete note">${I.minus}</button>
+      </div>`).join("")
+    : `<div class="empty"><b>No notes yet</b>
+        <p>Opening hours, the price someone quoted you, which alley the good bánh mì is down —
+        the things worth remembering by tomorrow.</p></div>`;
+  host.querySelectorAll("[data-del]").forEach((b) => {
+    b.onclick = () => { notes.splice(Number(b.dataset.del), 1); save(); };
+  });
+}
+const save = () => { localStorage.setItem("nl.notes", JSON.stringify(notes)); paintNotes(); };
+document.getElementById("newNote").onclick = () => {
+  const title = prompt("Note title");
+  if (!title) return;
+  const body = prompt("Note") || "";
+  notes.unshift({ title, body, date: new Date().toISOString().slice(0, 10) });
+  save();
+};
+paintNotes();
+</script>
+</body>
+</html>

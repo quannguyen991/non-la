@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Explore by map — Nón Lá</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+  <div style="display:flex;align-items:flex-end;gap:22px;padding:34px 0 18px;flex-wrap:wrap">
+    <div>
+      <h1 style="font-size:46px">Explore by map</h1>
+      <p class="muted" style="margin-top:10px;max-width:52ch" id="mapLede"></p>
+    </div>
+    <div class="chiprow" style="margin-left:auto" id="filters"></div>
+  </div>
+
+  <div class="chiprow" style="margin-bottom:18px" id="zonePick"></div>
+
+  <section class="maplayout">
+    <div>
+      <div class="mapstage" id="stage">
+        <img class="art" id="art" alt="Hand-painted map of this area">
+        <div class="maplegend">
+          <b>Local price legend</b>
+          <div class="lg" id="lg1"></div>
+          <div class="lg" id="lg2"></div>
+          <div class="lg" id="lg3"></div>
+        </div>
+      </div>
+      <p class="small muted" style="margin-top:12px" id="artNote"></p>
+    </div>
+
+    <aside class="panel pad">
+      <div class="sect-head">
+        <h2 id="listTitle">Tracked spots</h2>
+      </div>
+      <div class="spotlist" id="list"></div>
+    </aside>
+  </section>
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, zonePicker, load, zoneId, I, esc, money, photo,
+         placePhoto, verdictPill, artTransform } from "./web.js";
+let dishName = (k) => k;
+
+chrome("map.html");
+paintZoneName();
+zonePicker("zonePick");
+
+const zid = zoneId();
+const [places, maps, prices, dishData] = await Promise.all([
+  load("places"), load("maps"), load("prices"), load("dishes")]);
+dishName = (k) => dishData.dishes.find((d) => d.id === k)?.vi || k;
+const geo = maps.zones[zid];
+const zone = prices.zones[zid];
+const mine = places.places.filter((p) => p.zone === zid && p.at);
+
+document.getElementById("mapLede").textContent =
+  `${mine.length} tracked places in ${(zone.en || zone.name).replace(" · ", ", ")}. `
+  + "Prices come from accumulated scans, not from a rating.";
+document.getElementById("lg1").innerHTML = `${I.shield}<span><b>Fair Price</b><i>inside the local range</i></span>`;
+document.getElementById("lg2").innerHTML = `${I.alert}<span><b>Above range</b><i>prices run higher here</i></span>`;
+document.getElementById("lg3").innerHTML = `${I.clock}<span><b>Not enough data</b><i>fewer than 20 scans</i></span>`;
+
+/* ── bộ lọc ─────────────────────────────────────────────────── */
+const FILTERS = [
+  { k: "all", label: "All spots", ico: "grid", test: () => true },
+  { k: "fair", label: "Fair price", ico: "shield", test: (p) => p.fair === true },
+  { k: "street", label: "Street food", ico: "bowl", test: (p) => p.tier === "street" },
+  { k: "cafe", label: "Coffee", ico: "coffee", test: (p) => (p.known || []).some((k) => /^ca-phe/.test(k)) },
+  { k: "sit", label: "Sit-down", ico: "bag", test: (p) => p.tier === "restaurant" },
+];
+/* Trang chủ gửi bộ lọc qua ?f= — bấm "Coffee" ở ngoài kia thì mở ra đây
+   đã lọc sẵn, không bắt người ta chọn lại lần nữa. */
+const wanted = new URLSearchParams(location.search).get("f");
+let active = FILTERS.some((f) => f.k === wanted) ? wanted : "all";
+const fbox = document.getElementById("filters");
+fbox.innerHTML = FILTERS.map((f) => `<button class="chip" data-f="${f.k}"
+  aria-pressed="${f.k === active}">${I[f.ico]}${f.label}</button>`).join("");
+fbox.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-f]");
+  if (!b) return;
+  active = b.dataset.f;
+  for (const el of fbox.children) el.setAttribute("aria-pressed", String(el.dataset.f === active));
+  paint();
+});
+
+/* ── tranh nền + ghim ────────────────────────────────────────
+   Ghim đặt bằng ĐÚNG hai mốc trong maps.json, không phải căn tay theo
+   mắt: tranh nào cũng có tỉ lệ và góc xoay riêng, và art._note của từng
+   vùng nói rõ mốc ấy tin được tới đâu. */
+const art = document.getElementById("art");
+const stage = document.getElementById("stage");
+let toImg = null;
+
+if (geo?.art) {
+  art.src = `../${geo.art.src}`;
+  art.alt = geo.art.alt || "Hand-painted map";
+  toImg = artTransform(geo.art.anchors, geo.center);
+  /* KHÔNG đổ nguyên `art._note` ra trang: đó là ghi chú kỹ thuật viết cho
+     người bảo trì dữ liệu, dài cả đoạn và bằng tiếng Việt giữa một giao
+     diện tiếng Anh. Điều người xem cần biết gói trong một câu. */
+  document.getElementById("artNote").textContent =
+    "Hand-painted background anchored to real coordinates: distances and bearings between pins "
+    + "are true, but a pin sits on the right block rather than the exact doorway.";
+} else {
+  art.remove();
+  document.getElementById("artNote").textContent =
+    "This area has no hand-painted map yet, so the list is the map.";
+}
+
+function paint() {
+  const f = FILTERS.find((x) => x.k === active) || FILTERS[0];
+  const list = mine.filter(f.test);
+  document.getElementById("listTitle").textContent = `${list.length} spots · ${f.label}`;
+
+  stage.querySelectorAll(".mappin").forEach((el) => el.remove());
+  if (toImg && geo.art) {
+    for (const p of list) {
+      const q = toImg(p.at);
+      const x = (q.x / geo.art.w) * 100, y = (q.y / geo.art.h) * 100;
+      if (x < -2 || x > 102 || y < -2 || y > 102) continue;   // ngoài mép tranh thì bỏ
+      const colour = p.fair === true ? "#0E4A3C" : p.fair === false ? "#B0201A" : "#8A7A66";
+      stage.insertAdjacentHTML("beforeend", `
+        <a class="mappin" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%"
+           href="place.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}">
+          <svg viewBox="0 0 30 40" aria-hidden="true"><path
+            d="M15 0C6.7 0 0 6.7 0 15c0 10.5 15 25 15 25s15-14.5 15-25C30 6.7 23.3 0 15 0Z"
+            fill="${colour}"/><circle cx="15" cy="14.5" r="5.4" fill="#FBF7EC"/></svg>
+          <span class="lbl">${esc(p.name)}</span>
+        </a>`);
+    }
+  }
+
+  const dishes = list.length ? null : null;
+  document.getElementById("list").innerHTML = list.map((p) => {
+    /* Tên món viết ra bằng tiếng Việt, không phải id trong tệp: "cao-lau"
+       là khoá dữ liệu, người đọc cần thấy "Cao lầu". */
+    const named = (p.known || []).map((k) => dishName(k)).filter(Boolean).slice(0, 3);
+    /* Giá hiện là giá của MÓN CHÍNH ở quán này, không phải giá thấp nhất:
+       "from 3.000₫" ở một hàng cao lầu là giá cốc trà đá, và nó nói sai
+       hẳn về việc ăn ở đây tốn bao nhiêu. */
+    const lead = (p.known || []).find((k) => (p.prices || {})[k]);
+    return `<a class="spotrow" href="place.html?id=${encodeURIComponent(p.id)}">
+      <span class="ph">${photo(placePhoto(p, true), p.name)}</span>
+      <span>
+        <h4>${esc(p.name)}</h4>
+        <span class="meta">${esc(p.street)} · ${esc(p.tier)} · ${p.scans} scans</span>
+        <span class="meta">${named.length ? esc(named.join(" · ")) : "—"}</span>
+        <span class="r2">${verdictPill(p.fair)}
+          ${lead ? `<span class="small muted tnum">${esc(dishName(lead))} ${money(p.prices[lead])}</span>` : ""}
+        </span>
+      </span>
+    </a>`;
+  }).join("") || `<div class="empty"><b>Nothing matches that filter</b>
+    <p>Try another filter — every filter here answers from data the app actually has.</p></div>`;
+}
+paint();
+</script>
+</body>
+</html>

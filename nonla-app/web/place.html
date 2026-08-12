@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Place — Nón Lá</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+</head>
+<body>
+<main class="wrap" id="main">
+  <nav class="crumb" id="crumb"></nav>
+  <div id="page"></div>
+</main>
+
+<script type="module">
+import { chrome, paintZoneName, load, I, esc, money, km, distance, photo,
+         placePhoto, dishPhoto, verdictPill } from "./web.js";
+
+chrome("");
+paintZoneName();
+
+const id = new URLSearchParams(location.search).get("id");
+const [places, prices, dishes, maps] = await Promise.all([
+  load("places"), load("prices"), load("dishes"), load("maps")]);
+const p = places.places.find((x) => x.id === id);
+const page = document.getElementById("page");
+
+if (!p) {
+  page.innerHTML = `<div class="empty" style="margin:40px 0 60px"><b>No such place</b>
+    <p>That link points at a place this build does not carry. Open the map and pick one.</p>
+    <a class="btn pri" style="margin-top:16px" href="map.html">Open the map</a></div>`;
+} else {
+  const zone = prices.zones[p.zone];
+  const geo = maps.zones[p.zone];
+  const dishOf = (k) => dishes.dishes.find((d) => d.id === k);
+
+  document.getElementById("crumb").innerHTML =
+    `<a href="index.html">Explore</a>${I.chevron}<a href="map.html">Tracked spots</a>${I.chevron}
+     <span>${esc(p.name)}</span>`;
+  document.title = `${p.name} — Nón Lá`;
+
+  /* Thanh so giá: vị trí của quán trên dải p25–p95 của CHÍNH vùng đó.
+     Không có món nào có giá thì không vẽ thanh — một thanh trống trông
+     như dữ liệu bị mất chứ không như "chưa đo". */
+  const priced = Object.entries(p.prices || {})
+    .map(([k, v]) => ({ k, v, it: zone.items[k] })).filter((x) => x.it);
+  const lead = priced[0];
+  let meter = "";
+  if (lead) {
+    const { it, v } = lead;
+    const lo = it.p25, hi = it.p95;
+    const pct = Math.max(2, Math.min(98, ((v - lo) / Math.max(1, hi - lo)) * 100));
+    const inside = v <= it.p75;
+    meter = `
+      <div class="panel pad" style="margin-top:18px">
+        <div class="sect-head">
+          <h2>Price check</h2>
+          <span class="more" style="cursor:default">${inside
+            ? `<span class="pill ok soft">${I.shield}Inside local range</span>`
+            : `<span class="pill bad">${I.alert}Above the local range</span>`}</span>
+        </div>
+        <p class="small muted">${esc(dishOf(lead.k)?.vi || lead.k)} here vs what
+          ${zone.en || zone.name} usually pays</p>
+        <div class="meter">
+          <div class="bar"><span class="dot" style="left:${pct}%"></span></div>
+          <div class="ends">
+            <span>low ${money(lo)}</span>
+            <span><b>this place ${money(v)}</b></span>
+            <span>high ${money(hi)}</span>
+          </div>
+        </div>
+        <p class="small muted" style="margin-top:12px">Ranges come from seed data for
+          ${esc(zone.en || zone.name)}, updated ${esc(zone.updated || "")}. A price inside the
+          range is not a promise the food is good — only that the number is normal here.</p>
+      </div>`;
+  }
+
+  const near = places.places
+    .filter((x) => x.zone === p.zone && x.id !== p.id && x.at && p.at)
+    .map((x) => ({ x, m: distance(p.at, x.at) }))
+    .sort((a, b) => a.m - b.m).slice(0, 4);
+
+  const sights = (geo?.landmarks || [])
+    .filter((l) => l.at && l.note && p.at && distance(p.at, l.at) < 400)
+    .slice(0, 3);
+
+  page.innerHTML = `
+  <div class="detail" style="padding-bottom:40px">
+    <div>
+      <div class="dhero">
+        ${photo(placePhoto(p), p.name, "bg")}
+        <div class="inner">
+          <h1>${esc(p.name)}</h1>
+          <p class="muted" style="margin-top:8px">${I.pin} ${esc(p.street)} ·
+            ${esc(p.tier)} · ${p.scans} independent scans${p.since ? ` · badged since ${esc(p.since)}` : ""}</p>
+          <div style="margin-top:12px">${verdictPill(p.fair)}</div>
+          <div class="facts">
+            <div class="fact"><b>${I.bowl}Known for</b>
+              <p>${(p.known || []).map((k) => esc(dishOf(k)?.vi || k)).join(" · ") || "—"}</p></div>
+            <div class="fact"><b>${I.clock}Typical price</b>
+              <p>${lead ? `${money(lead.it.p25)} – ${money(lead.it.p75)} for
+                ${esc(dishOf(lead.k)?.vi || lead.k)}` : "No priced dish recorded here yet."}</p></div>
+            <div class="fact"><b>${I.pin}Where</b>
+              <p>${esc(p.street)}, ${esc((zone.en || zone.name).replace(" · ", ", "))}.
+                Coordinates are approximate placements on the named street.</p></div>
+          </div>
+        </div>
+      </div>
+
+      ${meter}
+
+      <div class="panel pad" style="margin-top:18px">
+        <div class="sect-head"><h2>Signature dishes</h2>
+          <a class="more" href="scan.html">Check a menu</a></div>
+        <div class="dishes3">
+          ${(p.known || []).map((k) => {
+            const d = dishOf(k), it = zone.items[k], mine = (p.prices || {})[k];
+            if (!d) return "";
+            return `<article class="dish">
+              <span class="ph">${photo(dishPhoto(d.id), d.vi)}</span>
+              <span>
+                <h4>${esc(d.vi)}</h4>
+                <span class="amt">${money(mine ?? it?.p50)}</span>
+                <p>${esc(d.en)}${it ? ` · local ${money(it.p25)}–${money(it.p75)}` : ""}</p>
+              </span></article>`;
+          }).join("") || `<p class="muted">No dish recorded for this place yet.</p>`}
+        </div>
+      </div>
+
+      ${sights.length ? `<div class="panel pad" style="margin-top:18px">
+        <div class="sect-head"><h2>Sights within 400 m</h2></div>
+        <div class="dishes3">
+          ${sights.map((l) => `<article class="dish">
+            <span class="ph">${photo(`../assets/sights/${l.img}.jpg`, l.n)}</span>
+            <span><h4>${esc(l.n)}</h4>
+              <p>${esc(l.note).slice(0, 90)}…</p></span></article>`).join("")}
+        </div></div>` : ""}
+    </div>
+
+    <aside style="display:flex;flex-direction:column;gap:18px">
+      <div class="panel pad">
+        <h3 style="font-size:19px">Save this spot</h3>
+        <p class="small muted" style="margin:8px 0 14px">Saved spots stay on this device —
+          this build has no account server behind it.</p>
+        <button class="btn pri wide" id="saveBtn">${I.bookmark}Save to my journal</button>
+      </div>
+
+      <div class="panel pad">
+        <h3 style="font-size:19px">Report a price</h3>
+        <p class="small muted" style="margin:8px 0 14px">Paid something different? The scan
+          history is what moves the range — reports without a scan do not.</p>
+        <a class="btn sec wide" href="scan.html">${I.scan}Scan the menu here</a>
+      </div>
+
+      <div class="panel pad">
+        <div class="sect-head"><h2 style="font-size:19px">Nearby tracked spots</h2></div>
+        <div class="rowlist">
+          ${near.map(({ x, m }) => `<a href="place.html?id=${encodeURIComponent(x.id)}">
+            <span class="avatar" style="background:var(--kem);color:var(--dong-chu)">${esc(x.name.slice(0, 1))}</span>
+            <span><b style="font-size:14.5px">${esc(x.name)}</b>
+              <span class="small muted" style="display:block">${esc(x.street)}</span></span>
+            <span class="amt">${km(m)}</span></a>`).join("")}
+        </div>
+      </div>
+    </aside>
+  </div>`;
+
+  /* Lưu vào cùng khoá localStorage mà app dùng, để hai bản không có hai
+     danh sách "đã lưu" khác nhau trên cùng một máy. */
+  const KEY = "nl.saved";
+  const saved = () => { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } };
+  const btn = document.getElementById("saveBtn");
+  const sync = () => {
+    const on = saved().includes(p.id);
+    btn.innerHTML = `${I.bookmark}${on ? "Saved to journal" : "Save to my journal"}`;
+    btn.className = `btn wide ${on ? "sec" : "pri"}`;
+  };
+  btn.onclick = () => {
+    const list = saved();
+    const i = list.indexOf(p.id);
+    if (i >= 0) list.splice(i, 1); else list.push(p.id);
+    localStorage.setItem(KEY, JSON.stringify(list));
+    sync();
+  };
+  sync();
+}
+</script>
+</body>
+</html>
