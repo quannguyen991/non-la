@@ -17,7 +17,7 @@
     <div style="padding:36px 40px">
       <h1 style="font-size:46px">Journal</h1>
       <p class="muted" style="margin-top:10px;max-width:44ch">Your saved places, menu checks and
-        travel notes. Everything on this page lives on this device only.</p>
+        travel notes — kept under your account, not scattered across devices.</p>
       <div class="chiprow" style="margin-top:18px" id="tabs"></div>
     </div>
     <figure style="height:100%"><img src="../assets/web/banner-journal.jpg" alt=""
@@ -57,14 +57,26 @@ document.getElementById("newNote").innerHTML = `${I.plus}New note`;
    "người" nào để mở sổ, nên ba khối để trống và nói thẳng — thay vì bịa
    ra vài thẻ mẫu cho đỡ trống. */
 if (!signedIn()) {
-  document.getElementById("newNote").remove();
-  document.getElementById("saved").innerHTML = gate("Saved spots need an account",
-    "Your saved places travel with the account, so the list on this laptop is the same one your phone shows.");
-  document.getElementById("scans").innerHTML = gate("Menu checks are yours alone",
-    "Every scan you make is written into your own journal. Nobody else's checks appear here, and yours appear nowhere else.");
-  document.getElementById("notes").innerHTML = gate("Notes need an account",
-    "Opening hours, a price someone quoted, which alley the good bánh mì is down — kept under your account.");
-  document.querySelector("#tabs").remove();
+  /* MỘT cổng cho cả trang, không phải ba cái giống hệt nhau xếp cạnh
+     nhau: cả ba khối cùng chờ đúng một điều kiện, nên lặp lại ba lần chỉ
+     làm người đọc phải đọc ba lần cùng một câu. */
+  document.querySelector(".jgrid").outerHTML = `
+    <section class="panel pad" style="margin-bottom:44px">
+      ${gate("Your journal needs an account",
+        "The journal is one person's notebook: places you saved, menus you checked, notes you "
+        + "wrote. It follows the account rather than the browser, so the list on this laptop is "
+        + "the one your phone shows.")}
+      <div class="cards3" style="margin:22px 0 0">
+        ${[["bookmark", "Saved spots", "Places you keep coming back to, with their price range."],
+           ["scan", "Menu checks", "Every scan, with what you paid and how it compared."],
+           ["note", "Travel notes", "Opening hours, quoted prices, which alley to turn down."]]
+          .map(([ic, t, d]) => `<article style="display:flex;gap:12px;align-items:flex-start">
+            <span style="color:var(--dong-chu)">${I[ic]}</span>
+            <span><b style="font-family:var(--disp);font-size:15px">${t}</b>
+              <span class="small muted" style="display:block">${d}</span></span>
+          </article>`).join("")}
+      </div>
+    </section>`;
 } else {
 
 /* Ba khoá localStorage này do CHÍNH app ghi. Bản web đọc cùng khoá chứ

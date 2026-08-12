@@ -124,8 +124,6 @@ export function gate(title, why, cta = "Log in to continue") {
       <a class="btn pri" href="login.html">${I.shield}${esc(cta)}</a>
       <a class="btn sec" href="signup.html">${I.userPlus}Create account</a>
     </div>
-    <span class="small muted">Tài khoản chưa nối máy chủ ở bản này — trang đăng nhập nói rõ
-      điều đó trước khi bạn gõ gì vào.</span>
   </div>`;
 }
 

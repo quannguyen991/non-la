@@ -329,7 +329,7 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:600;letter-spacing:-.015em;line-
 /* ── quét thực đơn ──────────────────────────────────────────── */
 .scanlayout{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
 .dropzone{border:2px dashed var(--vien);border-radius:var(--r-lg);background:var(--tam);
-  min-height:380px;display:grid;place-items:center;text-align:center;padding:30px;
+  min-height:320px;display:grid;place-items:center;text-align:center;padding:30px;
   transition:border-color .18s ease,background .18s ease}
 .dropzone.hot{border-color:var(--ngoc);background:#F3FAF6}
 .dropzone img.shot{max-height:420px;border-radius:14px;border:1px solid var(--vien)}
@@ -343,7 +343,12 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:600;letter-spacing:-.015em;line-
 .verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0}
 .verdict .v{padding:14px;border:1px solid var(--vien-in);border-radius:14px;background:var(--kem)}
 .verdict .v b{display:block;font-size:12px;color:var(--muc-nhat);font-weight:600}
-.verdict .v span{font-family:var(--disp);font-size:22px;font-weight:600}
+/* Số tiền KHÔNG được gãy dòng: "40.000₫ –" đứng một dòng rồi "60.000₫"
+   xuống dòng dưới đọc ra như hai con số rời nhau. Cỡ chữ nhỏ hơn một
+   bậc và tabular-nums giữ ba ô thẳng cột. */
+.verdict .v span{display:block;font-family:var(--disp);font-size:19px;font-weight:600;
+  white-space:nowrap;font-variant-numeric:tabular-nums}
+@media (max-width:1320px){ .verdict .v span{font-size:16.5px} }
 
 /* ── nhật ký ────────────────────────────────────────────────── */
 .jgrid{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:22px;align-items:start}
