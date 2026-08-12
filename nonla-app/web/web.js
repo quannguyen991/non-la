@@ -122,13 +122,30 @@ export function chrome(current) {
   const CHILD = { "map.html": "index.html", "place.html": "index.html" };
   const at = CHILD[current] || current;
   const here = (f) => (f === at ? ' aria-current="page"' : "");
+  /* ── khối thương hiệu ────────────────────────────────────────
+     Bản trước đặt TÊN VÙNG vào chỗ của tên sản phẩm: góc trái nói "HO CHI
+     MINH CITY · DISTRICT 1" và không chỗ nào trên trang nói đây là Nón
+     Lá. Ngoài ra tên vùng dài ngắn chênh nhau gấp đôi — "Hue · The
+     Citadel" so với "Ho Chi Minh City · District 1" — nên một dòng chữ
+     hoa giãn cách làm cả thanh trên co giật mỗi lần đổi vùng.
+
+     Nên tách hai tầng: TÊN SẢN PHẨM đứng yên, TÊN VÙNG thành một nút đổi
+     vùng ngay dưới. Vùng là thứ người ta đổi luôn, mà trước đây muốn đổi
+     phải về trang chủ tìm hàng chip. */
   document.body.insertAdjacentHTML("afterbegin", `
     <header class="top">
       <div class="wrap">
-        <a class="brand" href="index.html">
-          <img src="../icon.svg" alt="">
-          <b id="brandZone">Hội An · Old Town</b>
-        </a>
+        <div class="brand">
+          <a class="mark" href="index.html" aria-label="Nón Lá — trang chủ">
+            <img src="../icon.svg" alt=""></a>
+          <div class="lock">
+            <a class="name" href="index.html">Nón&nbsp;Lá</a>
+            <button class="zonebtn" id="zoneBtn" aria-haspopup="listbox" aria-expanded="false">
+              ${I.pin}<span id="brandZone">Hội An · Old Town</span>${I.chevron}
+            </button>
+            <div class="zonemenu" id="zoneMenu" role="listbox" hidden></div>
+          </div>
+        </div>
         <nav class="nav" aria-label="Chính">
           ${NAV.map(([f, label, ico]) => `<a href="${f}"${here(f)}>${I[ico]}<span>${label}</span></a>`).join("")}
         </nav>
@@ -166,13 +183,49 @@ export function chrome(current) {
 }
 
 /* Tên vùng trên thanh thương hiệu phải theo vùng đang chọn — mở app ở
-   Hội An rồi bay ra Đà Nẵng mà tiêu đề vẫn nói Hội An là sai. */
+   Hội An rồi bay ra Đà Nẵng mà tiêu đề vẫn nói Hội An là sai.
+
+   Nút này cũng LÀ chỗ đổi vùng: mỗi dòng trong menu mang theo số cơ sở
+   và số điểm tham quan của vùng đó, vì câu hỏi thật của người bấm vào
+   không phải "vùng nào" mà "đổi sang đó thì có gì". */
 export async function paintZoneName() {
   const el = document.getElementById("brandZone");
   if (!el) return;
-  const prices = (await load("prices")).zones;
-  const z = prices[zoneId()] || prices[DEFAULT_ZONE];
-  el.textContent = (z.en || z.name || "").replace(" · ", " · ");
+  const [prices, places, maps] = await Promise.all([load("prices"), load("places"), load("maps")]);
+  const zones = prices.zones;
+  const cur = zones[zoneId()] ? zoneId() : DEFAULT_ZONE;
+  el.textContent = zones[cur].en || zones[cur].name || "";
+
+  const btn = document.getElementById("zoneBtn");
+  const menu = document.getElementById("zoneMenu");
+  if (!btn || !menu) return;
+
+  menu.innerHTML = Object.entries(zones).map(([id, z]) => {
+    const [main, sub] = String(z.en || z.name).split(" · ");
+    const n = places.places.filter((p) => p.zone === id).length;
+    const s = (maps.zones[id]?.landmarks || []).filter((l) => l.note).length;
+    return `<button role="option" aria-selected="${id === cur}" data-zone="${esc(id)}">
+      <span class="tick">${id === cur ? I.shield : ""}</span>
+      <span><b>${esc(main)}</b><i>${esc(sub || "")}</i></span>
+      <span class="n">${n} spots · ${s} sights</span>
+    </button>`;
+  }).join("");
+
+  const open = (on) => {
+    menu.hidden = !on;
+    btn.setAttribute("aria-expanded", String(on));
+  };
+  btn.onclick = (e) => { e.stopPropagation(); open(menu.hidden); };
+  menu.onclick = (e) => {
+    const b = e.target.closest("[data-zone]");
+    if (!b) return;
+    setZone(b.dataset.zone);
+    location.reload();
+  };
+  /* Bấm ra ngoài và phím Esc đều phải đóng được. Một menu chỉ đóng bằng
+     cách bấm lại đúng cái nút vừa mở là cái bẫy quen thuộc nhất. */
+  document.addEventListener("click", () => open(false));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") open(false); });
 }
 
 export function zonePicker(hostId, onPick) {

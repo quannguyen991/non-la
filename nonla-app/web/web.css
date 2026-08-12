@@ -58,10 +58,43 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:600;letter-spacing:-.015em;line-
 .top{position:sticky;top:0;z-index:40;background:rgba(251,247,236,.92);
   backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .top .wrap{display:flex;align-items:center;gap:26px;height:76px}
-.brand{display:flex;align-items:center;gap:12px;flex:0 0 auto}
-.brand img{width:38px;height:38px}
-.brand b{font-family:var(--disp);font-size:19px;letter-spacing:.12em;font-weight:600;
-  text-transform:uppercase;white-space:nowrap}
+/* ── khối thương hiệu: tên sản phẩm trên, nút đổi vùng dưới ────
+   Tên vùng dài ngắn chênh gấp đôi giữa sáu vùng, nên nó KHÔNG được nằm
+   ở dòng tên sản phẩm: đổi vùng mà cả thanh trên xê dịch thì mỗi lần đổi
+   là một lần giao diện nhảy. Ở tầng dưới, nó có trần bề rộng riêng và
+   cắt bằng dấu ba chấm khi quá dài. */
+.brand{display:flex;align-items:center;gap:13px;flex:0 0 auto}
+.brand .mark{display:block;border-radius:13px;overflow:hidden;line-height:0;
+  box-shadow:0 1px 2px rgba(31,26,10,.10);transition:transform .18s ease}
+.brand .mark:hover{transform:translateY(-1px)}
+.brand img{width:42px;height:42px}
+.lock{display:grid;gap:2px;position:relative}
+.lock .name{font-family:var(--disp);font-size:21px;font-weight:600;letter-spacing:.01em;
+  line-height:1.05;color:var(--muc)}
+.zonebtn{display:inline-flex;align-items:center;gap:5px;padding:3px 9px 3px 6px;
+  border-radius:var(--pill);border:1px solid transparent;
+  font-size:12px;font-weight:600;color:var(--dong-chu);letter-spacing:.02em;
+  max-width:230px;transition:background .16s ease,border-color .16s ease}
+.zonebtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zonebtn svg{width:14px;height:14px;flex:0 0 auto}
+.zonebtn svg:last-child{width:12px;height:12px;transform:rotate(90deg);opacity:.75}
+.zonebtn:hover{background:rgba(201,162,39,.14);border-color:var(--vien-in)}
+.zonebtn[aria-expanded="true"]{background:var(--tam);border-color:var(--vien)}
+.zonebtn[aria-expanded="true"] svg:last-child{transform:rotate(-90deg)}
+
+.zonemenu{position:absolute;top:calc(100% + 10px);left:-6px;z-index:60;width:330px;
+  background:var(--tam);border:1px solid var(--vien);border-radius:18px;padding:6px;
+  box-shadow:var(--shadow-lift)}
+.zonemenu button{display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:center;
+  width:100%;text-align:left;padding:10px 12px;border-radius:13px;
+  transition:background .14s ease}
+.zonemenu button:hover{background:rgba(201,162,39,.12)}
+.zonemenu button[aria-selected="true"]{background:rgba(14,74,60,.07)}
+.zonemenu .tick{color:var(--ngoc-sau);display:flex}
+.zonemenu .tick svg{width:17px;height:17px}
+.zonemenu b{display:block;font-family:var(--disp);font-size:15px;font-weight:600}
+.zonemenu i{font-style:normal;font-size:12px;color:var(--muc-nhat)}
+.zonemenu .n{font-size:11.5px;color:var(--dong-chu);font-weight:600;white-space:nowrap}
 /* ── thanh điều hướng: chỉ ICON, chữ nở ra khi rê chuột ───────
    Năm mục có chữ đủ dài để "Scan Menu" gãy làm hai dòng ở màn 1440px, và
    một thanh nav cao hai dòng kéo lệch cả hàng. Nên mặc định chỉ hiện
