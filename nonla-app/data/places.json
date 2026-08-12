@@ -1542,6 +1542,182 @@
       "scans": 16,
       "fair": false,
       "since": "2026-04"
+    },
+    {
+      "id": "hue-bun-bo-nguyen-tri-phuong",
+      "name": "Bún bò Nguyễn Tri Phương",
+      "zone": "hue-citadel",
+      "tier": "casual",
+      "street": "Nguyễn Tri Phương",
+      "at": [
+        16.46472,
+        107.59276
+      ],
+      "known": [
+        "bun-bo-hue",
+        "tra-da"
+      ],
+      "prices": {
+        "bun-bo-hue": 35000,
+        "tra-da": 2000
+      },
+      "scans": 27,
+      "fair": true,
+      "since": "2026-02"
+    },
+    {
+      "id": "hue-banh-uot-vo-thi-sau",
+      "name": "Bánh ướt thịt nướng Võ Thị Sáu",
+      "zone": "hue-citadel",
+      "tier": "casual",
+      "street": "Võ Thị Sáu",
+      "at": [
+        16.46868,
+        107.59525
+      ],
+      "known": [
+        "banh-uot-thit-nuong",
+        "nem-lui"
+      ],
+      "prices": {
+        "banh-uot-thit-nuong": 35000,
+        "nem-lui": 10000
+      },
+      "scans": 23,
+      "fair": true,
+      "since": "2026-03"
+    },
+    {
+      "id": "hue-che-hem-hung-vuong",
+      "name": "Chè hẻm Nguyễn Công Trứ",
+      "zone": "hue-citadel",
+      "tier": "street",
+      "street": "Nguyễn Công Trứ",
+      "at": [
+        16.47165,
+        107.59628
+      ],
+      "known": [
+        "che",
+        "banh-flan"
+      ],
+      "prices": {
+        "che": 12000,
+        "banh-flan": 12000
+      },
+      "scans": 25,
+      "fair": true,
+      "since": "2026-02"
+    },
+    {
+      "id": "hue-ca-phe-le-loi",
+      "name": "Cà phê bờ sông Lê Lợi",
+      "zone": "hue-citadel",
+      "tier": "casual",
+      "street": "Lê Lợi",
+      "at": [
+        16.46651,
+        107.5891
+      ],
+      "known": [
+        "ca-phe-sua-da",
+        "ca-phe-dua"
+      ],
+      "prices": {
+        "ca-phe-sua-da": 18000,
+        "ca-phe-dua": 30000
+      },
+      "scans": 24,
+      "fair": true,
+      "since": "2026-03"
+    },
+    {
+      "id": "hue-banh-canh-hai-ba-trung",
+      "name": "Bánh canh cá lóc Hai Bà Trưng",
+      "zone": "hue-citadel",
+      "tier": "street",
+      "street": "Hai Bà Trưng",
+      "at": [
+        16.46063,
+        107.5891
+      ],
+      "known": [
+        "banh-canh-ca-loc",
+        "banh-bot-loc"
+      ],
+      "prices": {
+        "banh-canh-ca-loc": 30000,
+        "banh-bot-loc": 25000
+      },
+      "scans": 21,
+      "fair": true,
+      "since": "2026-04"
+    },
+    {
+      "id": "hue-bun-thit-nuong-ngo-quyen",
+      "name": "Bún thịt nướng Ngô Quyền",
+      "zone": "hue-citadel",
+      "tier": "casual",
+      "street": "Ngô Quyền",
+      "at": [
+        16.46121,
+        107.58839
+      ],
+      "known": [
+        "bun-thit-nuong",
+        "goi-cuon"
+      ],
+      "prices": {
+        "bun-thit-nuong": 35000,
+        "goi-cuon": 30000
+      },
+      "scans": 20,
+      "fair": true,
+      "since": "2026-04"
+    },
+    {
+      "id": "hue-com-hen-dinh-tien-hoang",
+      "name": "Cơm hến Đinh Tiên Hoàng",
+      "zone": "hue-citadel",
+      "tier": "street",
+      "street": "Đinh Tiên Hoàng",
+      "at": [
+        16.47869,
+        107.57769
+      ],
+      "known": [
+        "com-hen",
+        "tra-da"
+      ],
+      "prices": {
+        "com-hen": 20000,
+        "tra-da": 2000
+      },
+      "scans": 29,
+      "fair": true,
+      "since": "2026-01"
+    },
+    {
+      "id": "hue-lau-ben-nghe",
+      "name": "Lẩu Bến Nghé",
+      "zone": "hue-citadel",
+      "tier": "restaurant",
+      "street": "Bến Nghé",
+      "at": [
+        16.46558,
+        107.59475
+      ],
+      "known": [
+        "lau",
+        "bia-chai"
+      ],
+      "prices": {
+        "lau": 330000,
+        "bia-chai": 35000
+      },
+      "scans": 16,
+      "fair": false,
+      "since": "2026-04"
     }
   ]
 }
