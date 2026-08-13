@@ -508,3 +508,58 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:600;letter-spacing:-.015em;line-
 .gatebox b{font-family:var(--disp);font-size:18px}
 .gatebox p{font-size:13.5px;color:var(--muc-nhat);max-width:46ch}
 .gatebox .grow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+
+/* ── hộp trò chuyện ─────────────────────────────────────────
+   Neo góc phải dưới và KHÔNG đẩy nội dung: nó là lớp phủ, không phải một
+   cột nữa. z-index trên thanh trên (40) nhưng dưới menu đổi vùng (60) —
+   mở menu vùng mà bị cái bong bóng chat đè lên thì hỏng cả hai. */
+.chatfab{position:fixed;right:24px;bottom:24px;z-index:50;
+  display:inline-flex;align-items:center;gap:10px;padding:14px 20px;
+  border-radius:var(--pill);background:var(--ngoc-sau);color:#FBF7EC;
+  font-size:14.5px;font-weight:600;box-shadow:0 8px 30px rgba(14,74,60,.32);
+  transition:transform .16s ease,box-shadow .18s ease}
+.chatfab:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(14,74,60,.4)}
+.chatfab svg{width:20px;height:20px}
+.chatfab[aria-expanded="true"]{opacity:0;pointer-events:none}
+
+.chatbox{position:fixed;right:24px;bottom:24px;z-index:52;width:390px;max-width:calc(100vw - 32px);
+  height:min(600px, calc(100vh - 120px));display:flex;flex-direction:column;
+  background:var(--tam);border:1px solid var(--vien);border-radius:22px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(31,26,10,.22)}
+.chatbox header{display:flex;align-items:center;gap:11px;padding:14px 16px;
+  border-bottom:1px solid var(--line);background:rgba(201,162,39,.08)}
+.chatbox header .ava{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:var(--ngoc-sau);color:var(--dong);flex:0 0 auto}
+.chatbox header b{display:block;font-family:var(--disp);font-size:16px}
+.chatbox header i{font-style:normal;font-size:11.5px;color:var(--muc-nhat)}
+.chatbox header .x{margin-left:auto;width:34px;height:34px;border-radius:50%;
+  display:grid;place-items:center;color:var(--muc-nhat)}
+.chatbox header .x:hover{background:rgba(201,162,39,.16)}
+
+.chatbox .log{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chatbox .msg{max-width:86%;padding:11px 14px;border-radius:16px;font-size:14px;line-height:1.5}
+.chatbox .msg.bot{background:var(--diep);border:1px solid var(--vien-in);
+  border-bottom-left-radius:6px;align-self:flex-start}
+.chatbox .msg.me{background:var(--ngoc-sau);color:#F4FAF7;border-bottom-right-radius:6px;
+  align-self:flex-end}
+.chatbox .msg .tiny{display:block;margin-top:8px;font-size:11.5px;color:var(--muc-nhat)}
+.chatbox .keyin{width:100%;margin-top:8px;padding:9px 11px;border-radius:10px;
+  border:1px solid var(--vien);background:var(--giay);font-size:13px}
+
+.chatbox .ask{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.chatbox .ask input{flex:1;padding:12px 14px;border-radius:var(--pill);
+  border:1px solid var(--vien-in);background:var(--giay);font-size:14px;outline:none}
+.chatbox .ask input:focus{border-color:var(--vien-dam)}
+.chatbox .send{width:44px;height:44px;border-radius:50%;flex:0 0 auto;
+  display:grid;place-items:center;background:var(--ngoc-sau);color:#FBF7EC}
+.chatbox .send:hover{background:#0B3B30}
+.chatbox .foot{padding:0 14px 12px;font-size:11px;color:var(--muc-nhat)}
+
+@media (max-width:520px){
+  .chatbox{right:8px;left:8px;bottom:8px;width:auto;height:min(70vh, 520px)}
+  .chatfab{right:12px;bottom:12px}
+  .chatfab span{display:none}
+}
+.chatbox .think{color:var(--muc-nhat);font-style:italic}
+.chatbox .think::after{content:"";animation:nlDots 1.2s steps(4,end) infinite}
+@keyframes nlDots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}

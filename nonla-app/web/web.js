@@ -191,6 +191,10 @@ export function chrome(current) {
       </div>
     </header>`);
 
+  /* Hộp chat nạp SAU khung trang và nạp động: trang nào cũng có nó, mà
+     trang nào cũng không được chờ nó mới vẽ xong. */
+  import("./chat.js").then((m) => m.mountChat()).catch(() => {});
+
   document.body.insertAdjacentHTML("beforeend", `
     <footer class="foot">
       <div class="wrap">
