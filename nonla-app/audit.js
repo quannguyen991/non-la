@@ -89,6 +89,33 @@ export async function run({ verbose = true } = {}) {
   const out = [];
   const ck = (n, c, i = "") => { out.push({ name: n, pass: !!c, info: i }); };
 
+  /* ── đóng màn mở đầu TRƯỚC MỌI THỨ ──────────────────────
+     Đây là nguyên nhân thật của hai phép thử đỏ dai dẳng ("ghim không bị
+     nút mở bản đồ che", "ghim tham quan thực sự nhận cú chạm"). Cả hai
+     dùng elementFromPoint, và trên một hồ sơ trình duyệt sạch thì
+     #v-welcome vẫn đang mở, phủ z-index 80 lên TOÀN BỘ app. Mọi phép đo
+     "cái gì nằm ở toạ độ này" đều trả về tranh của màn mở đầu — không
+     phải ghim bị nút che, mà là cả bản đồ nằm dưới một tấm bạt.
+
+     Hai phép thử ấy vì thế báo sai chỗ suốt: chúng nói bản đồ hỏng trong
+     khi bản đồ vẫn tốt, và chỉ về đúng nơi không có gì để sửa.
+
+     Đóng bằng ĐÚNG ĐƯỜNG người dùng đi — bấm Skip rồi điền tên — chứ
+     không phải gán thẳng hidden=true: nếu luồng đó tự nó hỏng thì phép
+     thử phải đỏ ở đây, chứ không phải được che đi bằng một lối tắt. */
+  {
+    const wv = $("#v-welcome");
+    if (wv && !wv.hidden) {
+      if ($("[data-wc='skip']")) { $("[data-wc='skip']").click(); await wait(380); }
+      const nm = $("#wcName");
+      if (nm) nm.value = "Audit";
+      $("[data-wc='local']")?.click();
+      await wait(420);
+    }
+    ck("màn mở đầu đóng được trước khi kiểm giao diện", !!$("#v-welcome")?.hidden,
+      $("#v-welcome")?.hidden ? "" : "còn phủ z-index 80 lên toàn app");
+  }
+
   /* ── điều hướng ─────────────────────────────────────── */
   for (const t of ["map", "eat", "journal", "me", "scan"]) {
     A.go(t); await wait(110);
@@ -314,7 +341,25 @@ export async function run({ verbose = true } = {}) {
     ck("mọi ghim nằm trong khung bản đồ", stray.length === 0, String(stray.length));
   }
   const sheetBox = $("#v-map .ex-sheet")?.getBoundingClientRect();
-  if (mapBox && sheetBox) ck("khay đè lên mép dưới bản đồ", sheetBox.top < mapBox.bottom);
+  /* ĐẢO NGƯỢC so với bản trước. Phép thử cũ khoá đúng hành vi cũ: khay
+     trượt ĐÈ lên mép dưới bản đồ để ló ra một mảnh, báo cho người dùng
+     biết bên dưới còn nội dung. Ý thì đúng, nhưng 14px bị che lại đúng là
+     dải chứa viên "Open full map" và hai nút tròn — chỗ đắt nhất của cả
+     khối bản đồ. Mà việc "báo còn nội dung" đã có hàng thẻ quán lộ nửa ở
+     mép phải lo rồi.
+     Giờ khay nằm HẲN dưới, và phép thử canh đúng hai điều: có khe hở
+     thật, và khe đó không nuốt mất nút nào. */
+  if (mapBox && sheetBox) {
+    ck("khay nằm dưới bản đồ, không đè lên", sheetBox.top >= mapBox.bottom - 0.5,
+      `${Math.round(sheetBox.top - mapBox.bottom)}px`);
+    for (const sel of [".ex-openlabel", ".ex-fabs"]) {
+      const el = $(`#v-map ${sel}`);
+      if (el) {
+        ck(`khay không che ${sel}`, sheetBox.top >= el.getBoundingClientRect().bottom,
+          `${Math.round(sheetBox.top - el.getBoundingClientRect().bottom)}px`);
+      }
+    }
+  }
 
   const rail = $(".ex-rail");
   if (rail) ck("khay cuộn ngang được", rail.scrollWidth > rail.clientWidth + 5);
@@ -375,6 +420,17 @@ export async function run({ verbose = true } = {}) {
       hit?.className || String(hit?.tagName));
     nearPin.click(); await wait(500);
     ck("chạm ghim mở thẻ cơ sở", sheetOpen() && !!$("#sheetBody h3"));
+    /* Thẻ địa điểm phải trả lời được "nó trông thế nào" và "nó ở đâu"
+       ngay trong thẻ, không bắt người dùng rời app mới biết. */
+    ck("thẻ cơ sở có ảnh", !!$("#sheetBody .ph"));
+    const gm = $("#sheetBody .gmap iframe");
+    ck("thẻ cơ sở có bản đồ nhúng", !!gm);
+    /* Ô nhúng hỏi bằng TÊN chứ không bằng toạ độ — toạ độ chỉ ra một cái
+       ghim đỏ giữa bản đồ trắng, không có ảnh và không có đánh giá. */
+    ck("bản đồ nhúng hỏi bằng tên, không phải toạ độ",
+      !!gm && /[?&]q=[^&]*[A-Za-z%]/.test(gm.getAttribute("src"))
+      && !/[?&]q=\d+(\.\d+)?%2C/.test(gm.getAttribute("src")),
+      gm?.getAttribute("src")?.slice(0, 90));
     click("[data-act='close']"); await wait(340);
   }
 
@@ -588,8 +644,13 @@ export async function run({ verbose = true } = {}) {
       ck("màn mở đầu phủ trên thanh nav",
         Number(cs(wv).zIndex) > Number(cs($(".tabbar")).zIndex || 0),
         `${cs(wv).zIndex} vs ${cs($(".tabbar")).zIndex}`);
+      /* Hình của màn mở đầu là ẢNH sinh sẵn, không còn là SVG dựng bằng mã;
+         và chấm chỉ trang là <button> chứ không phải <i>, vì chúng bấm được
+         để quay lại màn trước. Phép thử cũ tìm ".wc-art svg" và ".wc-dots i"
+         nên nó vẫn xanh trong suốt lúc màn hình đã đổi hẳn hình dạng — đúng
+         thứ một phép thử không được phép làm. */
       ck("có hình, tiêu đề và chấm chỉ trang",
-        !!$(".wc-art svg") && !!$(".wc-title") && $$(".wc-dots i").length >= 3);
+        !!$(".wc-art img") && !!$(".wc-title") && $$(".wc-dots button").length >= 3);
 
       const nextBtn = $("[data-wc='next']");
       ck("nút đi tiếp đạt vùng chạm",
@@ -604,12 +665,26 @@ export async function run({ verbose = true } = {}) {
         !!$("[data-wc='local']"));
       // Không cấu hình máy chủ thì KHÔNG được trưng ô email dẫn tới lỗi.
       ck("không có máy chủ thì không trưng ô email",
-        A.S && !$("#wcEmail") ? !!$(".wc-offbox") : true);
+        A.S && !$("#wcEmail") ? !!$(".wc-card") : true);
+
+      /* Ô tên RỖNG thì không được đi tiếp. Đây không phải chuyện khó tính
+         với biểu mẫu: boot() hỏi Welcome.identified() để quyết định có mở
+         lại màn này không, và một người đi ra mà không để lại tên sẽ bị
+         hỏi lại đúng màn đó ở mọi lần mở app sau — một vòng lặp không có
+         cách nào hiểu là mình đang thiếu gì. Chặn ở đây là chỗ duy nhất
+         nói ra được cần gì. */
+      localStorage.removeItem("nl.local.name");
+      $("#wcName").value = "";
+      $("[data-wc='local']").click(); await wait(320);
+      ck("tên rỗng thì không đi tiếp được", !$("#v-welcome").hidden && !!$("#wcName"));
+      ck("và nói ra thiếu gì", !$("#wcErr")?.hidden && !!$("#wcErr")?.textContent);
+      ck("chưa có danh tính thì identified() là false", W.identified() === false);
 
       $("#wcName").value = "Audit";
       $("[data-wc='local']").click(); await wait(420);
       ck("đi tiếp thì đóng màn mở đầu", $("#v-welcome").hidden);
       ck("tên hiển thị được ghi lại", W.seen() && localStorage.getItem("nl.local.name") === "Audit");
+      ck("có tên rồi thì identified() là true", W.identified() === true);
     }
   }
 
@@ -623,7 +698,27 @@ export async function run({ verbose = true } = {}) {
       const before = await Local.count();
       A.go("community"); await wait(420);
       ck("Community nói rõ đang ở chế độ sổ tay", !!$(".clocal"));
-      click("[data-cact]"); await wait(420);
+
+      /* Bài mẫu ship kèm app. Ba điều phải đúng cùng lúc, và điều thứ ba
+         mới là điều đáng kiểm: một feed đầy bài có tên người, có cờ nước,
+         có nhận xét về quán CÓ THẬT mà không nói ra rằng nó do app viết
+         thì đó là bịa chứng cứ xã hội. Nhãn là thứ giữ nó khỏi thành ra
+         như vậy, nên nếu ai đó gỡ nhãn đi thì phép thử này phải đỏ. */
+      const seeded = $$(".cpost.cseed");
+      ck("màn Community có bài mẫu để đọc", seeded.length >= 3, String(seeded.length));
+      ck("mỗi bài mẫu đều mang nhãn sample",
+        seeded.length > 0 && seeded.every((el) => !!el.querySelector(".ctag")));
+      ck("bài mẫu tách khỏi bài thật và nói rõ nguồn gốc", !!$(".cseed-head"));
+      // Không được cho báo cáo/xoá một bài do chính app ship ra.
+      ck("bài mẫu không có nút báo cáo hay xoá",
+        seeded.every((el) => !el.querySelector("[data-creport],[data-cdel]")));
+
+      /* Chọn ĐÍCH DANH nút mở form. `[data-cact]` là cả một họ nút —
+         "flush", "submit", "connect" — và querySelector lấy cái ĐẦU TIÊN
+         trong DOM. Banner chế độ sổ tay nằm trên nút "Share a place", nên
+         một selector chung sẽ bấm nhầm sang nút kết nối máy chủ và phép
+         thử đi lạc sang tab khác. */
+      click("[data-cact='compose']"); await wait(420);
       ck("mở được form đăng bài", !!$("#cfPlace"));
 
       const place = A.S.places.find((p) => p.zone === A.S.zone);
@@ -646,6 +741,39 @@ export async function run({ verbose = true } = {}) {
       $(".cpost [data-cdel]").click(); await wait(700);
       ck("xoá được bài vừa ghi", (await Local.count()) === before, String(await Local.count()));
     }
+  }
+
+  /* ── quản lý dữ liệu ────────────────────────────────────
+     Màn này là lời hứa về quyền riêng tư, nên phép thử ở đây kiểm ĐÚNG
+     lời hứa đó: dữ liệu có được đếm thật không, và nó có nằm yên trên
+     máy khi chưa đăng nhập không. */
+  {
+    const H = await import("./history.js");
+    A.go("me"); await wait(420);
+    ck("tab You có mục Dữ liệu", !!$(".dcard"));
+
+    const before = await H.count();
+    await H.add("scan", { id: "audit-dish", label: "Audit", price: 1000, level: "ok" });
+    const after = await H.count();
+    ck("ghi được một hoạt động", after === before + 1, `${before} → ${after}`);
+
+    const st = await H.stats();
+    ck("mọi hoạt động mới đều chờ gửi", st.pending >= 1, `pending ${st.pending}`);
+
+    /* Chưa đăng nhập thì KHÔNG được gửi đi đâu cả. Đây là phép thử quan
+       trọng nhất của cả mục: nếu ai đó nới điều kiện trong canSync() thì
+       lịch sử đi đâu ăn gì của người dùng rời khỏi máy mà họ chưa hề
+       đồng ý. */
+    ck("chưa đăng nhập thì không đồng bộ", A.canSync() === false);
+
+    const rows = await H.unsynced(5);
+    ck("đọc lại được bản chưa gửi", rows.length >= 1);
+    ck("bản chưa gửi mang cờ sync=0", rows.every((r) => r.sync === 0));
+
+    // Dọn dẹp: phép thử không được để lại rác trong dữ liệu người dùng.
+    await H.markSynced(rows.map((r) => r.id));
+    const st2 = await H.stats();
+    ck("đánh dấu đã gửi thì hết chờ", st2.pending < st.pending, `${st.pending} → ${st2.pending}`);
   }
 
   A.go("scan");

@@ -116,3 +116,48 @@ export const ensureProfile = (name, country = null) =>
     prefer: "resolution=merge-duplicates",
     body: [{ id: Auth.user()?.id, name, country }],
   }).then(() => undefined);
+
+/* ── lịch sử hoạt động ────────────────────────────────────────
+   Bảng RIÊNG TƯ: policy activity_own_* chỉ cho chủ nhân đọc và ghi. Nên
+   ở đây không có tham số "của ai" — máy chủ tự lấy từ token, và một máy
+   khách bị sửa cũng không đọc được lịch sử của người khác.
+
+   VÌ SAO GỬI THEO LÔ VÀ CÓ client_id
+   Người quét mười món trong một bữa sinh mười bản ghi trong vài giây.
+   Gửi từng bản là mười request qua mạng 3G ở vỉa hè. Gửi theo lô thì chỉ
+   còn một — nhưng lô có thể rớt giữa chừng và bị thử lại, nên mỗi bản
+   mang theo `client_id` là id tự tăng bên máy khách; unique(owner,
+   client_id) trong lược đồ biến mọi lần gửi lại thành vô hại.
+
+   Prefer: resolution=ignore-duplicates chính là chỗ khoá đó phát huy —
+   bản đã có thì bỏ qua lặng lẽ, không báo lỗi, không tạo bản sao. */
+export const pushActivity = (rows) => rest("activity", {
+  method: "POST",
+  prefer: "resolution=ignore-duplicates,return=minimal",
+  body: rows.map((r) => {
+    // Tách ba trường có cột riêng; phần còn lại vào payload. Giữ nguyên
+    // `sync` bên máy khách thì máy chủ nhận về một cờ nói về máy khác —
+    // vô nghĩa với nó và gây nhầm khi đọc lại.
+    const { id, ts, kind, zone, sync, ...rest_ } = r;
+    return {
+      client_id: id,
+      kind,
+      ts: new Date(ts).toISOString(),
+      zone: zone || null,
+      payload: rest_,
+    };
+  }),
+});
+
+/** Lịch sử trên máy chủ, mới nhất trước. Dùng khi đăng nhập trên máy mới. */
+export const pullActivity = ({ limit = 500, since = null } = {}) =>
+  rest(`activity?select=client_id,kind,ts,zone,payload&order=ts.desc&limit=${limit}`
+    + (since ? `&ts=gt.${encodeURIComponent(new Date(since).toISOString())}` : ""))
+    .then((rows) => (rows || []).map((r) => ({
+      id: r.client_id, kind: r.kind, ts: new Date(r.ts).getTime(),
+      zone: r.zone || "", ...(r.payload || {}), sync: 1,
+    })));
+
+/** Xoá toàn bộ lịch sử của chính mình trên máy chủ. Dùng ở màn Dữ liệu:
+ *  "xoá dữ liệu" mà chỉ xoá bản trên máy là nói dối người dùng. */
+export const wipeActivity = () => rest("activity?client_id=gte.0", { method: "DELETE" });

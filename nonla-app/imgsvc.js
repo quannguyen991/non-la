@@ -83,7 +83,18 @@ export const ICON_SET = [
   { key: "civic", group: "sight", label: "Công sở", subject: "a colonial-era civic building with a flagpole" },
   { key: "heritage", group: "sight", label: "Di tích", subject: "weathered stone ruins overgrown with vines" },
   { key: "lake", group: "sight", label: "Hồ", subject: "a calm lake with a willow tree at the shore" },
+  { key: "gate", group: "sight", label: "Cổng", subject: "an old Vietnamese town gate arch of weathered brick with a small tiled roof" },
   { key: "sight", group: "sight", label: "Điểm tham quan", subject: "a Vietnamese conical palm-leaf hat, nón lá" },
+  /* Năm loại dưới đây khớp trường `t` của chuyến đi trong trips.json.
+     Thiếu chúng thì thẻ "Day trips from here" hiện một ô tròn RỖNG —
+     Đà Nẵng, Mỹ Khê, Ngũ Hành Sơn, Cù Lao Chàm và Bà Nà đều rơi vào đó,
+     tức năm trong chín loại. Bốn loại còn lại (heritage, craft, temple,
+     museum) tình cờ trùng tên với loại mốc ở trên nên đã có hình. */
+  { key: "city", group: "sight", label: "Thành phố", subject: "a Vietnamese riverside city skyline with a long bridge" },
+  { key: "beach", group: "sight", label: "Bãi biển", subject: "a sandy beach with a round thatched umbrella and a blue coracle boat" },
+  { key: "mountain", group: "sight", label: "Núi", subject: "a pair of limestone karst peaks in morning mist" },
+  { key: "island", group: "sight", label: "Đảo", subject: "a small green island in the sea with a wooden fishing boat" },
+  { key: "nature", group: "sight", label: "Thiên nhiên", subject: "a coconut water palm grove with a round basket boat on the water" },
   // ── loại quán ăn (khớp trường `kind` trong eateries.json) ──
   { key: "restaurant", group: "sight", label: "Nhà hàng", subject: "a small Vietnamese restaurant front with wooden tables" },
   { key: "cafe", group: "sight", label: "Quán cà phê", subject: "a Vietnamese pavement cafe with low plastic stools" },
@@ -363,14 +374,42 @@ export function registerIcons(items = []) {
 
    RÀNG BUỘC DANH SÁCH LÀ BẮT BUỘC, không phải để cho gọn. Đo thật trên
    proxy này: thả tự do, ảnh cao lầu bị đọc thành "bún thịt nướng" ở mức
-   tin cậy 83%. Ép chọn trong 30 id của dishes.json thì 4/4 ảnh thử đều
-   đúng. Với một app về GIÁ, nhận sai món nghĩa là so sai khoảng giá và
-   đưa ra phán quyết sai — hỏng đúng thứ sản phẩm này tồn tại để làm.  */
+   tin cậy 83%. Với một app về GIÁ, nhận sai món nghĩa là so sai khoảng
+   giá và đưa ra phán quyết sai — hỏng đúng thứ sản phẩm này tồn tại để làm.
+
+   Ba điều dưới đây trong prompt đều là kết quả đo, không phải phòng xa.
+   Đo trên 37 ảnh thật lấy từ Wikimedia (30 món + 7 ảnh không phải món),
+   chạy cả prompt cũ lẫn prompt này xen kẽ trong cùng một phiên:
+
+   1. CHỈ NHẬN MÓN CÓ THẬT TRÊN ĐĨA. Prompt cũ nhìn ảnh mặt tiền quán và
+      đọc chữ trên biển hiệu rồi trả về món: biển "PHO BANH CUON" ra
+      pho-cuon 72%, mặt phố có biển trà sữa ra tra-sua 97%. Khách đứng
+      trước cửa quán bấm máy là ra ngay tình huống đó, và app sẽ báo giá
+      cho một món không có trên bàn. Đối chứng âm: 4/7 → 7/7.
+
+   2. LUÔN TRẢ >= 2 LỰA CHỌN. Prompt cũ trả đúng 1 lựa chọn ở CẢ 30/30
+      ảnh, nên màn "Is this what you're looking at?" chỉ còn là nút gật.
+      Ý đồ thiết kế là người dùng chọn, muốn vậy phải có cái để chọn.
+      Giờ 0/30 ảnh trả về một lựa chọn duy nhất.
+
+   3. GỬI KÈM en + desc, KHÔNG CHỈ id=vi. Các món nhìn giống nhau cần chữ
+      để tách. Bánh bao bánh vạc ↔ bánh bột lọc trước đây lẫn cả HAI
+      CHIỀU ở mức 97%/88%; desc nói rõ "shaped like roses" so với "wrapped
+      around a whole shrimp" thì hết lẫn. Prompt dài 1.904 → 14.959 ký tự,
+      đắt thêm ~3k token mỗi lần quét, và đáng.
+
+   Đúng-trong-top-3 25/30 → 27/30. Đúng-hạng-1 đi ngang (25 → 24, trong
+   biên nhiễu: cùng một ảnh chạy lại vẫn ra khác nhau). Thứ được nhiều
+   nhất là con số tin cậy cuối cùng cũng có nghĩa — trước đây lượt đúng
+   TB 97,4% còn lượt sai 96,2%, chồng khít lên nhau nên vô dụng; giờ là
+   91,3% so với 83,0%.  */
 const VISION_MODEL = "gpt-5.4-mini";
 
 export async function identifyDish(dataURL, dishes) {
   if (!hasKey()) throw Object.assign(new Error("chưa có khoá"), { code: "no-key" });
-  const list = dishes.map((d) => `${d.id}=${d.vi}`).join("; ");
+  const list = dishes
+    .map((d) => `${d.id}=${d.vi} (${d.en || ""}): ${d.desc || ""}`)
+    .join("\n");
   const res = await fetch(`${S.base}/chat/completions`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${S.key}` },
@@ -380,11 +419,22 @@ export async function identifyDish(dataURL, dishes) {
         role: "user",
         content: [
           { type: "text", text:
-            "Identify the Vietnamese dish in this photo. You MUST choose only from these ids:\n"
+            "Identify the Vietnamese dish in this photo.\n\n"
+            + "Only identify food that is physically present in the photo as prepared food — on a "
+            + "plate, in a bowl, in a glass, on a grill, or in someone's hand. If the photo shows a "
+            + "shopfront, a signboard, a banner, a printed menu, packaging, or an empty table, "
+            + "return an empty list, EVEN IF text in the photo names a dish. Reading a name off a "
+            + "sign is not identifying a dish.\n\n"
+            + "You MUST choose only from these dishes:\n"
             + list
-            + "\nIf nothing in the list matches, return an empty list rather than guessing."
-            + "\nReply with JSON only: {\"top\":[{\"id\":\"<id>\",\"confidence\":0-100}]}, at most 3, "
-            + "ordered by confidence." },
+            + "\n\nSeveral of these look alike — read the descriptions before choosing between "
+            + "them. If nothing in the list matches what is actually served in the photo, return "
+            + "an empty list rather than guessing.\n\n"
+            + "Reply with JSON only: {\"top\":[{\"id\":\"<id>\",\"confidence\":0-100}]}, at most 3, "
+            + "ordered by confidence. Whenever you return any candidate at all, return AT LEAST 2 — "
+            + "the person will confirm which one is right, so always give them the next most "
+            + "plausible dish from the list even when you are confident. Only an empty list may be "
+            + "shorter than 2." },
           { type: "image_url", image_url: { url: dataURL } },
         ],
       }],

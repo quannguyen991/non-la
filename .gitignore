@@ -14,3 +14,7 @@ Thumbs.db
 # bộ nhớ đệm truy vấn Overpass — 1,9 MB JSON thô để chạy lại tools/fetch-*.py
 # mà không phiền máy chủ công cộng. Là giấy nháp, không phải dữ liệu ship.
 nonla-app/data/_overpass_cache/
+
+# bộ nhớ đệm bytecode của Python trong tools/ — sinh lại được, không phải mã nguồn
+__pycache__/
+*.pyc

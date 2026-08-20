@@ -107,3 +107,40 @@ drop policy if exists posts_upload on storage.objects;
 create policy posts_upload on storage.objects for insert to authenticated
   with check (bucket_id = 'posts'
               and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- ── lịch sử hoạt động ─────────────────────────────────────────
+-- Bảng RIÊNG TƯ, khác hẳn `posts`. Bài viết là thứ người dùng chủ ý đưa
+-- cho người khác đọc; lịch sử nói ra họ đã đi đâu, ăn gì, trả bao nhiêu.
+-- Nên policy ở đây là "chỉ chủ nhân", không có select công khai nào.
+--
+-- `client_id` + unique(owner, client_id) là chốt CHỐNG TRÙNG. Máy khách
+-- gửi theo lô và có thể gửi lại cả lô khi mạng chập giữa chừng — không có
+-- khoá này thì mỗi lần thử lại là một bản sao mới, và lịch sử phồng lên
+-- theo số lần rớt sóng. Có nó thì gửi lại bao nhiêu lần cũng vô hại.
+create table if not exists activity (
+  id         uuid primary key default gen_random_uuid(),
+  owner      uuid not null references auth.users on delete cascade,
+  client_id  bigint not null,
+  kind       text not null
+             check (kind in ('scan','place','sight','post','route','zone')),
+  ts         timestamptz not null,
+  zone       text,
+  payload    jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  unique (owner, client_id)
+);
+
+create index if not exists activity_owner_idx on activity (owner, ts desc);
+
+alter table activity enable row level security;
+
+drop policy if exists activity_own_read   on activity;
+drop policy if exists activity_own_insert on activity;
+drop policy if exists activity_own_delete on activity;
+
+-- Ba policy, một chủ thể. KHÔNG có bản update: một hoạt động đã xảy ra
+-- rồi thì không sửa lại được, và cho phép sửa chỉ mở thêm một đường để
+-- dữ liệu lệch khỏi thứ máy khách đang giữ.
+create policy activity_own_read   on activity for select using      (auth.uid() = owner);
+create policy activity_own_insert on activity for insert with check (auth.uid() = owner);
+create policy activity_own_delete on activity for delete using      (auth.uid() = owner);

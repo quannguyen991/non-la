@@ -21,6 +21,7 @@ import { validate as validatePost, farFrom, summarise, priceBand } from "./posts
 import { compress } from "./photo.js";
 import { mapsLinks, socialLinks, shareTargets, shareText } from "./links.js";
 import * as Local from "./localdb.js";
+import * as History from "./history.js";
 import * as Welcome from "./welcome.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
@@ -67,6 +68,10 @@ const S = {
   exMap: null,                       // bản đồ xem trước đang sống ở tab Nearby
   me: null,                          // [vĩ, kinh] của người dùng, nếu đã cho phép
   saved: new Set(),                  // My List — tuyến và địa điểm đã lưu
+  notes: null,                       // số bài đã viết trên máy; null = chưa đếm xong
+  notesRun: false,
+  history: [],                       // bản sao đọc nhanh của lịch sử quét
+  sync: { at: 0, sent: 0, err: "", busy: false },   // trạng thái lần đồng bộ gần nhất
   worker: null, ocrReady: false,
   stream: null,
 };
@@ -375,15 +380,96 @@ function say(text) {
 }
 
 /* ── nhật ký ──────────────────────────────────────────────── */
+/* Mặt tiền ĐỒNG BỘ đặt trên history.js — thứ bên dưới là IndexedDB và
+   bất đồng bộ. Ba màn hình (Journal, You, xuất dữ liệu) đều đọc nhật ký
+   ngay giữa lúc dựng HTML; bắt chúng await là phải viết lại cả ba thành
+   bất đồng bộ, và mỗi lần vẽ lại là một lượt đi hỏi đĩa.
+
+   Nên bản ghi được giữ thêm một bản trong bộ nhớ, nạp một lần lúc khởi
+   động. Ghi thì ghi vào CẢ HAI: mảng nhớ để màn hình thấy ngay, và
+   IndexedDB để lần mở sau còn. Mảng nhớ không phải nguồn sự thật — nó là
+   bản sao đọc nhanh, và boot() luôn dựng lại nó từ đĩa. */
 const journal = {
-  all: () => JSON.parse(localStorage.getItem("nl.journal") || "[]"),
+  all: () => S.history,
   add(e) {
-    const a = this.all();
-    a.unshift({ ts: Date.now(), ...e });
-    localStorage.setItem("nl.journal", JSON.stringify(a.slice(0, 300)));
+    const { kind, ...rest } = e;
+    // `kind` của nhật ký cũ là CHẾ ĐỘ quét (menu/cash/bill/dish). Trong
+    // history.js, `kind` là loại hoạt động — nên chế độ đổi tên thành
+    // `mode` để hai khái niệm không giẫm lên nhau.
+    const row = { ts: Date.now(), mode: kind, ...rest };
+    S.history.unshift(row);
+    History.add("scan", row).then(scheduleSync);
   },
-  clear() { localStorage.removeItem("nl.journal"); },
+  clear() { S.history = []; History.clear(); },
 };
+
+/* ── đồng bộ lịch sử lên máy chủ ──────────────────────────────
+   BA ĐIỀU KIỆN, thiếu một là không gửi gì cả:
+     · có cấu hình máy chủ (Auth.isConfigured),
+     · người dùng ĐÃ đăng nhập (Auth.signedIn),
+     · và đang có mạng.
+   Chưa đăng nhập thì lịch sử nằm yên trên máy. Đây không phải chi tiết
+   kỹ thuật mà là lời hứa: app ghi lại việc bạn đi đâu ăn gì, và nó chỉ
+   rời khỏi máy khi bạn đã tự nói "đây là tài khoản của tôi".
+
+   Gửi theo LÔ và có gián đoạn: quét mười món trong một bữa sinh mười bản
+   ghi trong vài giây, và mười request qua 3G vỉa hè là mười lần chờ. Gom
+   3 giây rồi gửi một lượt. */
+let syncTimer = null;
+
+export function scheduleSync(delay = 3000) {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => { syncData().catch(() => {}); }, delay);
+}
+
+export function canSync() {
+  return Auth.isConfigured() && Auth.signedIn() && navigator.onLine !== false;
+}
+
+export async function syncData({ quiet: silent = true } = {}) {
+  if (!canSync() || S.sync.busy) return S.sync;
+  S.sync.busy = true;
+  try {
+    const rows = await History.unsynced(200);
+    if (rows.length) {
+      await Cloud.pushActivity(rows);
+      /* Đánh dấu SAU khi máy chủ đã nhận. Đánh dấu trước rồi gửi hỏng là
+         mất hẳn — bản ghi vẫn nằm đó nhưng không lần đẩy nào tìm tới nó
+         nữa, và không ai biết. */
+      await History.markSynced(rows.map((r) => r.id));
+      S.sync.sent = rows.length;
+    } else {
+      S.sync.sent = 0;
+    }
+    S.sync.at = Date.now();
+    S.sync.err = "";
+    // Còn tồn thì đi tiếp — 200 bản một lô, một chuyến đi dài có thể
+    // đọng lại vài nghìn bản sau nhiều ngày không đăng nhập.
+    if (rows.length === 200) scheduleSync(1200);
+  } catch (e) {
+    S.sync.err = e.message || "sync failed";
+    if (!silent) toast(S.sync.err);
+  } finally {
+    S.sync.busy = false;
+  }
+  return S.sync;
+}
+
+/** Kéo lịch sử từ máy chủ về máy này. Dùng khi đăng nhập trên máy MỚI:
+ *  không có bước này thì "đăng nhập để giữ lịch sử" chỉ đúng một chiều. */
+export async function pullHistory() {
+  if (!canSync()) return 0;
+  const have = new Set(S.history.map((r) => r.id));
+  const rows = await Cloud.pullActivity({ limit: 1000 });
+  let added = 0;
+  for (const r of rows) {
+    if (r.kind !== "scan" || have.has(r.id)) continue;
+    S.history.push(r);
+    added++;
+  }
+  S.history.sort((a, b) => b.ts - a.ts);
+  return added;
+}
 
 /* ── camera ───────────────────────────────────────────────── */
 function showCamFallback(msg) {
@@ -758,7 +844,7 @@ function showDishGuess(top) {
     ${wave()}
     ${top.map(({ id, confidence }) => {
       const d = dishById(id), st = stat(id);
-      return `<button class="row" data-dish="${esc(id)}">
+      return `<button class="row guess" data-dish="${esc(id)}">
         <span class="dot" data-l="${st ? "ok" : "unknown"}"></span>
         <span><span class="nm">${esc(d?.vi || id)}</span>
           <span class="note">${d ? esc(d.en) : ""} · ${confidence}% sure</span></span>
@@ -961,6 +1047,7 @@ function renderEat(filter = "") {
 
 function showDish(id) {
   const d = dishById(id); if (!d) return;
+  History.add("place", { id: d.id, label: d.vi, of: "dish", zone: S.zone }).then(scheduleSync);
   const st = stat(id);
   const tagCls = (t) => /shrimp paste|soy|peanut|gluten|egg|dairy|alcohol|charged/i.test(t) ? "alert"
     : /veg|vegan/i.test(t) ? "veg" : "";
@@ -1154,6 +1241,74 @@ function fmtSince(s) {
   return `${names[+m[2] - 1] || m[2]} ${m[1]}`;
 }
 
+/* ── chọn vùng, ngay trên màn bản đồ ──────────────────────────
+   Trước đây ô chọn vùng chỉ nằm trong tab You, dưới một cái <select>.
+   App ship SÁU vùng, mà màn hình bản đồ — nơi duy nhất việc đổi vùng có
+   nghĩa — không hề nói ra rằng có vùng nào khác tồn tại. Người dùng mở
+   app ở Hội An rồi bay ra Đà Nẵng sẽ thấy một bản đồ sai chỗ và không
+   có gì trên màn đó gợi ý cách sửa.
+
+   Mỗi thẻ mang theo SỐ ĐIỂM THAM QUAN của vùng, không phải để trang trí:
+   nó là câu trả lời cho "đổi sang đó thì được gì", và nó đếm thật từ
+   maps.json chứ không ghi tay. */
+function zoneRowHTML() {
+  const ids = Object.keys(S.prices);
+  if (ids.length < 2) return "";
+  return `
+    <div class="zone-row" role="group" aria-label="Choose an area">
+      ${ids.map((id) => {
+        const z = S.prices[id];
+        const [main, sub] = String(z.en || z.name).split(" · ");
+        const sights = (S.maps[id]?.landmarks || []).length;
+        const on = id === S.zone;
+        return `<button class="zone-chip" data-act="gotoZone" data-zone="${esc(id)}"
+          aria-pressed="${on}">
+          <b>${esc(main)}</b>
+          <span>${esc(sub || "")}${sights ? ` · ${sights} sights` : ""}</span>
+        </button>`;
+      }).join("")}
+    </div>`;
+}
+
+/* ── điểm tham quan của vùng, ngay trên màn bản đồ ────────────
+   Khay này dùng ảnh RIÊNG của từng điểm (assets/sights/<khoá>.jpg) chứ
+   không phải icon theo loại: mở một khay mười thẻ mà bốn thẻ dùng chung
+   đúng một bức tranh ngôi chùa thì khay ấy không nói được gì.
+
+   Chỉ lấy mốc CÓ MÔ TẢ TAY. Phần còn lại là POI moi từ OpenStreetMap —
+   miếu xóm, công viên không tên — chúng đúng chỗ trên bản đồ nhưng không
+   phải thứ để mời người ta đi xem. */
+function sightsRailHTML() {
+  const all = (S.maps[S.zone]?.landmarks || []);
+  const list = all.map((lm, i) => ({ lm, i })).filter(({ lm }) => lm.note);
+  if (!list.length) return "";
+  list.sort((a, b) => (b.lm.star ? 1 : 0) - (a.lm.star ? 1 : 0));
+  return `
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>Worth seeing here</h2>
+      <span class="rule" aria-hidden="true"></span>
+      <button class="act" data-act="bigMap">On the map${I.chevron}</button>
+    </div>
+    <div class="sight-rail">
+      ${list.map(({ lm, i }) => `
+        <button class="sight-card" data-lm="${i}">
+          ${/* Ảnh NỀN chứ không phải <img>, cùng lẽ với .trip-ico: nó trang
+                trí cho cái tên nằm ngay dưới, nên một thẻ ảnh ở đây chỉ có
+                hai kết cục — alt rỗng thì phép thử alt bắt đúng, alt có tên
+                thì trình đọc màn hình đọc lại cái tên hai lần. Kèm theo một
+                cái lợi: ảnh 404 thì ô tự rơi về nền giấy dó có dấu nón lá,
+                không cần onerror. */""}
+          <span class="sight-art"${lm.img
+            ? ` style="background-image:url(&quot;assets/sights/${esc(lm.img)}.jpg&quot;)"`
+            : ""} aria-hidden="true">${
+            lm.star ? `<i class="sight-star">${I.spark}</i>` : ""}</span>
+          <b>${esc(lm.n)}</b>
+          <span class="sight-en">${esc(lm.en || MARK_KIND[lm.t] || "Sight")}</span>
+        </button>`).join("")}
+    </div>`;
+}
+
 /* Thẻ nằm ngang trong khay dưới — ảnh trái, thông tin phải.
    KHÔNG có sao đánh giá: dữ liệu của app là số lượt quét và mức lệch giá,
    không phải điểm bình chọn. Bịa một con số 4,8 ra là nói dối người dùng
@@ -1255,6 +1410,12 @@ function showTrip(id) {
   const m = distance(zone().center, t.at);
   const inApp = t.zone && S.prices[t.zone];
   openSheet(`
+    ${/* Cùng bức tranh mà thẻ chuyến đi ngoài danh sách đang dùng, chỉ to
+          hơn. Nó minh hoạ LOẠI điểm đến — biển, núi, di tích — chứ không
+          phải ảnh chụp chỗ đó, và figcaption nói đúng như vậy. */""}
+    <figure class="ph" style="aspect-ratio:16/10;background-image:url(&quot;${esc(markIcon(t.t))}&quot;);
+      background-size:cover;background-position:center">
+      <figcaption>${esc(TRIP_KIND[t.t] || "Day trip")}</figcaption></figure>
     <h3>${esc(t.n)}</h3>
     <p class="src">${esc(TRIP_KIND[t.t] || "Day trip")} · ${esc(t.en)} · ${esc(fmtDistance(m))} away</p>
     ${wave()}
@@ -1308,6 +1469,8 @@ function renderMap() {
         with live scan insights.</p>
     </div>
 
+    ${zoneRowHTML()}
+
     <div class="ex-stats">
       <div class="ex-stat">
         <span class="ico ok">${I.shield}</span>
@@ -1330,7 +1493,14 @@ function renderMap() {
     <div class="ex-map">
       <div class="ex-canvas" id="exCanvas"></div>
       <button class="ex-open" data-act="bigMap"
-        aria-label="Open the detailed map"><span>Open full map</span></button>
+        aria-label="Open the detailed map"></button>
+      <!-- Nhãn của nút nằm NGOÀI chính cái nút. Nút phủ kín bản đồ và phải
+           nằm DƯỚI lớp ghim, nếu không nó nuốt mọi cú chạm vào ghim; nhưng
+           nhãn thì ngược lại, phải nằm TRÊN mới đọc được — trước đây nó bị
+           một cái ghim đè lên mất nửa chữ. Hai yêu cầu trái nhau trong cùng
+           một thẻ, nên tách ra: nhãn không nhận chạm, cú chạm rơi xuống nút
+           bên dưới, và cả hai cùng đúng. -->
+      <span class="ex-openlabel" aria-hidden="true">Open full map</span>
       <div class="ex-fabs">
         <button class="ex-fab" data-act="exLocate" aria-label="Find my location">${I.crosshair}</button>
         <button class="ex-fab" data-act="bigMap" aria-label="Open the detailed map">${I.navigate}</button>
@@ -1364,6 +1534,8 @@ function renderMap() {
       <span class="note">${I.clock}Still checking…</span>
     </div>
     <div class="mini-grid">${rest.map(miniCardHTML).join("")}</div>` : ""}
+
+    ${sightsRailHTML()}
 
     ${tripsSectionHTML()}
 
@@ -1485,8 +1657,13 @@ const PLATFORM_ICON = {
   instagram: "camera", youtube: "vplay", google: "globe",
 };
 
-function outsideHTML({ name, at = null, tags = [], web = null, kind = "place" }) {
-  const L = mapsLinks(name, at, S.me);
+function outsideHTML({ name, at = null, tags = [], web = null, kind = "place", addr = "" }) {
+  /* `where` là ngữ cảnh để Google khớp ra ĐÚNG cơ sở chứ không phải một
+     cái ghim toạ độ: số nhà + tên phố + tên vùng. Chỉ mỗi "Chợ Hàn" thì
+     Google trả về chợ Hàn của mọi tỉnh — đúng lý do dòng `q` bên dưới
+     đã phải thêm tên vùng cho các mạng xã hội. */
+  const where = [addr, zoneEn().replace(" · ", " ")].filter(Boolean).join(", ");
+  const L = mapsLinks(name, at, S.me, where);
   // Từ khoá tìm: tên + tên vùng. Chỉ mỗi "Chợ Hàn" thì TikTok trả về chợ
   // Hàn của mọi tỉnh; thêm tên vùng vào là khác hẳn.
   const q = `${name} ${zoneEn().replace(" · ", " ")}`;
@@ -1495,7 +1672,23 @@ function outsideHTML({ name, at = null, tags = [], web = null, kind = "place" })
     `<a class="${cls}" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${inner}</a>`;
 
   return `
-    <h2 class="sect">Open in a map app</h2>
+    <h2 class="sect">On the map</h2>
+    ${/* Bản đồ nhúng đặt TRƯỚC hàng nút, không phải sau. Câu hỏi đầu tiên
+          khi mở một thẻ địa điểm là "nó ở đâu"; hàng nút là câu trả lời
+          cho câu hỏi THỨ HAI, "đưa tôi tới đó". Bắt người dùng bấm ra một
+          app khác chỉ để biết chỗ đó nằm hướng nào là bắt họ rời app để
+          lấy thứ lẽ ra phải có sẵn.
+
+          loading="lazy": khung này gọi sang máy chủ Google, và thẻ mở ra
+          thường bị đóng ngay. Chỉ nạp khi nó thật sự lọt vào tầm nhìn.
+
+          Không có toạ độ lẫn tên thì KHÔNG dựng khung: một ô nhúng trống
+          chiếm đúng bằng chỗ của một bản đồ mà không nói được gì. */""}
+    ${L.embed ? `<div class="gmap">
+      <iframe src="${esc(L.embed)}" title="${esc(name)} on Google Maps"
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen></iframe>
+    </div>` : ""}
     <div class="outrow">
       ${L.geo ? `<a class="btn maps" href="${esc(L.geo)}" data-web="${esc(L.osm)}"
          data-act="openMaps" rel="noopener">${I.external}Open in maps</a>` : ""}
@@ -1549,6 +1742,11 @@ async function shareThing({ name, sub = "", tags = [] }) {
 function showPlace(id, metres = null) {
   const p = S.places.find((x) => x.id === id);
   if (!p) return;
+  /* Ghi lại việc XEM, không chỉ việc quét. Người dùng mở app ba tuần sau
+     chuyến đi và hỏi "cái quán ở gần chùa tên gì nhỉ" — nhật ký chỉ có
+     lần quét thì không trả lời được, vì phần lớn chỗ họ ghé qua đều
+     không quét gì cả. */
+  History.add("place", { id: p.id, label: p.name, zone: p.zone }).then(scheduleSync);
   const lvl = p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown";
   const pill = p.fair === true ? `<span class="pill ok">${I.shield}Fair Price</span>`
     : p.fair === false ? `<span class="pill bad">${I.trendUp}Above range</span>`
@@ -1577,7 +1775,7 @@ function showPlace(id, metres = null) {
     }).join("")}
     ${/* Hashtag lấy từ MÓN trước, tên quán sau: người ta gắn #caolau vào
           video chứ gần như không ai gắn tên một hàng quán nhỏ. */""}
-    ${outsideHTML({ name: p.name, at: p.at, kind: "place",
+    ${outsideHTML({ name: p.name, at: p.at, kind: "place", addr: p.street || "",
       tags: [...(p.known || []).map((k) => dishById(k)?.vi || k), p.name] })}
     <button class="btn sec" data-act="shareThing" data-name="${esc(p.name)}"
       data-sub="${esc(p.street || "")}"
@@ -1679,7 +1877,7 @@ function renderJournal() {
     const d = new Date(e.ts).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
     (byDay[d] = byDay[d] || []).push(e);
   }
-  const dishes = new Set(all.filter((e) => e.kind !== "cash").map((e) => e.id)).size;
+  const dishes = new Set(all.filter((e) => e.mode !== "cash").map((e) => e.id)).size;
   const fair = all.filter((e) => e.level === "ok").length;
   const saved = all.reduce((a, e) => a + (e.over > 0 ? e.over : 0), 0);
 
@@ -1811,9 +2009,8 @@ function accountHTML() {
        gắn lên bài trong sổ tay riêng. Bỏ ô đó đi thì mọi bài ký tên "You"
        và người dùng không có cách nào sửa. */
     return `<div class="card" id="acct">
-      <h2 class="sect" style="margin-top:0">Account</h2>
-      <p class="src">Accounts are off. Everything below works without one — scans,
-        map and journal all live on this device.</p>
+      <p class="src">Accounts are off. Everything else on this screen works without
+        one — scans, map and journal all live on this device.</p>
       <div class="manual" style="grid-template-columns:1fr">
         <input id="localName" maxlength="32" placeholder="Display name"
           value="${esc(Local.name())}">
@@ -1836,7 +2033,6 @@ function accountHTML() {
   if (Auth.signedIn() || p) {
     const stale = !Auth.signedIn();
     return `<div class="card" id="acct">
-      <h2 class="sect" style="margin-top:0">Account</h2>
       <div class="row" style="pointer-events:none">
         <span class="dot" data-l="${stale ? "unknown" : "ok"}"></span>
         <span><span class="nm">${esc(p?.name || p?.email || "Signed in")}</span>
@@ -1854,7 +2050,6 @@ function accountHTML() {
   }
 
   return `<div class="card" id="acct">
-    <h2 class="sect" style="margin-top:0">Account</h2>
     <p class="src">Optional — sign in to carry your journal and saved dishes between devices.</p>
     <div class="manual" style="grid-template-columns:1fr">
       <input id="acctEmail" type="email" inputmode="email" autocomplete="username" placeholder="Email">
@@ -1871,57 +2066,310 @@ function accountHTML() {
   </div>`;
 }
 
-function renderMe() {
-  $("#meBody").innerHTML = `
-    ${crest(wrap(birdStanding(SON, GIAY), "-16 -10 200 165"), 104, -2, -14)}
-    <p class="kicker">Settings</p>
-    <h1 class="title">You</h1>
+/* ── mục "Dữ liệu của bạn" ────────────────────────────────────
+   Ba câu hỏi, theo đúng thứ tự người dùng hỏi:
+     1. app đang giữ gì của tôi?
+     2. nó có rời khỏi máy này không?
+     3. làm sao lấy về, làm sao xoá đi?
 
-    <button class="row" data-act="openJournal">
-      <span><span class="nm">Scan history</span>
-        <span class="note">Every scan you make, saved on this phone</span></span>
-    </button>
+   Con số ở đây ĐẾM THẬT từ IndexedDB, không ước lượng. Một màn hình về
+   quyền riêng tư mà trưng số liệu áng chừng thì hỏng đúng thứ nó sinh ra
+   để làm.
 
-    ${accountHTML()}
+   stats() bất đồng bộ còn renderMe() phải vẽ xong trong một lượt — nên
+   đếm MỘT lần rồi nhớ vào S và tự gọi vẽ lại, cùng khuôn với noteCount().
+   Trong lúc chờ thì hiện dấu gạch, không hiện số 0: số 0 giả là một câu
+   nói dối nhỏ về dữ liệu của chính họ. */
+const KIND_LABEL = {
+  scan: "Scans", place: "Places opened", sight: "Sights opened",
+  post: "Notes written", route: "Routes started", zone: "Area switches",
+};
 
-    <h2 class="sect">Where you are</h2>
-    <div class="manual" style="grid-template-columns:1fr">
-      <select id="zoneSel" style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;background:#fff">
-        ${Object.entries(S.prices).map(([id, z]) =>
-          `<option value="${id}"${id === S.zone ? " selected" : ""}>${esc(z.name)}</option>`).join("")}
-      </select></div>
-    <button class="btn sec" data-act="locate">Use my location</button>
+function dataStats() {
+  if (S.dataStats) return S.dataStats;
+  if (!S.dataRun) {
+    S.dataRun = true;
+    History.stats().then(async (st) => {
+      let quota = null;
+      try { quota = await navigator.storage?.estimate?.(); } catch { /* không hỗ trợ */ }
+      S.dataStats = { ...st, usage: quota?.usage || 0 };
+      S.dataRun = false;
+      if (S.tab === "me") renderMe();
+    }).catch(() => { S.dataRun = false; });
+  }
+  return null;
+}
 
-    <h2 class="sect">Works offline</h2>
-    <div class="card">
-      <h4>${esc(zone().name)} pack</h4>
-      <p class="src" id="cacheState">Checking…</p>
-      <p class="src" style="margin-top:7px">Reference prices, dish knowledge and the text engine are stored on this device. Nothing you scan is uploaded.</p>
+const fmtBytes = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB`
+  : n >= 1024 ? `${Math.round(n / 1024)} KB` : `${n} B`);
+
+function dataHTML() {
+  const st = dataStats();
+  const dash = "—";
+  const when = (t) => (t ? new Date(t).toLocaleDateString("en-GB",
+    { day: "2-digit", month: "short", year: "numeric" }) : dash);
+
+  /* Ba trạng thái, ba câu khác nhau. Gộp thành một câu "đồng bộ khi đăng
+     nhập" là để người dùng đoán xem mình đang ở trạng thái nào. */
+  const cloud = !Auth.isConfigured()
+    ? { cls: "", txt: `<b>This phone only.</b> No server is connected to this build, so
+        nothing here has ever left the device.` }
+    : !Auth.signedIn()
+    ? { cls: "", txt: `<b>This phone only.</b> Sign in above and your history starts
+        syncing — and comes back if you reinstall or switch phones.` }
+    : { cls: "ok", txt: `<b>Syncing to your account.</b> ${st && st.pending
+        ? `${st.pending} entr${st.pending === 1 ? "y" : "ies"} still waiting to send.`
+        : "Everything here is on the server too."}${S.sync.at
+        ? ` Last sync ${new Date(S.sync.at).toLocaleTimeString("en-GB",
+            { hour: "2-digit", minute: "2-digit" })}.` : ""}` };
+
+  const rows = Object.entries(KIND_LABEL).map(([k, label]) => `
+    <div class="drow"><span>${label}</span><b>${st ? (st.by[k] || 0) : dash}</b></div>`).join("");
+
+  return `<div class="card dcard">
+    <div class="dgrid">
+      ${rows}
+      <div class="drow tot"><span>Total kept</span><b>${st ? st.total : dash}</b></div>
+      ${/* navigator.storage.estimate() đo CẢ ORIGIN: tile bản đồ, tranh
+            món, cache của service worker — không phải riêng lịch sử. Đặt
+            nhãn "On this device" cạnh bảng đếm lịch sử là để người dùng
+            đọc ra "36 MB nhật ký", rồi hoảng. Nói đúng nó là gì. */""}
+      <div class="drow"><span>App storage in total</span><b>${st ? fmtBytes(st.usage) : dash}</b></div>
+      <div class="drow"><span>First entry</span><b>${st ? when(st.first) : dash}</b></div>
     </div>
 
-    <h2 class="sect">Illustrated icons</h2>
-    ${iconStudioHTML()}
+    ${/* LUÔN dùng infobox. .warnbox trần là kiểu cảnh báo nền hồng chữ
+          đỏ son — dành cho "giá vượt khoảng thường gặp". Câu "dữ liệu chỉ
+          nằm trên máy này" là một SỰ THẬT DỄ CHỊU, thậm chí là điều nhiều
+          người muốn; tô đỏ nó là dạy người dùng sợ đúng cái tính năng bảo
+          vệ họ. Khác biệt giữa hai trạng thái nằm ở icon và ở chữ. */""}
+    <div class="warnbox infobox" style="margin-top:12px">
+      ${cloud.cls === "ok" ? I.check : I.shield}<span>${cloud.txt}</span></div>
 
-    <button class="row" data-act="replayIntro">
-      <span><span class="nm">Replay the tour</span>
-        <span class="note">The four screens from the first launch</span></span>
-    </button>
+    <div class="ic-actions" style="margin-top:12px">
+      <button class="btn sec" data-act="dataExport">${I.external}Download my data</button>
+      ${Auth.signedIn() ? `<button class="btn sec" data-act="dataSync"${S.sync.busy ? " disabled" : ""}>
+        ${S.sync.busy ? "Syncing…" : "Sync now"}</button>` : ""}
+    </div>
+    ${/* Nút xoá đứng RIÊNG và ở cuối, không xếp cạnh hai nút kia: nó là
+          việc không hoàn tác được, và một nút không hoàn tác được nằm
+          ngang hàng với "Tải về" là một cái bẫy ngón tay. */""}
+    <button class="btn sec danger" data-act="dataWipe" style="margin-top:8px">Erase my history</button>
+    <p class="src" style="margin-top:8px">Downloads a JSON file with every entry above.
+      Erasing removes it from this phone${Auth.signedIn() ? " and from your account" : ""},
+      and cannot be undone. Your written notes are kept separately and are not touched.
+      Storage in total covers everything the app has cached — maps, artwork, photos —
+      not just the entries above.</p>
+  </div>`;
+}
 
-    <h2 class="sect">How verdicts work</h2>
-    <div class="card"><p class="muted" style="font-size:13px">
-      A price is compared with the spread of prices recorded nearby for the same item.
-      At or below the 75th percentile it reads <strong>fair</strong>.
-      Between the 75th and 95th it reads <strong>above 75% of places</strong>.
-      Above the 95th it shows how far past the local median it sits.
-      Nón Lá never labels a business dishonest — it reports the gap and the sample size.</p></div>
+/* Số bài đã viết nằm trong IndexedDB nên chỉ đọc được bất đồng bộ, còn
+   renderMe() phải vẽ xong ngay trong một lượt. Đếm MỘT lần rồi nhớ vào S
+   và tự gọi vẽ lại — cho tới lúc đó ô đó hiện dấu gạch chứ không hiện 0.
+   Số 0 giả trong một giây là một câu nói dối nhỏ về công của người dùng. */
+function noteCount() {
+  if (S.notes != null) return S.notes;
+  if (!S.notesRun) {
+    S.notesRun = true;
+    const done = (n) => { S.notes = n; S.notesRun = false; if (S.tab === "me") renderMe(); };
+    Local.count().then(done, () => done(0));
+  }
+  return null;
+}
+
+/* Mọi con số trên tab You rút từ nhật ký quét trên máy và kho bài trên
+   máy. Không có ô nào là số trang trí: một app đi nói hộ người dùng
+   chuyện giá cả mà tự bịa "24 địa điểm đã lưu" thì mất luôn quyền nói
+   những câu còn lại. */
+function meStats() {
+  const j = journal.all();
+  const eaten = j.filter((e) => e.mode !== "cash" && e.id);
+  const tally = {};
+  for (const e of eaten) tally[e.id] = (tally[e.id] || 0) + 1;
+  let top = null;
+  for (const [id, n] of Object.entries(tally))
+    if (!top || n > top.n) top = { id, n, label: eaten.find((e) => e.id === id)?.label || id };
+  return {
+    scans: j.length,
+    dishes: new Set(eaten.map((e) => e.id)).size,
+    zones: new Set(j.map((e) => e.zone).filter(Boolean)).size,
+    fair: j.filter((e) => e.level === "ok").length,
+    notes: noteCount(),
+    top,
+  };
+}
+
+/* Huy hiệu chỉ là một cách đọc khác của CHÍNH mấy con số trên, nên ngưỡng
+   phải nói ra được và tiến độ phải là tiến độ thật. Huy hiệu chưa mở hiện
+   còn thiếu bao nhiêu — một ô xám không giải thích gì chỉ là mực thừa. */
+const BADGES = [
+  { name: "First read",          of: "scans",  need: 1,  icon: () => I.camera,
+    hint: (n) => `${n}/1 scan` },
+  { name: "Fair-price explorer", of: "scans",  need: 20, icon: () => I.shield,
+    hint: (n) => `${n}/20 scans` },
+  { name: "Full table",          of: "dishes", need: 10, icon: () => I.bowl,
+    hint: (n) => `${n}/10 dishes` },
+  { name: "Community helper",    of: "notes",  need: 5,  icon: () => I.speech,
+    hint: (n) => (n == null ? "counting…" : `${n}/5 notes`) },
+];
+
+function badgeHTML(b, st) {
+  const have = st[b.of];
+  const on = have != null && have >= b.need;
+  const pct = have == null ? 0 : Math.min(100, Math.round((have / b.need) * 100));
+  return `<div class="you-badge" data-on="${on ? 1 : 0}">
+    <span class="you-hex" aria-hidden="true"><i>${b.icon()}</i></span>
+    <span><span class="bn">${esc(b.name)}</span>
+      <span class="bs">${on ? "Earned" : esc(b.hint(have))}</span>
+      <span class="bp"><i style="width:${pct}%"></i></span></span>
+  </div>`;
+}
+
+/* Một hàng cài đặt. `value` và `extra` nhận HTML đã dựng sẵn, `label` và
+   `sub` là chữ thô — trộn hai loại vào một tham số là cách chắc chắn nhất
+   để một cái tên người dùng tự đặt biến thành lỗ chèn thẻ. */
+const youRow = ({ icon, label, sub = "", value = "", act = "", tag = "button", extra = "", chev = true }) =>
+  `<${tag} class="you-row"${act ? ` data-act="${act}"` : ""}>
+    ${icon}
+    <span><span class="lb">${esc(label)}</span>${sub ? `<span class="sub">${esc(sub)}</span>` : ""}</span>
+    <span class="val">${value ? `<span>${value}</span>` : ""}${chev ? I.chevron : ""}</span>
+    ${extra}</${tag}>`;
+
+function renderMe() {
+  const st = meStats();
+  const p = Auth.profile();
+  const nm = (p?.name || Local.name() || "").trim();
+  const c = Img.counts();
+  const earned = BADGES.filter((b) => st[b.of] != null && st[b.of] >= b.need).length;
+
+  const record = st.scans === 0
+    ? `Nothing scanned yet — every number here starts moving the first time you
+       point the camera at a menu.`
+    : `${st.top ? `Most scanned: <b>${esc(st.top.label)}</b> · ${st.top.n} time${st.top.n > 1 ? "s" : ""}. ` : ""}
+       <b>${st.fair}</b> of ${st.scans} came back at a fair price${
+         st.zones > 1 ? `, across ${st.zones} areas` : ""}.`;
+
+  $("#meBody").innerHTML = `
+    <div class="you-mandala" aria-hidden="true"></div>
+
+    <div class="you-brand">
+      <img src="assets/motifs/chua-cau.webp" alt="" aria-hidden="true" onerror="this.hidden=true">
+      <b>${esc(zoneEn())}</b>
+    </div>
+
+    <header class="you-hero">
+      <div class="you-medal">
+        ${/* Chưa có tên thì đặt nón lá vào giữa huy chương. Một hình người
+             xám mặc định hay một khung ảnh vỡ là hai cách tệ hơn để nói
+             cùng một điều: chỗ này chưa có gì. */""}
+        ${nm ? `<span class="ini" aria-hidden="true">${esc(nm[0].toUpperCase())}</span>`
+             : `<img src="assets/motifs/non-la.webp" alt="" aria-hidden="true" onerror="this.hidden=true">`}
+        <button class="you-edit" data-act="editName"
+          aria-label="${nm ? "Change your display name" : "Add a display name"}">${I.pencil}</button>
+      </div>
+      <h1 class="you-name">${nm ? esc(nm) : "You"}</h1>
+      <p class="you-where">${I.pinSm}${esc(zoneEn())}</p>
+      <p class="you-lede">Your trip, counted on your own phone. Every scan you add
+        makes the next price easier to read.</p>
+    </header>
+
+    <div class="you-stats">
+      <div class="you-stat"><span class="ic" data-t="a" aria-hidden="true">${I.camera}</span>
+        <b>${st.scans}</b><small>Scans</small></div>
+      <div class="you-stat"><span class="ic" data-t="b" aria-hidden="true">${I.bowl}</span>
+        <b>${st.dishes}</b><small>Dishes</small></div>
+      <div class="you-stat"><span class="ic" data-t="c" aria-hidden="true">${I.speech}</span>
+        <b>${st.notes == null ? "—" : st.notes}</b><small>Notes shared</small></div>
+    </div>
+    <p class="you-note">${I.spark}<span>${record}</span></p>
+
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>Achievements</h2>
+      <span class="rule" aria-hidden="true"></span>
+      <span class="act">${earned}/${BADGES.length}</span>
+    </div>
+    <div class="you-badges">${BADGES.map((b) => badgeHTML(b, st)).join("")}</div>
+
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>Settings</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <div class="you-list">
+      ${youRow({ icon: I.clock, label: "Scan history", act: "openJournal",
+        sub: "Every scan you make, saved on this phone",
+        value: st.scans ? `${st.scans} entr${st.scans === 1 ? "y" : "ies"}` : "Empty" })}
+
+      ${/* <select> THẬT phủ trong suốt lên cả hàng: vẽ lại một trình chọn
+           bằng div thì mất bánh xe chọn của hệ điều hành, mất bàn phím và
+           mất cả trình đọc màn hình — đổi lấy một mũi tên đẹp hơn. Và hàng
+           này phải là <div>: một <select> nằm trong <button> là HTML sai,
+           trình duyệt tự gỡ ra và cú chạm rơi vào nút. */""}
+      ${/* Tên vùng ở đây viết như mọi chỗ khác trong giao diện tiếng Anh:
+           dòng thương hiệu ngay phía trên đã ghi "Hoi An · Old Town", mà
+           hàng này ghi "Hội An · Phố cổ" thì đọc ra là hai nơi khác nhau. */""}
+      ${youRow({ icon: I.pinSm, label: "Where you are", tag: "div",
+        value: esc(zoneEn()),
+        extra: `<select id="zoneSel" aria-label="Where you are">
+          ${Object.entries(S.prices).map(([id, z]) =>
+            `<option value="${id}"${id === S.zone ? " selected" : ""}>${esc(z.en || z.name)}</option>`).join("")}
+        </select>` })}
+
+      ${youRow({ icon: I.crosshair, label: "Use my location", act: "locate",
+        sub: "Picks the nearest area for you" })}
+
+      ${/* Hàng này chỉ BÁO trạng thái, không mở gì. Mũi tên ở đây là lời hứa
+           suông: người dùng chạm vào và không có gì xảy ra. */""}
+      ${youRow({ icon: I.shield, label: "Works offline", tag: "div", chev: false,
+        sub: "Prices, dishes and the reader live here. Nothing you scan is uploaded.",
+        value: `<span id="cacheState">Checking…</span>` })}
+
+      ${youRow({ icon: I.play, label: "Replay the tour", act: "replayIntro",
+        sub: "The four screens from the first launch" })}
+
+      ${/* Xưởng icon dài hơn tất cả phần còn lại của màn cộng lại. Mở sẵn
+           thì tài khoản và cách đọc phán quyết rơi khỏi tầm cuộn. */""}
+      <details class="you-fold">
+        <summary>${youRow({ icon: I.pencil, label: "Illustrated icons", tag: "div",
+          sub: "Redraw the map and dish art with your own API key",
+          value: `${c.done}/${c.total} drawn` })}</summary>
+        <div class="fold-in">${iconStudioHTML()}</div>
+      </details>
+
+      <details class="you-fold">
+        <summary>${youRow({ icon: I.coins, label: "How verdicts work", tag: "div",
+          sub: "What “fair price” is measured against" })}</summary>
+        <div class="fold-in"><p class="muted" style="font-size:13px">
+          A price is compared with the spread of prices recorded nearby for the same item.
+          At or below the 75th percentile it reads <strong>fair</strong>.
+          Between the 75th and 95th it reads <strong>above 75% of places</strong>.
+          Above the 95th it shows how far past the local median it sits.
+          Nón Lá never labels a business dishonest — it reports the gap and the sample size.</p></div>
+      </details>
+    </div>
+
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>Account</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    ${accountHTML()}
+
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>Your data</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    ${dataHTML()}
 
     <p class="seedwarn">Reference prices shipping with this build are seed data, not a completed field survey. Replace <code>data/prices.json</code> with surveyed figures before using this with real travellers.</p>`;
 
   const sel = $("#zoneSel");
-  sel.onchange = () => { S.zone = sel.value; localStorage.setItem("nl.zone", S.zone); toast("Zone set to " + zone().name); renderMe(); };
+  sel.onchange = () => { S.zone = sel.value; localStorage.setItem("nl.zone", S.zone); toast("Zone set to " + zoneEn()); renderMe(); };
   caches?.keys?.().then((k) => {
-    $("#cacheState").textContent = k.length ? `Cached and ready (${k.join(", ")})` : "Not cached yet — reload once while online";
-  }).catch(() => { $("#cacheState").textContent = "Cache status unavailable"; });
+    $("#cacheState").textContent = k.length ? "Cached and ready" : "Not cached yet";
+  }).catch(() => { $("#cacheState").textContent = "Unavailable"; });
 }
 
 /* ── màn hình bản đồ chi tiết ─────────────────────────────
@@ -2005,7 +2453,10 @@ function showEatery(e, metres = null) {
         <span class="amt">→</span>
       </button>` : ""}
 
+    ${/* Quán OSM có sẵn số nhà và tên phố — đúng thứ Google cần để khớp
+          ra một cơ sở thật thay vì thả ghim xuống toạ độ. */""}
     ${outsideHTML({ name: e.name, at: e.at, kind: "eatery", web: e.web || null,
+      addr: [e.no, e.street].filter(Boolean).join(" "),
       tags: [e.name, e.cuisine || ""] })}
     <p class="seedwarn">Name, address and position from OpenStreetMap contributors (ODbL),
       not from Nón Lá. Details can be out of date — shops in the old town change hands often.</p>
@@ -2027,6 +2478,8 @@ const MARK_KIND = {
 };
 function showMark(lm, metres = null) {
   setEdge(null);
+  History.add("sight", { id: lm.img || lm.n, label: lm.n, kindOf: lm.t, zone: S.zone })
+    .then(scheduleSync);
   const kind = MARK_KIND[lm.t] || "Sight";
   const near = S.places
     .filter((p) => p.zone === S.zone && p.at)
@@ -2038,6 +2491,13 @@ function showMark(lm, metres = null) {
   openSheet(`
     <h3>${esc(lm.n)}</h3>
     <p class="src">${esc(kind)}${lm.en ? ` · ${esc(lm.en)}` : ""}${metres != null ? ` · ${fmtDistance(metres)} away` : ""}</p>
+    ${/* Tranh riêng của điểm này, không phải icon theo loại. Ảnh hỏng thì
+          bỏ hẳn khung — một khung xám có chữ "không tải được ảnh" chiếm
+          đúng bằng chỗ của bức tranh mà không thay được nó. */""}
+    ${lm.img ? `<figure class="ph sight-hero" style="aspect-ratio:16/10">
+      <img src="assets/sights/${esc(lm.img)}.jpg" alt="${esc(lm.n)}"
+        loading="lazy" decoding="async" onerror="this.closest('figure').remove()">
+      <figcaption>${esc(lm.n)}</figcaption></figure>` : ""}
     ${wave()}
     ${lm.note ? `<p class="muted" style="margin-top:2px">${esc(lm.note)}</p>` : ""}
 
@@ -2051,7 +2511,8 @@ function showMark(lm, metres = null) {
       : `<div class="warnbox infobox">${I.clock}<span>No place near this sight is being
         tracked yet. That means no price data — not that the food here is bad.</span></div>`}
 
-    ${outsideHTML({ name: lm.n, at: lm.at, kind: "sight", tags: [lm.n, lm.en || ""] })}
+    ${outsideHTML({ name: lm.n, at: lm.at, kind: "sight", addr: lm.en || "",
+      tags: [lm.n, lm.en || ""] })}
     <button class="btn sec" data-act="shareThing" data-name="${esc(lm.n)}"
       data-sub="${esc(lm.en || kind)}" data-tags="${esc([lm.n, lm.en || ""].join("|"))}">
       ${I.share}Share this sight</button>
@@ -2106,6 +2567,13 @@ function renderCommunity() {
     places: S.places,
     onOpenPlace: (id) => showPlace(id),
     onReport: (id) => reportPost(id),
+    /* Đưa thẳng tới thẻ Account và cuộn tới nó, không chỉ đổi tab: tab You
+       dài hơn một màn hình, và bỏ người dùng ở đầu trang với lời dặn "tìm
+       mục Account" là bắt họ làm nốt việc mà mình vừa hứa sẽ làm hộ. */
+    onConnect: () => {
+      go("me");
+      setTimeout(() => $("#acct")?.scrollIntoView({ behavior: "smooth", block: "center" }), 60);
+    },
   });
 }
 
@@ -2285,6 +2753,11 @@ async function submitPostLocally(draft) {
     const place = S.places.find((p) => p.id === draft.placeId);
     const far = farFrom(place, coords || S.me);
     await Local.savePost({ ...draft, zone: S.zone, photo: null }, { photo: blob, far });
+    History.add("post", { id: draft.placeId, label: draft.placeId, local: 1, zone: S.zone })
+      .then(scheduleSync);
+    // Ô "Notes shared" ở tab You đọc từ bộ đếm nhớ trong S. Không xoá ở đây
+    // thì viết bài xong mở tab You vẫn thấy con số cũ cho tới lần tải lại.
+    S.notes = null;
     closeSheet();
     toast("Saved to this phone");
     renderCommunity();
@@ -2397,6 +2870,17 @@ document.addEventListener("click", async (ev) => {
   const dd = el("[data-dish]");
   if (dd && dd.dataset.dish) return showDish(dd.dataset.dish);
 
+  /* Thẻ điểm tham quan ở khay "Worth seeing here". Chỉ số trỏ vào mảng
+     landmarks của ĐÚNG vùng đang mở — đổi vùng là khay dựng lại nên chỉ
+     số không bao giờ trỏ sang vùng khác. Khoảng cách để null: người dùng
+     chưa bấm định vị thì không có gì để đo, và bịa một con số ở đây là
+     nói dối về thứ họ sắp đi bộ tới. */
+  const lmEl = el("[data-lm]");
+  if (lmEl) {
+    const lm = (S.maps[S.zone]?.landmarks || [])[Number(lmEl.dataset.lm)];
+    if (lm) return showMark(lm, S.me ? distance(S.me, lm.at) : null);
+  }
+
   if (el("[data-act='allPlaces']")) { S.showAll = !S.showAll; renderMap(); return; }
   if (el("[data-act='goScan']")) return go("scan");
 
@@ -2409,7 +2893,10 @@ document.addEventListener("click", async (ev) => {
     return;
   }
   // ── tuyến đi bộ ──
-  if (el("[data-act='openRoute']")) return openWalk();
+  if (el("[data-act='openRoute']")) {
+    History.add("route", { id: S.zone, label: "walking route", zone: S.zone }).then(scheduleSync);
+    return openWalk();
+  }
   if (el("[data-act='rtPlay']")) {
     const on = BigMap.toggleRun();
     return toast(on ? "Walking — a stop every few seconds" : "Paused");
@@ -2477,6 +2964,15 @@ document.addEventListener("click", async (ev) => {
         const r = await Auth.signUp(em, pw, $("#acctName")?.value?.trim());
         toast(r.needsEmailConfirm ? "Check your email to confirm" : "Account created");
       } else { await Auth.signIn(em, pw); toast("Signed in"); }
+      /* Đăng nhập xong: KÉO VỀ trước, ĐẨY LÊN sau.
+         Kéo trước để máy mới có ngay lịch sử cũ — đó là toàn bộ lý do
+         người ta chịu đăng nhập. Đẩy sau để những gì họ vừa làm trên máy
+         này (có thể là hàng tuần, lúc chưa có tài khoản) không bị bản
+         trên máy chủ nuốt mất. */
+      const got = await pullHistory().catch(() => 0);
+      S.dataStats = null;
+      await syncData({ quiet: false });
+      if (got) toast(`${got} earlier entries restored`);
     } catch (e) { toast(e.message || "Could not sign in"); }
     renderMe();
     return;
@@ -2492,6 +2988,18 @@ document.addEventListener("click", async (ev) => {
     const n = Local.setName($("#localName")?.value || "");
     renderMe();
     return toast(n ? `Saved — you're ${n}` : "Name cleared");
+  }
+  /* Bút chì trên huy chương không mở một hộp thoại riêng: ô nhập tên đã có
+     sẵn trong thẻ Account ở cuối màn. Cuộn tới đúng ô đó và đặt con trỏ vào
+     — dựng thêm một hộp thoại thứ hai sửa cùng một trường là hai chỗ để
+     lệch nhau về sau. */
+  if (el("[data-act='editName']")) {
+    const inp = $("#acctName") || $("#localName");
+    if (!inp) return;
+    inp.scrollIntoView({ block: "center", behavior: "smooth" });
+    inp.focus({ preventScroll: true });
+    inp.select?.();
+    return;
   }
   if (el("[data-act='replayIntro']")) {
     // Mở lại từ màn ĐẦU: người bấm vào đây muốn xem lại phần giới thiệu,
@@ -2619,6 +3127,7 @@ document.addEventListener("click", async (ev) => {
     if (!S.prices[z]) return toast("No data for that area yet");
     S.zone = z;
     localStorage.setItem("nl.zone", z);
+    History.add("zone", { id: z, label: S.prices[z].en || S.prices[z].name }).then(scheduleSync);
     closeSheet();
     go("map");
     return toast("Now showing " + (S.prices[z].en || S.prices[z].name));
@@ -2683,6 +3192,52 @@ document.addEventListener("click", async (ev) => {
   if (el("[data-act='openJournal']")) return go("journal");
 
   if (el("[data-act='clearJournal']")) { journal.clear(); renderJournal(); return toast("Journal cleared"); }
+
+  /* ── mục Dữ liệu ─────────────────────────────────────── */
+  if (el("[data-act='dataExport']")) {
+    const rows = await History.exportAll();
+    /* Tải về một TỆP, không phải chép vào clipboard như nút Export cũ.
+       Nhật ký ba tuần là vài nghìn dòng — clipboard không phải chỗ để
+       đựng nó, và người dùng muốn giữ dữ liệu thì họ cần một tệp. */
+    const blob = new Blob([JSON.stringify({
+      app: "Nón Lá", exportedAt: new Date().toISOString(),
+      name: Auth.profile()?.name || Local.name() || "",
+      count: rows.length, events: rows,
+    }, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `non-la-history-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    // Thu hồi ngay là Safari huỷ luôn lượt tải chưa kịp bắt đầu.
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    return toast(`${rows.length} entries downloaded`);
+  }
+
+  if (el("[data-act='dataSync']")) {
+    S.sync.busy = true; renderMe();
+    const r = await syncData({ quiet: false });
+    renderMe();
+    return toast(r.err ? r.err : r.sent ? `${r.sent} entries sent` : "Already up to date");
+  }
+
+  if (el("[data-act='dataWipe']")) {
+    /* Hỏi lại bằng confirm() chứ không phải một thẻ tuỳ biến: đây là thao
+       tác KHÔNG hoàn tác được, và hộp thoại của hệ điều hành là thứ người
+       dùng đã biết cách đọc. Một sheet tự vẽ trông giống mọi sheet khác
+       trong app, và người ta bấm qua nó theo quán tính. */
+    if (!confirm("Erase your whole activity history? This cannot be undone.")) return;
+    await History.clear();
+    S.history = [];
+    S.dataStats = null;
+    if (Auth.signedIn()) {
+      // Xoá trên máy mà không xoá trên máy chủ là nói dối: lần đăng nhập
+      // sau nó quay về nguyên vẹn.
+      await Cloud.wipeActivity().catch((e) => toast(`Server copy not erased: ${e.message}`));
+    }
+    renderMe();
+    return toast("History erased");
+  }
 
   if (el("[data-act='export']")) {
     const txt = journal.all().map((e) =>
@@ -2811,7 +3366,23 @@ async function boot() {
      Project URL vào Settings. Ô đó giữ lại để test, nên chỉ ghi đè khi
      config.js có giá trị thật. */
   if (SUPABASE_URL && SUPABASE_ANON) Auth.configure(SUPABASE_URL, SUPABASE_ANON);
-  Auth.restore().then(() => { if (S.tab === "me") renderMe(); });
+  /* Lịch sử: chuyển nhật ký cũ sang rồi nạp bản sao đọc nhanh. Chạy
+     TRƯỚC khi giao diện vẽ lần đầu, nếu không màn Journal mở ra trống
+     rồi mới đầy lên — người dùng đọc cái nháy đó là "mất dữ liệu". */
+  await History.migrate().catch(() => 0);
+  S.history = await History.list({ kind: "scan", limit: 2000 }).catch(() => []);
+
+  Auth.restore().then(async () => {
+    if (S.tab === "me") renderMe();
+    /* Đã đăng nhập sẵn từ phiên trước: kéo về trước, đẩy lên sau. Kéo
+       trước để máy MỚI có ngay lịch sử cũ; đẩy sau để những gì vừa làm
+       trên máy này không bị bản trên máy chủ nuốt mất. */
+    if (canSync()) {
+      const got = await pullHistory().catch(() => 0);
+      if (got && S.tab === "journal") renderJournal();
+      scheduleSync(1500);
+    }
+  });
   if (!S.prices[S.zone]) S.zone = Object.keys(S.prices)[0];
   S.ready = true;
 
@@ -2835,8 +3406,19 @@ async function boot() {
      Chạy đúng một lần. Đặt nó trước boot() thì nó chặn cả lượt khởi động
      sau một cú chạm của người dùng — và trên một app hứa chạy offline,
      thứ chặn đường vào phải là ít nhất có thể. */
+  /* HAI cổng chặn, không phải một. Bản trước chỉ hỏi "đã xem chưa", nên
+     một người xem xong bốn màn rồi thoát ra giữa bước tài khoản sẽ vào
+     thẳng app mà không có danh tính nào — và mọi bài họ viết sau đó
+     không có tên để ký.
+
+     Người đã xem rồi thì KHÔNG bắt xem lại: mở thẳng vào bước tài khoản.
+     Bắt một người quay lại đọc lại bốn màn giới thiệu chỉ vì họ chưa
+     điền tên là phạt họ vì một việc họ đã làm xong. */
+  const host = $("#v-welcome");
   if (!Welcome.seen()) {
-    Welcome.open({ host: $("#v-welcome"), onDone: () => go("scan") });
+    Welcome.open({ host, onDone: () => go("scan") });
+  } else if (!Welcome.identified()) {
+    Welcome.open({ host, onDone: () => go("scan"), step: Welcome.ACCOUNT_STEP });
   } else {
     go("scan");
   }
@@ -2855,7 +3437,8 @@ Img.onChange(() => {
 });
 
 // cho phép kiểm thử pipeline mà không cần camera
-window.__nonla = { S, handleText, judgeRows, go, showDish, showPlace, ocr, doScan, Img };
+window.__nonla = { S, handleText, judgeRows, go, showDish, showPlace, ocr, doScan, Img,
+  canSync, syncData, pullHistory };
 
 boot().catch((e) => { console.error(e); document.body.innerHTML =
   `<pre style="color:#fff;padding:20px;font:13px monospace">Failed to start: ${esc(e.message)}</pre>`; });

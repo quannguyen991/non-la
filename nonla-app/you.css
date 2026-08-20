@@ -197,3 +197,22 @@
   .you-stat small{font-size:8.5px;letter-spacing:.06em}
   .you-badges{grid-template-columns:1fr}
 }
+
+/* ── mục "Dữ liệu của bạn" ─────────────────────────────────
+   Bảng hai cột: nhãn trái, số phải, chữ số đều bề rộng để mắt so hàng
+   theo cột chứ không phải đọc từng dòng. */
+.dcard .dgrid{display:grid;gap:1px;background:var(--vien-in);
+  border:1px solid var(--vien-in);border-radius:14px;overflow:hidden}
+.dcard .drow{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:9px 12px;background:var(--giay);font-size:13px;color:var(--muc-nhat)}
+.dcard .drow b{font-variant-numeric:tabular-nums;font-weight:700;color:var(--then);font-size:14px}
+/* Dòng tổng nặng hơn các dòng trên nó — mắt phải bám được vào một con số
+   khi lướt qua, và con số đó là tổng. */
+.dcard .drow.tot{background:var(--kem)}
+.dcard .drow.tot b{font-family:var(--disp);font-size:17px}
+
+/* Nút xoá: viền đỏ son trên nền giấy, KHÔNG phải nền đỏ đặc. Nền đặc kéo
+   mắt về nó mạnh hơn cả nút chính của màn hình, mà đây là thao tác người
+   dùng hiếm khi muốn — nó phải tìm thấy được, không phải mời gọi. */
+.btn.sec.danger{border-color:rgba(142,28,23,.45);color:var(--son-dam)}
+.btn.sec.danger:active{background:var(--hong)}

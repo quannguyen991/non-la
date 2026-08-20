@@ -9,11 +9,15 @@
 node_modules
 
 # Script dựng dữ liệu và ảnh, chạy tay trên máy — không phải mã của app
+# _tmp_*.png là ảnh thô của _gen_assets.mjs; nó dọn bằng `rm` nên trên
+# Windows lần nào lỗi là còn lại vài tấm PNG 1,5MB nằm trong thư mục phát.
+_tmp_*.png
 _gen_assets.mjs
 _import_eateries.mjs
 _link_famous.mjs
 _normalize_landmarks.mjs
 _shrink.py
+_thumb.py
 tools/
 
 # Bộ nhớ đệm Overpass thô, 138 KB, chỉ dùng để chạy lại script nhập quán ăn

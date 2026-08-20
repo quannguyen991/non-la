@@ -379,11 +379,24 @@ eq("đã tới hạn thì gửi ngay", nextAttempt({ tries: 1, lastTry: NOW - 12
 
 console.log("\n── links: ra bên ngoài ─────────────────────");
 {
-  const L = mapsLinks("Chợ Hàn", [16.0687, 108.2242]);
+  const L = mapsLinks("Chợ Hàn", [16.0687, 108.2242], null, "Bạch Đằng, Da Nang Han River");
   ok("có toạ độ thì đánh dấu là chính xác", L.exact === true);
   ok("lược đồ geo: mang đúng toạ độ", L.geo.startsWith("geo:16.0687,108.2242"));
-  ok("Google Maps trỏ tới TOẠ ĐỘ, không phải tên",
-    L.google.includes("query=16.0687%2C108.2242"), L.google);
+  /* ĐẢO NGƯỢC so với bản trước, có chủ ý. Trước đây link Google mang
+     toạ độ, và phép thử này khoá nó lại. Nhưng một truy vấn toạ độ mở ra
+     MỘT CÁI GHIM: không giờ mở cửa, không ảnh, không đánh giá — mà đánh
+     giá mới là thứ khiến khách dám bước vào một cái quán lạ. Hỏi bằng
+     tên kèm địa chỉ thì Google mở đúng trang của cơ sở đó.
+     Toạ độ vẫn giữ nguyên ở `geo:` và ở đường đi, nơi thứ cần là một
+     điểm chính xác chứ không phải một trang có review. */
+  ok("Google Maps hỏi bằng TÊN kèm địa chỉ, không phải toạ độ",
+    L.google.includes(encodeURIComponent("Chợ Hàn"))
+    && L.google.includes(encodeURIComponent("Bạch Đằng"))
+    && !L.google.includes("query=16.0687"), L.google);
+  ok("không có tên thì mới lùi về toạ độ",
+    mapsLinks("", [16.0687, 108.2242]).google.includes("query=16.0687%2C108.2242"));
+  ok("bỏ dấu trang trí trong tên trước khi hỏi Google",
+    !mapsLinks("Bà Bé · Cao lầu", [15.8, 108.3], null, "Hội An").google.includes("%C2%B7"));
   ok("chỉ đường mặc định là đi bộ", L.googleDir.includes("travelmode=walking"));
   ok("không có điểm đầu thì không gửi origin", !L.googleDir.includes("origin="));
 

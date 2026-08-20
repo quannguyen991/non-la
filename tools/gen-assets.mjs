@@ -55,7 +55,7 @@ function baseUrl() {
    gọn mã: gpt-image-1 xuất được jpeg, dall-e-3 chỉ có png. Ghi bytes PNG
    vào một file tên .jpg thì máy chủ tĩnh khai sai Content-Type và một số
    trình duyệt từ chối vẽ. App bên kia thử .jpg rồi tự lùi sang .png. */
-const MODELS = (process.env.OPENAI_IMAGE_MODELS || "gpt-image-1.5,gpt-image-1").split(",");
+const MODELS = (process.env.OPENAI_IMAGE_MODELS || "gpt-image-2,gpt-image-1").split(",");
 
 async function generate(key, { prompt, size, outBase, transparent = false }) {
   const attempts = MODELS.map((m) => ({
@@ -142,8 +142,146 @@ const STYLE_ICON = "Flat vector sticker icon, bold clean outline, simple geometr
   + "centred, filling the frame, fully transparent background, no ground shadow, "
   + "no text, no letters, no border, no frame, no drop shadow.";
 
+/* ── tranh bản đồ theo vùng ───────────────────────────────────
+   VÌ SAO CÁC TRANH NÀY PHẢI "BẮC Ở TRÊN"
+   Tranh nền được neo vào toạ độ thật bằng HAI mốc trong maps.json. Tấm
+   Hội An đầu tiên là một góc nhìn chim bay nghiêng 26°, nên hai mốc của
+   nó phải đi chấm tay: nhìn vào tranh, tìm Chùa Cầu, đọc lấy toạ độ pixel.
+   Việc đó không lặp lại được cho mỗi tấm mới, và chấm sai một chút là mọi
+   ghim lệch khỏi con phố của nó.
+
+   Nên mọi tấm từ đây trở đi đều xin BẮC Ở TRÊN và nói rõ tấm ảnh trải bao
+   nhiêu mét ngang. Khi đó hai mốc suy ra được bằng số học thuần: tâm ảnh
+   là tâm vùng, và một điểm cách tâm groundM/4 về phía đông rơi đúng vào
+   1/4 bề ngang ảnh. Không còn ai phải chấm tay, và tấm nào vẽ lại cũng
+   dùng lại đúng cặp mốc cũ.
+
+   VÌ SAO PHẢI NHÌN THẲNG TỪ TRÊN XUỐNG, KHÔNG ĐƯỢC PHỐI CẢNH
+   Đây là bài học đắt nhất của đợt này. Lượt đầu xin "nhìn từ trên xuống,
+   hơi nghiêng ba phần tư" — model trả về một bức phối cảnh rất đẹp nhìn
+   dọc sông Hàn. Đo lại thì hai cây cầu cách nhau 1114m thật chỉ chiếm
+   285 pixel, trong khi chính con sông rộng 700m lại chiếm 450 pixel: tỉ
+   lệ theo chiều xa gấp năm lần tỉ lệ theo chiều ngang. artmap.js dựng
+   phép ĐỒNG DẠNG — một tỉ lệ, một góc xoay — nên nó không có cách nào mô
+   tả nổi thứ đó, và mọi ghim bờ tây rơi xuống giữa lòng sông.
+
+   Phối cảnh chỉ dùng được khi vùng vẽ nhỏ và độ nghiêng nhẹ, như tấm Hội
+   An gốc. Từ đây trở đi mọi tấm mới đều xin ORTHOGRAPHIC, thẳng đứng từ
+   trên xuống, không đường chân trời — lúc đó tỉ lệ đồng nhất theo cả hai
+   chiều và hai mốc là đủ.
+
+   VÌ SAO PHẢI RỘNG HƠN NHIỀU SO VỚI CỤM QUÁN
+   Tấm Hội An cũ phủ 1097×731m trong khi tám cơ sở của vùng trải hơn
+   1400m — quán ở Cẩm Nam rơi hẳn ra ngoài mép tranh. Bề ngang ở đây đặt
+   rộng gấp đôi đường kính cụm quán để chuyện đó không tái diễn khi thêm
+   cơ sở mới. (Nhưng đừng trông vào việc model tuân theo con số mét mình
+   xin: nó vẽ theo bố cục nó thấy hợp, nên groundM ở đây chỉ là ý định —
+   tỉ lệ thật vẫn phải đo lại từ mốc trên tranh sau khi sinh.) */
+const ZONE_MAPS = {
+  /* VÌ SAO VẼ LẠI HỘI AN
+     Tấm cũ (assets/maps/hoian-oldtown.jpg) đẹp nhưng ĐỊA LÝ BỊA. Trong
+     tranh, Chùa Cầu bắc qua con sông lớn; ngoài đời nó bắc qua một con
+     lạch chừng 18m, còn Thu Bồn là dòng khác cách một dãy phố về phía
+     nam. Tranh gộp hai dòng nước làm một, nên mốc neo thứ hai — đáng lẽ
+     nằm trên đường Bạch Đằng — rơi xuống giữa lòng sông, và ghim "Quán
+     ven sông" theo nó xuống nước.
+
+     Không mức chỉnh mốc nào cứu được chuyện đó: sai nằm trong tranh chứ
+     không nằm ở phép neo. Nên vẽ lại, và lần này tả đúng thế đất: sông
+     chạy NGANG phía dưới, phố cổ nằm TRÊN sông, con lạch nhỏ có cây cầu
+     mái nằm ở rìa tây. */
+  "hoian-oldtown": {
+    zone: "hoian-oldtown", groundM: 2000,
+    what: "Hoi An Ancient Town, Vietnam. The wide Thu Bon river runs horizontally across the "
+      + "LOWER THIRD of the frame from the left edge to the right edge, jade-green, with small "
+      + "wooden sampan boats. NORTH of the river, filling the middle and upper half of the "
+      + "frame, the dense grid of the old town: hundreds of small ochre-yellow rooftops and "
+      + "weathered dark-brown tiled roofs in tight rows along three long streets that run "
+      + "parallel to the river, with narrow lanes crossing between them, a covered market hall "
+      + "near the right, courtyard trees. At the LEFT edge of the town a NARROW CANAL only a "
+      + "few metres wide cuts north from the river, and a single small covered bridge with a "
+      + "tiled roof crosses that canal — it does NOT cross the big river. In the lower left, "
+      + "across the river, a long narrow sandy islet with low houses. In the lower right, "
+      + "a green island of vegetable gardens and coconut palms",
+  },
+  "danang-hanriver": {
+    zone: "danang-hanriver", groundM: 3000,
+    what: "Da Nang city centre on the Han river, Vietnam. The wide Han river runs straight "
+      + "from the bottom edge of the frame to the top edge, a little left of centre, in "
+      + "blue-jade water with small cargo boats. Two landmark bridges cross it horizontally: a "
+      + "long golden dragon-shaped bridge in the lower half of the frame, and a white "
+      + "cable-stayed bridge with a single tall pylon in the upper half. West of the river a "
+      + "dense grid of city blocks — white and cream rooftops, a riverside promenade lined with "
+      + "palm trees, a covered market hall, a small ochre colonial museum with a red tiled roof. "
+      + "East of the river, lower rooftops, hotels and tree-lined boulevards",
+  },
+  /* Lượt đầu của tấm này phải bỏ vì lý do KHÁC hẳn tấm sông Hàn: nó vẽ
+     đúng góc nhìn nhưng ZOOM QUÁ SÂU — đo lại chỉ phủ chừng 500m bờ,
+     trong khi năm quán và mười tám mốc của vùng trải hơn 2km dọc biển.
+     Một tấm nền hẹp hơn cụm ghim thì fitArt không có cách nào vừa phủ
+     kín khung vừa chứa hết, và phần lớn ghim bị kẹp về sát viền.
+
+     Cách chữa không phải xin "rộng hơn" — model không có khái niệm mét.
+     Cách chữa là mô tả những thứ CHỈ NHÌN THẤY ĐƯỢC khi lùi đủ xa: cả
+     một dải bờ cong nhìn thấy hai đầu, chân núi ở đầu bắc, và những toà
+     nhà nhỏ như con tem. Model vẽ theo thứ nó phải vẽ vừa vào khung. */
+  /* ĐÃ THỬ HAI LƯỢT, CẢ HAI ĐỀU BỎ — vùng này dùng bản vector.
+     Lượt một zoom quá sâu (~500m bờ). Lượt hai, với lời nhắc "ba km, nhìn
+     thấy cả hai đầu, nhà nhỏ như con tem" dưới đây, ra một tấm đẹp và
+     đúng góc — nhưng đo lại vẫn chỉ phủ chừng 1,4km: khoảng cách từ
+     đường ven biển ra mép nước (96m thật) chiếm 105px, tức 1,09 px/m,
+     trong khi chứa hết năm quán trải 2km dọc bờ thì cần 0,49 px/m. Lệch
+     hơn hai lần, và không lời nhắc nào bắt model lùi xa hơn được: nó
+     không có khái niệm mét, chỉ có khái niệm bố cục đẹp.
+
+     Giữ lại mục này để lần sau ai đó định thử lần ba thì biết hai lần
+     trước đã thử gì. Chạy nó sẽ sinh ảnh, nhưng maps.json KHÔNG trỏ tới
+     — muốn dùng phải tự đo lại tỉ lệ và chấm mốc tay. */
+  "danang-mykhe": {
+    zone: "danang-mykhe", groundM: 3200,
+    what: "A THREE KILOMETRE stretch of the My Khe coastline in Da Nang, Vietnam, the whole "
+      + "length visible at once from top edge to bottom edge, distant and small in scale like "
+      + "a satellite view. The turquoise East Sea fills the right third with long parallel "
+      + "lines of surf. The pale-gold sand runs the full height of the frame as a narrow "
+      + "ribbon, curving very slightly, with the dark green foot of a forested headland "
+      + "entering at the top right corner. A broad seafront avenue lined with tiny coconut "
+      + "palms runs the whole length beside it, and west of that a dense regular grid of many "
+      + "small city blocks — hundreds of little white and cream rooftops, narrow green side "
+      + "streets, a few taller hotel blocks casting no shadow. Everything small and far away",
+  },
+};
+
 function jobs(which) {
   const list = [];
+  /* `zonemaps:danang-mykhe` — vẽ lại ĐÚNG một tấm.
+     Không phải tiện tay: mỗi tấm bản đồ vùng có hai mốc toạ độ chấm TAY
+     trong maps.json, và chúng chỉ đúng với đúng tấm ảnh đó. Chạy
+     `zonemaps --force` để sửa một tấm sẽ vẽ đè cả những tấm còn lại, và
+     mọi ghim của chúng lệch khỏi con phố của nó mà không có gì báo. */
+  const [group, pick] = which.split(":");
+  const only = pick ? new Set(pick.split(",")) : null;
+  if (group === "zonemaps" || group === "all") {
+    for (const [id, m] of Object.entries(ZONE_MAPS)) {
+      if (only && !only.has(id)) continue;
+      list.push({
+        outBase: join(APP, `assets/maps/${id}`),
+        size: "1536x1024",
+        prompt: `${m.what}. Illustrated pictorial map covering roughly ${m.groundM} metres `
+          + "across, NORTH AT THE TOP. "
+          + "STRICTLY ORTHOGRAPHIC TOP-DOWN PLAN VIEW: the viewer is directly overhead looking "
+          + "straight down, every building seen from above as its roof, streets as flat ribbons. "
+          + "No perspective, no vanishing point, no horizon, no sky, no building facades or "
+          + "walls visible, nothing tilted, the scale identical at the top and the bottom of "
+          + "the frame. "
+          + "Style: delicate watercolour and fine ink linework, storybook cartography, soft "
+          + "gouache washes, visible paper grain, warm muted palette of cream, ochre, terracotta "
+          + "roof brown, sage green and jade-teal. Warm diffused daylight, no harsh shadows. "
+          + "The whole frame is filled edge to edge with the scene, no border, no vignette. "
+          + "Absolutely no text, no labels, no signage, no map pins, no compass rose, "
+          + "no scale bar, no UI elements, no watermark.",
+      });
+    }
+  }
   if (which === "icons" || which === "all") {
     for (const [k, what] of Object.entries(SIGHTS)) {
       list.push({
@@ -203,8 +341,9 @@ const which = process.argv[2] || "map";
 const dry = process.argv.includes("--dry");
 const force = process.argv.includes("--force");
 
-if (!["map", "dishes", "places", "icons", "all"].includes(which)) {
-  console.error("Dùng: node tools/gen-assets.mjs <map|dishes|places|icons|all> [--dry] [--force]");
+if (!["map", "zonemaps", "dishes", "places", "icons", "all"].includes(which.split(":")[0])) {
+  console.error("Dùng: node tools/gen-assets.mjs <map|zonemaps|dishes|places|icons|all> [--dry] [--force]");
+  console.error("      zonemaps:<mã vùng>  vẽ lại đúng một tấm bản đồ vùng");
   process.exit(1);
 }
 

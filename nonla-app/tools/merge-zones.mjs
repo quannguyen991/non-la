@@ -26,7 +26,19 @@ chdir(join(dirname(fileURLToPath(import.meta.url)), ".."));
 
 const MAPS = "data/maps.json";
 const RAW = "data/_osm_raw_zones.json";
-const EXTRA_OSM_MARKS = 16;      // trần số mốc OSM nối thêm cho vùng mới
+const EXTRA_OSM_MARKS = 28;      // trần số mốc OSM nối thêm cho vùng mới
+
+/* Mốc OSM là POI lẫn lộn: bên cạnh chùa và chợ có cả văn phòng du lịch,
+   chi nhánh công ty và mấy cái tên rác kiểu "Market Street" hay "Công
+   viên" trơn. Hội An có 35 mốc vì phố cổ thật sự dày di tích; nhồi cho
+   Đà Nẵng đủ 35 bằng cách nhận hết mọi POI là đổi một con số đẹp lấy
+   một bản đồ đầy ghim chỉ vào phòng vé.
+
+   Hai luật, cố ý thô: tên phải dài hơn ba ký tự và không được khớp mẫu
+   thương mại. Lọc thô ở đây tốt hơn danh sách chặn từng cái tên — danh
+   sách ấy sẽ mục ngay lần OSM cập nhật sau. */
+const JUNK_NAME = /travel|tour|agency|company|branch|chi nhánh|văn phòng|office|hotel|resort|spa|bank|atm|^market street$|^công viên$|^park$/i;
+const isUsefulMark = (m) => String(m.n || "").trim().length > 3 && !JUNK_NAME.test(m.n);
 
 /* ── mốc tuyển chọn cho ba vùng mới ───────────────────────────
    Toạ độ đặt xấp xỉ trên đúng công trình, đủ để định hướng và đo
@@ -227,6 +239,7 @@ if (existsSync(RAW)) {
     for (const m of oz.landmarks || []) {
       if (extra.length >= EXTRA_OSM_MARKS) break;
       if (names.has(norm(m.n))) continue;
+      if (!isUsefulMark(m)) continue;
       // Bỏ POI trùng chỗ với mốc tuyển chọn: cùng một nơi, hai cái tên.
       if (spots.some((s) => metres(m.at, s) < 60)) continue;
       extra.push({ ...m, osm: true });

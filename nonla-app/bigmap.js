@@ -13,7 +13,16 @@
 import { Viewport, distance, fmtDistance, boundsOf, clamp } from "./geo.js";
 import { camera, drawTown } from "./iso.js";
 import { artTransform, fitArt } from "./artmap.js";
-import { buildFabric, drawFabric } from "./citymap.js";
+/* citymap.js KHÔNG còn được nhập. buildFabric() dựng khối nhà bằng thuật
+   toán từ một hạt giống giả ngẫu nhiên; nó chạy mỗi lần mở bản đồ và mỗi
+   lần mở lộ trình, duyệt hết mọi đoạn phố để sinh ra hàng nghìn tứ giác
+   — rồi gán vào M.fabric, thứ KHÔNG CHỖ NÀO ĐỌC. drawFabric cũng được
+   nhập mà không gọi lần nào.
+
+   Đó là lý do bản đồ trơ phố trên nền giấy: nhà vẫn được tính, chỉ là
+   tính xong rồi vứt. Giờ nhà lấy từ dấu chân THẬT của OpenStreetMap
+   (geo.buildings, xem tools/fetch-fabric.py), nên lớp sinh giả không còn
+   lý do tồn tại — kể cả nếu có ai nối dây lại cho nó. */
 import { progressAt, legLabel } from "./route.js";
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -25,7 +34,6 @@ const M = {
   filter: "all", me: null, sel: null,
   route: null, at: 0, _timer: null,   // tuyến đi bộ đang mở
   onOpenPlace: null, icons: null,
-  fabric: null,        // kết cấu đô thị, sinh một lần lúc mở
   eateries: [], showEat: false, _eatKey: "",   // lớp quán ăn OSM
   mode: "flat", cam: null,                     // "flat" | "3d"
   // Trạng thái một lần kéo: quãng đã dời, và cờ báo nền không còn dời
@@ -77,10 +85,148 @@ function bboxOfLine(line) {
  *  `water` là mảng các VÒNG toạ độ (iso.js và citymap.js đọc water[0]
  *  như một vòng — đổi hình dạng ở đây là làm hỏng cả hai). Sông vẽ dạng
  *  nét nằm riêng ở `waterLines`. */
+/* ── lớp tile bản đồ thật ─────────────────────────────────────
+   Nền vector dựng từ OSM đúng hình nhưng thưa: nó chỉ có phố, nước, nhà
+   và không bao giờ có được nhãn phố, số nhà, bến xe, mức chi tiết của
+   một bản đồ thật. Khi app không còn phải chạy offline thì không có lý
+   do gì để tự vẽ lại thứ đã có sẵn.
+
+   VÌ SAO CHỒNG TILE ĐƯỢC DÙ PHÉP CHIẾU KHÁC NHAU
+   geo.js chiếu phẳng theo vĩ độ tâm vùng; tile đánh chỉ số theo Web
+   Mercator. Hai phép chiếu này KHÁC nhau trên toàn cầu nhưng TRÙNG nhau
+   tới bậc nhất quanh tâm: tỉ lệ dọc trên tỉ lệ ngang là 1/cos(φ) ở
+   Mercator và 1/cos(φ_tâm) ở đây, bằng nhau khi φ ≈ φ_tâm. Vùng phủ chỉ
+   2–3 km nên sai lệch dưới một phần nghìn — nhỏ hơn bề dày một nét vẽ.
+
+   Nên tile được đặt bằng chính vp.toScreen() của app: đổi hai góc của ô
+   tile ra toạ độ màn hình rồi kéo ảnh cho khớp. Không cần engine bản đồ,
+   không cần đổi phép chiếu, và ghim vẫn nằm đúng chỗ cũ vì chúng đi qua
+   đúng hàm đó.
+
+   VÌ SAO VẪN GIỮ NỀN VECTOR
+   Tile hỏng, mạng chặn, hay máy chủ tile từ chối — bản đồ vẫn phải hiện
+   ra cái gì đó. Lớp vector nằm dưới và chỉ bị ẩn đi KHI tile thật sự vẽ
+   được. Mất mạng giữa phố cổ là đúng lúc người dùng cần màn hình này
+   nhất, và "không cần offline" là một yêu cầu về tính năng, không phải
+   một lời hứa rằng mạng luôn có. */
+const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const TILE_PX = 256;
+
+const lng2tile = (lng, z) => ((lng + 180) / 360) * 2 ** z;
+const lat2tile = (lat, z) => {
+  const r = (lat * Math.PI) / 180;
+  return ((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * 2 ** z;
+};
+const tile2lng = (x, z) => (x / 2 ** z) * 360 - 180;
+const tile2lat = (y, z) => {
+  const n = Math.PI - (2 * Math.PI * y) / 2 ** z;
+  return (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+};
+
+function paintTiles() {
+  const layer = $("#bmTiles");
+  if (!layer || !M.vp || !M.geo) return;
+  if (M.mode === "3d") { layer.hidden = true; return; }   // 3D có nền riêng
+  layer.hidden = false;
+
+  /* Chọn mức phóng của tile theo tỉ lệ hiện tại. vp.scale là pixel trên
+     mét; một tile 256px ở mức z phủ (40075017·cos φ / 2^z) mét ngang. */
+  const lat0 = M.geo.center[0];
+  const mPerTile = (40075017 * Math.cos((lat0 * Math.PI) / 180)) / 2 ** 1;
+  let z = Math.round(Math.log2((mPerTile * M.vp.scale) / TILE_PX)) + 1;
+  z = Math.max(12, Math.min(19, z));
+
+  const v = viewBounds(M.vp, 64);
+  const x0 = Math.floor(lng2tile(v.w, z)), x1 = Math.floor(lng2tile(v.e, z));
+  const y0 = Math.floor(lat2tile(v.n, z)), y1 = Math.floor(lat2tile(v.s, z));
+  /* Trần 220 ô: kéo nhanh ở mức phóng sâu có thể quét qua hàng nghìn ô
+     trong một khung hình, và mỗi ô là một request. Thà thiếu vài ô ở rìa
+     còn hơn tự bắn mình bằng một cơn bão request. */
+  if ((x1 - x0 + 1) * (y1 - y0 + 1) > 220) return;
+
+  const want = new Map();
+  for (let x = x0; x <= x1; x++) {
+    for (let y = y0; y <= y1; y++) {
+      const a = M.vp.toScreen([tile2lat(y, z), tile2lng(x, z)]);
+      const b = M.vp.toScreen([tile2lat(y + 1, z), tile2lng(x + 1, z)]);
+      want.set(`${z}/${x}/${y}`, { a, b });
+    }
+  }
+
+  /* Giữ lại ô đã có, chỉ dựng ô mới. Xoá sạch rồi dựng lại mỗi khung hình
+     là trình duyệt tải lại đúng những ảnh nó vừa có, và bản đồ nhấp nháy
+     trắng suốt lúc kéo. */
+  for (const el of [...layer.children]) {
+    const keep = want.get(el.dataset.k);
+    if (!keep) { el.remove(); continue; }
+    place(el, keep);
+    want.delete(el.dataset.k);
+  }
+  for (const [k, box] of want) {
+    const [tz, tx, ty] = k.split("/");
+    const img = new Image();
+    img.dataset.k = k;
+    img.loading = "eager";
+    img.decoding = "async";
+    img.alt = "";
+    img.onload = () => { M._tilesOK = true; syncBaseVisibility(); };
+    img.onerror = () => img.remove();
+    place(img, box);
+    layer.appendChild(img);
+    img.src = TILE_URL.replace("{z}", tz).replace("{x}", tx).replace("{y}", ty);
+  }
+
+  function place(el, { a, b }) {
+    el.style.transform = `translate(${a.x.toFixed(1)}px,${a.y.toFixed(1)}px)`;
+    // +1px: hai ô cạnh nhau làm tròn xuống sẽ hở một đường tóc nền giấy
+    // chạy suốt bản đồ, trông như lưới kẻ.
+    el.style.width = `${(b.x - a.x + 1).toFixed(1)}px`;
+    el.style.height = `${(b.y - a.y + 1).toFixed(1)}px`;
+  }
+}
+
+/** Tile đã vẽ được thì tắt phố/nhà vector đi — hai lớp cùng vẽ phố sẽ
+ *  chồng lệch nhau và bản đồ đọc ra là bị nhoè. Nước và ghim giữ nguyên:
+ *  ghim là dữ liệu của app, không phải của tile. */
+function syncBaseVisibility() {
+  const base = $("#bmBase");
+  if (base) base.classList.toggle("thin", !!M._tilesOK && M.mode !== "3d");
+}
+
+/* ── nhà: nạp SAU, không chặn ─────────────────────────────────
+   12.805 dấu chân nhà là 1,5MB. Gộp vào maps.json thì vỏ app phải tải
+   ngần ấy TRƯỚC khi mở được lần đầu — trên wifi khách sạn, đúng lúc
+   người dùng vừa xuống sân bay. Mà nhà là lớp tô điểm: thiếu nó bản đồ
+   vẫn đủ phố, đủ sông, đủ ghim, vẫn đi lại được.
+
+   Nên bản đồ vẽ ngay bằng những gì đã có, rồi nhà về sau và vẽ chèn vào.
+   Tải đúng MỘT LẦN cho cả phiên: đổi vùng qua lại sáu lần không được đẻ
+   ra sáu lượt tải cùng một tệp. */
+let buildingsPromise = null;
+
+function ensureBuildings(geo, zid, after) {
+  if (!geo || geo.buildings) return;
+  buildingsPromise = buildingsPromise
+    || fetch("data/buildings.json").then((r) => r.json()).catch(() => ({}));
+  buildingsPromise.then((all) => {
+    const rings = all?.[zid];
+    // Vùng chưa có nhà là chuyện bình thường, không phải lỗi.
+    if (!rings || !rings.length) return;
+    geo.buildings = rings;
+    geo._bb = rings.map(bboxOfLine);
+    /* Người dùng có thể đã đóng bản đồ hoặc đổi vùng trong lúc chờ tải,
+       nên việc kiểm "còn đang mở không" thuộc về NGƯỜI GỌI — chỉ nó biết
+       màn hình của nó còn sống hay không. */
+    after?.();
+  });
+}
+
 function indexGeo(geo) {
   for (const st of geo.streets || []) if (!st._b) st._b = bboxOfLine(st.l);
   geo._wb = (geo.water || []).map(bboxOfLine);
   geo._wlb = (geo.waterLines || []).map(bboxOfLine);
+  geo._lwb = (geo.landInWater || []).map(bboxOfLine);
+  geo._bb = (geo.buildings || []).map(bboxOfLine);
   return geo;
 }
 
@@ -119,12 +265,51 @@ function drawBase(vp = M.vp, geo = M.geo) {
     .map((ring, i) => (inView(geo._wb[i], view)
       ? `<path d="${basePath(ring, vp)}Z" fill="#C3DBDD" stroke="#A9C8CC" stroke-width="1"/>` : ""))
     .join("")
+    /* Cồn giữa sông, tô LẠI thành giấy. Mảng nước lấy từ OSM là một
+       multipolygon: vòng ngoài là mặt nước, vòng trong là đất nổi lên
+       trong đó. Vẽ mỗi vòng ngoài thì cả Cẩm Kim, An Hội, Cẩm Nam chìm
+       dưới một lớp xanh — mà phố trên chúng vẫn vẽ đè lên trên, nên
+       nhìn ra là đường chạy thẳng ra giữa sông.
+
+       Không dùng fill-rule="evenodd" gộp vào một path: cồn ở đây đến từ
+       NHIỀU relation khác nhau, evenodd chỉ đục lỗ được trong cùng một
+       path, và gộp chúng lại sẽ khiến hai mảng nước chồng nhau tự triệt
+       tiêu thành lỗ thủng. Vẽ đè một lớp là đúng và đọc được. */
+    + (geo.landInWater || [])
+      .map((ring, i) => (inView(geo._lwb[i], view)
+        ? `<path d="${basePath(ring, vp)}Z" fill="#F4EBD3" stroke="#A9C8CC" stroke-width="1"/>` : ""))
+      .join("")
     + (geo.waterLines || [])
       .map((line, i) => (inView(geo._wlb[i], view)
         ? `<path d="${basePath(line, vp)}" fill="none" stroke="#C3DBDD"
              stroke-width="${Math.max(3, 14 * vp.scale).toFixed(1)}"
              stroke-linecap="round" stroke-linejoin="round"/>` : ""))
       .join("");
+
+  /* ── dấu chân nhà THẬT ────────────────────────────────────
+     Lấy từ OpenStreetMap (tools/fetch-fabric.py), không phải khối nhà do
+     buildFabric() sinh ra. Đây là thứ khiến bản đồ này nhìn khác hẳn
+     Google Maps ngay từ cái liếc đầu: Google vẽ dấu chân nhà thật, còn
+     một mạng lưới phố trần trên nền giấy trơn thì đọc ra là bản nháp.
+
+     Ngưỡng phóng 0,15 chứ không phải 0,35: mức mặc định khi mở bản đồ
+     Hội An đo được 0,299 — đặt ngưỡng 0,35 nghĩa là màn hình đầu tiên
+     người dùng thấy KHÔNG có nhà, đúng cái màn hình đáng có nhà nhất.
+     Ở 0,15 một căn nhà 10m còn 1,5px, vẫn ra được nhịp mặt phố; dưới nữa
+     thì 2.600 <path> chỉ tô ra một vệt xám mà một hình chữ nhật cũng cho
+     ra đúng như thế.
+
+     Vẽ SAU nước và TRƯỚC phố: nhà nằm trên đất, còn mặt đường phải phủ
+     lên nhà ở chỗ chúng chạm nhau, không thì lòng đường bị viền nhà cắt
+     vụn ở mọi ngã tư. */
+  const builds = vp.scale > 0.15
+    ? (geo.buildings || [])
+      .map((ring, i) => (inView(geo._bb[i], view)
+        ? `<path d="${basePath(ring, vp)}Z"/>` : ""))
+      .join("")
+    : "";
+  const buildLayer = builds
+    ? `<g fill="#E7D9BC" stroke="#D8C49B" stroke-width="0.7">${builds}</g>` : "";
 
   const vis = (geo.streets || []).filter((st) => inView(st._b, view));
   M._visStreets = vis.length;
@@ -178,7 +363,7 @@ function drawBase(vp = M.vp, geo = M.geo) {
     </g>`;
   }).join("") : "";
 
-  return `<rect width="100%" height="100%" fill="#F4EBD3"/>${water}${casing}${fill}${labels}${marks}`;
+  return `<rect width="100%" height="100%" fill="#F4EBD3"/>${water}${buildLayer}${casing}${fill}${labels}${marks}`;
 }
 
 
@@ -531,6 +716,11 @@ function paint() {
       }
     }
   }
+  /* Tile đặt SAU khi nền vector đã dựng: nếu tile về được thì nó che nền
+     vector đi, còn nếu không thì nền vector đã sẵn ở đó rồi. Thứ tự này
+     là cái giữ cho bản đồ không bao giờ trắng. */
+  paintTiles();
+  syncBaseVisibility();
   placeMarks();
   placeEateries();
   placePins();
@@ -548,9 +738,23 @@ function paint() {
 }
 
 /* ── cử chỉ: kéo và phóng ────────────────────────────────────── */
+/* NGƯỠNG CHẠM — vì sao 12px và vì sao đo theo ĐƯỜNG CHIM BAY
+   Bản trước cộng dồn |dx|+|dy| của từng sự kiện pointermove rồi coi >8 là
+   kéo. Trên chuột thì một cú bấm không sinh pointermove nào nên số đó ở
+   yên 0 và mọi thứ chạy đúng. Trên ngón tay thì KHÔNG: một cú chạm bình
+   thường vẫn rung 1–3px mỗi sự kiện, mươi sự kiện là vượt 8 — và cú chạm
+   ấy bị chính lưới chặn "kéo xong đừng chọn ghim" nuốt mất. Kết quả là
+   trên điện thoại, chạm vào ghim quán hay điểm tham quan thường không mở
+   ra gì, còn trên máy tính thì không ai tái hiện được.
+
+   Nên đo KHOẢNG CÁCH TỪ ĐIỂM ĐẶT NGÓN, không cộng quãng đường: rung tại
+   chỗ bao nhiêu lần cũng vẫn là chạm. 12px xấp xỉ ngưỡng trượt 8dp mà
+   Android dùng cho cùng việc này. */
+const TAP_SLOP = 12;
+
 function attachGestures(canvas) {
   const pts = new Map();
-  let last = null, pinch = null, moved = 0;
+  let last = null, pinch = null, moved = 0, start = null, captured = false;
 
   const dist2 = () => {
     const [a, b] = [...pts.values()];
@@ -560,11 +764,24 @@ function attachGestures(canvas) {
     const [a, b] = [...pts.values()];
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   };
+  /* Bắt con trỏ MUỘN — chỉ khi đã thành cú kéo thật. Vẫn cần bắt: kéo mà
+     ngón trượt ra ngoài mép bản đồ thì không có nó, bản đồ đứng lại giữa
+     chừng. Gọi nhiều lần vô hại. */
+  const grab = (e) => {
+    if (captured) return;
+    try { canvas.setPointerCapture(e.pointerId); captured = true; } catch { /* con trỏ đã nhả */ }
+  };
 
   canvas.addEventListener("pointerdown", (e) => {
-    canvas.setPointerCapture(e.pointerId);
+    /* KHÔNG bắt con trỏ ngay ở đây. Khi một phần tử đang giữ pointer
+       capture, trình duyệt bắn luôn cả `click` vào phần tử ấy thay vì vào
+       thứ nằm dưới ngón tay — tức là mọi cú chạm ghim sẽ rơi vào #bmCanvas,
+       và bộ định tuyến `ev.target.closest("[data-pin]")` bên app.js không
+       còn thấy cái ghim nào. Chỉ bắt khi đã CHẮC CHẮN là kéo (xem
+       pointermove), lúc đó việc giữ sự kiện mới thật sự cần. */
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
     moved = 0;
+    start = { x: e.clientX, y: e.clientY };
     M.dragging = true;
     /* Chi khoi dong lai quang doi khi day la ngon DAU TIEN. Ngon thu hai
        cham xuong ma xoa _dx/_dy thi nen bat lai goc trong khi vp da doi —
@@ -585,14 +802,16 @@ function attachGestures(canvas) {
       M.vp.zoomAt(d / pinch.d, m.x - r.left, m.y - r.top);
       M.vp.panBy(m.x - pinch.m.x, m.y - pinch.m.y);
       pinch = { d, m };
-      moved += 10;
+      moved = TAP_SLOP + 1;     // hai ngón thì chắc chắn không phải cú chạm
+      grab(e);
       M._dirty = true;          // phong pha the tinh tien: dung lai that
       schedulePaint();
       return;
     }
     if (last) {
       const dx = e.clientX - last.x, dy = e.clientY - last.y;
-      moved += Math.abs(dx) + Math.abs(dy);
+      if (start) moved = Math.max(moved, Math.hypot(e.clientX - start.x, e.clientY - start.y));
+      if (moved > TAP_SLOP) grab(e);
       M.vp.panBy(dx, dy);
       M._dx += dx; M._dy += dy;
       last = { x: e.clientX, y: e.clientY };
@@ -606,6 +825,8 @@ function attachGestures(canvas) {
     if (pts.size === 1) { const [q] = [...pts.values()]; last = { x: q.x, y: q.y }; }
     if (pts.size === 0) {
       last = null;
+      start = null;
+      captured = false;
       // Nhả hết tay: bỏ cờ rồi vẽ lại MỘT lần để thành phố 3D bắt kịp
       // vị trí mới. Thiếu bước này thì nhà cửa đứng lại ở chỗ cũ vĩnh viễn.
       M.dragging = false;
@@ -630,7 +851,7 @@ function attachGestures(canvas) {
 
   // kéo xong không được tính là một cú chạm chọn ghim
   canvas.addEventListener("click", (e) => {
-    if (moved > 8) { e.stopPropagation(); e.preventDefault(); }
+    if (moved > TAP_SLOP) { e.stopPropagation(); e.preventDefault(); }
   }, true);
 }
 
@@ -645,15 +866,17 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
      ở mức thu xa hơn ngưỡng dùng được. Và giữ M.filter thì chip đang sáng
      nói một đằng còn bản đồ hiện một nẻo. */
   M.mode = "flat"; M.cam = null; M.filter = "all"; M.showEat = false; M._eatKey = "";
+  // Mỗi lần mở lại phải hỏi lại mạng: bản trước có tile không nói gì về
+  // bản này, và giữ cờ cũ là ẩn nền vector đi khi tile không bao giờ tới.
+  M._tilesOK = false;
   M.places = places.filter((p) => p.zone === zoneId && p.at);
   // Lớp quán ăn chỉ có dữ liệu cho vùng đã nhập từ OSM. Vùng khác thì mảng
   // rỗng và chip Eateries không hiện — thà không có nút còn hơn có nút bấm
   // vào chẳng ra gì.
   M.eateries = eateries;
   M._eatKey = "";
-  // Sinh một lần cho mỗi lần mở bản đồ. paint() chạy theo từng pointermove,
-  // sinh lại ở đó thì vừa tốn vừa làm nhà cửa nhảy khi người dùng kéo.
-  M.fabric = buildFabric(geo);
+  // Nhà thật nạp SAU, không chặn lần vẽ đầu — xem ensureBuildings().
+  ensureBuildings(geo, zoneId, () => { if (M.geo === geo) paint(); });
 
   const view = $("#v-bigmap");
   const pts = M.places.map((p) => p.at);
@@ -661,6 +884,7 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
 
   view.innerHTML = `
     <div class="bm-canvas" id="bmCanvas">
+      <div class="bm-tiles" id="bmTiles" aria-hidden="true"></div>
       <svg id="bmBase" aria-hidden="true"></svg>
       <div class="bm-marks" id="bmMarks" data-zone="${esc(zoneId)}"
         role="group" aria-label="Sights and landmarks"
@@ -688,9 +912,14 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
 
     <div class="bm-foot">
       <div class="bm-scale"><span id="bmScale"><i></i></span></div>
-      <p class="bm-attr">Streets, water${M.eateries.length ? " and eateries" : ""}: map data
-        ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL — simplified for offline use.
-        Sight positions are <b>unsurveyed seed data</b> and can be tens of metres off.
+      ${/* Ghi nguồn phải nói đúng thứ đang hiện. Câu cũ là "simplified for
+            offline use" — đúng khi nền là lớp vector tự dựng, sai từ lúc
+            bản đồ vẽ bằng tile thật của OpenStreetMap. Giấy phép của họ
+            buộc ghi nguồn, và ghi sai nguồn thì tệ hơn không ghi. */""}
+      <p class="bm-attr">Base map and data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.
+        Tiles from openstreetmap.org; a simplified offline copy is drawn when they
+        cannot load. Sight positions are <b>unsurveyed seed data</b> and can be tens of
+        metres off.
         ${M.eateries.length ? "Eateries carry <b>no price data</b> — Nón Lá has never scanned them." : ""}
         Orientation only; tap anything, then <b>Open in maps</b> for turn-by-turn.</p>
     </div>
@@ -742,12 +971,14 @@ export function openRoute({ zoneId, zone, geo, places, icons, route, iconOf, onO
   Object.assign(M, { zoneId, zone, geo, icons, iconOf, route, at: 0, onOpenStop, sel: null });
   M._hasBase = false; M._dx = 0; M._dy = 0; M._dirty = false; M.dragging = false;
   M.places = [];                       // màn hình này nói về tuyến, không về giá
-  M.fabric = buildFabric(geo);
+  // (lớp nhà giả đã bỏ — nhà thật nằm trong geo.buildings)
+  ensureBuildings(geo, zoneId, () => { if (M.geo === geo) paint(); });
 
   const view = $("#v-bigmap");
   view.classList.add("rt");
   view.innerHTML = `
     <div class="bm-canvas" id="bmCanvas">
+      <div class="bm-tiles" id="bmTiles" aria-hidden="true"></div>
       <svg id="bmBase" aria-hidden="true"></svg>
       <div class="bm-marks" id="bmMarks" data-zone="${esc(zoneId)}"
         role="group" aria-label="Sights"
@@ -901,7 +1132,7 @@ export function close() {
   $("#v-bigmap")?.classList.remove("rt");
   window.removeEventListener("resize", M._resize);
   M.vp = null;
-  M.fabric = null;
+
 }
 
 /* Dòng đếm ở đầu bản đồ. Gom về một chỗ vì giờ có ba lớp cùng đóng góp,
@@ -1087,8 +1318,12 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30 }) {
       : p.fair === true ? I.mapPin("#0E4A3C") : I.mapPinUnknown("#8A7A66");
     const lvl = p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown";
     const d = P.me ? fmtDistance(distance(P.me, p.at)) : "";
+    /* Nhãn cơ bản giữ lại trong data-label: place() có thể phải nối thêm
+       "beyond the edge of this map", và nối vào chính aria-label thì mỗi
+       lần vẽ lại nó dài thêm một đoạn nữa. */
+    const lab = `${esc(p.name)}${d ? `, ${d} away` : ""}`;
     return `<button class="ex-pin" data-place="${esc(p.id)}" data-lvl="${lvl}"
-      aria-label="${esc(p.name)}${d ? `, ${d} away` : ""}">${g}</button>`;
+      data-label="${lab}" aria-label="${lab}">${g}</button>`;
   };
   layer.innerHTML = P.places.map(pin).join("");
 
@@ -1136,10 +1371,36 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30 }) {
     : P.cam.at(ll, liftM);
 
   function place() {
+    /* Khung để kẹp ghim. Đo một lần cho cả vòng lặp: getBoundingClientRect
+       trong thân vòng lặp buộc trình duyệt tính lại bố cục mỗi ghim. */
+    const r = host.getBoundingClientRect();
+    const bw = r.width || 340, bh = r.height || 240;
+    const EDGE = 20;                       // chừa đủ cho nửa bề ngang ghim
+
     for (const el of layer.children) {
       const p = P.places.find((x) => x.id === el.dataset.place);
       if (!p) continue;
-      const s = at(p.at, 16);
+      let s = at(p.at, 16);
+
+      /* Cơ sở nằm NGOÀI mép tranh — Cẩm Nam so với tranh phố cổ chẳng hạn.
+         Không có mức phóng nào kéo nó vào trong được, vì nó ở ngoài mép
+         giấy chứ không phải ngoài khung nhìn. Trước đây fitArt phản ứng
+         bằng cách thu nhỏ cả tranh lại cho vừa, và màn hình mở ra là một
+         tấm tranh con nằm lệch giữa khung trống. Giờ tranh giữ nguyên,
+         còn ghim này bị kéo về sát viền và làm mờ đi: nó vẫn được đếm,
+         vẫn bấm được, nhưng không giả vờ đang chỉ vào một mái nhà nào. */
+      const off = P.fit && !P.fit.onArt(P.tf.toImage(p.at));
+      if (off) {
+        s = {
+          x: Math.max(EDGE, Math.min(bw - EDGE, s.x)),
+          y: Math.max(EDGE + 32, Math.min(bh - EDGE, s.y)),
+        };
+        el.dataset.off = "1";
+        el.setAttribute("aria-label", `${el.dataset.label}, beyond the edge of this map`);
+      } else if (el.dataset.off) {
+        delete el.dataset.off;
+        el.setAttribute("aria-label", el.dataset.label);
+      }
       el.style.transform = `translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)`;
     }
     if (P.me) {
@@ -1158,11 +1419,26 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30 }) {
     const r = host.getBoundingClientRect();
     const view = { w: r.width || 340, h: r.height || 240 };
     const pts = P.places.map((p) => p.at);
-    P.fit = fitArt({ tf: P.tf, art: A, points: pts, view });
+    /* pad 26 chứ không phải mặc định 34. Lề là thứ quyết định fitArt có
+       phủ kín được khung hay phải nhường: lề càng rộng thì mức phóng cần
+       để chứa hết ghim càng nhỏ, và tới lúc nó nhỏ hơn mức phủ kín thì
+       tranh co lại, hở nền ở mép. Đo thật ở khung 354×304: cụm bờ tây
+       sông Hàn ở lề 34 thì hở 71px bên trái, ở lề 26 thì khít. Khối xem
+       trước nhỏ hơn bản đồ toàn khung nên nó cũng cần lề nhỏ hơn — 34 là
+       con số hợp cho khung to, không phải cho khung này. */
+    P.fit = fitArt({ tf: P.tf, art: A, points: pts, view, pad: 26 });
     if (!P.fit) return false;
     art.style.width = `${(A.w * P.fit.k).toFixed(1)}px`;
     art.style.height = `${(A.h * P.fit.k).toFixed(1)}px`;
     art.style.transform = `translate(${P.fit.ox.toFixed(1)}px, ${P.fit.oy.toFixed(1)}px)`;
+    /* Lót nền: chính tấm tranh đó, phóng phủ kín và làm mờ hẳn.
+       fitArt cố phủ kín khung, nhưng có cụm ghim mà không mức phóng nào
+       vừa phủ kín vừa chứa hết — lúc đó nó nhường, và cái hở ra là một
+       mảng giấy phẳng lì trông y như ảnh tải hỏng. Một lớp mờ của chính
+       tấm tranh thì không bao giờ đọc ra là lỗi: nó là chiều sâu.
+       Đặt qua biến CSS chứ không gán background-image thẳng, để mọi luật
+       trình bày (mờ bao nhiêu, phóng bao nhiêu) nằm gọn trong app.css. */
+    host.style.setProperty("--ex-art", `url("${A.src}")`);
     art.hidden = false;
     svg.hidden = true;
     place();

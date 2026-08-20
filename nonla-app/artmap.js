@@ -59,18 +59,36 @@ export function artTransform(anchors, center) {
 /**
  * Chọn mức phóng và độ lệch để đặt tranh vào khung.
  *
- * Hai ràng buộc kéo ngược nhau và phải thoả CẢ HAI:
- *   · mọi ghim phải nằm trong khung — nếu không, con số "4 quán gần đây"
+ * Hai ràng buộc kéo ngược nhau:
+ *   · mọi ghim phải nằm trong khung — nếu không, con số "6 quán gần đây"
  *     nói một đằng còn bản đồ hiện một nẻo;
- *   · tranh phải PHỦ KÍN khung — hở ra một dải nền trắng ở mép thì cả
- *     màn hình đọc ra là ảnh chưa tải xong.
- * Khi hai điều đó không thể cùng đúng, phủ kín thắng và ghim ngoài rìa
- * bị kéo về sát mép — người dùng vẫn thấy chúng, chỉ là sát viền.
+ *   · tranh phải PHỦ KÍN khung — hở ra một dải nền giấy ở mép thì cả
+ *     màn hình đọc ra là ảnh tải hỏng.
+ *
+ * PHỦ KÍN LUÔN THẮNG. Bản trước ưu tiên ngược lại: gặp một ghim không
+ * lọt được thì nó bỏ ràng buộc phủ kín, và cái người dùng thấy là một
+ * tấm tranh 311×207 nằm lệch trong khung 343×290, kèm một cái ghim cắm
+ * giữa nền giấy trống — trông đúng như ảnh tải lỗi. Lý lẽ cũ ("thà hở
+ * mép còn hơn giấu ghim") không sai, nó chỉ giải sai bài: ghim nằm
+ * NGOÀI TRANH thì phóng to cỡ nào cũng không kéo nó vào trong được, vì
+ * nó ở ngoài mép giấy chứ không phải ngoài khung nhìn.
+ *
+ * Nên ghim ngoài tranh bị LOẠI khỏi phép tính khung: khung khít theo
+ * những ghim thật sự vẽ được, còn số ghim còn lại do bigmap.js kéo về
+ * sát mép và làm mờ đi, kèm nhãn nói rõ nó nằm ngoài tranh. Người dùng
+ * vẫn đếm đủ, và không màn hình nào trông như hỏng.
  */
 export function fitArt({ tf, art, points, view, pad = 34, maxUpscale = 2.2 }) {
   if (!tf || !art) return null;
   const w = view.w, h = view.h;
-  const imgPts = points.map((ll) => tf.toImage(ll));
+  const all = points.map((ll) => tf.toImage(ll));
+  /* Lề 2%: một ghim đúng sát mép giấy cũng coi như ngoài tranh. Ghim vẽ
+     ở mép thì mũi nhọn của nó chỉ vào chỗ hết tranh, không chỉ vào chỗ
+     nào cả — kéo về sát viền và làm mờ đọc ra đúng hơn. */
+  const m = 0.02;
+  const inArt = all.filter((p) => p.x > -art.w * m && p.x < art.w * (1 + m)
+    && p.y > -art.h * m && p.y < art.h * (1 + m));
+  const imgPts = inArt.length ? inArt : all;
 
   const xs = imgPts.map((p) => p.x), ys = imgPts.map((p) => p.y);
   const bw = imgPts.length ? Math.max(1, Math.max(...xs) - Math.min(...xs)) : art.w;
@@ -120,15 +138,27 @@ export function fitArt({ tf, art, points, view, pad = 34, maxUpscale = 2.2 }) {
     if (k >= maxUpscale) break;
   }
 
-  /* Có cụm ghim mà KHÔNG tồn tại mức phóng nào vừa phủ kín khung vừa chứa
-     hết ghim — chẳng hạn khi cụm nằm sát mép tranh. Lúc đó bỏ ràng buộc
-     phủ kín và để hở một dải nền giấy ở mép, vì thứ tự ưu tiên là:
-     HIỆN ĐỦ GHIM trước, đẹp khung sau. Một ghim bị cắt mất nửa là app nói
-     có 4 quán rồi chỉ cho thấy 3; một dải nền hở chỉ là kém đẹp. */
+  /* Cụm ghim NẰM TRÊN TRANH mà vẫn không có mức phóng nào vừa phủ kín
+     khung vừa chứa hết — chẳng hạn khi cụm dài ngang lại nằm sát mép dưới
+     tranh. Ở đây, và CHỈ ở đây, phủ kín mới nhường: phóng to thêm một
+     chút nữa là thật sự kéo được ghim vào trong, chỉ là hết chỗ trượt.
+     Một dải nền giấy hở ở mép là kém đẹp; giấu mất một quán là app nói
+     có 6 chỗ rồi chỉ cho thấy 5.
+
+     Khác hẳn trường hợp ghim NGOÀI mép giấy: cái đó đã bị loại khỏi
+     imgPts ở trên, vì không mức phóng nào kéo nó vào được và để nó ở lại
+     thì cả tấm tranh bị thu nhỏ lại vô ích. */
   if (imgPts.length >= 2 && !fits(out)) {
     const k = Math.min(maxUpscale, want);
     out = { k, ox: w / 2 - cx * k, oy: h / 2 - cy * k, uncovered: true };
   }
 
-  return { ...out, toScreen: (p) => ({ x: p.x * out.k + out.ox, y: p.y * out.k + out.oy }) };
+  return {
+    ...out,
+    /** Điểm này có nằm trong mép giấy không — bigmap.js dùng để làm mờ
+     *  và kẹp những ghim vẽ ra ngoài tranh. */
+    onArt: (p) => p.x > -art.w * m && p.x < art.w * (1 + m)
+      && p.y > -art.h * m && p.y < art.h * (1 + m),
+    toScreen: (p) => ({ x: p.x * out.k + out.ox, y: p.y * out.k + out.oy }),
+  };
 }

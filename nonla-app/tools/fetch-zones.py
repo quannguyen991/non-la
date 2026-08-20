@@ -45,15 +45,41 @@ WIDTH = {
 }
 KEEP_HW = set(WIDTH) | {"steps"}
 
+# Thứ tự CÓ NGHĨA: mục khớp trước thắng. "historic" đứng trên "tourism"
+# để một ngôi chùa cổ ra `temple` chứ không ra `sight` chung chung.
+#
+# Tám mục đầu là bộ gốc. Mười mục sau thêm ở vòng mở rộng Đà Nẵng: vùng
+# Mỹ Khê chỉ moi ra được 15 mốc trong khi Hội An có 35, và lý do không
+# phải là Mỹ Khê không có gì — mà là một dải biển thì không gắn thẻ
+# `historic` hay `tourism=museum`. Nó gắn `natural=beach`, `leisure=park`,
+# `tourism=viewpoint`. Bộ thẻ cũ đơn giản là không nhìn thấy loại vùng đó.
+#
+# Mỗi loại mới đều ánh xạ về một `t` ĐÃ CÓ ICON trong assets/icons/ —
+# thêm một loại không có hình thì ghim rơi về icon mặc định, và bản đồ
+# lại có một dấu chấm không nói lên điều gì.
 LANDMARK_KIND = [
     ("historic", "bridge", "bridge"),
     ("man_made", "bridge", "bridge"),
+    ("historic", "city_gate", "gate"),
+    ("historic", "memorial", "heritage"),
+    ("historic", "monument", "heritage"),
     ("historic", None, "heritage"),
     ("amenity", "place_of_worship", "temple"),
     ("amenity", "marketplace", "market"),
-    ("tourism", "attraction", "sight"),
     ("tourism", "museum", "museum"),
+    ("tourism", "gallery", "museum"),
+    ("tourism", "artwork", "sight"),
+    ("tourism", "viewpoint", "sight"),
+    ("tourism", "theme_park", "sight"),
+    ("tourism", "attraction", "sight"),
+    ("natural", "beach", "beach"),
+    ("leisure", "beach_resort", "beach"),
+    ("leisure", "park", "nature"),
+    ("leisure", "garden", "nature"),
+    ("man_made", "lighthouse", "sight"),
     ("amenity", "theatre", "sight"),
+    ("amenity", "arts_centre", "sight"),
+    ("amenity", "fountain", "sight"),
 ]
 
 PARTS = {
@@ -62,10 +88,14 @@ PARTS = {
               'way["waterway"~"^(riverbank|river)$"]({b});'
               'relation["natural"="water"]({b});'),
     "coast": 'way["natural"="coastline"]({b});',
+    # ["name"] ở mọi dòng là bắt buộc, không phải cho gọn: một mốc không
+    # tên vẽ ra một cái ghim mà chạm vào không hiện được gì cả.
     "marks": ('nwr["historic"]["name"]({b});'
-              'nwr["amenity"~"^(place_of_worship|marketplace|theatre)$"]["name"]({b});'
-              'nwr["tourism"~"^(attraction|museum)$"]["name"]({b});'
-              'nwr["man_made"="bridge"]["name"]({b});'),
+              'nwr["amenity"~"^(place_of_worship|marketplace|theatre|arts_centre|fountain)$"]["name"]({b});'
+              'nwr["tourism"~"^(attraction|museum|gallery|artwork|viewpoint|theme_park)$"]["name"]({b});'
+              'nwr["leisure"~"^(park|garden|beach_resort)$"]["name"]({b});'
+              'nwr["natural"="beach"]["name"]({b});'
+              'nwr["man_made"~"^(bridge|lighthouse)$"]["name"]({b});'),
 }
 
 

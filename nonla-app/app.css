@@ -534,7 +534,10 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 /* z-index 5 — TRÊN cả lớp ghim (3). Nhãn là chữ, bị một cái ghim đè lên
    là mất nghĩa; ghim bị nhãn đè lên thì vẫn còn 5 cái khác cùng loại.
    pointer-events:none để cú chạm rơi xuống .ex-open nằm dưới. */
-.ex-openlabel{position:absolute;left:12px;bottom:26px;z-index:5;pointer-events:none;
+/* Về lại sát đáy. Con số 26 trước đây chỉ tồn tại để né phần khay đè
+   lên; khay thôi đè thì nút không còn gì phải né, và giữ nó ở 26 là ăn
+   mất một dải bản đồ mà không đổi lại được gì. */
+.ex-openlabel{position:absolute;left:12px;bottom:14px;z-index:5;pointer-events:none;
   display:inline-flex;align-items:center;min-height:38px;padding:0 15px;
   border-radius:var(--pill);background:rgba(14,43,36,.94);color:#F6F2E6;
   border:1px solid var(--vien);
@@ -544,7 +547,7 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
    lưới 52×114 kể cả khe hở giữa hai nút, và ở trạng thái nhận chạm nó
    nuốt luôn cú chạm vào cái ghim nằm lọt phía sau khe đó — đo được thật:
    ghim banh-mi-goc trả về DIV.ex-fabs thay vì chính nó. */
-.ex-fabs{position:absolute;right:12px;bottom:26px;z-index:4;display:grid;gap:10px;
+.ex-fabs{position:absolute;right:12px;bottom:14px;z-index:4;display:grid;gap:10px;
   pointer-events:none}
 .ex-fabs>*{pointer-events:auto}
 .ex-fab{width:52px;height:52px;border-radius:50%;background:#FDFAF1;
@@ -564,11 +567,17 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   box-shadow:0 8px 20px -6px rgba(11,42,34,.62)}
 
 /* ── khay thẻ dưới ─────────────────────────────────── */
-/* Trượt đè lên mép dưới bản đồ 14px, không phải 26. Ở 26 thì khay cắt
-   ngang viên "Open full map" và hai nút tròn nằm cách đáy bản đồ 12px —
-   người dùng thấy một nút bị xén mất nửa dưới. Hai con số này đi cặp với
-   `bottom:26px` của .ex-open và .ex-fabs: 26 − 14 = 12px hở thật. */
-.ex-sheet{position:relative;z-index:2;margin-top:-14px;
+/* KHÔNG đè lên bản đồ nữa. Bản đầu đè 26px, bản sau 14px — cả hai xuất
+   phát từ một ý đúng (khay phải ló ra thì người dùng mới biết dưới còn
+   nội dung) nhưng giải sai: thứ ló ra không cần là khay, vì hàng thẻ quán
+   bên trong nó đã tự lộ một nửa ở mép phải màn hình rồi.
+
+   Cái giá thì thật: 14px cuối của bản đồ bị che, và đó đúng là dải chứa
+   viên "Open full map" cùng hai nút tròn — chỗ đắt nhất của cả khối.
+
+   8px khe hở thay vì 0: hai khối bo góc chạm sát nhau thì hai đường cong
+   ngược chiều tạo ra một khe hình thoi trông như lỗi dựng hình. */
+.ex-sheet{position:relative;z-index:2;margin-top:8px;
   padding:10px 14px 14px;border-radius:26px;
   background:var(--diep);border:1.5px solid var(--vien);
   box-shadow:0 -6px 24px rgba(14,43,36,.10)}
@@ -1456,3 +1465,13 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   }
   .deskhint:hover{border-color:var(--vien-dam)}
 }
+
+/* ── bản đồ Google nhúng trong thẻ ─────────────────────────
+   Khung 16/10 bo góc, cùng hình dạng với mọi khung ảnh khác trong thẻ
+   (.ph), để nó đọc ra là một phần của thẻ chứ không phải một mảnh web
+   lạ dán vào. border-radius phải đi kèm overflow:hidden — iframe không
+   tự bo theo khung cha. */
+.gmap{position:relative;width:100%;aspect-ratio:16/10;margin:2px 0 12px;
+  border-radius:16px;overflow:hidden;border:1px solid var(--line);
+  background:var(--kem)}
+.gmap iframe{width:100%;height:100%;border:0;display:block}

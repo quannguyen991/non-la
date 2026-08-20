@@ -113,6 +113,30 @@ else:
     im.save(dst, "JPEG", quality=84, optimize=True, progressive=True)
 print(im.size[0], im.size[1])
 `;
+
+/* Bản thumb vuông cho ảnh cơ sở. Cắt từ ảnh 16/10 ĐÃ CÓ, không gọi API
+   lần nữa — nó là cùng một tấm ảnh, chỉ khác khung.
+
+   Vì sao phải nằm trong script này chứ không làm tay một lượt: bốn trong
+   năm chỗ dùng ảnh cơ sở là ô VUÔNG, nhỏ tới 54px, và placePhoto() lấy
+   thẳng `<id>.thumb.jpg`. Sinh mười ảnh mới mà quên bước này thì mười ô
+   đó rơi về nền giấy dó trong khi ảnh vẫn nằm ngay cạnh, đúng tên, chỉ
+   sai khung — thứ nhìn ra y hệt "chưa sinh ảnh". Đã xảy ra một lần rồi. */
+const THUMB_PY = `
+import sys
+from PIL import Image
+src, dst, px = sys.argv[1], sys.argv[2], int(sys.argv[3])
+im = Image.open(src).convert("RGB")
+s = min(im.size)
+l = (im.width - s) // 2
+# Cắt từ 8% xuống chứ không cắt giữa: ảnh mặt tiền quán có trời ở trên,
+# và một ô vuông lấy đúng giữa thì nửa trên là trời trắng.
+t = min(round(im.height * 0.08), im.height - s)
+im.crop((l, t, l + s, t + s)).resize((px, px), Image.LANCZOS) \\
+  .save(dst, "JPEG", quality=82, optimize=True, progressive=True)
+print(px, px)
+`;
+writeFileSync("_thumb.py", THUMB_PY);
 writeFileSync("_shrink.py", PY);
 
 function shrink(srcPng, dst, mode, px) {
@@ -177,9 +201,25 @@ await Promise.all(Array.from({ length: PARALLEL }, async () => {
   while (queue.length) await one(queue.shift());
 }));
 
+/* Ảnh cơ sở nào chưa có bản vuông thì cắt ngay tại đây. Chạy trên MỌI
+   tấm, không chỉ tấm vừa sinh: một tấm cũ thiếu thumb cũng là một ô rỗng
+   trong app, và ở đây phát hiện ra nó không tốn gì cả. */
+const { readdirSync } = await import("node:fs");
+let thumbs = 0;
+for (const f of readdirSync("assets/places")) {
+  if (!/\.jpg$/.test(f) || /\.thumb\.jpg$/.test(f)) continue;
+  const dst = `assets/places/${f.replace(/\.jpg$/, ".thumb.jpg")}`;
+  if (existsSync(dst)) continue;
+  try {
+    execFileSync("python", ["_thumb.py", `assets/places/${f}`, dst, String(ICON_PX)],
+      { encoding: "utf8" });
+    thumbs++;
+  } catch (e) { console.log(`  FAIL thumb ${f}  ${e.message.slice(0, 120)}`); }
+}
+if (thumbs) console.log(`\n${thumbs} bản thumb vuông cắt từ ảnh đã có`);
+
 /* Chỉ mục để app biết ảnh nào ĐÃ ship — thăm dò từng file bằng 72 request
    404 thì vừa chậm vừa bẩn log. */
-const { readdirSync } = await import("node:fs");
 const icons = readdirSync("assets/icons").filter((f) => f.endsWith(".webp"))
   .map((f) => f.replace(/\.webp$/, "")).sort();
 const photos = readdirSync("assets/places").filter((f) => /\.(jpg|png|webp)$/.test(f))
