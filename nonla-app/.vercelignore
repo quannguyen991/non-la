@@ -5,8 +5,13 @@
 # trang xem thử — chúng không được file nào trong luồng chạy tham chiếu tới
 # (đã kiểm), nên loại ra cho bản deploy gọn và không lộ giấy nháp.
 
-.netlify
 node_modules
+
+# .env.local do `vercel link` sinh ra, chứa VERCEL_OIDC_TOKEN thật. App này
+# là static thuần nên mọi tệp lên máy chủ đều tải về được qua URL — một tệp
+# .env nằm trong thư mục phát là token công khai. Không có gì trong luồng
+# chạy đọc nó cả.
+.env*
 
 # Script dựng dữ liệu và ảnh, chạy tay trên máy — không phải mã của app
 # _tmp_*.png là ảnh thô của _gen_assets.mjs; nó dọn bằng `rm` nên trên

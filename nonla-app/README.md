@@ -32,8 +32,8 @@ vercel deploy --prod --cwd "D:/Claude/nón lá/nonla-app"
 
 `.vercelignore` giữ script dựng dữ liệu, `test.mjs`, `tools/` và chính README
 này ở lại repo — máy chủ chỉ nhận đúng thứ app cần lúc chạy. Không có bước
-build nào, nên đổi sang hosting tĩnh khác (GitHub Pages, Netlify, Cloudflare
-Pages) chỉ là đẩy nguyên thư mục `nonla-app/` lên.
+build nào, nên đổi sang hosting tĩnh khác (GitHub Pages, Cloudflare Pages)
+chỉ là đẩy nguyên thư mục `nonla-app/` lên.
 
 Lớp cộng đồng trên bản đang chạy **chưa nối máy chủ**: `config.js` còn rỗng
 nên tab Community chạy ở chế độ sổ tay riêng trên máy. Xem `supabase/README.md`

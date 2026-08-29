@@ -1,8 +1,6 @@
+# Liên kết CLI của Vercel: project id gắn với TÀI KHOẢN người deploy,
+# không phải cấu hình dự án.
 .vercel
 
-# Trạng thái CLI của Netlify: state.json chỉ có site id, còn netlify.toml do CLI
-# tự sinh lại ghi publish = đường dẫn tuyệt đối trên máy người deploy
-# ("D:\Claude\nón lá\nonla-app"). Đường dẫn đó vô nghĩa với mọi máy khác và sẽ
-# đổi qua lại mỗi lần một máy khác deploy, nên nó là cấu hình máy chứ không
-# phải cấu hình dự án.
-.netlify
+# .env.local do `vercel link` sinh ra và chứa VERCEL_OIDC_TOKEN thật.
+.env*
