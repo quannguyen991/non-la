@@ -16,6 +16,10 @@ import { changeDue, breakdown, explain, check as checkChange, NOTES } from "./ch
 import { compare as compareMenus, MIN_PAIRS } from "./menutax.js";
 import { tripSummary, dateLine, fileName } from "./postcard.js";
 import { PHRASES } from "./showcard.js";
+import { merge as mergePrices, count as countPrices,
+         extract as extractPrices } from "./localprices.js";
+import { aggregate as aggregateTax } from "./menutax.js";
+import { t as tr, setLang } from "./i18n.js";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
@@ -700,6 +704,115 @@ console.log("\n── showcard: bộ câu ────────────�
   ok("không câu nào mang theo con số giá",
     PHRASES.every((p) => !/[0-9]/.test(p.vi)),
     PHRASES.find((p) => /[0-9]/.test(p.vi))?.vi || "");
+}
+
+/* ── giá khảo sát dùng ngay trên máy (localprices.js) ─────
+   Hàm đáng kiểm nhất là merge(): nó quyết định con số tiền mà app nói ra,
+   và nó phải KHÔNG sửa bảng gốc — bảng đang chạy và bảng ship kèm là hai
+   vật khác nhau, gộp chúng lại là mất đường hoàn nguyên. */
+console.log("\n── localprices: phần đè giá ────────────────");
+{
+  const base = {
+    "hoian-oldtown": { name: "Hội An", items: {
+      "cao-lau": { p25: 60000, p50: 70000, p75: 90000, p95: 120000, n: 34, seed: true },
+      "mi-quang": { p25: 40000, p50: 50000, p75: 60000, p95: 80000, n: 21, seed: true },
+    } },
+    "hue-citadel": { name: "Huế", items: {
+      "bun-bo-hue": { p25: 30000, p50: 40000, p75: 50000, p95: 70000, n: 18, seed: true },
+    } },
+  };
+  const band = { p25: 62000, p50: 64000, p75: 66000, p95: 68000, n: 6, surveyedAt: "2026-08" };
+  const doc = { v: 1, at: "2026-08-29T00:00:00Z",
+    zones: { "hoian-oldtown": { "cao-lau": band } } };
+
+  const out = mergePrices(base, doc);
+  eq("dải đã đo thay được dải ước lượng", out["hoian-oldtown"].items["cao-lau"].p50, 64000);
+  eq("món khác trong cùng vùng không bị đụng",
+    out["hoian-oldtown"].items["mi-quang"].p50, 50000);
+  eq("BẢNG GỐC KHÔNG BỊ SỬA", base["hoian-oldtown"].items["cao-lau"].p50, 70000);
+  ok("dải đã đo mất cờ seed", !out["hoian-oldtown"].items["cao-lau"].seed);
+
+  /* Vùng không có phần đè phải giữ NGUYÊN tham chiếu cũ: vài chỗ trong
+     app so vùng bằng ===, và nhân bản tất cả sẽ làm chúng vẽ lại vô cớ. */
+  ok("vùng không đụng tới giữ nguyên tham chiếu",
+    out["hue-citadel"] === base["hue-citadel"]);
+  ok("không có gì để đè thì trả về chính bảng gốc",
+    mergePrices(base, { v: 1, zones: {} }) === base);
+
+  /* Một id món lạ trong phần đè — dữ liệu cũ hoặc hỏng — không được tạo
+     ra một dải giá cho thứ không nằm trong dishes.json. */
+  const weird = { v: 1, zones: { "hoian-oldtown": { "khong-ton-tai": { p50: 1 } } } };
+  ok("id món lạ bị bỏ qua", !mergePrices(base, weird)["hoian-oldtown"].items["khong-ton-tai"]);
+  eq("và không được đếm là đang có hiệu lực", countPrices(weird, base), 0);
+  eq("đếm thô thì vẫn thấy nó", countPrices(weird), 1);
+  eq("đếm đúng số dải đang dùng", countPrices(doc, base), 1);
+
+  /* extract() chỉ được lấy đúng những món đã đổi. Lưu cả tài liệu là đóng
+     băng bảng giá: bản deploy sau sửa giá sáu mươi món khác, máy này
+     không bao giờ thấy. */
+  const built = { zones: { "hoian-oldtown": { items: { "cao-lau": band,
+    "mi-quang": { p50: 999 } } } } };
+  const got = extractPrices(built, [{ zone: "hoian-oldtown", dishId: "cao-lau" }]);
+  eq("chỉ rút món đã đổi", Object.keys(got["hoian-oldtown"]).join(","), "cao-lau");
+  eq("không lấy theo cả bảng", countPrices({ zones: got }), 1);
+
+  /* Sau khi trộn, trust.js phải đọc ra "đã đo" — đây LÀ vòng lặp mà tệp
+     localprices.js sinh ra để khép, nên nó được kiểm từ đầu tới cuối. */
+  eq("vòng khảo sát khép kín tới tận phán quyết",
+    provenance(out["hoian-oldtown"].items["cao-lau"], 6).level, "fair");
+  eq("và trước khi trộn thì vẫn là ước lượng",
+    provenance(base["hoian-oldtown"].items["cao-lau"], 6).level, "ready");
+}
+
+/* ── cộng dồn nhiều lần so thực đơn ───────────────────────*/
+console.log("\n── menutax: cộng dồn nhiều quán ────────────");
+{
+  const rec = (ratio, dishes) => ({ zone: "hoian-oldtown", matched: dishes.length,
+    ratio, level: "gap", dishes });
+  const rs = [
+    rec(1.50, [{ id: "cao-lau", local: 50000, guest: 75000 }, { id: "bia-hoi", local: 15000, guest: 25000 }]),
+    rec(1.30, [{ id: "cao-lau", local: 60000, guest: 75000 }, { id: "bia-hoi", local: 15000, guest: 22000 }]),
+    rec(1.20, [{ id: "cao-lau", local: 50000, guest: 60000 }, { id: "bia-hoi", local: 20000, guest: 30000 }]),
+  ];
+  const a = aggregateTax(rs);
+  eq("đếm đủ số quán đã so", a.places, 3);
+  eq("trung vị qua các quán", Math.round(a.ratio * 100), 130);
+  ok("nêu ra từng món, món chênh nhiều nhất trước", a.dishes[0].id === "bia-hoi",
+    a.dishes.map((d) => d.id).join(","));
+  eq("đếm được món đắt hơn ở mấy quán", a.dishes[0].dearer, 3);
+
+  ok("một quán thì chưa gọi là mẫu hình", /needs a few more/.test(aggregateTax([rs[0]]).line));
+  eq("chưa so lần nào", aggregateTax([]).places, 0);
+  eq("chưa so lần nào thì không có câu nào", aggregateTax([]).line, "");
+  // Bản ghi hỏng — thiếu ratio — không được kéo cả phép cộng đi đâu.
+  eq("bỏ qua bản ghi hỏng", aggregateTax([...rs, { ratio: null }, { ratio: 0 }]).places, 3);
+}
+
+/* ── bảng dịch ────────────────────────────────────────────
+   Không kiểm "dịch có hay không" — kiểm những chỗ MỘT LỖI SẼ IM LẶNG:
+   câu chìa cho người bán phải có nghĩa ở mọi thứ tiếng, và hai nghĩa khác
+   nhau không được dùng chung một khoá. */
+console.log("\n── i18n: các màn mới ───────────────────────");
+{
+  const langs = ["vi", "ko", "zh", "ja"];
+  for (const code of langs) {
+    setLang(code);
+    const miss = PHRASES.filter((p) => tr(p.en) === p.en).map((p) => p.id);
+    ok(`${code}: mọi câu chìa ra đều có nghĩa dịch`, miss.length === 0, miss.join(", "));
+    ok(`${code}: nhãn màn xoay ngược được dịch`,
+      tr("Show this to the seller") !== "Show this to the seller");
+    ok(`${code}: nhãn đếm tiền thối được dịch`,
+      tr("Check my change") !== "Check my change");
+    /* "Cash" là TÊN CHẾ ĐỘ QUÉT (tờ tiền) ở chỗ khác trong app, còn nhãn
+       trên màn xoay ngược nghĩa là "tôi trả tiền mặt". Hai nghĩa dùng
+       chung một khoá thì tiếng Hàn sẽ hiện 지폐 — tờ giấy bạc — ở chỗ nói
+       về cách thanh toán. Hai khoá phải khác nhau, và khác BẢN DỊCH. */
+    ok(`${code}: "trả tiền mặt" không dùng chung khoá với "tờ tiền"`,
+      tr("Pay cash") !== tr("Cash"), `${tr("Pay cash")} / ${tr("Cash")}`);
+  }
+  setLang("en");
+  eq("tiếng Anh trả về chính câu gốc", tr("Check my change"), "Check my change");
+  ok("mã ngôn ngữ lạ bị từ chối", setLang("xx") === false);
 }
 
 console.log("\n════════════════════════════════════════════");

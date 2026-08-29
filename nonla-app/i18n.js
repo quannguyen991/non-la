@@ -41,6 +41,15 @@ export const LANGS = [
 /* Bảng dịch. Khoá = câu tiếng Anh. Ngôn ngữ nào thiếu một câu thì câu đó
    hiện ra bằng tiếng Anh — hụt một dòng thì mất một dòng, không phải mất
    cả màn hình. */
+/* MỘT TỪ TIẾNG ANH, HAI NGHĨA — VÀ CÁI BẪY CỦA KHOÁ-LÀ-CÂU
+   "Cash" trong app này là TÊN CHẾ ĐỘ QUÉT (chĩa vào tờ tiền), nên tiếng
+   Hàn dịch là 지폐 — tờ giấy bạc. Nhưng nhãn trên màn xoay ngược lại có
+   nghĩa "tôi trả bằng tiền mặt", và 지폐 ở đó là sai hẳn.
+
+   Đây là điểm yếu duy nhất của việc lấy câu tiếng Anh làm khoá: hai nghĩa
+   khác nhau tình cờ viết giống nhau sẽ dùng chung một bản dịch. Cách chữa
+   không phải thêm mã khoá trừu tượng cho cả bảng, mà là viết câu tiếng
+   Anh ĐỦ DÀI để nó chỉ còn một nghĩa — nhãn kia vì thế là "Pay cash". */
 const DICT = {
   vi: {
     // điều hướng
@@ -66,6 +75,40 @@ const DICT = {
     "Scan history": "Lịch sử quét", "Where you are": "Bạn đang ở đâu",
     "Use my location": "Dùng vị trí của tôi", "Warn me while I walk": "Nhắc tôi khi đang đi",
     On: "Bật", Off: "Tắt",
+    // câu để chìa cho người bán đọc — NGHĨA của câu, không phải bản dịch
+    // để nói ra; câu nói ra luôn là tiếng Việt.
+    "How much is this?": "Cái này bao nhiêu tiền?",
+    "May I see a menu with prices?": "Cho tôi xem thực đơn có giá",
+    "I'll have this one.": "Cho tôi món này",
+    "Not too spicy, please.": "Cho ít cay thôi",
+    "I'm vegetarian.": "Tôi ăn chay",
+    "I'm allergic to peanuts.": "Tôi bị dị ứng đậu phộng",
+    "To take away, please.": "Cho tôi mang về",
+    "The bill, please.": "Cho tôi xin hoá đơn",
+    "Could I look at the bill again?": "Cho tôi xem lại hoá đơn",
+    "I'll pay cash.": "Tôi trả tiền mặt",
+    "Thank you!": "Cảm ơn!",
+    // nhãn ngắn trên hàng chip
+    "How much?": "Bao nhiêu?", "This one": "Món này", "Not spicy": "Ít cay",
+    Vegetarian: "Ăn chay", "Peanut allergy": "Dị ứng đậu phộng",
+    "Take away": "Mang về", "The bill": "Hoá đơn", "Check bill": "Xem lại hoá đơn",
+    "Pay cash": "Trả tiền mặt", Thanks: "Cảm ơn",
+    // các màn mới
+    "Show this to the seller": "Chìa cho người bán xem",
+    "Say it in Vietnamese": "Nói bằng tiếng Việt",
+    "Check my change": "Kiểm tiền thối",
+    "You handed over": "Bạn đã đưa", "You got back": "Bạn nhận lại",
+    "Change owed": "Phải thối lại",
+    "Compare with the other menu": "So với tấm thực đơn kia",
+    "Two menus, one kitchen": "Hai tấm thực đơn, một bếp",
+    "Menus compared": "Đã so thực đơn",
+    "Vietnamese menu": "Thực đơn tiếng Việt", "English menu": "Thực đơn tiếng Anh",
+    "Make a postcard": "Làm tấm bưu thiếp", "Save the image": "Lưu ảnh",
+    "Why Nón Lá says this": "Vì sao Nón Lá nói thế",
+    "Record what you paid": "Ghi lại giá bạn đã trả",
+    "Hold this up, or lay the phone on the counter": "Giơ lên, hoặc đặt máy xuống quầy",
+    "Usual price here": "Giá thường ở đây",
+    "Order this dish": "Gọi món này",
   },
   ko: {
     Nearby: "주변", Eat: "먹거리", Community: "커뮤니티", You: "내 정보",
@@ -87,6 +130,36 @@ const DICT = {
     "Scan history": "스캔 기록", "Where you are": "현재 지역",
     "Use my location": "내 위치 사용", "Warn me while I walk": "걷는 중 알림",
     On: "켬", Off: "끔",
+    "How much is this?": "이거 얼마예요?",
+    "May I see a menu with prices?": "가격이 있는 메뉴판 좀 볼 수 있을까요?",
+    "I'll have this one.": "이걸로 할게요",
+    "Not too spicy, please.": "덜 맵게 해주세요",
+    "I'm vegetarian.": "저는 채식해요",
+    "I'm allergic to peanuts.": "땅콩 알레르기가 있어요",
+    "To take away, please.": "포장해 주세요",
+    "The bill, please.": "계산서 주세요",
+    "Could I look at the bill again?": "계산서 다시 볼 수 있을까요?",
+    "I'll pay cash.": "현금으로 낼게요",
+    "Thank you!": "감사합니다!",
+    "How much?": "얼마?", "This one": "이거", "Not spicy": "덜 맵게",
+    Vegetarian: "채식", "Peanut allergy": "땅콩 알레르기",
+    "Take away": "포장", "The bill": "계산서", "Check bill": "계산서 확인",
+    "Pay cash": "현금 결제", Thanks: "감사",
+    "Show this to the seller": "판매자에게 보여주기",
+    "Say it in Vietnamese": "베트남어로 말하기",
+    "Check my change": "거스름돈 확인",
+    "You handed over": "건넨 금액", "You got back": "받은 금액",
+    "Change owed": "받을 거스름돈",
+    "Compare with the other menu": "다른 메뉴판과 비교",
+    "Two menus, one kitchen": "메뉴판 두 장, 주방 하나",
+    "Menus compared": "비교한 메뉴판",
+    "Vietnamese menu": "베트남어 메뉴판", "English menu": "영어 메뉴판",
+    "Make a postcard": "엽서 만들기", "Save the image": "이미지 저장",
+    "Why Nón Lá says this": "이렇게 판단한 이유",
+    "Record what you paid": "낸 금액 기록하기",
+    "Hold this up, or lay the phone on the counter": "들어 보이거나 계산대에 올려두세요",
+    "Usual price here": "이 근처 보통 가격",
+    "Order this dish": "이 음식 주문하기",
   },
   zh: {
     Nearby: "附近", Eat: "吃什么", Community: "社区", You: "我的",
@@ -108,6 +181,36 @@ const DICT = {
     "Scan history": "扫描记录", "Where you are": "当前区域",
     "Use my location": "使用我的位置", "Warn me while I walk": "步行时提醒我",
     On: "开", Off: "关",
+    "How much is this?": "这个多少钱?",
+    "May I see a menu with prices?": "可以看有价格的菜单吗?",
+    "I'll have this one.": "我要这个",
+    "Not too spicy, please.": "请不要太辣",
+    "I'm vegetarian.": "我吃素",
+    "I'm allergic to peanuts.": "我对花生过敏",
+    "To take away, please.": "打包带走",
+    "The bill, please.": "请给我账单",
+    "Could I look at the bill again?": "可以再看一下账单吗?",
+    "I'll pay cash.": "我付现金",
+    "Thank you!": "谢谢!",
+    "How much?": "多少钱?", "This one": "这个", "Not spicy": "不辣",
+    Vegetarian: "素食", "Peanut allergy": "花生过敏",
+    "Take away": "打包", "The bill": "账单", "Check bill": "核对账单",
+    "Pay cash": "付现金", Thanks: "谢谢",
+    "Show this to the seller": "给店家看",
+    "Say it in Vietnamese": "用越南语说",
+    "Check my change": "核对找零",
+    "You handed over": "你付了", "You got back": "找回的",
+    "Change owed": "应找零",
+    "Compare with the other menu": "与另一份菜单比较",
+    "Two menus, one kitchen": "两份菜单,一个厨房",
+    "Menus compared": "已比较的菜单",
+    "Vietnamese menu": "越南语菜单", "English menu": "英文菜单",
+    "Make a postcard": "制作明信片", "Save the image": "保存图片",
+    "Why Nón Lá says this": "为什么这样判断",
+    "Record what you paid": "记下你付的价格",
+    "Hold this up, or lay the phone on the counter": "举起来,或把手机放在柜台上",
+    "Usual price here": "这一带常见价",
+    "Order this dish": "点这道菜",
   },
   ja: {
     Nearby: "周辺", Eat: "食べる", Community: "コミュニティ", You: "マイページ",
@@ -129,11 +232,49 @@ const DICT = {
     "Scan history": "スキャン履歴", "Where you are": "現在のエリア",
     "Use my location": "現在地を使う", "Warn me while I walk": "歩行中に知らせる",
     On: "オン", Off: "オフ",
+    "How much is this?": "これはいくらですか?",
+    "May I see a menu with prices?": "値段のあるメニューを見せてください",
+    "I'll have this one.": "これをください",
+    "Not too spicy, please.": "辛さ控えめでお願いします",
+    "I'm vegetarian.": "ベジタリアンです",
+    "I'm allergic to peanuts.": "ピーナッツアレルギーです",
+    "To take away, please.": "持ち帰りでお願いします",
+    "The bill, please.": "お会計をお願いします",
+    "Could I look at the bill again?": "もう一度お会計を見せてもらえますか?",
+    "I'll pay cash.": "現金で払います",
+    "Thank you!": "ありがとうございます!",
+    "How much?": "いくら?", "This one": "これ", "Not spicy": "辛さ控えめ",
+    Vegetarian: "ベジタリアン", "Peanut allergy": "ピーナッツアレルギー",
+    "Take away": "持ち帰り", "The bill": "お会計", "Check bill": "会計を確認",
+    "Pay cash": "現金で", Thanks: "ありがとう",
+    "Show this to the seller": "お店の人に見せる",
+    "Say it in Vietnamese": "ベトナム語で言う",
+    "Check my change": "おつりを確認",
+    "You handed over": "渡した金額", "You got back": "受け取った金額",
+    "Change owed": "おつりの額",
+    "Compare with the other menu": "もう一枚のメニューと比べる",
+    "Two menus, one kitchen": "メニュー二枚、厨房ひとつ",
+    "Menus compared": "比べたメニュー",
+    "Vietnamese menu": "ベトナム語メニュー", "English menu": "英語メニュー",
+    "Make a postcard": "ポストカードを作る", "Save the image": "画像を保存",
+    "Why Nón Lá says this": "この判断の根拠",
+    "Record what you paid": "払った金額を記録",
+    "Hold this up, or lay the phone on the counter": "掲げるか、カウンターに置いてください",
+    "Usual price here": "この辺りの相場",
+    "Order this dish": "この料理を注文",
   },
 };
 
 let lang = "en";
 const listeners = new Set();
+
+/* Đánh dấu ngôn ngữ lên thẻ <html> — cho trình đọc màn hình và cho luật
+   ngắt dòng của trình duyệt. Bọc lại vì tệp này còn được nạp trong node
+   để chạy kiểm thử, và ở đó không có `document`: một dòng gán trần ở cấp
+   module sẽ làm cả bộ kiểm thử chết ngay từ câu lệnh import. */
+const markLang = (code) => {
+  try { document.documentElement.lang = code; } catch { /* không có DOM */ }
+};
 
 /* Đoán ngôn ngữ từ trình duyệt, một lần, khi người dùng chưa từng chọn.
    Chỉ nhận nếu app THẬT SỰ có thứ tiếng đó — navigator.language trả về
@@ -156,8 +297,7 @@ export function setLang(code) {
   if (!LANGS.some((l) => l.code === code)) return false;
   lang = code;
   try { localStorage.setItem(KEY, code); } catch { /* riêng tư */ }
-  // Cho trình duyệt và trình đọc màn hình biết trang đang là tiếng gì.
-  document.documentElement.lang = code;
+  markLang(code);
   for (const fn of listeners) fn(code);
   return true;
 }
@@ -189,4 +329,4 @@ export const LANG_NOTE = "Tabs, price verdicts and the main headings are transla
   + "Longer explanations are still English for now. Dish names stay in Vietnamese "
   + "everywhere — they are what you point at on the menu.";
 
-document.documentElement.lang = lang;
+markLang(lang);

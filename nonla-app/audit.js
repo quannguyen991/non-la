@@ -1081,6 +1081,95 @@ export async function run({ verbose = true } = {}) {
     }
   }
 
+  /* ── khảo sát → bảng giá đang chạy ──────────────────────
+     Đây là vòng lặp mà cả chế độ khảo sát dựa vào, và trước bản này nó
+     hở một đầu: dải đo được chỉ ra khỏi app qua một tệp tải về. Phép thử
+     đi hết đường — ghi giá, dựng bảng, áp dụng, đọc lại phán quyết — vì
+     một mắt xích đứt ở giữa sẽ không làm màn nào đỏ lên cả. */
+  {
+    const Sv = await import("./survey.js");
+    const Tr = await import("./trust.js");
+    const LP = await import("./localprices.js");
+    LP.clear();
+    A.S.localPrices = LP.load();
+    A.S.prices = A.S.shipped;
+
+    const dishId = "cao-lau";
+    const zone = A.S.zone;
+    const before = Tr.provenance(A.S.prices[zone].items[dishId], 0).level;
+    ck("trước khi khảo sát, dải là số ước lượng", before === "seed", before);
+
+    const was = await Sv.count();
+    for (const p of [62000, 65000, 60000, 68000, 63000, 66000]) {
+      await Sv.add({ zone, dishId, price: p });
+    }
+    A.go("me"); await wait(420);
+    click("[data-act='surveyOpen']"); await wait(700);
+    click("[data-svact='apply']"); await wait(900);
+
+    const applyBtn = $("[data-act='surveyApply']");
+    ck("bảng dựng xong có nút dùng ngay trên máy", !!applyBtn,
+      "chỉ còn nút tải tệp về — người đang đứng ở quán không deploy được");
+    if (applyBtn) {
+      applyBtn.click(); await wait(700);
+      const band = A.S.prices[zone].items[dishId];
+      ck("dải đo được thay dải ước lượng", band.p50 === 64000, String(band.p50));
+      ck("cờ seed biến mất", !band.seed);
+      ck("phán quyết đọc ra là đã đo",
+        Tr.isMeasured(Tr.provenance(band, 6)), Tr.provenance(band, 6).level);
+      /* Bảng ship kèm phải còn nguyên vẹn — nó là đường hoàn nguyên duy
+         nhất, và ghi đè lên nó là đóng cửa đường đó lại vĩnh viễn. */
+      ck("bảng ship kèm không bị sửa", A.S.shipped[zone].items[dishId].seed === true);
+
+      A.go("me"); await wait(500);
+      ck("màn Dữ liệu nói rõ có giá của chính bạn", !!$("[data-act='localDrop']"),
+        "người dùng không có cách nào biết mình đã thay số tiền của app");
+      $("[data-act='localDrop']").click(); await wait(600);
+      ck("hoàn nguyên được về giá ship kèm",
+        A.S.prices[zone].items[dishId].seed === true);
+    }
+
+    // Dọn sạch: phép thử không để lại giá giả trong dữ liệu người dùng.
+    LP.clear();
+    const rows = await Sv.list();
+    for (const r of rows.slice(0, (await Sv.count()) - was)) await Sv.remove(r.id);
+    A.S.localPrices = LP.load();
+    A.S.prices = A.S.shipped;
+  }
+
+  /* ── đọc lại các lần so thực đơn ────────────────────────
+     Ghi vào lịch sử mà không màn nào đọc lại thì app đang thu thập một
+     thứ không ai xem được — và đây lại là loại dữ kiện duy nhất app tự
+     tạo ra thay vì tra cứu từ sẵn có. */
+  {
+    A.S.taxLog = [
+      { ts: Date.now(), kind: "tax", zone: A.S.zone, matched: 2, ratio: 1.5, level: "gap",
+        dishes: [{ id: "cao-lau", local: 50000, guest: 75000 },
+                 { id: "bia-hoi", local: 15000, guest: 25000 }] },
+      { ts: Date.now(), kind: "tax", zone: A.S.zone, matched: 2, ratio: 1.25, level: "gap",
+        dishes: [{ id: "cao-lau", local: 60000, guest: 75000 },
+                 { id: "bia-hoi", local: 20000, guest: 26000 }] },
+    ];
+    A.go("journal"); await wait(600);
+
+    const line = $(".jtaxline")?.textContent || "";
+    ck("Journal đọc lại được các lần so thực đơn", !!line, "mục không hiện ra");
+    ck("cộng dồn qua nhiều quán", /2 places/.test(line), line);
+    const rows = $$(".jtaxrow");
+    ck("nêu từng món đã so ở nhiều quán", rows.length === 2, String(rows.length));
+    ck("món chênh nhiều nhất đứng trước",
+      (rows[0]?.textContent || "").includes("Bia"), rows[0]?.textContent?.trim());
+    /* Chỉ nêu món đã thấy ở TỪ HAI quán trở lên: một quan sát đơn lẻ xếp
+       cạnh một mẫu hình là để người đọc tưởng cả hai cùng sức nặng. */
+    A.S.taxLog = [A.S.taxLog[0]];
+    A.go("scan"); await wait(200); A.go("journal"); await wait(500);
+    ck("một quán thì không liệt kê món nào", $$(".jtaxrow").length === 0);
+    ck("và nói thẳng là chưa đủ để thành mẫu hình",
+      /needs a few more/.test($(".jtaxline")?.textContent || ""),
+      $(".jtaxline")?.textContent);
+    A.S.taxLog = [];
+  }
+
   A.go("scan");
 
   const fail = out.filter((o) => !o.pass);

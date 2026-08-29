@@ -120,6 +120,53 @@ export function compare(local = [], guest = []) {
   };
 }
 
+/**
+ * Cộng dồn nhiều lần so ở nhiều quán.
+ *
+ * VÌ SAO PHẢI CÓ HÀM NÀY
+ * Một lần so ở một quán không nói được gì về nơi chốn: quán đó có thể in
+ * thực đơn tiếng Anh từ năm ngoái. Ba quán cùng chênh theo một hướng thì
+ * đã là một mẫu hình — và đó chính là loại dữ kiện chưa ai có, lý do
+ * tính năng này tồn tại. Ghi vào lịch sử mà không có chỗ nào đọc lại thì
+ * app đang thu thập một thứ không ai xem được.
+ *
+ * @param {Array} records  các bản ghi record() đã lưu
+ * @returns {{places:number, ratio:number|null, dishes:Array, line:string}}
+ */
+export function aggregate(records = []) {
+  const rows = records.filter((r) => r && Number.isFinite(r.ratio) && r.ratio > 0);
+  if (!rows.length) {
+    return { places: 0, ratio: null, dishes: [], line: "" };
+  }
+  const ratio = median(rows.map((r) => r.ratio));
+
+  /* Cộng theo MÓN, không chỉ theo quán. "Bia hơi đắt hơn ở cả ba quán" là
+     một câu cụ thể và kiểm chứng được; "thực đơn tiếng Anh đắt hơn 20%"
+     thì không chỉ cho ai biết phải nhìn vào đâu. */
+  const byDish = new Map();
+  for (const r of rows) {
+    for (const d of r.dishes || []) {
+      if (!(d.local > 0) || !(d.guest > 0)) continue;
+      const e = byDish.get(d.id) || { id: d.id, seen: 0, dearer: 0, ratios: [] };
+      e.seen++;
+      if (d.guest > d.local) e.dearer++;
+      e.ratios.push(d.guest / d.local);
+      byDish.set(d.id, e);
+    }
+  }
+  const dishes = [...byDish.values()]
+    .map((e) => ({ id: e.id, seen: e.seen, dearer: e.dearer, ratio: median(e.ratios) }))
+    .sort((a, b) => b.ratio - a.ratio || b.seen - a.seen);
+
+  const p = rows.length;
+  const line = p === 1
+    ? "One place compared so far. A pattern needs a few more."
+    : `Across ${p} places you compared, the English menu sat at the middle `
+      + `${ratio >= 1 ? `${pct(ratio)}% above` : `${Math.abs(pct(ratio))}% below`} the local one.`;
+
+  return { places: p, ratio, dishes, line };
+}
+
 /** Bản ghi để lưu lại — gọn, đủ để cộng dồn về sau, không kèm lời văn. */
 export function record(res, { zone = "", place = "" } = {}) {
   return {

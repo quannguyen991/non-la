@@ -73,8 +73,15 @@ export const PHRASES = [
 
 const M = {
   host: null, list: [], pick: 0, qty: 1, band: "", dishVi: "",
-  flip: false, cb: {},
+  flip: false, cb: {}, t: (s) => s,
 };
+
+/* Dịch NGHĨA của câu, không dịch câu.
+   Câu chìa ra luôn là tiếng Việt — đó là toàn bộ công dụng của màn này.
+   Nhưng phần dưới, phần của người dùng, phải nói bằng thứ tiếng họ đọc
+   được: một khách Hàn thấy tab tiếng Hàn rồi gặp "May I see a menu with
+   prices?" thì không biết mình sắp chìa ra câu gì. */
+const t = (s) => M.t(s);
 
 /* ── vẽ ─────────────────────────────────────────────────────── */
 
@@ -86,7 +93,7 @@ function paint() {
   M.host.innerHTML = `
     <div class="sc-top">
       <button class="iconbtn" data-scact="close" aria-label="Close">←</button>
-      <p>Hold this up, or lay the phone on the counter</p>
+      <p>${esc(t("Hold this up, or lay the phone on the counter"))}</p>
       <button class="iconbtn${M.flip ? " on" : ""}" data-scact="flip"
         aria-label="Turn the text around" aria-pressed="${M.flip}">⇅</button>
     </div>
@@ -103,7 +110,7 @@ function paint() {
     <div class="sc-mine">
       <button class="sc-speak" data-scact="say">
         <span class="sc-ph">${esc(p?.ph || "")}</span>
-        <span class="sc-en">${esc(p?.en || "")}</span>
+        <span class="sc-en">${esc(p?.en ? t(p.en) : "")}</span>
         <span class="sc-spk">${SPK}</span>
       </button>
 
@@ -118,7 +125,7 @@ function paint() {
 
       <div class="sc-chips">
         ${M.list.map((x, i) => `<button class="sc-chip${i === M.pick ? " on" : ""}"
-          data-scpick="${i}">${esc(x.short || x.en)}</button>`).join("")}
+          data-scpick="${i}">${esc(t(x.short || x.en))}</button>`).join("")}
       </div>
     </div>`;
 }
@@ -156,8 +163,8 @@ function onTap(e) {
  * @param {string}  [o.band] khoảng giá thường gặp, ĐÃ định dạng sẵn
  * @param {Function} o.say   phát âm một câu tiếng Việt
  */
-export function open({ host, dish = null, band = "", say, onClose }) {
-  M.host = host; M.cb = { say, onClose };
+export function open({ host, dish = null, band = "", say, onClose, t: tr }) {
+  M.host = host; M.cb = { say, onClose }; M.t = tr || ((s) => s);
   M.band = band; M.dishVi = dish?.vi || "";
   M.qty = 1; M.pick = 0;
   try { M.flip = localStorage.getItem(FLIP_KEY) === "1"; } catch { M.flip = false; }
@@ -166,7 +173,12 @@ export function open({ host, dish = null, band = "", say, onClose }) {
      đang muốn gọi đúng món đó — bắt họ lướt qua mười câu chung để tìm nó
      là làm hỏng cả lý do có màn này. */
   M.list = dish?.say
-    ? [{ id: "dish", vi: dish.say, ph: dish.ph || "", en: `Order ${dish.vi}`, short: dish.vi }, ...PHRASES]
+    ? [{ id: "dish", vi: dish.say, ph: dish.ph || "",
+         /* "Order Cao lầu" ghép tên món vào câu tiếng Anh, nên nó là một
+            chuỗi ĐỘNG và không làm khoá dịch được. Bỏ tên ra: tên món đã
+            nằm ngay trên kia bằng chữ cỡ lớn, nhắc lại ở dòng nghĩa chỉ
+            tốn chỗ mà không thêm thông tin gì. */
+         en: "Order this dish", short: dish.vi }, ...PHRASES]
     : [...PHRASES];
   // Nhãn ngắn cho hàng chip: nghĩa tiếng Anh quá dài để xếp ngang.
   for (const x of M.list) x.short ||= SHORT[x.id] || x.en;
@@ -179,7 +191,7 @@ export function open({ host, dish = null, band = "", say, onClose }) {
 const SHORT = {
   howmuch: "How much?", menu: "Menu", order: "This one", nospice: "Not spicy",
   veg: "Vegetarian", peanut: "Peanut allergy", takeaway: "Take away",
-  bill: "The bill", recheck: "Check bill", cash: "Cash", thanks: "Thanks",
+  bill: "The bill", recheck: "Check bill", cash: "Pay cash", thanks: "Thanks",
 };
 
 export function close() {

@@ -33,6 +33,7 @@ import * as Trust from "./trust.js";
 import * as Change from "./change.js";
 import * as MenuTax from "./menutax.js";
 import * as Postcard from "./postcard.js";
+import * as LocalPrices from "./localprices.js";
 import * as Welcome from "./welcome.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
@@ -94,8 +95,11 @@ const S = {
   /* So hai tấm thực đơn. `a` là tấm quét TRƯỚC — mặc định coi là tấm
      tiếng Việt, vì đó là tấm treo ngoài cửa và người ta đi qua nó trước
      khi ngồi xuống. Đảo lại được bằng một nút. */
-  tax: { a: null, b: null, waiting: false, swapped: false },
+  tax: { a: null, b: null, waiting: false, swapped: false, saved: false },
   taxRows: [],
+  localPrices: null,                 // phần đè giá của chính người dùng
+  shipped: null,                     // bảng giá ship kèm, chưa trộn
+  taxLog: [],                        // các lần so hai tấm thực đơn
 };
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -712,7 +716,7 @@ function whyHTML(dishId) {
   const st = stat(dishId);
   return `<details class="why">
     <summary><span class="wdot" data-l="${esc(pv.level)}"></span>
-      Why Nón Lá says this<span class="wtag">${esc(pv.short)}</span></summary>
+      ${esc(T("Why Nón Lá says this"))}<span class="wtag">${esc(pv.short)}</span></summary>
     <p class="wtitle">${esc(pv.title)}</p>
     <p>${esc(pv.line)}</p>
     ${st ? `<dl class="wgrid">
@@ -723,7 +727,7 @@ function whyHTML(dishId) {
     </dl>
     <p class="wfoot">A price is called fair up to the dear end, and high once it
       passes the last figure. Those two lines are the whole verdict.</p>` : ""}
-    <button class="btn sec" data-act="surveyOpen">Record what you paid</button>
+    <button class="btn sec" data-act="surveyOpen">${esc(T("Record what you paid"))}</button>
   </details>`;
 }
 
@@ -778,10 +782,10 @@ function showMenuResult(rows, conf) {
          không quét lại tờ hoá đơn lần nữa, nên nếu nút chỉ có ở màn kia
          thì con đường phổ biến nhất lại là con đường không có nút. */""}
     ${rows.filter((r) => r.id).length >= MenuTax.MIN_PAIRS
-      ? `<button class="btn sec" data-act="taxStart">Compare with the other menu</button>` : ""}
-    ${rows.some((r) => r.id) ? `<button class="btn sec" data-act="chOpen">Check my change</button>` : ""}
-    <button class="btn sec" data-act="show">Say it in Vietnamese</button>
-    ${seeded ? `<p class="seedwarn">Reference prices are seed data, not a completed field survey. Every verdict shows its sample size so you can judge how much to trust it.</p>` : ""}
+      ? `<button class="btn sec" data-act="taxStart">${esc(T("Compare with the other menu"))}</button>` : ""}
+    ${rows.some((r) => r.id) ? `<button class="btn sec" data-act="chOpen">${esc(T("Check my change"))}</button>` : ""}
+    <button class="btn sec" data-act="show">${esc(T("Say it in Vietnamese"))}</button>
+    ${seeded ? `<p class="seedwarn">Reference prices here are estimates, not a completed field survey. Every line says which it is, and tapping one shows where the number came from.</p>` : ""}
     <button class="btn sec" data-act="close">Close</button>`);
 }
 
@@ -837,7 +841,7 @@ function showCashResult(text) {
         ${slip ? `Your bill is ${fmtVND(expected)}. That's ${slip.factor}× less — one zero more in your hand. Check before you hand it over.`
                : `Your bill is ${fmtVND(expected)}. This looks right.`}</div>`
       : `<div class="warnbox infobox">Scan a menu or a bill first and Nón Lá will check this against what you owe.</div>`}
-    <button class="btn pri" data-act="chOpen">${I.coins}Check my change</button>
+    <button class="btn pri" data-act="chOpen">${I.coins}${esc(T("Check my change"))}</button>
     <button class="btn sec" data-act="close">Close</button>`);
 }
 
@@ -873,7 +877,7 @@ async function openPostcard() {
     <p class="src">Built from ${s.scans} reading${s.scans === 1 ? "" : "s"} on this
       phone. Nothing here is an estimate — if Nón Lá cannot count it, it is not on the card.</p>
     <div class="pc-wrap"><canvas id="pcCanvas" aria-label="Trip postcard"></canvas></div>
-    <button class="btn pri" data-act="pcSave">${I.share}Save the image</button>
+    <button class="btn pri" data-act="pcSave">${I.share}${esc(T("Save the image"))}</button>
     <button class="btn sec" data-act="close">Close</button>`);
 
   const cv = $("#pcCanvas");
@@ -917,7 +921,7 @@ async function savePostcard() {
    ghi vào lịch sử dưới một loại riêng. */
 
 function taxStart(rows) {
-  S.tax = { a: rows.filter((r) => r.id), b: null, waiting: true, swapped: false };
+  S.tax = { a: rows.filter((r) => r.id), b: null, waiting: true, swapped: false, saved: false };
   closeSheet();
   go("scan");
   setMode("menu");
@@ -933,20 +937,26 @@ function renderTax() {
      một màn hình bắt xác nhận trước khi giữ lại kết quả sẽ mất phần lớn
      số liệu vào những lần người ta đóng thẻ đi ăn tiếp. Chỉ ghi khi đủ
      món để có nghĩa. */
-  if (res.enough) {
-    History.add("tax", MenuTax.record(res, { zone: S.zone })).then(scheduleSync);
+  if (res.enough && !t.saved) {
+    /* `saved` chặn ghi trùng: đảo chiều hai tấm gọi lại renderTax(), và
+       không có cờ này thì mỗi lần bấm nút đảo lại sinh thêm một bản ghi
+       cho CÙNG MỘT lần so — bảng cộng dồn sẽ đếm một quán thành năm. */
+    t.saved = true;
+    const rec = MenuTax.record(res, { zone: S.zone });
+    S.taxLog.unshift({ ts: Date.now(), kind: "tax", ...rec });
+    History.add("tax", rec).then(scheduleSync);
   }
 
   setEdge(res.level === "gap" ? "warn" : null);
   openSheet(`
-    <h3>Two menus, one kitchen</h3>
+    <h3>${esc(T("Two menus, one kitchen"))}</h3>
     <p class="src">${esc(zone().name)} · ${res.matched} dish${res.matched === 1 ? "" : "es"} on both</p>
     ${wave()}
 
     <div class="tx-head">
-      <span>${t.swapped ? "Second scan" : "First scan"}<b>Vietnamese menu</b></span>
+      <span>${t.swapped ? "Second scan" : "First scan"}<b>${esc(T("Vietnamese menu"))}</b></span>
       <button class="tx-swap" data-act="taxSwap" aria-label="Swap which menu is which">⇄</button>
-      <span>${t.swapped ? "First scan" : "Second scan"}<b>English menu</b></span>
+      <span>${t.swapped ? "First scan" : "Second scan"}<b>${esc(T("English menu"))}</b></span>
     </div>
 
     <div class="warnbox ${res.level === "gap" ? "" : res.level === "same" ? "okbox" : "infobox"}"><div>
@@ -1009,29 +1019,29 @@ function renderChange() {
   const v = due != null && due >= 0 && got > 0 ? Change.check(due, got) : null;
 
   openSheet(`
-    <h3>Check my change</h3>
+    <h3>${esc(T("Check my change"))}</h3>
     <p class="src">Tap the notes you handed over, then the notes you got back.
       Nón Lá does the subtraction and names the gap if there is one.</p>
     ${wave()}
 
     <label class="ch-bill">
-      <span>The bill</span>
+      <span>${esc(T("The bill"))}</span>
       <input id="chBill" type="number" inputmode="numeric" value="${g.bill || ""}"
         placeholder="e.g. 320000" min="0" step="1000">
     </label>
 
-    <h2 class="sect">You handed over</h2>
+    <h2 class="sect">${esc(T("You handed over"))}</h2>
     <div class="ch-tally">${tallyLine("paid", g.paid)}<b>${paid ? fmtVND(paid) : ""}</b></div>
     <div class="ch-pad">${noteRow("paid")}</div>
 
-    <h2 class="sect">You got back</h2>
+    <h2 class="sect">${esc(T("You got back"))}</h2>
     <div class="ch-tally">${tallyLine("got", g.got)}<b>${got ? fmtVND(got) : ""}</b></div>
     <div class="ch-pad">${noteRow("got")}</div>
     <button class="btn sec" data-act="chScan">Scan the change instead</button>
 
     ${due != null && due >= 0 ? `
       <div class="ch-due">
-        <p class="kicker">Change owed</p>
+        <p class="kicker">${esc(T("Change owed"))}</p>
         <p class="ch-big">${fmtVND(due)}</p>
         ${due > 0 ? `<p class="src">Usually handed back as ${Change.breakdown(due)
           .map((b) => `${b.count}×${Math.round(b.note / 1000)}k`).join(" + ")}</p>` : ""}
@@ -1092,9 +1102,9 @@ function showBillResult(rows) {
         ? `${extra.length} line${extra.length===1?"":"s"} you didn't order. Expected ${fmtVND(expected)}.`
         : `Every line matches what you ordered.`}</div>` : ""}
     ${rows.length > 1 ? `<button class="btn pri" data-act="splitOpen">${I.coins}${esc(T("Split this bill"))}</button>` : ""}
-    <button class="btn sec" data-act="chOpen">Check my change</button>
+    <button class="btn sec" data-act="chOpen">${esc(T("Check my change"))}</button>
     ${extra.length ? sayBlock("Cho tôi xem lại hoá đơn", "chaw toy sem lai hwa dun") : ""}
-    <button class="btn sec" data-act="show">Say it in Vietnamese</button>
+    <button class="btn sec" data-act="show">${esc(T("Say it in Vietnamese"))}</button>
     <p class="muted" style="margin-top:10px">Ask politely first. Most extra lines are honest mistakes, and they come off the bill when you point at them.</p>
     <button class="btn sec" data-act="close">Close</button>`);
 }
@@ -1424,7 +1434,7 @@ function showDish(id) {
     ${whereToEat(id)}
     ${sayBlock(d.say, d.ph)}
     <button class="btn pri" data-act="show" data-showdish="${esc(d.id)}">
-      ${I.speech}Show this to the seller</button>
+      ${I.speech}${esc(T("Show this to the seller"))}</button>
     ${dishLinksHTML(d)}
     <button class="btn sec" data-act="shareThing" data-name="${esc(d.vi)}"
       data-sub="${esc(d.en)}" data-tags="${esc([d.vi, d.en].join("|"))}">
@@ -2232,6 +2242,36 @@ function fmtWhen(iso) {
 }
 
 /* ── màn hình: Nhật ký ────────────────────────────────────── */
+/* Các lần so hai tấm thực đơn, đọc lại trong Journal.
+   Trước bản này chúng được ghi vào lịch sử và KHÔNG màn nào đọc — app
+   thu thập một thứ không ai xem được, mà đây lại đúng là loại dữ kiện
+   duy nhất app tự tạo ra chứ không tra cứu từ sẵn có. */
+function taxSectionHTML() {
+  const rows = S.taxLog || [];
+  if (!rows.length) return "";
+  const agg = MenuTax.aggregate(rows);
+  const dn = (id) => dishById(id)?.vi || id;
+  const pc = (r) => `${r >= 1 ? "+" : ""}${Math.round((r - 1) * 100)}%`;
+
+  /* Chỉ nêu những món đã so ở TỪ HAI quán trở lên. Một món chênh ở một
+     quán là một quan sát, không phải một mẫu hình, và xếp nó cạnh những
+     món đã thấy ba lần là để người đọc tưởng cả danh sách cùng sức nặng. */
+  const solid = agg.dishes.filter((d) => d.seen >= 2).slice(0, 5);
+
+  return `<h2 class="sect">${esc(T("Menus compared"))}</h2>
+    <div class="jtax">
+      <p class="jtaxline">${esc(agg.line)}</p>
+      ${solid.length ? `<div class="jtaxd">
+        ${solid.map((d) => `<div class="jtaxrow">
+          <span class="nm">${esc(dn(d.id))}</span>
+          <span class="js">${d.dearer} of ${d.seen} places</span>
+          <b data-l="${d.ratio > 1.05 ? "high" : d.ratio < 0.95 ? "low" : "same"}">${pc(d.ratio)}</b>
+        </div>`).join("")}
+      </div>` : `<p class="js">Compare a few more places and the dishes that
+        move most will be listed here.</p>`}
+    </div>`;
+}
+
 function renderJournal() {
   const all = journal.all();
   const byDay = {};
@@ -2261,6 +2301,7 @@ function renderJournal() {
             <span><span class="jn">${esc(e.label)}</span><span class="js">${esc(S.prices[e.zone]?.name || "")} · ${esc(e.kind)}</span></span>
             <span class="ja">${fmtVND(e.price)}</span>
           </div>`).join("")}`).join("")}
+        ${taxSectionHTML()}
         <button class="btn sec" data-act="export" style="border-color:rgba(201,162,39,.4);color:#EDE4D2">Export as text</button>
         <button class="btn sec" data-act="clearJournal" style="border-color:rgba(201,162,39,.25);color:#A99B80">Clear journal</button>`}`;
 }
@@ -2608,7 +2649,9 @@ function openShow(dishId = null) {
   ShowCard.open({
     host: $("#v-show"),
     dish: d,
-    band: st ? `${d ? d.vi + " · " : ""}usually ${fmtVND(st.p25)}–${fmtVND(st.p75)} around here` : "",
+    t: T,
+    band: st ? `${d ? d.vi + " · " : ""}${T("Usual price here")}: `
+      + `${fmtVND(st.p25)}–${fmtVND(st.p75)}` : "",
     say,
     onClose: () => { if (S.tab !== "scan") return; },
   });
@@ -2673,12 +2716,21 @@ async function buildPriceTable() {
           <span class="note">${esc(S.prices[p.zone]?.en || p.zone)}</span></span>
         <span class="amt">${p.have}/${Survey.MIN_SAMPLES}<small>${p.need} more</small></span>
       </div>`).join("")}` : ""}
+    ${/* Hai lối ra, và lối MẶC ĐỊNH là lối dùng được ngay trên máy.
+         Trước bản này chỉ có nút tải về, tức là số khảo sát chỉ dùng được
+         bởi người có quyền deploy — người đang đứng ở Hội An thì không. */""}
+    ${changed.length ? `<div class="warnbox okbox"><div>These ${changed.length}
+      range${changed.length === 1 ? "" : "s"} replace the shipped estimates on
+      <b>this phone only</b>, and stay through updates. You can put the shipped
+      ones back at any time in You → Your data.</div></div>
+    <button class="btn pri" data-act="surveyApply">Use these prices here</button>` : ""}
     <div class="warnbox infobox">${I.shield}<span>Downloading gives you a full
-      <code>prices.json</code>. Replace the file in <code>data/</code> and redeploy —
-      nothing is overwritten from inside the app.</span></div>
-    <button class="btn pri" data-act="surveyDownload">Download prices.json</button>
+      <code>prices.json</code> to send back, so everyone else gets these numbers
+      too — that needs a redeploy, which this app cannot do to itself.</span></div>
+    <button class="btn sec" data-act="surveyDownload">Download prices.json</button>
     <button class="btn sec" data-act="close">Close</button>`);
   S._builtPrices = doc;
+  S._builtChanged = changed;
 }
 
 /* ── mục "Dữ liệu của bạn" ────────────────────────────────────
@@ -2698,7 +2750,34 @@ async function buildPriceTable() {
 const KIND_LABEL = {
   scan: "Scans", place: "Places opened", sight: "Sights opened",
   post: "Notes written", route: "Routes started", zone: "Area switches",
+  tax: "Menus compared",
 };
+
+/* Nhận bảng vừa dựng làm bảng đang chạy, trên MÁY NÀY. */
+function applyLocalPrices() {
+  const zones = LocalPrices.extract(S._builtPrices, S._builtChanged || []);
+  const n = LocalPrices.count({ zones }, S.shipped);
+  if (!n) return toast("Nothing ready to apply yet");
+  if (!LocalPrices.save(zones, new Date().toISOString())) {
+    return toast("This browser will not let the app save anything");
+  }
+  S.localPrices = LocalPrices.load();
+  S.prices = LocalPrices.merge(S.shipped, S.localPrices);
+  closeSheet();
+  refreshTally().then(() => { if (S.tab === "me") renderMe(); });
+  toast(`${n} range${n === 1 ? "" : "s"} now come from your survey`);
+}
+
+/* Hoàn nguyên về bảng ship kèm. Có mặt vì phải có: người dùng vừa được
+   trao quyền thay số tiền mà app nói ra, và một quyền không rút lại được
+   thì không phải một quyền, nó là một cái bẫy. */
+function dropLocalPrices() {
+  LocalPrices.clear();
+  S.localPrices = LocalPrices.load();
+  S.prices = S.shipped;
+  renderMe();
+  toast("Back to the prices that shipped with the app");
+}
 
 function dataStats() {
   if (S.dataStats) return S.dataStats;
@@ -2741,6 +2820,9 @@ function dataHTML() {
   const rows = Object.entries(KIND_LABEL).map(([k, label]) => `
     <div class="drow"><span>${label}</span><b>${st ? (st.by[k] || 0) : dash}</b></div>`).join("");
 
+  // Đếm những dải ĐANG có hiệu lực, không phải những dải đã lưu.
+  const mine = LocalPrices.count(S.localPrices, S.shipped);
+
   return `<div class="card dcard">
     <div class="dgrid">
       ${rows}
@@ -2769,6 +2851,19 @@ function dataHTML() {
       ${I.camera}${esc(T("Survey prices here"))}</button>
     <p class="src" style="margin-top:6px">Every reference price in this build is an
       estimate, not a field survey. This is how you replace them with real ones.</p>
+
+    ${/* Phần đè giá phải HIỆN RA ở đây, kèm đường hoàn nguyên. Người dùng
+          vừa được trao quyền thay số tiền mà app nói ra — một thay đổi vô
+          hình và không rút lại được thì không phải một quyền, nó là một
+          cái bẫy: sáu tháng sau họ sẽ thấy app nói một con số lạ và không
+          có cách nào biết chính mình đã đặt nó vào đó. */""}
+    ${mine ? `<div class="warnbox okbox" style="margin-top:12px"><div>
+        <b>${mine} price range${mine === 1 ? "" : "s"} on this phone come from your
+        own survey</b>, not from the estimates that shipped${S.localPrices?.at
+          ? `, since ${when(Date.parse(S.localPrices.at))}` : ""}.
+        Updates to the app still reach every other dish.</div></div>
+      <button class="btn sec" data-act="localDrop" style="margin-top:8px">
+        Put the shipped prices back</button>` : ""}
 
     <div class="ic-actions" style="margin-top:12px">
       <button class="btn sec" data-act="dataExport">${I.external}Download my data</button>
@@ -2922,7 +3017,7 @@ function renderMe() {
          mời tới chỗ thất vọng. */""}
     ${st.scans ? `<button class="pc-card" data-act="pcOpen">
       <span class="pc-ic" aria-hidden="true">${I.share}</span>
-      <span><b>Make a postcard</b>
+      <span><b>${esc(T("Make a postcard"))}</b>
         <small>${st.dishes} dish${st.dishes === 1 ? "" : "es"} and ${st.scans}
           price${st.scans === 1 ? "" : "s"} on one card you can send home</small></span>
     </button>` : ""}
@@ -3213,7 +3308,16 @@ const TABS = [
   { id: "community", label: "Community", icon: '<circle cx="7" cy="7" r="2.8"/><circle cx="14" cy="6" r="2.2"/><path d="M2.5 16a4.5 4.5 0 0 1 9 0"/><path d="M12.5 16a4 4 0 0 1 5-3.6"/>' },
   { id: "me", label: "You", icon: '<circle cx="10" cy="6.5" r="3.5"/><path d="M3.5 17a6.5 6.5 0 0 1 13 0"/>' },
 ];
+/* Vài nhãn nằm thẳng trong index.html chứ không do JS dựng. Chúng không
+   tự đổi theo ngôn ngữ, nên phải viết lại bằng tay ở đây — chỗ duy nhất
+   biết ngôn ngữ vừa đổi. */
+function syncStaticText() {
+  const b = $(".sayhere");
+  if (b) b.textContent = T("Say it in Vietnamese");
+}
+
 function renderTabs() {
+  syncStaticText();
   $("#tabbar").innerHTML = TABS.map((t) => t.id === "scan"
     ? `<button class="scanbtn" id="scanBtn" aria-label="Scan">${sunStar(25, GOLD)}</button>`
     : `<button class="tab" data-tab="${t.id}"${S.tab === t.id ? ' aria-current="page"' : ""}>
@@ -3550,6 +3654,8 @@ document.addEventListener("click", async (ev) => {
     syncChangeBill();
     return renderChange();
   }
+  if (el("[data-act='surveyApply']")) return applyLocalPrices();
+  if (el("[data-act='localDrop']")) return dropLocalPrices();
   if (el("[data-act='pcOpen']")) { closeSheet(); return openPostcard(); }
   if (el("[data-act='pcSave']")) return savePostcard();
   if (el("[data-act='taxStart']")) return taxStart(S.taxRows || []);
@@ -4058,7 +4164,15 @@ async function boot() {
   S.assets = { icons: new Set(ax.icons || []), photos: new Set(ax.photos || []) };
   S.famous = fm.places || [];
   S.maps = mp.zones;
-  S.dishes = d.dishes; S.prices = p.zones; S.places = pl.places;
+  S.dishes = d.dishes;
+  /* Giá khảo sát của chính người dùng chồng lên bảng ship kèm, NGAY ở
+     đây — trước khi bất kỳ hàm vẽ nào đọc S.prices. Trộn muộn hơn một
+     nhịp là màn hình đầu tiên hiện số ước lượng rồi mới nhảy sang số đo,
+     và cái nháy đó đọc ra là "app vừa đổi ý về giá". */
+  S.localPrices = LocalPrices.load();
+  S.prices = LocalPrices.merge(p.zones, S.localPrices);
+  S.shipped = p.zones;              // bản gốc, để hoàn nguyên được
+  S.places = pl.places;
   S.fx = p._fx || null;
   /* Bản ghi quán ăn phải mang `zone`. Bản xuất cũ chỉ có Hội An và không
      có trường đó — nếu ai đó chạy app với tệp cũ thì lớp này sẽ biến mất
@@ -4108,6 +4222,11 @@ async function boot() {
      rồi mới đầy lên — người dùng đọc cái nháy đó là "mất dữ liệu". */
   await History.migrate().catch(() => 0);
   S.history = await History.list({ kind: "scan", limit: 2000 }).catch(() => []);
+  /* Các lần so hai tấm thực đơn. Nạp riêng vì chúng là một LOẠI phép đo
+     khác — không phải quan sát về giá một món mà là phép đo chênh lệch
+     giữa hai tấm — và trộn chung vào S.history sẽ làm mọi con số của màn
+     Journal đếm lẫn hai thứ. */
+  S.taxLog = await History.list({ kind: "tax", limit: 500 }).catch(() => []);
   /* Bộ đếm mẫu khảo sát. Không await: khối "Vì sao" hiện được ngay với số
      0 và tự đúng lại vài trăm mili giây sau, còn chặn khởi động vì một cái
      đếm thì màn hình đầu tiên chậm đi cho tất cả mọi người. */
