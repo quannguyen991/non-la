@@ -284,7 +284,12 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .say{display:flex;align-items:center;gap:11px;margin-top:13px;
   background:var(--ngoc-sau);color:#EAF6F1;border-radius:15px;padding:12px 14px;width:100%;text-align:left}
 .say .vi{font-family:var(--disp);font-size:19px;font-weight:600}
-.say .ph{font-size:10px;opacity:.68;font-weight:300;margin-top:1px}
+/* Phiên âm nằm trên DÒNG RIÊNG dưới câu tiếng Việt. Trước đây nó là một
+   <span> inline nên chạy dính ngay sau câu — mà kể cả thế cũng không ai
+   thấy, vì lớp cũ tên `.ph` trùng với lớp khung ảnh và bị tô thành một
+   mảng xám đặc. */
+.say .sayph{display:block;font-size:11px;opacity:.72;font-weight:400;
+  margin-top:3px;letter-spacing:.02em}
 .say .spk{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--ho-phach);
   display:grid;place-items:center;flex:0 0 auto}
 .say .spk svg{width:15px;height:15px;fill:none;stroke:#14170F;stroke-width:1.9;stroke-linecap:round}
@@ -1600,3 +1605,192 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .sp-p span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
   background:var(--then);color:var(--dong);font-size:12px;font-weight:700;flex:0 0 auto}
 .sp-p b{font-variant-numeric:tabular-nums;color:var(--then);font-size:15px}
+
+/* ── màn xoay ngược cho người bán đọc ──────────────── */
+/* Nền THEN, không phải nền giấy như mọi màn khác. Đây là màn duy nhất
+   được đọc từ xa một mét, chéo góc, có khi dưới nắng chói — chữ sáng
+   trên nền sẫm giữ được tương phản ở góc nhìn mà nền sáng thì loá. Nó
+   cũng là tín hiệu cho chính người dùng rằng màn này khác: bạn đang
+   không còn đọc app nữa, bạn đang đưa nó cho người khác. */
+#v-show{position:fixed;inset:0;z-index:75;display:flex;flex-direction:column;
+  background:var(--then);color:var(--diep);
+  padding:0 var(--pad-x) calc(16px + var(--safe))}
+#v-show[hidden]{display:none}
+
+.sc-top{display:flex;align-items:center;gap:10px;padding:10px 0}
+.sc-top p{flex:1;text-align:center;font-size:11.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:rgba(245,240,228,.62)}
+.sc-top .iconbtn{background:rgba(245,240,228,.1);border-color:rgba(201,162,39,.4);
+  color:var(--diep);box-shadow:none;font-size:18px}
+.sc-top .iconbtn.on{background:var(--dong);color:var(--then-sau);border-color:var(--dong)}
+
+/* Khối của người bán. Chiếm phần lớn màn hình vì nó LÀ tính năng. */
+.sc-face{flex:1;display:grid;place-content:center;text-align:center;
+  border:1px solid rgba(201,162,39,.34);border-radius:var(--r);
+  background:linear-gradient(160deg,rgba(201,162,39,.1),rgba(245,240,228,.03));
+  padding:22px 16px;min-height:0;
+  transition:transform .34s cubic-bezier(.22,.61,.36,1)}
+.sc-face.flip{transform:rotate(180deg)}
+/* clamp chứ không phải một cỡ cố định: câu ngắn nhất ở đây là hai chữ,
+   câu dài nhất là mười — một cỡ vừa cho câu dài thì câu ngắn nhỏ đến vô
+   nghĩa, mà cả điểm của màn này là ĐỌC ĐƯỢC TỪ XA. */
+.sc-vi{font-family:var(--disp);font-weight:600;line-height:1.16;
+  font-size:clamp(30px,8.4vw,46px);letter-spacing:-.015em;color:var(--diep);
+  text-wrap:balance}
+.sc-qty{margin-top:14px;font-size:clamp(34px,11vw,58px);font-weight:800;
+  color:var(--dong);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+
+.sc-mine{flex:0 0 auto;padding-top:12px}
+.sc-speak{display:grid;grid-template-columns:1fr auto;align-items:center;
+  gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:16px;
+  border:1px solid rgba(201,162,39,.3);background:rgba(245,240,228,.07);
+  color:var(--diep);min-height:56px}
+.sc-speak:active{background:rgba(245,240,228,.13)}
+.sc-ph{display:block;font-size:16px;font-weight:600;letter-spacing:.01em}
+.sc-en{display:block;font-size:12.5px;color:rgba(245,240,228,.6);margin-top:2px}
+.sc-spk{grid-row:1/3;grid-column:2;display:grid;place-items:center;color:var(--dong)}
+.sc-spk svg{width:26px;height:26px}
+
+.sc-count{display:flex;align-items:center;justify-content:center;gap:18px;
+  margin-top:10px;font-variant-numeric:tabular-nums}
+.sc-count button{width:44px;height:44px;border-radius:50%;font-size:22px;
+  border:1px solid rgba(201,162,39,.4);background:rgba(245,240,228,.07);color:var(--diep)}
+.sc-count span{min-width:34px;text-align:center;font-size:22px;font-weight:700}
+
+/* Khoảng giá — nhỏ, ở NỬA CỦA BẠN, và không bao giờ đi lên khối trên. */
+.sc-band{margin-top:10px;text-align:center;font-size:12.5px;
+  color:rgba(245,240,228,.58);font-variant-numeric:tabular-nums}
+
+.sc-chips{display:flex;gap:7px;overflow-x:auto;margin:12px -18px 0;
+  padding:2px 18px 4px;scrollbar-width:none}
+.sc-chips::-webkit-scrollbar{display:none}
+.sc-chip{flex:0 0 auto;padding:11px 14px;border-radius:var(--pill);font-size:13px;
+  font-weight:600;white-space:nowrap;min-height:44px;
+  border:1px solid rgba(201,162,39,.3);background:rgba(245,240,228,.06);
+  color:rgba(245,240,228,.82)}
+.sc-chip.on{background:var(--dong);border-color:var(--dong);color:var(--then-sau)}
+
+/* Lối vào màn xoay ngược, nổi trên khung camera. Nền sẫm mờ chứ không
+   phải nút đặc: nó nằm ĐÈ LÊN hình camera đang chạy, và một khối màu đặc
+   ở đây che mất đúng phần thực đơn người dùng đang ngắm. */
+.sayhere{position:absolute;left:50%;transform:translateX(-50%);
+  bottom:calc(150px + var(--safe));z-index:3;
+  padding:10px 18px;min-height:42px;border-radius:var(--pill);
+  font-size:13.5px;font-weight:600;letter-spacing:.01em;
+  color:var(--diep);background:rgba(14,43,36,.62);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(201,162,39,.45)}
+.sayhere:active{background:rgba(14,43,36,.8)}
+
+/* ── khối "vì sao lại nói thế" ─────────────────────── */
+.why{margin-top:12px;border:1px solid var(--line);border-radius:16px;
+  background:var(--giay);overflow:hidden}
+.why summary{display:flex;align-items:center;gap:9px;padding:13px 14px;
+  min-height:48px;font-size:14px;font-weight:650;color:var(--then);
+  cursor:pointer;list-style:none}
+.why summary::-webkit-details-marker{display:none}
+/* Mũi chỉ hướng vẽ bằng CSS, không thêm một icon nữa vào bộ: nó chỉ có
+   một việc là cho biết khối này mở ra được. */
+.why summary::after{content:"";margin-left:auto;width:8px;height:8px;flex:0 0 auto;
+  border-right:2px solid var(--muc-nhat);border-bottom:2px solid var(--muc-nhat);
+  transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s}
+.why[open] summary::after{transform:rotate(-135deg) translate(-2px,-2px)}
+.why[open] summary{border-bottom:1px solid var(--line)}
+
+/* Chấm màu = bậc tin cậy. Cùng bảng màu với chấm phán quyết ở hàng kết
+   quả, nên người dùng không phải học hai hệ ký hiệu. */
+.wdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:var(--xam-ghim)}
+.wdot[data-l="seed"],.wdot[data-l="thin"]{background:var(--ho-phach)}
+.wdot[data-l="ready"]{background:var(--dong)}
+.wdot[data-l="fair"],.wdot[data-l="strong"]{background:var(--ngoc)}
+
+.wtag{margin-left:auto;margin-right:6px;font-size:11px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--muc-nhat)}
+.why>p{padding:0 14px;font-size:13px;line-height:1.5;color:var(--muc-nhat)}
+.why>p:first-of-type{padding-top:12px}
+.wtitle{font-weight:700;color:var(--muc)!important}
+.why .btn{margin:12px 14px 14px;width:calc(100% - 28px)}
+
+.wgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;
+  margin:12px 14px;background:var(--line);border:1px solid var(--line);
+  border-radius:12px;overflow:hidden}
+.wgrid>div{background:var(--diep);padding:9px 11px}
+.wgrid dt{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muc-nhat)}
+.wgrid dd{font-size:15px;font-weight:700;color:var(--then);
+  font-variant-numeric:tabular-nums;margin-top:1px}
+.wfoot{font-size:12px!important;color:var(--xam-ghim)!important}
+
+/* ── đếm tiền thối ─────────────────────────────────── */
+.ch-bill{display:grid;gap:5px;margin-top:12px;font-size:12.5px;color:var(--muc-nhat)}
+.ch-bill input{min-height:52px;padding:10px 12px;border-radius:14px;
+  border:1px solid var(--line);background:#fff;color:var(--muc);
+  font:inherit;font-size:20px;font-weight:700;width:100%;
+  font-variant-numeric:tabular-nums}
+
+/* Bàn phím mệnh giá. Lưới 5 cột chứ không phải hàng cuộn ngang: chín tờ
+   là con số cố định và người dùng phải với tới TỜ NÀO CŨNG ĐƯỢC mà không
+   cần cuộn — họ đang cầm tiền bằng tay còn lại. */
+.ch-pad{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:8px}
+.ch-note{min-height:46px;border-radius:12px;border:1px solid var(--line);
+  background:var(--giay);color:var(--then);font-size:14px;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.ch-note:active{background:var(--kem);transform:scale(.96)}
+
+.ch-tally{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;
+  min-height:34px}
+.ch-tally b{margin-left:auto;font-size:16px;font-variant-numeric:tabular-nums;
+  color:var(--then)}
+.ch-chip{padding:6px 11px;border-radius:var(--pill);font-size:12.5px;font-weight:700;
+  background:var(--ngoc);color:#fff;border:0;font-variant-numeric:tabular-nums;
+  min-height:32px}
+.ch-chip::after{content:" ×";opacity:.55;font-weight:400}
+.ch-empty{font-size:12.5px;color:var(--xam-ghim)}
+
+.ch-due{margin-top:14px;padding:12px 14px;border-radius:16px;
+  border:1px solid var(--vien);background:var(--kem)}
+.ch-big{font-size:30px;font-weight:800;letter-spacing:-.03em;color:var(--then);
+  font-variant-numeric:tabular-nums;margin-top:2px}
+.ch-due .src{margin-top:4px}
+
+/* ── so hai tấm thực đơn ───────────────────────────── */
+.tx-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  gap:10px;margin-top:12px}
+.tx-head span{display:grid;font-size:10.5px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--xam-ghim);text-align:center}
+.tx-head b{font-size:13.5px;letter-spacing:0;text-transform:none;
+  color:var(--then);margin-top:2px}
+.tx-swap{width:40px;height:40px;border-radius:50%;flex:0 0 auto;font-size:17px;
+  border:1px solid var(--line);background:var(--giay);color:var(--then)}
+
+.tx-list{margin-top:12px;border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;background:var(--giay)}
+.tx-row{display:grid;grid-template-columns:minmax(0,1fr) auto 16px auto;
+  align-items:center;gap:8px;padding:10px 12px;font-variant-numeric:tabular-nums}
+.tx-row+.tx-row{border-top:1px solid var(--line)}
+.tx-row .nm{font-size:13.5px;font-weight:600;color:var(--muc);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tx-a{font-size:13.5px;color:var(--muc-nhat)}
+.tx-arrow{text-align:center;color:var(--xam-ghim);font-size:12px}
+.tx-b{font-size:14px;font-weight:700}
+.tx-b[data-l="high"]{color:var(--son)}
+.tx-b[data-l="low"]{color:var(--ngoc)}
+.tx-b[data-l="same"]{color:var(--muc-nhat)}
+
+/* ── bưu thiếp ─────────────────────────────────────── */
+.pc-card{display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+  margin-top:14px;padding:14px;border-radius:var(--r);
+  border:1px solid var(--vien);background:var(--kem);min-height:64px}
+.pc-card:active{transform:scale(.99)}
+.pc-ic{width:42px;height:42px;flex:0 0 auto;border-radius:50%;display:grid;
+  place-items:center;background:var(--then);color:var(--dong)}
+.pc-ic svg{width:19px;height:19px}
+.pc-card b{display:block;font-size:15px;color:var(--then)}
+.pc-card small{display:block;font-size:12.5px;color:var(--muc-nhat);
+  line-height:1.4;margin-top:2px}
+
+/* Canvas 1080×1350 co về đúng bề rộng thẻ. aspect-ratio giữ chỗ TRƯỚC khi
+   vẽ xong, nếu không thẻ nhảy cao lên một nhịp khi tranh nền tải về. */
+.pc-wrap{margin-top:12px;border-radius:16px;overflow:hidden;
+  border:1px solid var(--line);background:var(--diep)}
+.pc-wrap canvas{display:block;width:100%;height:auto;aspect-ratio:1080/1350}

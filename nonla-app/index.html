@@ -40,6 +40,9 @@
     <div class="offline" id="offlineBadge"><i></i>OFFLINE READY</div>
     <div class="reticle" id="reticle" aria-hidden="true"></div>
     <p class="hint" id="hint">Point at a menu and tap the button</p>
+    <!-- Lối vào màn xoay ngược, đặt ngay trên màn quét vì đây LÀ chỗ người
+         dùng đang đứng khi cần nó: trước quầy, máy đã cầm sẵn trên tay. -->
+    <button class="sayhere" data-act="show">Say it in Vietnamese</button>
   </section>
 
   <!-- ══ ĂN GÌ ══ -->
@@ -65,6 +68,10 @@
        chục phút và gõ liên tục, nên nó không được nằm trong sheet dùng
        chung — sheet đóng lại khi chạm ra ngoài. -->
   <section id="v-survey" hidden aria-label="Price survey"></section>
+  <!-- Màn xoay ngược cho người bán đọc. Toàn màn hình và z-index CAO HƠN
+       sheet: nó được mở TỪ trong sheet, và một thẻ kết quả còn nằm đè lên
+       trong lúc bạn chìa máy qua bàn là đúng thứ làm hỏng cả cử chỉ. -->
+  <section id="v-show" hidden aria-label="Show this to the seller"></section>
 
   <!-- Lớp phủ dùng chung cho MỌI tab. Trước đây chúng nằm trong #v-scan,
        nên chạm một món ở tab Eat thì thẻ kết quả mở ra bên trong một khối

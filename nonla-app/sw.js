@@ -34,10 +34,23 @@
 // v29: survey.js + surveyui.js — chế độ khảo sát giá. Thiếu hai tệp này
 // trong SHELL thì máy đang offline mở app ra chết ngay ở dòng import của
 // app.js: mất cả app, không phải mất một màn hình.
+// v35: postcard.js — tấm bưu thiếp cuối chuyến. Thiếu tệp là chết ở dòng
+// import. Nó cũng là màn hay được mở khi sắp rời Việt Nam, tức là đúng lúc
+// SIM du lịch vừa hết hạn — nên nó phải chạy được không cần mạng.
+// v34: menutax.js — so hai tấm thực đơn. Thiếu tệp là chết ở dòng import.
+// v33: change.js — đếm tiền thối. Thiếu tệp là chết ở dòng import, và đây
+// đúng là tính năng ÍT có mạng nhất: người ta dùng nó khi đang đứng trả tiền.
+// v32: trust.js — nguồn gốc của mỗi dải giá. Thiếu tệp này thì app chết ở
+// dòng import; và cả tệp sinh ra để app thôi in con số hư cấu ra màn hình,
+// nên một bản cache cũ còn chạy chính là bản còn nói dối.
+// v31: showcard.js — màn xoay ngược cho người bán đọc. Cùng lý do với mọi
+// module mới: thiếu tệp trong SHELL thì máy đang offline mở app ra chết ngay
+// ở dòng import của app.js. Và màn này là màn ÍT có mạng nhất trong cả app —
+// nó được mở khi đang đứng trong chợ, giữa hai người.
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v30";
+const CACHE = "nonla-v35";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -51,7 +64,7 @@ const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css", "./community.css", "./welcome.css", "./you.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./route.js",
   "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
-  "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js",
+  "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js",
   "./manifest.json", "./icon.svg",
   "./data/dishes.json", "./data/prices.json", "./data/places.json",
   "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./data/trips.json",

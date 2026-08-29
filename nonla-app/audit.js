@@ -907,6 +907,180 @@ export async function run({ verbose = true } = {}) {
     ck("đóng được màn khảo sát", !!$("#v-survey")?.hidden);
   }
 
+  /* ── màn xoay ngược cho người bán đọc ───────────────────
+     Phép thử quan trọng nhất ở đây không phải "nút có chạy không" mà là
+     RANH GIỚI: khối chữ lớn hướng về phía người bán không được chứa con
+     số giá nào. Đó là thứ giữ cho tính năng này là một công cụ giao tiếp
+     chứ không phải một tấm biển buộc tội, và nó là loại quy tắc mà một
+     lần refactor vô tình sẽ phá mà không ai nhận ra. */
+  {
+    A.go("eat"); await wait(300);
+    A.showDish("cao-lau"); await wait(400);
+    ck("thẻ món có nút chìa cho người bán", !!$("#sheetBody [data-act='show']"));
+    $("#sheetBody [data-act='show']").click(); await wait(500);
+
+    ck("màn xoay ngược mở ra", !$("#v-show")?.hidden);
+    ck("mở từ một món thì câu của món đó lên đầu",
+      ($(".sc-vi")?.textContent || "").includes("cao lầu"), $(".sc-vi")?.textContent);
+    ck("thẻ kết quả đóng lại khi chìa máy qua", !sheetOpen(),
+      "một thẻ còn nằm đè lên trong lúc đưa máy cho người khác");
+
+    const face = $(".sc-face")?.textContent || "";
+    ck("khối chữ cho người bán KHÔNG có con số giá", !/\d{3}|₫|k\b/.test(face), face.trim());
+    ck("khoảng giá nằm ở nửa của người dùng", !!$(".sc-band"));
+
+    ck("có nút lật chữ", !!$("[data-scact='flip']"));
+    const before = cs($(".sc-face")).transform;
+    $("[data-scact='flip']").click(); await wait(420);
+    ck("lật chữ thật sự xoay khối", cs($(".sc-face")).transform !== before,
+      cs($(".sc-face")).transform);
+    $("[data-scact='flip']").click(); await wait(420);
+
+    ck("có hàng câu chọn nhanh", $$(".sc-chip").length > 5);
+    $$(".sc-chip")[3]?.click(); await wait(260);
+    ck("đổi câu thì khối chữ đổi theo",
+      !($(".sc-vi")?.textContent || "").includes("cao lầu"));
+
+    // Vùng chạm: màn này dùng khi đang đứng, một tay cầm máy, tay kia cầm tiền.
+    const small = $$(".sc-chip, .sc-count button, [data-scact]")
+      .filter((e) => e.getBoundingClientRect().height < MIN_TAP);
+    ck("mọi nút trên màn xoay ngược đủ lớn để chạm", small.length === 0,
+      small.map((e) => e.textContent.trim().slice(0, 12)).join(", "));
+
+    $("[data-scact='close']").click(); await wait(360);
+    ck("đóng được màn xoay ngược", !!$("#v-show")?.hidden);
+  }
+
+  /* ── vì sao lại nói thế ─────────────────────────────────
+     Khối này tồn tại để app thôi trình bày số ước lượng như số đo. Phép
+     thử vì thế soi đúng chỗ đó: giao diện KHÔNG được in trường n của dữ
+     liệu seed, vì con số ấy là hư cấu. */
+  {
+    A.go("eat"); await wait(260);
+    A.showDish("cao-lau"); await wait(400);
+    const why = $("#sheetBody .why");
+    ck("thẻ món có khối vì sao", !!why);
+    if (why) {
+      ck("khối vì sao mặc định đóng", !why.open);
+      ck("có nhãn nguồn ngay trên đầu khối", !!$(".wtag")?.textContent?.trim());
+      why.querySelector("summary").click(); await wait(300);
+      ck("mở ra được", why.open);
+      ck("nói rõ đây là số ước lượng",
+        /estimate|Estimated/.test(why.textContent), why.textContent.slice(0, 60));
+      ck("bày ra bốn mốc của dải giá", $$(".wgrid dd").length === 4);
+      ck("có đường đi tới việc ghi giá thật", !!why.querySelector("[data-act='surveyOpen']"));
+    }
+    // "34 places" là trường n của dữ liệu seed — một con số không có thật.
+    const card = $("#sheetBody .card .src")?.textContent || "";
+    ck("thẻ giá không còn khoe số quán hư cấu", !/\d+\s+places/.test(card), card);
+    click("[data-act='close']"); await wait(320);
+  }
+
+  /* ── đếm tiền thối ──────────────────────────────────────*/
+  {
+    A.go("scan");
+    /* Đặt lại chế độ quét TRƯỚC khi đọc chữ. handleText() rẽ nhánh theo
+       S.mode, và phần kiểm điều hướng phía trên để nó ở "bill" — nên nếu
+       không đặt lại thì phép thử này đo màn hoá đơn trong khi tưởng mình
+       đang đo màn thực đơn. Đúng bẫy đã làm nó đỏ lần đầu. */
+    click(".mode[data-mode='menu']"); await wait(220);
+    A.handleText("Cao lau 55.000\nMi Quang 50.000", 92); await wait(420);
+    ck("đang đo màn thực đơn, không phải màn hoá đơn",
+      ($("#sheetBody h3")?.textContent || "").startsWith("Menu"),
+      $("#sheetBody h3")?.textContent);
+    ck("kết quả quét có lối vào đếm tiền", !!$("#sheetBody [data-act='chOpen']"));
+    $("#sheetBody [data-act='chOpen']").click(); await wait(400);
+
+    ck("ô hoá đơn tự điền từ lần quét", Number($("#chBill")?.value) === 105000,
+      $("#chBill")?.value);
+    ck("có đủ chín mệnh giá ở mỗi hàng", $$("[data-chnote^='paid']").length === 9);
+
+    $("[data-chnote='paid:500000']").click(); await wait(280);
+    ck("cộng tờ đã đưa", !!$("[data-chdrop='paid:500000']"));
+    ck("tính ra số phải thối", ($(".ch-big")?.textContent || "").includes("395"),
+      $(".ch-big")?.textContent);
+
+    $("[data-chnote='got:200000']").click(); await wait(240);
+    $("[data-chnote='got:100000']").click(); await wait(320);
+    ck("báo thiếu tiền", /short/i.test($("#sheetBody .warnbox b")?.textContent || ""),
+      $("#sheetBody .warnbox b")?.textContent);
+
+    /* Chạm vào một tờ đã cộng thì BỚT MỘT TỜ, không xoá cả cụm — cách sửa
+       một lần chạm thừa là bỏ đúng lần chạm ấy ra. */
+    $("[data-chnote='got:100000']").click(); await wait(240);
+    ck("hai tờ cùng mệnh giá gộp thành một cụm",
+      ($("[data-chdrop='got:100000']")?.textContent || "").includes("2"));
+    $("[data-chdrop='got:100000']").click(); await wait(300);
+    ck("bỏ một tờ thì chỉ bớt một", !!$("[data-chdrop='got:100000']"),
+      "cả cụm biến mất thay vì bớt một tờ");
+
+    /* Khi chưa đếm được đồng nào thì KHÔNG được chấm điểm: một lời cảnh
+       báo "thiếu đúng bằng khoảng cách hai tờ xanh" cho người còn chưa
+       đếm gì là đúng công thức nhưng sai hoàn cảnh. */
+    A.S.chg.got = [];
+    $("[data-chnote='paid:1000']").click(); await wait(300);
+    ck("chưa cầm tiền thì chưa phán gì", !$("#sheetBody .warnbox b"),
+      $("#sheetBody .warnbox b")?.textContent || "");
+
+    click("[data-act='close']"); await wait(320);
+  }
+
+  /* ── so hai tấm thực đơn ────────────────────────────────*/
+  {
+    A.go("scan");
+    click(".mode[data-mode='menu']"); await wait(220);
+    A.handleText("Cao lau 50.000\nMi Quang 45.000\nCom ga 55.000", 92); await wait(420);
+    const start = $("#sheetBody [data-act='taxStart']");
+    ck("đủ món thì hiện nút so hai tấm", !!start,
+      `thẻ đang mở: "${$("#sheetBody h3")?.textContent || "(không có)"}" · `
+      + `${$$("#sheetBody .row").length} dòng · chờ tấm hai: ${A.S.tax.waiting}`);
+    if (start) {
+      start.click(); await wait(420);
+      ck("bấm rồi thì quay về màn quét", !$("#v-scan").hidden);
+      ck("thẻ cũ đóng lại", !sheetOpen());
+
+      A.handleText("Cao lau 75.000\nMi Quang 65.000\nChicken rice 80.000", 90);
+      await wait(560);
+      ck("lần quét thứ hai ra màn so sánh",
+        ($("#sheetBody h3")?.textContent || "").includes("Two menus"),
+        $("#sheetBody h3")?.textContent);
+      ck("so được cả ba món", $$(".tx-row").length === 3);
+      ck("nêu ra chênh lệch", /higher/.test($("#sheetBody .warnbox b")?.textContent || ""),
+        $("#sheetBody .warnbox b")?.textContent);
+      /* Câu nhắc rằng hai tấm có thể chênh nhau vì lý do lương thiện phải
+         còn nguyên ĐÚNG LÚC con số gây phẫn nộ nhất. */
+      ck("vẫn nhắc rằng đây là phép đo, không phải phán quyết",
+        /not a verdict/.test($("#sheetBody .seedwarn")?.textContent || ""));
+
+      const a = $(".tx-a")?.textContent;
+      $("[data-act='taxSwap']").click(); await wait(360);
+      ck("đảo được chiều hai tấm", $(".tx-a")?.textContent !== a,
+        `${a} → ${$(".tx-a")?.textContent}`);
+      click("[data-act='close']"); await wait(300);
+    }
+  }
+
+  /* ── bưu thiếp ──────────────────────────────────────────*/
+  {
+    A.go("me"); await wait(420);
+    const pc = $("[data-act='pcOpen']");
+    ck("tab You có lối vào bưu thiếp", !!pc, "chưa quét gì thì đúng là không có");
+    if (pc) {
+      pc.click(); await wait(2400);
+      const cv = $("#pcCanvas");
+      ck("bưu thiếp có canvas", !!cv);
+      ck("đúng khổ 1080×1350", cv?.width === 1080 && cv?.height === 1350,
+        `${cv?.width}×${cv?.height}`);
+      /* Canvas trống vẫn là một canvas. Đọc thẳng điểm ảnh ở giữa nửa
+         trên: chỗ đó phải có tranh hoặc nền sơn mài, không được là trong
+         suốt — một tấm ảnh nửa trên rỗng đi ra khỏi app đọc ra là "hỏng". */
+      const px = cv?.getContext("2d").getImageData(540, 300, 1, 1).data;
+      ck("nửa trên đã được vẽ", !!px && px[3] === 255, px ? [...px].join(",") : "");
+      ck("có nút lưu ảnh", !!$("[data-act='pcSave']"));
+      click("[data-act='close']"); await wait(320);
+    }
+  }
+
   A.go("scan");
 
   const fail = out.filter((o) => !o.pass);

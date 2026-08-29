@@ -28,6 +28,11 @@ import { t as T, LANGS, LANG_NOTE, current as curLang, setLang, onChange as onLa
 import * as History from "./history.js";
 import * as Survey from "./survey.js";
 import * as SurveyUI from "./surveyui.js";
+import * as ShowCard from "./showcard.js";
+import * as Trust from "./trust.js";
+import * as Change from "./change.js";
+import * as MenuTax from "./menutax.js";
+import * as Postcard from "./postcard.js";
 import * as Welcome from "./welcome.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
@@ -82,6 +87,15 @@ const S = {
   sync: { at: 0, sent: 0, err: "", busy: false },   // trạng thái lần đồng bộ gần nhất
   worker: null, ocrReady: false,
   stream: null,
+  /* Phiên đếm tiền thối. `wantScan` bật khi người dùng bấm "quét chỗ tiền
+     này": nó là cách màn quét biết rằng lần đọc tiền tới KHÔNG phải một
+     lần tra cứu độc lập mà là nửa sau của một phép trừ đang dở. */
+  chg: { bill: 0, paid: [], got: [], wantScan: false },
+  /* So hai tấm thực đơn. `a` là tấm quét TRƯỚC — mặc định coi là tấm
+     tiếng Việt, vì đó là tấm treo ngoài cửa và người ta đi qua nó trước
+     khi ngồi xuống. Đảo lại được bằng một nút. */
+  tax: { a: null, b: null, waiting: false, swapped: false },
+  taxRows: [],
 };
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -657,9 +671,13 @@ function closeSheet() { $("#sheet").classList.remove("open"); setEdge(null); }
 
 function rowHTML(r) {
   const v = r.v;
+  /* Nhãn nguồn đi NGAY SAU khoảng giá, không phải trong một dòng riêng ở
+     đáy thẻ. Người đọc phải thấy "40–50k" và "estimate" trong cùng một
+     cái liếc mắt — tách ra là để lời khẳng định đi một mình. */
+  const src = r.id ? Trust.badge(provOf(r.id)) : "";
   const note = v.level === "unknown"
     ? T("Not enough data")
-    : `${T("typical")} ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)}`;
+    : `${T("typical")} ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)}${src ? ` · ${src}` : ""}`;
   const badge = v.level === "ok" ? "fair"
     : v.level === "warn" ? "above 75%"
     : v.level === "high" ? (v.pct != null ? `+${v.pct}%` : "high") : "unknown";
@@ -668,6 +686,45 @@ function rowHTML(r) {
     <span><span class="nm">${esc(r.label)}</span><span class="note">${esc(note)}</span></span>
     <span class="amt" data-l="${v.level}">${money(r.price)}<small>${esc(badge)}</small></span>
   </button>`;
+}
+
+/* Số mẫu khảo sát NGƯỜI DÙNG đã tự ghi, giữ đồng bộ trong bộ nhớ.
+   Nguồn thật nằm trong IndexedDB và đọc nó là bất đồng bộ, nhưng mọi chỗ
+   dựng HTML ở đây đều đồng bộ. Nạp một lần lúc khởi động rồi cập nhật sau
+   mỗi lần ghi — thà một con số trễ vài giây còn hơn biến mọi hàm vẽ thành
+   async chỉ để đọc một cái đếm. */
+let TALLY = {};
+export function refreshTally() {
+  return Survey.tally().then((t) => { TALLY = t || {}; }).catch(() => {});
+}
+const surveyedCount = (dishId, z = S.zone) => TALLY[`${z}|${dishId}`] || 0;
+
+/** Nguồn gốc dải giá của một món ở vùng đang mở. */
+const provOf = (dishId) => Trust.provenance(stat(dishId), surveyedCount(dishId), zone().updated);
+
+/* Khối "vì sao lại nói thế". Mặc định ĐÓNG.
+   Người đang đứng trước quầy cần câu trả lời, không cần bài giảng về
+   phương pháp; nhưng người đã bị một phán quyết làm cho ngờ vực thì phải
+   tìm được đường đi tới tận nguồn mà không cần rời màn hình. <details>
+   làm đúng cả hai việc đó và không tốn một dòng JavaScript nào. */
+function whyHTML(dishId) {
+  const pv = provOf(dishId);
+  const st = stat(dishId);
+  return `<details class="why">
+    <summary><span class="wdot" data-l="${esc(pv.level)}"></span>
+      Why Nón Lá says this<span class="wtag">${esc(pv.short)}</span></summary>
+    <p class="wtitle">${esc(pv.title)}</p>
+    <p>${esc(pv.line)}</p>
+    ${st ? `<dl class="wgrid">
+      <div><dt>Cheap end</dt><dd>${fmtVND(st.p25)}</dd></div>
+      <div><dt>Middle</dt><dd>${fmtVND(st.p50)}</dd></div>
+      <div><dt>Dear end</dt><dd>${fmtVND(st.p75)}</dd></div>
+      <div><dt>Called high above</dt><dd>${fmtVND(st.p95)}</dd></div>
+    </dl>
+    <p class="wfoot">A price is called fair up to the dear end, and high once it
+      passes the last figure. Those two lines are the whole verdict.</p>` : ""}
+    <button class="btn sec" data-act="surveyOpen">Record what you paid</button>
+  </details>`;
 }
 
 function judgeRows(pairs) {
@@ -680,28 +737,81 @@ function judgeRows(pairs) {
 }
 
 function showMenuResult(rows, conf) {
+  /* Đang chờ tấm thứ hai: lần quét này không phải một tra cứu giá mà là
+     nửa sau của một phép so sánh. Đi thẳng sang màn kia. */
+  if (S.tax.waiting) {
+    S.tax.waiting = false;
+    S.tax.b = rows.filter((r) => r.id);
+    return renderTax();
+  }
   const z = zone();
   const worst = rows.reduce((a, r) =>
     ({ ok:0, unknown:0, warn:1, high:2 }[r.v.level] > { ok:0, unknown:0, warn:1, high:2 }[a] ? r.v.level : a), "ok");
   setEdge(worst);
   S.session = rows.filter((r) => r.id).map((r) => ({ id: r.id, label: r.label, price: r.price }));
+  /* Giữ RIÊNG bản sao cho việc so hai tấm thực đơn. Không dùng lại
+     S.session: nó mang nghĩa "những món tôi đã gọi" và bị màn hoá đơn lẫn
+     màn chia tiền đọc theo nghĩa đó. Hai khái niệm khác nhau đi chung một
+     biến là cách chắc chắn để một hôm nào đó sửa cái này hỏng cái kia. */
+  S.taxRows = S.session.map((r) => ({ ...r }));
+  /* Quét một thực đơn MỚI là bắt đầu một bữa mới, nên tờ hoá đơn của bữa
+     trước hết hiệu lực ngay tại đây. Không xoá thì màn đếm tiền thối —
+     vốn đọc S.billRows trước rồi mới tới S.session — sẽ lấy tổng của một
+     bữa đã ăn xong ở quán khác, và người dùng không có cách nào nhận ra
+     con số đó từ đâu ra. */
+  S.billRows = null;
 
   const seeded = rows.some((r) => r.st?.seed);
-  const known = rows.filter((r) => r.st);
-  const n = known.length ? Math.round(known.reduce((s, r) => s + r.st.n, 0) / known.length) : 0;
+  /* Trước đây dòng này in "compared with ~34 nearby places", lấy trung
+     bình trường n của các mục seed. Không có 34 quán nào — n của dữ liệu
+     seed là số hư cấu. Trust.summary() nói đúng thứ đang có trong tay. */
+  const basis = Trust.summary(rows.map((r) => provOf(r.id)));
 
   openSheet(`
     <h3>Menu · ${esc(z.name)}</h3>
-    <p class="src">${rows.length} item${rows.length===1?"":"s"} read${n?` · compared with ~${n} nearby places`:""} · updated ${esc(z.updated)}${conf!=null?` · OCR confidence ${Math.round(conf)}%`:""}</p>
+    <p class="src">${rows.length} item${rows.length===1?"":"s"} read · ${esc(basis)} · updated ${esc(z.updated)}${conf!=null?` · OCR confidence ${Math.round(conf)}%`:""}</p>
     ${wave()}
     ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">No prices found in that shot. Move closer, hold steady, or enter them by hand below.</p>`}
     ${manualBlock()}
+    ${/* Lối vào đếm tiền thối cũng nằm ở đây, không chỉ ở màn hoá đơn.
+         Phần lớn người dùng quét THỰC ĐƠN rồi gọi món rồi trả tiền — họ
+         không quét lại tờ hoá đơn lần nữa, nên nếu nút chỉ có ở màn kia
+         thì con đường phổ biến nhất lại là con đường không có nút. */""}
+    ${rows.filter((r) => r.id).length >= MenuTax.MIN_PAIRS
+      ? `<button class="btn sec" data-act="taxStart">Compare with the other menu</button>` : ""}
+    ${rows.some((r) => r.id) ? `<button class="btn sec" data-act="chOpen">Check my change</button>` : ""}
+    <button class="btn sec" data-act="show">Say it in Vietnamese</button>
     ${seeded ? `<p class="seedwarn">Reference prices are seed data, not a completed field survey. Every verdict shows its sample size so you can judge how much to trust it.</p>` : ""}
     <button class="btn sec" data-act="close">Close</button>`);
 }
 
+/* Đổi chế độ quét. Tách khỏi bộ điều phối vì màn đếm tiền thối cũng cần
+   chuyển sang chế độ Cash — và nhân bản ba dòng cập nhật giao diện ở chỗ
+   thứ hai là cách chắc chắn để một hôm nào đó nút sáng lên một đằng còn
+   S.mode lại một nẻo. */
+function setMode(mode) {
+  S.mode = mode;
+  $$(".mode").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  $("#hint").textContent = { menu: "Point at a menu and tap the button",
+    cash: "Lay the notes flat, big number facing up",
+    bill: "Point at the bill you were just given",
+    dish: "Point at the food itself — needs a connection" }[mode] || "";
+}
+
 function showCashResult(text) {
   const notes = readNotes(text);
+
+  /* Đang dở một phiên đếm tiền thối: lần đọc này KHÔNG phải một câu hỏi
+     độc lập ("tôi đang cầm bao nhiêu") mà là nửa sau của một phép trừ.
+     Đổ thẳng vào cột "nhận về" rồi quay lại đúng màn người dùng vừa rời,
+     thay vì mở ra một thẻ thứ hai bắt họ tự cộng lại lần nữa. */
+  if (S.chg.wantScan) {
+    S.chg.wantScan = false;
+    if (!notes.length) { setEdge(null); toast("No banknotes recognised — tap them in below"); }
+    else S.chg.got.push(...notes);
+    return renderChange();
+  }
+
   if (!notes.length) {
     setEdge(null);
     return openSheet(`<h3>No banknotes recognised</h3>
@@ -727,7 +837,236 @@ function showCashResult(text) {
         ${slip ? `Your bill is ${fmtVND(expected)}. That's ${slip.factor}× less — one zero more in your hand. Check before you hand it over.`
                : `Your bill is ${fmtVND(expected)}. This looks right.`}</div>`
       : `<div class="warnbox infobox">Scan a menu or a bill first and Nón Lá will check this against what you owe.</div>`}
+    <button class="btn pri" data-act="chOpen">${I.coins}Check my change</button>
     <button class="btn sec" data-act="close">Close</button>`);
+}
+
+/* ── bưu thiếp cuối chuyến ─────────────────────────────────
+   Thứ duy nhất trong app này được làm ra để RỜI KHỎI máy vì người dùng
+   muốn thế, chứ không phải vì một tính năng cần đồng bộ. */
+
+const zoneNames = () => Object.fromEntries(
+  Object.entries(S.prices).map(([id, z]) => [id, z.name || z.en || id]));
+
+/** Tải tranh nền của vùng. Không có thì trả null — draw() tự vẽ nền thay. */
+function loadArt(src) {
+  return new Promise((res) => {
+    if (!src) return res(null);
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    im.src = src;
+  });
+}
+
+async function openPostcard() {
+  const s = Postcard.tripSummary(journal.all(), { zoneNames: zoneNames() });
+  if (s.empty) {
+    return openSheet(`<h3>Nothing to put on it yet</h3>
+      <p class="src">The postcard is built from prices you have read. Scan one
+        menu and it has something to say.</p>
+      <button class="btn sec" data-act="close">Close</button>`);
+  }
+
+  openSheet(`
+    <h3>Your trip, on one card</h3>
+    <p class="src">Built from ${s.scans} reading${s.scans === 1 ? "" : "s"} on this
+      phone. Nothing here is an estimate — if Nón Lá cannot count it, it is not on the card.</p>
+    <div class="pc-wrap"><canvas id="pcCanvas" aria-label="Trip postcard"></canvas></div>
+    <button class="btn pri" data-act="pcSave">${I.share}Save the image</button>
+    <button class="btn sec" data-act="close">Close</button>`);
+
+  const cv = $("#pcCanvas");
+  /* Đợi phông TẢI XONG rồi mới vẽ. canvas không tự vẽ lại khi một phông
+     đến muộn, nên vẽ trước khi Playfair sẵn sàng sẽ đóng băng tấm ảnh ở
+     phông dự phòng — và người dùng không có cách nào biết để thử lại. */
+  const [art] = await Promise.all([
+    loadArt(S.maps[S.zone]?.art?.src || ""),
+    Postcard.ensureFonts(),
+  ]);
+  if ($("#pcCanvas") !== cv) return;        // người dùng đã đóng thẻ trong lúc chờ
+  Postcard.draw(cv, s, { name: localStorage.getItem("nl.name") || "", art });
+}
+
+/* Lưu ảnh. navigator.share TRƯỚC, tải về sau: trên điện thoại — chỗ app
+   này thật sự chạy — bảng chia sẻ đưa thẳng tấm ảnh vào tin nhắn hoặc
+   Instagram, còn một tệp rơi vào thư mục Tải về thì phải đi tìm. */
+async function savePostcard() {
+  const cv = $("#pcCanvas");
+  if (!cv) return;
+  const s = Postcard.tripSummary(journal.all(), { zoneNames: zoneNames() });
+  const name = Postcard.fileName(s);
+  const blob = await new Promise((r) => cv.toBlob(r, "image/png"));
+  if (!blob) return toast("Could not build the image");
+
+  const file = new File([blob], name, { type: "image/png" });
+  if (navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: "Nón Lá" }); return; }
+    catch { /* người dùng đóng bảng chia sẻ — rơi xuống nhánh tải về */ }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast("Saved to your downloads");
+}
+
+/* ── so hai tấm thực đơn ───────────────────────────────────
+   Đây là tính năng duy nhất trong app SINH RA dữ kiện mới thay vì tra
+   cứu dữ kiện có sẵn, nên nó cũng là tính năng duy nhất mà kết quả được
+   ghi vào lịch sử dưới một loại riêng. */
+
+function taxStart(rows) {
+  S.tax = { a: rows.filter((r) => r.id), b: null, waiting: true, swapped: false };
+  closeSheet();
+  go("scan");
+  setMode("menu");
+  toast("Now scan the other menu");
+}
+
+function renderTax() {
+  const t = S.tax;
+  const [local, guest] = t.swapped ? [t.b, t.a] : [t.a, t.b];
+  const res = MenuTax.compare(local, guest);
+
+  /* Ghi lại NGAY, không đợi người dùng bấm lưu: phép đo đã xảy ra rồi, và
+     một màn hình bắt xác nhận trước khi giữ lại kết quả sẽ mất phần lớn
+     số liệu vào những lần người ta đóng thẻ đi ăn tiếp. Chỉ ghi khi đủ
+     món để có nghĩa. */
+  if (res.enough) {
+    History.add("tax", MenuTax.record(res, { zone: S.zone })).then(scheduleSync);
+  }
+
+  setEdge(res.level === "gap" ? "warn" : null);
+  openSheet(`
+    <h3>Two menus, one kitchen</h3>
+    <p class="src">${esc(zone().name)} · ${res.matched} dish${res.matched === 1 ? "" : "es"} on both</p>
+    ${wave()}
+
+    <div class="tx-head">
+      <span>${t.swapped ? "Second scan" : "First scan"}<b>Vietnamese menu</b></span>
+      <button class="tx-swap" data-act="taxSwap" aria-label="Swap which menu is which">⇄</button>
+      <span>${t.swapped ? "First scan" : "Second scan"}<b>English menu</b></span>
+    </div>
+
+    <div class="warnbox ${res.level === "gap" ? "" : res.level === "same" ? "okbox" : "infobox"}"><div>
+      <b>${esc(res.title)}</b><br>${esc(res.line)}</div></div>
+
+    ${res.pairs.length ? `<div class="tx-list">
+      ${res.pairs.map((p) => `<div class="tx-row">
+        <span class="nm">${esc(p.label)}</span>
+        ${/* fmtVND chứ không phải money(): money() kèm theo quy đổi ra đô
+             la, và bốn cột trên một hàng rộng 360px thì hai con số kèm hai
+             dòng "≈ $1.92" sẽ đè lên nhau. Ở đây điều đáng nhìn là CHÊNH
+             LỆCH giữa hai cột, không phải giá trị tuyệt đối. */""}
+        <span class="tx-a">${fmtVND(p.local)}</span>
+        <span class="tx-arrow" aria-hidden="true">→</span>
+        <span class="tx-b" data-l="${p.delta > 0 ? "high" : p.delta < 0 ? "low" : "same"}">${fmtVND(p.guest)}</span>
+      </div>`).join("")}
+    </div>` : ""}
+
+    ${/* Câu này KHÔNG được bỏ đi khi chênh lệch lớn. Đúng lúc con số gây
+         phẫn nộ nhất là lúc người đọc cần nhớ rằng nó có cách giải thích
+         lương thiện — và app không có cách nào biết là cách nào. */""}
+    <p class="seedwarn">Two menus can differ for honest reasons: a different
+      portion, a takeaway price, or one of them printed a year ago. This is a
+      measurement, not a verdict on the place.</p>
+
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+/* ── đếm tiền thối ─────────────────────────────────────────
+   Một màn duy nhất, không chia bước. Người đang đứng ở quầy với một tay
+   cầm tiền không đi qua được ba bước có nút "Tiếp theo" — họ chạm vài
+   mệnh giá rồi liếc lên xem con số. Nên cả ba đại lượng (hoá đơn, đưa
+   đi, nhận về) nằm cùng một màn và tổng cập nhật ngay mỗi cú chạm. */
+
+function openChange(bill = 0) {
+  S.chg = { bill: Math.round(bill) || 0, paid: [], got: [], wantScan: false };
+  renderChange();
+}
+
+const noteRow = (which) => Change.NOTES.map((n) =>
+  `<button class="ch-note" data-chnote="${which}:${n}">${Math.round(n / 1000)}k</button>`).join("");
+
+const tallyLine = (which, notes) => {
+  if (!notes.length) return `<span class="ch-empty">nothing yet</span>`;
+  const c = notes.reduce((m, v) => (m[v] = (m[v] || 0) + 1, m), {});
+  return Object.entries(c).sort((a, b) => b[0] - a[0])
+    .map(([v, k]) => `<button class="ch-chip" data-chdrop="${which}:${v}"
+      aria-label="Remove one ${Math.round(v / 1000)}k note">${Math.round(v / 1000)}k${k > 1 ? ` ×${k}` : ""}</button>`)
+    .join("");
+};
+
+function renderChange() {
+  const g = S.chg;
+  const paid = g.paid.reduce((a, b) => a + b, 0);
+  const got = g.got.reduce((a, b) => a + b, 0);
+  const due = Change.changeDue(paid, g.bill);
+  /* Chỉ chấm điểm khi ĐÃ có tiền trong tay. Gọi check() với got = 0 sẽ
+     báo "thiếu đúng bằng khoảng cách hai tờ xanh" cho một người còn chưa
+     đếm gì cả — một lời cảnh báo đúng công thức nhưng sai hoàn cảnh. */
+  const v = due != null && due >= 0 && got > 0 ? Change.check(due, got) : null;
+
+  openSheet(`
+    <h3>Check my change</h3>
+    <p class="src">Tap the notes you handed over, then the notes you got back.
+      Nón Lá does the subtraction and names the gap if there is one.</p>
+    ${wave()}
+
+    <label class="ch-bill">
+      <span>The bill</span>
+      <input id="chBill" type="number" inputmode="numeric" value="${g.bill || ""}"
+        placeholder="e.g. 320000" min="0" step="1000">
+    </label>
+
+    <h2 class="sect">You handed over</h2>
+    <div class="ch-tally">${tallyLine("paid", g.paid)}<b>${paid ? fmtVND(paid) : ""}</b></div>
+    <div class="ch-pad">${noteRow("paid")}</div>
+
+    <h2 class="sect">You got back</h2>
+    <div class="ch-tally">${tallyLine("got", g.got)}<b>${got ? fmtVND(got) : ""}</b></div>
+    <div class="ch-pad">${noteRow("got")}</div>
+    <button class="btn sec" data-act="chScan">Scan the change instead</button>
+
+    ${due != null && due >= 0 ? `
+      <div class="ch-due">
+        <p class="kicker">Change owed</p>
+        <p class="ch-big">${fmtVND(due)}</p>
+        ${due > 0 ? `<p class="src">Usually handed back as ${Change.breakdown(due)
+          .map((b) => `${b.count}×${Math.round(b.note / 1000)}k`).join(" + ")}</p>` : ""}
+      </div>` : ""}
+
+    ${due != null && due < 0 ? `<div class="warnbox">You have handed over
+      ${fmtVND(-due)} less than the bill — there is nothing to give back yet.</div>` : ""}
+
+    ${/* .warnbox là flex container, nên mỗi con trực tiếp thành một cột.
+         Không gói lại thì tiêu đề đứng một cột còn câu giải thích đứng
+         cột bên cạnh — trông như hai mẩu tin rời nhau. */""}
+    ${v ? `<div class="warnbox ${v.level === "ok" ? "okbox" : ""}"><div>
+        <b>${esc(v.title)}</b><br>${esc(v.line)}
+        ${v.hint ? `<br><br>${esc(v.hint)}` : ""}</div></div>` : ""}
+
+    ${v && v.level !== "ok"
+      ? sayBlock("Cho tôi xem lại tiền thối ạ", "chaw toy sem lai tien toy ah") : ""}
+
+    <button class="btn sec" data-act="close">Close</button>`);
+
+  const bi = $("#chBill");
+  if (bi) {
+    /* Ghi vào state theo từng phím nhưng KHÔNG vẽ lại: renderChange()
+       dựng lại innerHTML, tức là thay thế chính cái ô đang gõ và ném con
+       trỏ về đầu. Vẽ lại khi rời ô — và mỗi cú chạm mệnh giá cũng đọc
+       lại ô này trước, nên con số không bao giờ cũ hơn một thao tác. */
+    bi.oninput = () => { S.chg.bill = Number(bi.value) || 0; };
+    bi.onchange = () => renderChange();
+  }
+}
+
+/** Đọc ô hoá đơn về state trước khi vẽ lại vì bất kỳ lý do gì. */
+function syncChangeBill() {
+  const bi = $("#chBill");
+  if (bi) S.chg.bill = Number(bi.value) || 0;
 }
 
 function showBillResult(rows) {
@@ -753,13 +1092,22 @@ function showBillResult(rows) {
         ? `${extra.length} line${extra.length===1?"":"s"} you didn't order. Expected ${fmtVND(expected)}.`
         : `Every line matches what you ordered.`}</div>` : ""}
     ${rows.length > 1 ? `<button class="btn pri" data-act="splitOpen">${I.coins}${esc(T("Split this bill"))}</button>` : ""}
+    <button class="btn sec" data-act="chOpen">Check my change</button>
     ${extra.length ? sayBlock("Cho tôi xem lại hoá đơn", "chaw toy sem lai hwa dun") : ""}
+    <button class="btn sec" data-act="show">Say it in Vietnamese</button>
     <p class="muted" style="margin-top:10px">Ask politely first. Most extra lines are honest mistakes, and they come off the bill when you point at them.</p>
     <button class="btn sec" data-act="close">Close</button>`);
 }
 
+/* Lớp phiên âm tên là `sayph`, KHÔNG phải `ph`.
+   `.ph` là lớp của khung ảnh: width 100%, viền, nền giấy, bo góc, cộng
+   thêm một lớp phủ gradient qua ::after. Đặt nó lên một <span> chữ trong
+   khối say làm dòng phiên âm biến thành một mảng xám đặc che kín chính
+   nó — nghĩa là hướng dẫn phát âm, thứ duy nhất khiến khối này có ích với
+   người không đọc được tiếng Việt, đã không hiện ra suốt từ đầu.
+   Cùng loại va chạm tên lớp với `.hint` trước đây. */
 const sayBlock = (vi, ph) => `<button class="say" data-say="${esc(vi)}">
-  <span><span class="vi">${esc(vi)}</span><span class="ph">${esc(ph)}</span></span>
+  <span><span class="vi">${esc(vi)}</span><span class="sayph">${esc(ph)}</span></span>
   <span class="spk">${spkIcon}</span></button>`;
 
 const manualBlock = (kind = "menu") => `
@@ -1071,9 +1419,12 @@ function showDish(id) {
     <div class="tagrow">${d.tags.map((t) => `<span class="tg ${tagCls(t)}">${esc(t)}</span>`).join("")}${d.spice === "hot" ? '<span class="tg hot">Spicy</span>' : ""}</div>
     ${st ? `<div class="card"><p class="kicker">Local price</p>
         <p style="font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:3px">${fmtVND(st.p25)} – ${money(st.p75)}</p>
-        <p class="src">Typical range in ${esc(zone().name)} · ${st.n} places · ${esc(zone().updated)}${st.seed ? " · seed data" : ""}</p></div>` : ""}
+        <p class="src">Typical range in ${esc(zone().name)} · ${esc(zone().updated)}</p></div>` : ""}
+    ${whyHTML(id)}
     ${whereToEat(id)}
     ${sayBlock(d.say, d.ph)}
+    <button class="btn pri" data-act="show" data-showdish="${esc(d.id)}">
+      ${I.speech}Show this to the seller</button>
     ${dishLinksHTML(d)}
     <button class="btn sec" data-act="shareThing" data-name="${esc(d.vi)}"
       data-sub="${esc(d.en)}" data-tags="${esc([d.vi, d.en].join("|"))}">
@@ -2247,6 +2598,22 @@ function showWalkWarn(p, m) {
    app.js chỉ nối dây: surveyui.js sở hữu màn hình, survey.js sở hữu dữ
    liệu. Ở đây chỉ có ba việc mà hai file kia không làm được — mở màn với
    dữ liệu của vùng đang chọn, tải tệp về, và dựng bảng giá mới. */
+/* Mở màn xoay ngược. `band` dựng ở ĐÂY chứ không trong showcard.js: cách
+   viết số tiền là việc của app, còn màn kia chỉ biết nhận một chuỗi đã
+   xong và đặt nó vào đúng nửa màn hình của người dùng. */
+function openShow(dishId = null) {
+  const d = dishId ? dishById(dishId) : null;
+  const st = dishId ? stat(dishId) : null;
+  closeSheet();
+  ShowCard.open({
+    host: $("#v-show"),
+    dish: d,
+    band: st ? `${d ? d.vi + " · " : ""}usually ${fmtVND(st.p25)}–${fmtVND(st.p75)} around here` : "",
+    say,
+    onClose: () => { if (S.tab !== "scan") return; },
+  });
+}
+
 function openSurvey() {
   const z = zone();
   SurveyUI.open({
@@ -2257,7 +2624,7 @@ function openSurvey() {
     places: S.places.filter((p) => p.zone === S.zone),
     prices: S.prices[S.zone],
     toast,
-    onClose: () => { renderMe(); },
+    onClose: () => { refreshTally().then(renderMe); },
     onApply: (what) => (what === "export" ? exportSurvey() : buildPriceTable()),
   });
 }
@@ -2547,6 +2914,18 @@ function renderMe() {
       <span class="act">${earned}/${BADGES.length}</span>
     </div>
     <div class="you-badges">${BADGES.map((b) => badgeHTML(b, st)).join("")}</div>
+
+    ${/* Bưu thiếp nằm NGAY DƯỚI phần huy hiệu, trên mục Cài đặt: cả hai
+         khối này nói về cùng một thứ — chuyến đi đã đi tới đâu — còn Cài
+         đặt là chỗ người ta vào để sửa một thứ, không phải để nhớ lại.
+         Chỉ hiện khi đã có gì để đếm: một tấm bưu thiếp trống là một lời
+         mời tới chỗ thất vọng. */""}
+    ${st.scans ? `<button class="pc-card" data-act="pcOpen">
+      <span class="pc-ic" aria-hidden="true">${I.share}</span>
+      <span><b>Make a postcard</b>
+        <small>${st.dishes} dish${st.dishes === 1 ? "" : "es"} and ${st.scans}
+          price${st.scans === 1 ? "" : "s"} on one card you can send home</small></span>
+    </button>` : ""}
 
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
@@ -3134,16 +3513,7 @@ document.addEventListener("click", async (ev) => {
   const tb = el("[data-tab]"); if (tb) return go(tb.dataset.tab);
 
   const md = el(".mode");
-  if (md) {
-    S.mode = md.dataset.mode;
-    $$(".mode").forEach((b) => b.setAttribute("aria-pressed", String(b === md)));
-    $("#hint").textContent = { menu: "Point at a menu and tap the button",
-      cash: "Lay the notes flat, big number facing up",
-      bill: "Point at the bill you were just given",
-      dish: "Point at the food itself — needs a connection" }[S.mode];
-    closeSheet();
-    return;
-  }
+  if (md) { setMode(md.dataset.mode); closeSheet(); return; }
 
   if (el("[data-act='close']")) return closeSheet();
 
@@ -3153,6 +3523,50 @@ document.addEventListener("click", async (ev) => {
   if (rv) { closeSheet(); return openComposer(rv.dataset.place); }
 
   const sy = el("[data-say]"); if (sy) return say(sy.dataset.say);
+
+  /* Kiểm TRƯỚC [data-dish]: nút "Show this to the seller" trong thẻ món
+     mang data-showdish, và nếu nhánh [data-dish] phía dưới bắt được nó
+     trước thì chạm vào chỉ mở lại đúng cái thẻ đang mở. */
+  const shw = el("[data-act='show']");
+  if (shw) return openShow(shw.dataset.showdish || null);
+
+  /* Đếm tiền thối. Mọi nhánh đều đọc ô hoá đơn về state trước khi vẽ
+     lại — người dùng thường gõ số hoá đơn rồi chạm thẳng vào mệnh giá mà
+     không rời ô, và bỏ qua bước này sẽ tính bằng con số của lần trước. */
+  const cn = el("[data-chnote]");
+  if (cn) {
+    const [which, val] = cn.dataset.chnote.split(":");
+    syncChangeBill();
+    S.chg[which].push(Number(val));
+    return renderChange();
+  }
+  const cd = el("[data-chdrop]");
+  if (cd) {
+    /* Chạm vào một mệnh giá đã cộng thì BỚT MỘT TỜ, không xoá cả cụm:
+       cách sửa một lần chạm thừa là bỏ đúng lần chạm ấy ra. */
+    const [which, val] = cd.dataset.chdrop.split(":");
+    const i = S.chg[which].lastIndexOf(Number(val));
+    if (i >= 0) S.chg[which].splice(i, 1);
+    syncChangeBill();
+    return renderChange();
+  }
+  if (el("[data-act='pcOpen']")) { closeSheet(); return openPostcard(); }
+  if (el("[data-act='pcSave']")) return savePostcard();
+  if (el("[data-act='taxStart']")) return taxStart(S.taxRows || []);
+  if (el("[data-act='taxSwap']")) { S.tax.swapped = !S.tax.swapped; return renderTax(); }
+  if (el("[data-act='chOpen']")) {
+    const total = (S.billRows || S.session).reduce((a, r) => a + r.price, 0);
+    return openChange(total);
+  }
+  if (el("[data-act='chScan']")) {
+    syncChangeBill();
+    S.chg.wantScan = true;
+    closeSheet();
+    go("scan");
+    setMode("cash");
+    toast("Point at the change and tap the shutter");
+    return;
+  }
 
   const pl = el("[data-place]");
   if (pl && pl.dataset.place) return showPlace(pl.dataset.place);
@@ -3508,7 +3922,7 @@ document.addEventListener("click", async (ev) => {
   if (wo) { $("#walkwarn").classList.remove("on"); return showPlace(wo.dataset.place); }
 
   /* ── khảo sát giá ────────────────────────────────────── */
-  if (el("[data-act='surveyOpen']")) return openSurvey();
+  if (el("[data-act='surveyOpen']")) { closeSheet(); return openSurvey(); }
 
   /* ── mục Dữ liệu ─────────────────────────────────────── */
   if (el("[data-act='surveyDownload']")) {
@@ -3694,6 +4108,10 @@ async function boot() {
      rồi mới đầy lên — người dùng đọc cái nháy đó là "mất dữ liệu". */
   await History.migrate().catch(() => 0);
   S.history = await History.list({ kind: "scan", limit: 2000 }).catch(() => []);
+  /* Bộ đếm mẫu khảo sát. Không await: khối "Vì sao" hiện được ngay với số
+     0 và tự đúng lại vài trăm mili giây sau, còn chặn khởi động vì một cái
+     đếm thì màn hình đầu tiên chậm đi cho tất cả mọi người. */
+  refreshTally();
 
   Auth.restore().then(async () => {
     if (S.tab === "me") renderMe();

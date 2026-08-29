@@ -37,7 +37,11 @@ const MAX_EVENTS = 5000;
 
 /** Các loại hoạt động được ghi. Danh sách đóng: một chuỗi lạ lọt vào là
  *  một hàng trong bảng thống kê mà không ai biết nó nghĩa là gì. */
-export const KINDS = ["scan", "place", "sight", "post", "route", "zone"];
+/* "tax" = một lần so hai tấm thực đơn của cùng một quán. Nó là loại
+   RIÊNG chứ không nhét vào "scan": một lần quét là một quan sát về giá,
+   còn cái này là một phép đo về chênh lệch giữa hai tấm — cộng dồn hai
+   thứ đó vào một rổ sẽ làm hỏng cả hai. */
+export const KINDS = ["scan", "place", "sight", "post", "route", "zone", "tax"];
 
 function open() {
   return new Promise((res, rej) => {

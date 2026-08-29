@@ -10,6 +10,12 @@ import { resolveRoute, progressAt, legLabel } from "./route.js";
 import { fitSize } from "./photo.js";
 import { nextAttempt } from "./outbox.js";
 import { mapsLinks, socialLinks, shareTargets, shareText, hashtag } from "./links.js";
+import { provenance, badge as trustBadge, summary as trustSummary, isMeasured,
+         MIN_SAMPLES as TRUST_MIN } from "./trust.js";
+import { changeDue, breakdown, explain, check as checkChange, NOTES } from "./change.js";
+import { compare as compareMenus, MIN_PAIRS } from "./menutax.js";
+import { tripSummary, dateLine, fileName } from "./postcard.js";
+import { PHRASES } from "./showcard.js";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
@@ -525,6 +531,175 @@ console.log("\n── dữ liệu: món, giá, vùng ─────────
     ok(`${zid}: chuyến đi nằm ngoài khung bản đồ`, inside.length === 0,
       inside.map((t) => t.id).join(", "));
   }
+}
+
+/* ── nguồn gốc dải giá (trust.js) ─────────────────────────
+   Điều duy nhất thật sự đáng kiểm ở đây: dữ liệu seed KHÔNG BAO GIỜ được
+   trình bày như một phép đo. Trường n của nó là số hư cấu, và cả tệp
+   trust.js sinh ra để chấm dứt việc in nó ra như bằng chứng. */
+console.log("\n── trust: nguồn của phán quyết ─────────────");
+{
+  const seed = { p25: 60000, p50: 70000, p75: 90000, p95: 120000, n: 34, seed: true };
+  const real = { p25: 55000, p50: 60000, p75: 65000, p95: 80000, n: 18, surveyedAt: "2026-08" };
+
+  eq("seed chưa có mẫu → bậc seed", provenance(seed, 0).level, "seed");
+  ok("seed KHÔNG nhắc tới n hư cấu", !provenance(seed, 0).line.includes("34"),
+    provenance(seed, 0).line);
+  eq("seed không kèm số mẫu", provenance(seed, 0).samples, null);
+  ok("seed không được coi là đã đo", !isMeasured(provenance(seed, 0)));
+
+  eq("seed + vài mẫu → thin", provenance(seed, 3).level, "thin");
+  eq("thin nói còn thiếu mấy mẫu", provenance(seed, 3).short, `3/${TRUST_MIN} yours`);
+
+  /* Đủ mẫu KHÔNG có nghĩa là dải đang dùng đã đổi — nó chỉ đổi khi người
+     dùng bấm dựng bảng giá. Nhãn ở bậc này vẫn phải là "estimate". */
+  eq("đủ mẫu nhưng chưa dựng → ready", provenance(seed, TRUST_MIN).level, "ready");
+  eq("bậc ready vẫn dán nhãn ước lượng", trustBadge(provenance(seed, TRUST_MIN)), "estimate");
+  ok("ready chưa được coi là đã đo", !isMeasured(provenance(seed, TRUST_MIN)));
+
+  eq("dải đã khảo sát → strong", provenance(real, 0).level, "strong");
+  ok("dải đã khảo sát nói ra số mẫu thật", provenance(real, 0).line.includes("18"));
+  eq("dải đã khảo sát dán nhãn surveyed", trustBadge(provenance(real, 0)), "surveyed");
+
+  eq("không có dải → none", provenance(null, 0).level, "none");
+  eq("không có dải thì nhãn rỗng", trustBadge(provenance(null, 0)), "");
+
+  ok("tóm tắt không bịa ra số quán",
+    !/\d+ nearby|~\d+/.test(trustSummary([provenance(seed, 0), provenance(seed, 0)])),
+    trustSummary([provenance(seed, 0), provenance(seed, 0)]));
+  eq("tóm tắt khi chẳng có dải nào",
+    trustSummary([provenance(null, 0)]), "No local range for anything on this list yet");
+}
+
+/* ── tiền thối (change.js) ────────────────────────────────
+   Phần đáng giá nhất là câu giải thích: nó phải nhận ra một khoảng lệch
+   ĐÚNG BẰNG chênh lệch giữa hai tờ cùng màu, vì đó là kiểu mất tiền phổ
+   biến nhất của khách nước ngoài ở Việt Nam. */
+console.log("\n── change: đếm tiền thối ───────────────────");
+{
+  eq("phải thối lại", changeDue(500000, 320000), 180000);
+  eq("chưa đủ dữ kiện", changeDue(0, 320000), null);
+  eq("đưa thiếu thì ra số âm", changeDue(100000, 320000), -220000);
+
+  eq("180k trông như thế nào",
+    breakdown(180000).map((b) => `${b.count}×${b.note / 1000}`).join("+"),
+    "1×100+1×50+1×20+1×10");
+  eq("số 0 không có tờ nào", breakdown(0).length, 0);
+  ok("mọi mệnh giá dựng lại đúng chính nó",
+    NOTES.every((n) => breakdown(n).length === 1 && breakdown(n)[0].note === n));
+
+  ok("nhận ra cặp 500k/20k", /blue/.test(explain(480000) || ""), explain(480000));
+  ok("nhận ra cặp 200k/10k", /brown/.test(explain(190000) || ""), explain(190000));
+  ok("nhận ra lệch đúng một tờ", /one 50\.000/.test(explain(50000) || ""), explain(50000));
+  eq("lệch 0 thì không giải thích gì", explain(0), null);
+  eq("lệch không theo mẫu nào", explain(73000), null);
+  /* Bốn tờ trở lên thì con số trùng khớp là ngẫu nhiên chứ không phải dấu
+     vết — nói ra sẽ dẫn người dùng đi tìm một thứ không có. */
+  eq("bốn lần chênh lệch là trùng hợp", explain(480000 * 4), null);
+
+  eq("đúng số", checkChange(180000, 180000).level, "ok");
+  eq("thiếu tiền", checkChange(180000, 130000).level, "short");
+  eq("thừa tiền", checkChange(180000, 230000).level, "over");
+  ok("thừa tiền cũng được báo rõ", /too much/.test(checkChange(180000, 230000).title));
+  ok("giải thích đọc xuôi cả hai chiều",
+    checkChange(180000, 230000).hint === checkChange(180000, 130000).hint);
+}
+
+/* ── so hai tấm thực đơn (menutax.js) ─────────────────────
+   Kiểm hai điều: trung vị chịu được một dòng OCR hỏng, và dưới ngưỡng
+   mẫu thì KHÔNG kết luận gì. */
+console.log("\n── menutax: hai tấm thực đơn ───────────────");
+{
+  const vi = [
+    { id: "cao-lau", label: "Cao lầu", price: 50000 },
+    { id: "mi-quang", label: "Mì Quảng", price: 45000 },
+    { id: "com-ga", label: "Cơm gà", price: 55000 },
+    { id: "bia-hoi", label: "Bia hơi", price: 15000 },
+  ];
+  const dearer = vi.map((r) => ({ ...r, price: Math.round(r.price * 1.5) }));
+
+  eq("thấy chênh lệch có hệ thống", compareMenus(vi, dearer).level, "gap");
+  eq("khớp đủ bốn món", compareMenus(vi, dearer).matched, 4);
+  eq("hai tấm giống nhau", compareMenus(vi, vi.map((r) => ({ ...r }))).level, "same");
+
+  /* Một dòng OCR đọc 50.000 thành 500.000. Trung vị phải phớt lờ nó —
+     trung bình sẽ báo "cao hơn 300%" và đẩy người dùng đi cãi nhau dựa
+     trên một lỗi đọc chữ. */
+  const bad = vi.map((r) => ({ ...r }));
+  bad[0] = { ...bad[0], price: 500000 };
+  eq("một dòng OCR hỏng không lật kết luận", compareMenus(vi, bad).level, "same");
+
+  eq("ít món thì không kết luận", compareMenus(vi, [dearer[0]]).level, "thin");
+  ok("ít món thì enough = false", !compareMenus(vi, [dearer[0]]).enough);
+  eq("không món nào khớp",
+    compareMenus(vi, [{ id: "pho-bo", label: "Phở", price: 90000 }]).level, "nomatch");
+  ok("ngưỡng mẫu là con số công khai", MIN_PAIRS >= 3);
+  /* Rẻ hơn cũng phải nói ra. Một phép đo chỉ báo động một chiều thì nó
+     không phải phép đo, nó là thứ đi tìm cái nó muốn thấy. */
+  eq("tấm tiếng Anh rẻ hơn cũng được nêu",
+    compareMenus(vi, vi.map((r) => ({ ...r, price: Math.round(r.price * 0.7) }))).level, "cheaper");
+}
+
+/* ── bưu thiếp (postcard.js) ──────────────────────────────
+   Tấm này đi ra khỏi app, nên mọi con số trên nó phải đếm được từ lịch
+   sử — không ô nào là ước lượng. */
+console.log("\n── postcard: tổng kết chuyến ───────────────");
+{
+  const d = (s) => Date.parse(s);
+  const rows = [
+    { ts: d("2026-08-20T10:00:00Z"), mode: "menu", id: "cao-lau", label: "Cao lầu", level: "ok", zone: "hoian-oldtown" },
+    { ts: d("2026-08-20T13:00:00Z"), mode: "menu", id: "cao-lau", label: "Cao lầu", level: "ok", zone: "hoian-oldtown" },
+    { ts: d("2026-08-22T12:00:00Z"), mode: "menu", id: "mi-quang", label: "Mì Quảng", level: "high", zone: "hoian-oldtown" },
+    { ts: d("2026-08-23T12:00:00Z"), mode: "cash", zone: "hue-citadel" },
+  ];
+  const s = tripSummary(rows, { zoneNames: { "hoian-oldtown": "Hội An · Phố cổ" } });
+
+  eq("đếm đủ số lần quét", s.scans, 4);
+  // Quét tiền là một lần dùng app nhưng không phải một món ăn.
+  eq("món khác nhau, quét tiền không tính", s.dishes, 2);
+  eq("món gọi nhiều nhất", s.top.label, "Cao lầu");
+  eq("vùng chưa có tên hiển thị thì giữ id", s.zones[1], "hue-citadel");
+  eq("số lần giá nằm trong khoảng", s.fair, 2);
+  eq("lịch sử rỗng thì báo rỗng", tripSummary([]).empty, true);
+  eq("lịch sử rỗng không có ngày", tripSummary([]).days, 0);
+
+  /* Ngày, không phải giờ chia 24: quét lúc 23h và 1h sáng hôm sau là hai
+     ngày của chuyến đi dù cách nhau hai tiếng. */
+  eq("một ngày duy nhất vẫn là 1", tripSummary([rows[0]]).days, 1);
+  eq("ngày viết gọn khi cùng tháng",
+    dateLine(d("2026-08-20T00:00:00"), d("2026-08-23T00:00:00")), "20–23 Aug 2026");
+  eq("một ngày thì không có gạch nối",
+    dateLine(d("2026-08-20T00:00:00"), d("2026-08-20T09:00:00")), "20 Aug 2026");
+  eq("qua năm mới thì ghi cả hai năm",
+    dateLine(d("2026-12-28T00:00:00"), d("2027-01-03T00:00:00")), "28 Dec 2026 – 3 Jan 2027");
+
+  /* Tên tệp phải bỏ dấu TRƯỚC khi lọc ký tự, nếu không "Hội An · Phố cổ"
+     ra "h-i-an-ph-c" — một tên tệp không đọc được nằm trong thư mục Tải
+     về của người dùng. */
+  eq("tên tệp bỏ dấu đọc được",
+    fileName({ zones: ["Hội An · Phố cổ"] }), "non-la-hoi-an-pho-co.png");
+  eq("chưa đi vùng nào", fileName({ zones: [] }), "non-la-vietnam.png");
+}
+
+/* ── bộ câu cho người bán đọc (showcard.js) ───────────────
+   Không kiểm giao diện ở đây — chỉ kiểm bộ câu, vì nó là DỮ LIỆU và một
+   câu thiếu phiên âm thì vô dụng với đúng người cần nó nhất. */
+console.log("\n── showcard: bộ câu ────────────────────────");
+{
+  ok("mọi câu đều có phiên âm và nghĩa",
+    PHRASES.every((p) => p.vi && p.ph && p.en),
+    PHRASES.find((p) => !p.ph || !p.en)?.id || "");
+  ok("id không trùng nhau", new Set(PHRASES.map((p) => p.id)).size === PHRASES.length);
+  ok("có câu hỏi giá", PHRASES.some((p) => p.id === "howmuch"));
+  // Đậu phộng có mặt trong rất nhiều món Việt; đây là câu duy nhất trong
+  // danh sách mà nói chậm một phút có thể thành chuyện cấp cứu.
+  ok("có câu báo dị ứng đậu phộng", PHRASES.some((p) => p.id === "peanut"));
+  /* Không câu nào được mang con số giá. Khối chữ lớn ở màn đó hướng về
+     phía người bán, và biến nó thành chỗ trưng dải giá là biến mọi bữa ăn
+     thành một cuộc đối chất. */
+  ok("không câu nào mang theo con số giá",
+    PHRASES.every((p) => !/[0-9]/.test(p.vi)),
+    PHRASES.find((p) => /[0-9]/.test(p.vi))?.vi || "");
 }
 
 console.log("\n════════════════════════════════════════════");
