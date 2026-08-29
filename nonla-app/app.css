@@ -1475,3 +1475,128 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   border-radius:16px;overflow:hidden;border:1px solid var(--line);
   background:var(--kem)}
 .gmap iframe{width:100%;height:100%;border:0;display:block}
+
+/* ── màn khảo sát giá ───────────────────────────────────────
+   Phủ toàn màn hình như #v-bigmap. Nền giấy đặc chứ không trong suốt:
+   đây là một phiên làm việc, không phải một lớp phủ tra cứu, và nhìn
+   thấy tab bên dưới chỉ mời người ta bấm ra giữa chừng. */
+#v-survey{position:fixed;inset:0;z-index:70;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;background:var(--ngoc-nhat);
+  max-width:520px;margin:0 auto;padding:0 var(--pad-x) calc(28px + var(--safe))}
+#v-survey[hidden]{display:none}
+
+.sv-head{display:flex;align-items:center;gap:12px;padding:14px 0 6px;
+  position:sticky;top:0;z-index:2;background:var(--ngoc-nhat)}
+.sv-head h1{font-family:var(--disp);font-size:23px;font-weight:600;color:var(--then);line-height:1.1}
+.sv-head .kicker{margin:0}
+.sv-count{margin-left:auto;font-size:12px;font-weight:700;color:var(--dong-chu);
+  font-variant-numeric:tabular-nums}
+
+.sv-place{display:grid;gap:5px;margin-top:8px;font-size:12.5px;color:var(--muc-nhat)}
+.sv-place small{color:var(--xam-ghim)}
+.sv-place input{min-height:46px;padding:10px 12px;border-radius:12px;
+  border:1px solid var(--line);background:#fff;color:var(--muc);font:inherit;width:100%}
+
+/* Ô nhập giá là thứ to nhất trên màn — người dùng đang gõ nó hàng chục
+   lần liên tiếp, và mỗi lần trượt ngón tay là một lần phải gõ lại. */
+.sv-entry{margin-top:12px;padding:12px;border-radius:16px;
+  background:var(--giay);border:1.5px solid var(--vien)}
+.sv-picked b{display:block;font-family:var(--disp);font-size:18px;color:var(--then)}
+.sv-picked span{font-size:12px;color:var(--muc-nhat)}
+.sv-entry input{width:100%;margin-top:9px;min-height:58px;padding:10px 14px;
+  border-radius:14px;border:1.5px solid var(--vien);background:#fff;
+  font-size:26px;font-weight:700;color:var(--then);font-variant-numeric:tabular-nums}
+.sv-entry .btn{margin-top:9px}
+
+.sv-tip{margin-top:12px;padding:12px;border-radius:14px;background:var(--kem);
+  border:1px solid var(--vien-in);font-size:13px;line-height:1.5;color:var(--muc-nhat)}
+
+.sv-list{display:grid;gap:6px;margin-top:14px}
+/* Cột phải ĐẶT TÊN RÕ, không để lưới tự xếp. `.tick` mang grid-row:1/3
+   nên khi không chỉ định cột, thuật toán tự xếp đặt nó vào cột 1 — ô đầu
+   tiên còn trống — và đẩy tên món sang cột 2. Kết quả là cả danh sách
+   đọc ngược: con số bên trái, tên món dạt sang phải, chữ chồng lên nhau. */
+.sv-dish{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;
+  gap:2px 10px;text-align:left;
+  padding:10px 12px;min-height:52px;border-radius:12px;
+  background:var(--giay);border:1px solid var(--vien-in)}
+.sv-dish .nm{grid-column:1;grid-row:1;font-weight:600;color:var(--then);font-size:14px}
+/* KHÔNG dùng tên `.hint`: app.css đã có một `.hint` toàn cục cho dòng
+   nhắc trên màn quét, và nó định vị TUYỆT ĐỐI giữa màn hình. Đặt trùng
+   tên thì 41 dòng phụ ở đây chồng hết lên nhau thành một viên thuốc đen
+   trôi giữa danh sách — mất hai phút mới lần ra vì CSS không báo gì. */
+.sv-dish .svsub{grid-column:1;grid-row:2;font-size:11px;color:var(--xam-ghim)}
+.sv-dish .tick{grid-column:2;grid-row:1/3;align-self:center;font-size:12px;font-weight:700;
+  color:var(--dong-chu);font-variant-numeric:tabular-nums}
+.sv-dish.on{border-color:var(--vien-dam);background:var(--kem)}
+/* Món đã đủ mẫu mờ đi nhưng KHÔNG biến mất: giá đổi theo mùa, và đi qua
+   lần nữa thì vẫn đáng ghi thêm. */
+.sv-dish.done{opacity:.55}
+.sv-dish.done .tick{color:var(--ngoc)}
+
+.sv-sect{font-family:var(--disp);font-size:15px;color:var(--then);margin:16px 0 6px}
+.sv-recent{display:grid;gap:4px}
+.sv-row{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;
+  background:var(--kem);font-size:13px;color:var(--muc-nhat)}
+.sv-row b{margin-left:auto;color:var(--then);font-variant-numeric:tabular-nums}
+.sv-row button{width:32px;height:32px;border-radius:50%;color:var(--son-dam);font-size:18px}
+
+.sv-foot{display:grid;gap:8px;margin-top:18px}
+.sv-note{margin-top:8px;font-size:12px;line-height:1.5;color:var(--xam-ghim)}
+
+/* ── dải cảnh báo khi đi bộ ─────────────────────────────────
+   Nằm ngay TRÊN thanh nav, không phải giữa màn hình: người dùng đang đi
+   bộ, cầm máy thấp, và ngón cái ở nửa dưới. Một hộp thoại giữa màn chặn
+   mất bản đồ đúng lúc họ cần nhìn nó nhất. */
+#walkwarn{position:fixed;left:50%;transform:translateX(-50%) translateY(140%);
+  bottom:calc(96px + var(--safe));z-index:60;
+  width:min(calc(100% - 24px),496px);display:flex;align-items:stretch;gap:0;
+  border-radius:18px;overflow:hidden;
+  background:#FBF2E2;border:1.5px solid rgba(200,121,31,.5);
+  box-shadow:0 12px 34px -10px rgba(58,42,10,.5);
+  transition:transform .3s cubic-bezier(.22,.61,.36,1),opacity .3s;opacity:0;
+  pointer-events:none}
+#walkwarn.on{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+#walkwarn>button:first-child{flex:1;display:flex;align-items:center;gap:11px;
+  text-align:left;padding:11px 12px;min-height:56px}
+#walkwarn .wi{flex:0 0 auto;width:34px;height:34px;border-radius:50%;
+  display:grid;place-items:center;background:var(--ho-phach);color:#FFF6E8}
+#walkwarn .wi svg{width:18px;height:18px}
+#walkwarn .wt{display:grid;gap:2px;min-width:0}
+#walkwarn .wt b{font-family:var(--disp);font-size:15px;color:var(--then);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#walkwarn .wt i{font-style:normal;font-size:11.5px;line-height:1.35;color:#8A5A16}
+#walkwarn .wx{flex:0 0 auto;width:46px;color:#8A5A16;font-size:20px;
+  border-left:1px solid rgba(200,121,31,.3)}
+@media (prefers-reduced-motion:reduce){ #walkwarn{transition:none} }
+
+/* ── chia hoá đơn ───────────────────────────────────────────
+   Số người là một hàng nút to: người dùng đang ngồi ở bàn, có tiếng ồn,
+   và đây là thao tác đầu tiên họ làm — nó phải trúng ngay lần đầu. */
+/* Bảy nút phải nằm gọn MỘT hàng. Ở 46px + khe 7px chúng cần 364px, quá
+   bề ngang còn lại trên máy 390px, nên nút "8" rớt xuống một hàng riêng —
+   trông như một lựa chọn khác loại với sáu nút kia. */
+.sp-n{display:flex;gap:6px;margin:10px 0 4px}
+.sp-nbtn{flex:1 1 0;min-width:0;height:46px;border-radius:14px;font-size:16px;font-weight:700;
+  background:var(--giay);border:1.5px solid var(--vien-in);color:var(--muc-nhat)}
+.sp-nbtn.on{background:var(--then);border-color:var(--vien-dam);color:#F6F2E6}
+
+.sp-rows{display:grid;gap:8px;margin-top:10px}
+.sp-row{padding:10px 12px;border-radius:14px;background:var(--giay);
+  border:1px solid var(--vien-in)}
+.sp-line{display:flex;align-items:baseline;gap:10px;font-size:14px;color:var(--muc)}
+.sp-line span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-line b{color:var(--then);font-variant-numeric:tabular-nums}
+.sp-chips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+/* 40px chứ không 44: tám chip phải vừa một hàng trên máy 360px, và chúng
+   nằm sát nhau theo hàng ngang nên ngón tay có cả chiều cao để trượt. */
+.sp-who{width:40px;height:40px;border-radius:50%;font-size:14px;font-weight:700;
+  background:#fff;border:1.5px solid var(--line);color:var(--xam-ghim)}
+.sp-who.on{background:var(--ngoc);border-color:var(--ngoc-sau);color:#fff}
+
+.sp-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.sp-p{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:14px;
+  background:var(--kem);border:1px solid var(--vien-in)}
+.sp-p span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  background:var(--then);color:var(--dong);font-size:12px;font-weight:700;flex:0 0 auto}
+.sp-p b{font-variant-numeric:tabular-nums;color:var(--then);font-size:15px}

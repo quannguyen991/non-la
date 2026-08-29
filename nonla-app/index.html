@@ -60,6 +60,11 @@
   <!-- ══ BẢN ĐỒ CHI TIẾT ══ -->
   <section id="v-bigmap" hidden aria-label="Detailed map"></section>
   <section id="v-foodmap" hidden aria-label="Must-Try Food Map"></section>
+  <!-- Khảo sát giá: toàn màn hình như hai màn bản đồ, vì nó là một PHIÊN
+       LÀM VIỆC chứ không phải một thẻ tra cứu. Người dùng ở lại đây hàng
+       chục phút và gõ liên tục, nên nó không được nằm trong sheet dùng
+       chung — sheet đóng lại khi chạm ra ngoài. -->
+  <section id="v-survey" hidden aria-label="Price survey"></section>
 
   <!-- Lớp phủ dùng chung cho MỌI tab. Trước đây chúng nằm trong #v-scan,
        nên chạm một món ở tab Eat thì thẻ kết quả mở ra bên trong một khối
@@ -82,6 +87,11 @@
 
   <nav class="tabbar" id="tabbar"></nav>
   <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Dải cảnh báo khi đi bộ. Tách khỏi #toast vì nó BẤM ĐƯỢC và ở lại lâu
+       hơn: toast tự tắt sau 2,6 giây và không mở được gì, còn người đang đi
+       trên phố cần đủ thời gian rút máy ra rồi chạm vào để xem vì sao. -->
+  <div id="walkwarn" role="alert" aria-live="assertive"></div>
 
   <!-- Màn mở đầu: giới thiệu rồi tài khoản. Nằm ở CẤP #app và phủ toàn
        màn hình, sau tabbar trong thứ tự DOM nên nó che được cả thanh nav —

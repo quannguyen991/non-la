@@ -776,6 +776,137 @@ export async function run({ verbose = true } = {}) {
     ck("đánh dấu đã gửi thì hết chờ", st2.pending < st.pending, `${st.pending} → ${st2.pending}`);
   }
 
+  /* ── ngôn ngữ ───────────────────────────────────────────
+     Phép thử canh hai điều dễ hỏng nhất của một lớp i18n:
+     câu chưa dịch phải rơi về TIẾNG ANH ĐỌC ĐƯỢC (không phải một mã
+     khoá lọt ra màn hình), và đổi ngôn ngữ phải vẽ lại màn đang mở chứ
+     không đợi tải lại trang. */
+  {
+    const L = await import("./i18n.js");
+    const was = L.current();
+    const tabs = () => $$(".tab span").map((e) => e.textContent).join("/");
+
+    L.setLang("en"); await wait(320);
+    const en = tabs();
+    ck("mặc định là tiếng Anh đọc được", /Nearby/.test(en), en);
+
+    L.setLang("ko"); await wait(360);
+    ck("đổi ngôn ngữ vẽ lại thanh tab ngay", tabs() !== en && /주변/.test(tabs()), tabs());
+    ck("thẻ html mang đúng mã ngôn ngữ", document.documentElement.lang === "ko");
+
+    /* Chuỗi chưa có trong bảng phải trả về CHÍNH NÓ. Đây là điều giữ cho
+       một bản dịch thiếu chỉ mất một dòng, chứ không phải làm màn hình
+       hiện ra những mã khoá trần. */
+    ck("câu chưa dịch rơi về tiếng Anh",
+      L.t("A sentence that is definitely not translated")
+        === "A sentence that is definitely not translated");
+
+    ck("ngôn ngữ không hỗ trợ bị từ chối", L.setLang("de") === false && L.current() === "ko");
+
+    // Có nói thật về mức độ dịch, không trưng một con số phần trăm.
+    ck("nói rõ còn chỗ chưa dịch", typeof L.LANG_NOTE === "string" && L.LANG_NOTE.length > 40);
+
+    L.setLang(was || "en"); await wait(320);
+    ck("trả về ngôn ngữ ban đầu", L.current() === (was || "en"));
+  }
+
+  /* ── chia hoá đơn ───────────────────────────────────────
+     Phép thử quan trọng nhất ở đây là phép CỘNG: người dùng sẽ đối chiếu
+     tổng các suất với tờ hoá đơn ngay tại bàn, và lệch một nghìn đồng là
+     mất niềm tin vào mọi con số khác của app. */
+  {
+    A.go("scan");
+    click("[data-mode='bill']"); await wait(220);
+    A.handleText("Cao lau 70.000\nMi Quang 65.000\nBia chai 30.000\nTra da 5.000", 92);
+    await wait(520);
+    const btn = $("[data-act='splitOpen']");
+    ck("hoá đơn nhiều dòng có nút chia", !!btn);
+    if (btn) {
+      btn.click(); await wait(420);
+      ck("mở được màn chia", !!$(".sp-rows"));
+      const sum = () => $$(".sp-p b")
+        .reduce((a, e) => a + Number(e.textContent.replace(/\D/g, "")), 0);
+      ck("hai suất cộng đúng hoá đơn", sum() === 170_000, String(sum()));
+
+      click("[data-act='splitN'][data-n='3']"); await wait(300);
+      ck("đổi số người thì có ba suất", $$(".sp-p").length === 3);
+      // Bỏ một người khỏi một dòng: tổng vẫn phải khớp tuyệt đối.
+      click(".sp-row:nth-child(3) [data-i='1']"); await wait(300);
+      ck("bỏ một người khỏi một dòng, tổng vẫn khớp", sum() === 170_000, String(sum()));
+      click("[data-act='close']"); await wait(320);
+    }
+  }
+
+  /* ── cảnh báo khi đi bộ ─────────────────────────────────
+     Chỉ kiểm phần LOGIC, không xin quyền vị trí: hộp thoại quyền của
+     trình duyệt không tự bấm được, và một phép thử treo ở đó sẽ chặn cả
+     lượt chạy. */
+  {
+    const bad = A.S.places.find((p) => p.fair === false && p.at && p.zone === A.S.zone);
+    ck("vùng này có chỗ vượt khoảng để cảnh báo", !!bad);
+    if (bad) {
+      A.S.warned = new Set();
+      A.S.me = [bad.at[0] + 0.00035, bad.at[1]];        // ~39 m
+      A.checkNearby(); await wait(220);
+      const w = $("#walkwarn");
+      ck("đi gần chỗ giá cao thì hiện cảnh báo", w?.classList.contains("on"));
+      ck("cảnh báo nói tên chỗ đó", (w?.textContent || "").includes(bad.name));
+      /* Không kết tội ai: câu chữ phải nói về SỐ LIỆU. Nếu ai đó đổi nó
+         thành "tránh chỗ này" thì phép thử phải đỏ. */
+      ck("cảnh báo nói về số liệu, không phán xét người bán",
+        /above the local range/i.test(w?.textContent || "")
+        && !/avoid|scam|cheat|rip/i.test(w?.textContent || ""));
+      A.checkNearby();
+      ck("cùng một chỗ không nhắc lần hai", A.S.warned.size === 1, String(A.S.warned.size));
+      $("#walkwarn").classList.remove("on");
+      A.S.me = null;
+    }
+  }
+
+  /* ── khảo sát giá ───────────────────────────────────────
+     Màn này sinh ra dữ liệu sẽ TRỞ THÀNH lời khẳng định của app về giá
+     của những cơ sở có thật, nên phép thử ở đây canh hai thứ: nó ghi
+     đúng, và nó KHÔNG tự ghi đè bảng giá. */
+  {
+    const Sv = await import("./survey.js");
+    const before = await Sv.count();
+    A.go("me"); await wait(360);
+    click("[data-act='surveyOpen']"); await wait(420);
+    ck("mở được màn khảo sát", !$("#v-survey")?.hidden);
+    ck("chỉ hiện món của vùng này", $$(".sv-dish").length > 0
+      && $$(".sv-dish").length <= Object.keys(A.S.prices[A.S.zone].items).length);
+
+    const first = $(".sv-dish");
+    if (first) {
+      const dishId = first.dataset.svdish;
+      first.click(); await wait(200);
+      ck("chọn món thì hiện ô giá", !!$("#svPrice"));
+      $("#svPrice").value = "70000";
+      $("#svPrice").dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      await wait(360);
+      ck("Enter lưu được một giá", (await Sv.count()) === before + 1);
+
+      // Giá vô lý phải bị từ chối ngay ở lớp dữ liệu, không đợi giao diện.
+      ck("chặn giá thiếu số 0", (await Sv.add({ zone: A.S.zone, dishId, price: 70 })) === null);
+      ck("chặn giá thừa số 0",
+        (await Sv.add({ zone: A.S.zone, dishId, price: 70_000_000 })) === null);
+
+      /* Điều quan trọng nhất của cả màn: dựng bảng giá KHÔNG được đụng
+         vào bảng đang chạy. Một hàm âm thầm ghi đè S.prices sẽ khiến app
+         nói một con số khác với tệp dữ liệu, và không ai truy ra được. */
+      const snapshot = JSON.stringify(A.S.prices[A.S.zone].items[dishId]);
+      await Sv.buildPrices({ zones: A.S.prices });
+      ck("dựng bảng giá không sửa bảng đang chạy",
+        JSON.stringify(A.S.prices[A.S.zone].items[dishId]) === snapshot);
+
+      // Dọn sạch: phép thử không để lại giá giả trong dữ liệu người dùng.
+      const rows = await Sv.list();
+      for (const r of rows.slice(0, (await Sv.count()) - before)) await Sv.remove(r.id);
+    }
+    click("[data-svact='close']"); await wait(320);
+    ck("đóng được màn khảo sát", !!$("#v-survey")?.hidden);
+  }
+
   A.go("scan");
 
   const fail = out.filter((o) => !o.pass);

@@ -21,7 +21,13 @@ import { validate as validatePost, farFrom, summarise, priceBand } from "./posts
 import { compress } from "./photo.js";
 import { mapsLinks, socialLinks, shareTargets, shareText } from "./links.js";
 import * as Local from "./localdb.js";
+/* Nhập tên là T, không phải t: chỗ vẽ thanh tab đã dùng `t` làm biến vòng
+   lặp (TABS.map((t) => …)), và một cái tên trùng ở phạm vi ngoài sẽ bị che
+   đúng tại chỗ cần nó nhất — lỗi im lặng, chỉ lộ ra khi đổi ngôn ngữ. */
+import { t as T, LANGS, LANG_NOTE, current as curLang, setLang, onChange as onLang } from "./i18n.js";
 import * as History from "./history.js";
+import * as Survey from "./survey.js";
+import * as SurveyUI from "./surveyui.js";
 import * as Welcome from "./welcome.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
@@ -71,6 +77,8 @@ const S = {
   notes: null,                       // số bài đã viết trên máy; null = chưa đếm xong
   notesRun: false,
   history: [],                       // bản sao đọc nhanh của lịch sử quét
+  watch: 0,                          // id của watchPosition; 0 = đang tắt
+  warned: new Set(),                 // cơ sở đã nhắc trong phiên này
   sync: { at: 0, sent: 0, err: "", busy: false },   // trạng thái lần đồng bộ gần nhất
   worker: null, ocrReady: false,
   stream: null,
@@ -650,8 +658,8 @@ function closeSheet() { $("#sheet").classList.remove("open"); setEdge(null); }
 function rowHTML(r) {
   const v = r.v;
   const note = v.level === "unknown"
-    ? "No local data for this item yet"
-    : `Typical ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)} here`;
+    ? T("Not enough data")
+    : `${T("typical")} ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)}`;
   const badge = v.level === "ok" ? "fair"
     : v.level === "warn" ? "above 75%"
     : v.level === "high" ? (v.pct != null ? `+${v.pct}%` : "high") : "unknown";
@@ -723,6 +731,8 @@ function showCashResult(text) {
 }
 
 function showBillResult(rows) {
+  // Giữ lại để nút "Split this bill" dựng được màn chia mà không phải quét lại.
+  S.billRows = rows;
   const ordered = new Map(S.session.map((r) => [r.id, r]));
   const matched = [], extra = [];
   for (const r of rows) (r.id && ordered.has(r.id) ? matched : extra).push(r);
@@ -737,11 +747,12 @@ function showBillResult(rows) {
     ${matched.map(rowHTML).join("")}
     ${extra.length ? `<h2 class="sect" style="color:var(--son)">Not on your menu scan</h2>${extra.map(rowHTML).join("")}` : ""}
     <div class="row" style="border-top:1px solid var(--line);margin-top:6px">
-      <span></span><span class="nm">Bill total</span><span class="amt">${fmtVND(total)}</span></div>
+      <span></span><span class="nm">${esc(T("Bill total"))}</span><span class="amt">${fmtVND(total)}</span></div>
     ${S.session.length ? `<div class="warnbox ${extra.length ? "" : "okbox"}">
       ${extra.length
         ? `${extra.length} line${extra.length===1?"":"s"} you didn't order. Expected ${fmtVND(expected)}.`
         : `Every line matches what you ordered.`}</div>` : ""}
+    ${rows.length > 1 ? `<button class="btn pri" data-act="splitOpen">${I.coins}${esc(T("Split this bill"))}</button>` : ""}
     ${extra.length ? sayBlock("Cho tôi xem lại hoá đơn", "chaw toy sem lai hwa dun") : ""}
     <p class="muted" style="margin-top:10px">Ask politely first. Most extra lines are honest mistakes, and they come off the bill when you point at them.</p>
     <button class="btn sec" data-act="close">Close</button>`);
@@ -1286,7 +1297,7 @@ function sightsRailHTML() {
   return `
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
-      <h2>Worth seeing here</h2>
+      <h2>${esc(T("Worth seeing here"))}</h2>
       <span class="rule" aria-hidden="true"></span>
       <button class="act" data-act="bigMap">On the map${I.chevron}</button>
     </div>
@@ -1395,7 +1406,7 @@ function tripsSectionHTML() {
   return `
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
-      <h2>Day trips from here</h2>
+      <h2>${esc(T("Day trips from here"))}</h2>
       <span class="rule" aria-hidden="true"></span>
     </div>
     <p class="muted" style="margin:-2px 0 10px;font-size:13px">Places worth a day, outside the
@@ -1464,7 +1475,7 @@ function renderMap() {
       </div>
       <button class="nb-bell" aria-label="Notifications" data-act="notif">${I.bell}</button>
 
-      <h1 class="nb-h1 ex-h1">Explore by map</h1>
+      <h1 class="nb-h1 ex-h1">${esc(T("Explore by map"))}</h1>
       <p class="nb-sub ex-sub">Discover fair-price spots in ${esc(zoneEn().replace(" · ", " "))}
         with live scan insights.</p>
     </div>
@@ -1500,7 +1511,7 @@ function renderMap() {
            một cái ghim đè lên mất nửa chữ. Hai yêu cầu trái nhau trong cùng
            một thẻ, nên tách ra: nhãn không nhận chạm, cú chạm rơi xuống nút
            bên dưới, và cả hai cùng đúng. -->
-      <span class="ex-openlabel" aria-hidden="true">Open full map</span>
+      <span class="ex-openlabel" aria-hidden="true">${esc(T("Open full map"))}</span>
       <div class="ex-fabs">
         <button class="ex-fab" data-act="exLocate" aria-label="Find my location">${I.crosshair}</button>
         <button class="ex-fab" data-act="bigMap" aria-label="Open the detailed map">${I.navigate}</button>
@@ -1672,7 +1683,7 @@ function outsideHTML({ name, at = null, tags = [], web = null, kind = "place", a
     `<a class="${cls}" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${inner}</a>`;
 
   return `
-    <h2 class="sect">On the map</h2>
+    <h2 class="sect">${esc(T("On the map"))}</h2>
     ${/* Bản đồ nhúng đặt TRƯỚC hàng nút, không phải sau. Câu hỏi đầu tiên
           khi mở một thẻ địa điểm là "nó ở đâu"; hàng nút là câu trả lời
           cho câu hỏi THỨ HAI, "đưa tôi tới đó". Bắt người dùng bấm ra một
@@ -1691,12 +1702,12 @@ function outsideHTML({ name, at = null, tags = [], web = null, kind = "place", a
     </div>` : ""}
     <div class="outrow">
       ${L.geo ? `<a class="btn maps" href="${esc(L.geo)}" data-web="${esc(L.osm)}"
-         data-act="openMaps" rel="noopener">${I.external}Open in maps</a>` : ""}
+         data-act="openMaps" rel="noopener">${I.external}${esc(T("Open in maps"))}</a>` : ""}
       ${ext(L.google, "btn sec out", `${I.pinSm}Google Maps`)}
-      ${L.googleDir ? ext(L.googleDir, "btn sec out", `${I.route}Walking directions`) : ""}
+      ${L.googleDir ? ext(L.googleDir, "btn sec out", `${I.route}${esc(T("Walking directions"))}`) : ""}
     </div>
 
-    <h2 class="sect">Look it up</h2>
+    <h2 class="sect">${esc(T("Look it up"))}</h2>
     <div class="netgrid">
       ${nets.map((n) => ext(n.url, "netchip",
         `${I[PLATFORM_ICON[n.id]] || I.globe}<span><b>${esc(n.label)}</b><i>${esc(n.note)}</i></span>`)).join("")}
@@ -2066,6 +2077,243 @@ function accountHTML() {
   </div>`;
 }
 
+/* ── chia hoá đơn ─────────────────────────────────────────────
+   Đây là lúc người ta THẬT SỰ rút app ra: cuối bữa, bốn người, một tờ
+   hoá đơn tiếng Việt, và ai cũng đang nhẩm trong đầu. Chế độ Bill đã đọc
+   được từng dòng rồi — thiếu đúng bước cuối là chia nó ra.
+
+   MÔ HÌNH: MỖI DÒNG THUỘC VỀ MỘT TẬP NGƯỜI
+   Mặc định là cả bàn. Chạm số của ai thì thêm/bớt người đó khỏi dòng đó.
+   Đơn giản hơn "gán mỗi dòng cho một người" vì thực tế phần lớn dòng là
+   đồ dùng chung — nồi lẩu, đĩa rau, mấy chai bia — và bắt tách chúng ra
+   thành từng suất là bắt người dùng làm phép tính mà app đang hứa làm hộ.
+
+   TIỀN LẺ KHÔNG BIẾN MẤT
+   Chia 95.000đ cho 3 là 31.666,67đ. Việt Nam không có tiền lẻ dưới 500đ,
+   nên phần dư dồn vào người ĐẦU TIÊN trong dòng đó thay vì làm tròn từng
+   suất — làm tròn từng suất thì tổng bốn suất không bằng hoá đơn, và
+   người trả tiền phát hiện ra ngay tại bàn. */
+const SPLIT_MAX = 8;
+
+function openSplit() {
+  const rows = (S.billRows || []).filter((r) => r.price > 0);
+  if (!rows.length) return toast("Nothing to split");
+  S.split = {
+    n: 2,
+    // Mặc định mọi dòng thuộc về cả bàn — cách đúng trong đa số bữa ăn.
+    rows: rows.map((r) => ({ label: r.label, price: r.price, who: new Set([0, 1]) })),
+  };
+  renderSplit();
+}
+
+function splitTotals() {
+  const { n, rows } = S.split;
+  const per = Array.from({ length: n }, () => 0);
+  for (const r of rows) {
+    const who = [...r.who].filter((i) => i < n);
+    if (!who.length) continue;
+    const base = Math.floor(r.price / who.length / 1000) * 1000;
+    who.forEach((i) => { per[i] += base; });
+    // Phần dư về người đầu tiên của dòng, để tổng luôn khớp hoá đơn.
+    per[who[0]] += r.price - base * who.length;
+  }
+  return per;
+}
+
+function renderSplit() {
+  const { n, rows } = S.split;
+  const per = splitTotals();
+  const total = rows.reduce((a, r) => a + r.price, 0);
+  const chip = (ri, i, on) =>
+    `<button class="sp-who${on ? " on" : ""}" data-act="splitWho" data-r="${ri}" data-i="${i}"
+      aria-pressed="${on}" aria-label="Person ${i + 1}">${i + 1}</button>`;
+
+  setEdge(null);
+  openSheet(`
+    <h3>${esc(T("Split the bill"))}</h3>
+    <p class="src">Tap the numbers on a line to say who had it</p>
+    ${wave()}
+
+    <div class="sp-n" role="group" aria-label="How many people">
+      ${Array.from({ length: SPLIT_MAX - 1 }, (_, i) => i + 2).map((v) =>
+        `<button class="sp-nbtn${v === n ? " on" : ""}" data-act="splitN" data-n="${v}"
+          aria-pressed="${v === n}">${v}</button>`).join("")}
+    </div>
+
+    <div class="sp-rows">
+      ${rows.map((r, ri) => `
+        <div class="sp-row">
+          <div class="sp-line"><span>${esc(r.label)}</span><b>${fmtVND(r.price)}</b></div>
+          <div class="sp-chips">
+            ${Array.from({ length: n }, (_, i) => chip(ri, i, r.who.has(i))).join("")}
+          </div>
+        </div>`).join("")}
+    </div>
+
+    <h2 class="sect">${esc(T("Each person pays"))}</h2>
+    <div class="sp-out">
+      ${per.map((v, i) => `<div class="sp-p"><span>${i + 1}</span><b>${fmtVND(v)}</b></div>`).join("")}
+    </div>
+    <div class="row" style="border-top:1px solid var(--line);margin-top:6px">
+      <span></span><span class="nm">Bill total</span><span class="amt">${fmtVND(total)}</span></div>
+    ${/* Câu này phải có: người ta sẽ đối chiếu tổng bốn suất với tờ hoá
+          đơn ngay tại bàn, và nếu lệch mà app không nói trước thì họ mất
+          niềm tin vào cả những con số khác. */""}
+    <p class="muted" style="margin-top:8px">Shares are rounded down to 1.000₫ and the
+      remainder goes to the first person on each line, so the four shares always add up
+      to the bill exactly.</p>
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+/* ── cảnh báo khi đi ngang một chỗ giá cao ────────────────────
+   App đã biết chỗ nào vượt khoảng và đã biết người dùng đang ở đâu. Thiếu
+   đúng một mắt xích: nói ra TRƯỚC khi họ ngồi xuống, chứ không phải sau
+   khi đã gọi món. Đây là chỗ khác nhau giữa một cuốn cẩm nang và một
+   người bạn đi cùng.
+
+   BỐN RÀNG BUỘC, MỖI CÁI CHỮA MỘT CÁCH LÀM HỎNG
+
+   1. PHẢI TỰ BẬT. watchPosition chạy ngầm là thứ không được bật hộ ai.
+      Mặc định tắt, và trạng thái không lưu qua các phiên — mở app hôm sau
+      mà điện thoại vẫn đang theo dõi vị trí là một bất ngờ khó chịu.
+
+   2. VỊ TRÍ KHÔNG ĐI ĐÂU CẢ. Không gửi lên máy chủ, không ghi vào lịch
+      sử. Nó chỉ sống trong bộ nhớ đúng phiên này.
+
+   3. MỖI CHỖ NHẮC ĐÚNG MỘT LẦN. Đi qua đi lại một con phố mà nhắc mười
+      lần thì lần thứ ba người ta tắt nó đi, và mất luôn cả bảy lần sau.
+
+   4. KHÔNG KẾT TỘI AI. Câu chữ nói về SỐ LIỆU — "giá ở đây đã từng cao
+      hơn khoảng thường gặp" — chứ không nói về người bán. Cùng một luật
+      với phán quyết giá và với màn Community.
+
+   enableHighAccuracy:false là cố ý: cần biết "đang ở khúc phố nào", không
+   cần biết đang đứng ở mét thứ mấy, và GPS độ chính xác cao ăn pin gấp
+   nhiều lần cho một độ chính xác không dùng tới. */
+const WARN_RADIUS_M = 70;
+
+function stopWatch() {
+  if (S.watch) navigator.geolocation.clearWatch(S.watch);
+  S.watch = 0;
+}
+
+function toggleWatch() {
+  if (S.watch) { stopWatch(); renderMe(); return toast("Walking alerts off"); }
+  if (!navigator.geolocation) return toast("Location not available on this device");
+  S.warned = new Set();
+  S.watch = navigator.geolocation.watchPosition(
+    (pos) => {
+      S.me = [pos.coords.latitude, pos.coords.longitude];
+      checkNearby();
+    },
+    () => { stopWatch(); renderMe(); toast("Could not follow your location"); },
+    { enableHighAccuracy: false, maximumAge: 20_000, timeout: 25_000 },
+  );
+  renderMe();
+  toast("On — I'll say something if you walk past one");
+}
+
+function checkNearby() {
+  if (!S.me) return;
+  const near = S.places
+    .filter((p) => p.fair === false && p.at && !S.warned.has(p.id))
+    .map((p) => ({ p, m: distance(S.me, p.at) }))
+    .filter((x) => x.m <= WARN_RADIUS_M)
+    .sort((a, b) => a.m - b.m)[0];
+  if (!near) return;
+  S.warned.add(near.p.id);
+  /* Nhắc bằng một dải BẤM ĐƯỢC, không phải toast: toast tự tắt sau 2,6
+     giây và không mở được gì. Người đang đi bộ cần đủ thời gian rút máy
+     ra, và cần chạm được vào để xem vì sao. */
+  showWalkWarn(near.p, near.m);
+}
+
+let walkT = 0;
+function showWalkWarn(p, m) {
+  const el = $("#walkwarn");
+  if (!el) return;
+  el.innerHTML = `<button data-act="walkOpen" data-place="${esc(p.id)}">
+      <span class="wi">${I.alert}</span>
+      <span class="wt"><b>${esc(p.name)}</b>
+        <i>${fmtDistance(m)} away · scans here have come in above the local range</i></span>
+    </button>
+    <button class="wx" data-act="walkHide" aria-label="Dismiss">×</button>`;
+  el.classList.add("on");
+  clearTimeout(walkT);
+  walkT = setTimeout(() => el.classList.remove("on"), 12_000);
+}
+
+/* ── khảo sát giá ─────────────────────────────────────────────
+   app.js chỉ nối dây: surveyui.js sở hữu màn hình, survey.js sở hữu dữ
+   liệu. Ở đây chỉ có ba việc mà hai file kia không làm được — mở màn với
+   dữ liệu của vùng đang chọn, tải tệp về, và dựng bảng giá mới. */
+function openSurvey() {
+  const z = zone();
+  SurveyUI.open({
+    host: $("#v-survey"),
+    zone: S.zone,
+    zoneName: zoneEn(),
+    dishes: S.dishes,
+    places: S.places.filter((p) => p.zone === S.zone),
+    prices: S.prices[S.zone],
+    toast,
+    onClose: () => { renderMe(); },
+    onApply: (what) => (what === "export" ? exportSurvey() : buildPriceTable()),
+  });
+}
+
+/** Tải một Blob về máy. Dùng chung cho ba chỗ xuất dữ liệu. */
+function download(obj, name) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name; a.click();
+  // Thu hồi ngay là Safari huỷ luôn lượt tải chưa kịp bắt đầu.
+  setTimeout(() => URL.revokeObjectURL(url), 30_000);
+}
+
+async function exportSurvey() {
+  const doc = await Survey.exportAll();
+  if (!doc.rows.length) return toast("Nothing surveyed yet");
+  download(doc, `non-la-survey-${new Date().toISOString().slice(0, 10)}.json`);
+  toast(`${doc.rows.length} prices downloaded`);
+}
+
+/* Dựng bảng giá mới và CHO XEM TRƯỚC, không ghi đè gì cả.
+   prices.json là tệp ship kèm app — trình duyệt không ghi vào nó được, và
+   kể cả ghi được thì cũng không nên: đây là lúc một người phải nhìn vào
+   danh sách "50k → 70k" và tự chịu trách nhiệm về nó. */
+async function buildPriceTable() {
+  const { doc, changed, pending } = await Survey.buildPrices(
+    { zones: S.prices, _fx: S.fx });
+  if (!changed.length && !pending.length) return toast("Nothing surveyed yet");
+  const dn = (id) => dishById(id)?.vi || id;
+  setEdge(null);
+  openSheet(`
+    <h3>Price table from your survey</h3>
+    <p class="src">${changed.length} dish${changed.length === 1 ? "" : "es"} ready
+      · ${pending.length} still collecting</p>
+    ${wave()}
+    ${changed.length ? `<h2 class="sect">Would change</h2>
+      ${changed.map((c) => `<div class="row">
+        <span><span class="nm">${esc(dn(c.dishId))}</span>
+          <span class="note">${esc(S.prices[c.zone]?.en || c.zone)} · ${c.n} samples</span></span>
+        <span class="amt">${c.from ? fmtVND(c.from) : "—"} → ${fmtVND(c.to)}</span>
+      </div>`).join("")}` : ""}
+    ${pending.length ? `<h2 class="sect">Not enough samples yet</h2>
+      ${pending.map((p) => `<div class="row">
+        <span><span class="nm">${esc(dn(p.dishId))}</span>
+          <span class="note">${esc(S.prices[p.zone]?.en || p.zone)}</span></span>
+        <span class="amt">${p.have}/${Survey.MIN_SAMPLES}<small>${p.need} more</small></span>
+      </div>`).join("")}` : ""}
+    <div class="warnbox infobox">${I.shield}<span>Downloading gives you a full
+      <code>prices.json</code>. Replace the file in <code>data/</code> and redeploy —
+      nothing is overwritten from inside the app.</span></div>
+    <button class="btn pri" data-act="surveyDownload">Download prices.json</button>
+    <button class="btn sec" data-act="close">Close</button>`);
+  S._builtPrices = doc;
+}
+
 /* ── mục "Dữ liệu của bạn" ────────────────────────────────────
    Ba câu hỏi, theo đúng thứ tự người dùng hỏi:
      1. app đang giữ gì của tôi?
@@ -2145,6 +2393,15 @@ function dataHTML() {
           vệ họ. Khác biệt giữa hai trạng thái nằm ở icon và ở chữ. */""}
     <div class="warnbox infobox" style="margin-top:12px">
       ${cloud.cls === "ok" ? I.check : I.shield}<span>${cloud.txt}</span></div>
+
+    ${/* Khảo sát giá đặt trong mục Dữ liệu, không phải một tab riêng: nó
+          là việc của người DỰNG dữ liệu, không phải của khách du lịch, và
+          một tab thứ năm cho một việc mà 99% người dùng không làm là lấy
+          chỗ của bốn tab họ dùng hằng ngày. */""}
+    <button class="btn sec" data-act="surveyOpen" style="margin-top:12px">
+      ${I.camera}${esc(T("Survey prices here"))}</button>
+    <p class="src" style="margin-top:6px">Every reference price in this build is an
+      estimate, not a field survey. This is how you replace them with real ones.</p>
 
     <div class="ic-actions" style="margin-top:12px">
       <button class="btn sec" data-act="dataExport">${I.external}Download my data</button>
@@ -2293,11 +2550,25 @@ function renderMe() {
 
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
-      <h2>Settings</h2>
+      <h2>${esc(T("Settings"))}</h2>
       <span class="rule" aria-hidden="true"></span>
     </div>
     <div class="you-list">
-      ${youRow({ icon: I.clock, label: "Scan history", act: "openJournal",
+      ${/* Đặt NGAY ĐẦU mục Cài đặt, trên cả lịch sử quét. Người cần hàng
+           này nhất là người không đọc được thứ tiếng đang hiện — họ phải
+           tìm thấy nó mà không phải đọc dòng nào. Và giá trị hiện ra là
+           TÊN BẢN ĐỊA ("한국어", không phải "Korean"): một danh sách ngôn
+           ngữ viết toàn tiếng Anh thì đúng nhóm người đó không nhận ra
+           dòng của mình. */""}
+      ${youRow({ icon: I.globe, label: T("Language"), tag: "div",
+        value: esc(LANGS.find((l) => l.code === curLang())?.native || "English"),
+        extra: `<select id="langSel" aria-label="${esc(T("Language"))}">
+          ${LANGS.map((l) => `<option value="${l.code}"${l.code === curLang() ? " selected" : ""}
+            >${esc(l.native)}</option>`).join("")}
+        </select>` })}
+      ${curLang() === "en" ? "" : `<p class="src" style="margin:-2px 0 8px 4px">${esc(LANG_NOTE)}</p>`}
+
+      ${youRow({ icon: I.clock, label: T("Scan history"), act: "openJournal",
         sub: "Every scan you make, saved on this phone",
         value: st.scans ? `${st.scans} entr${st.scans === 1 ? "y" : "ies"}` : "Empty" })}
 
@@ -2309,15 +2580,21 @@ function renderMe() {
       ${/* Tên vùng ở đây viết như mọi chỗ khác trong giao diện tiếng Anh:
            dòng thương hiệu ngay phía trên đã ghi "Hoi An · Old Town", mà
            hàng này ghi "Hội An · Phố cổ" thì đọc ra là hai nơi khác nhau. */""}
-      ${youRow({ icon: I.pinSm, label: "Where you are", tag: "div",
+      ${youRow({ icon: I.pinSm, label: T("Where you are"), tag: "div",
         value: esc(zoneEn()),
         extra: `<select id="zoneSel" aria-label="Where you are">
           ${Object.entries(S.prices).map(([id, z]) =>
             `<option value="${id}"${id === S.zone ? " selected" : ""}>${esc(z.en || z.name)}</option>`).join("")}
         </select>` })}
 
-      ${youRow({ icon: I.crosshair, label: "Use my location", act: "locate",
+      ${youRow({ icon: I.crosshair, label: T("Use my location"), act: "locate",
         sub: "Picks the nearest area for you" })}
+
+      ${youRow({ icon: I.alert, label: T("Warn me while I walk"), act: "nearbyWatch",
+        sub: S.watch
+          ? "On — your position stays on this phone, nothing is sent anywhere"
+          : "Say something when I'm about to sit down somewhere priced above the local range",
+        value: S.watch ? T("On") : T("Off") })}
 
       ${/* Hàng này chỉ BÁO trạng thái, không mở gì. Mũi tên ở đây là lời hứa
            suông: người dùng chạm vào và không có gì xảy ra. */""}
@@ -2351,19 +2628,22 @@ function renderMe() {
 
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
-      <h2>Account</h2>
+      <h2>${esc(T("Account"))}</h2>
       <span class="rule" aria-hidden="true"></span>
     </div>
     ${accountHTML()}
 
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
-      <h2>Your data</h2>
+      <h2>${esc(T("Your data"))}</h2>
       <span class="rule" aria-hidden="true"></span>
     </div>
     ${dataHTML()}
 
     <p class="seedwarn">Reference prices shipping with this build are seed data, not a completed field survey. Replace <code>data/prices.json</code> with surveyed figures before using this with real travellers.</p>`;
+
+  const ls = $("#langSel");
+  if (ls) ls.onchange = () => setLang(ls.value);
 
   const sel = $("#zoneSel");
   sel.onchange = () => { S.zone = sel.value; localStorage.setItem("nl.zone", S.zone); toast("Zone set to " + zoneEn()); renderMe(); };
@@ -2558,7 +2838,7 @@ function renderTabs() {
   $("#tabbar").innerHTML = TABS.map((t) => t.id === "scan"
     ? `<button class="scanbtn" id="scanBtn" aria-label="Scan">${sunStar(25, GOLD)}</button>`
     : `<button class="tab" data-tab="${t.id}"${S.tab === t.id ? ' aria-current="page"' : ""}>
-        <svg viewBox="0 0 20 20" aria-hidden="true">${t.icon}</svg><span>${t.label}</span></button>`).join("");
+        <svg viewBox="0 0 20 20" aria-hidden="true">${t.icon}</svg><span>${esc(T(t.label))}</span></button>`).join("");
 }
 function renderCommunity() {
   Community.open({
@@ -2819,12 +3099,22 @@ function go(tab) {
 }
 
 /* ── sự kiện ──────────────────────────────────────────────── */
+/* Enter = lưu. Gắn ở cấp document vì surveyui.js dựng lại toàn bộ DOM của
+   nó sau mỗi lần lưu — một listener gắn vào chính ô nhập sẽ chết ngay lần
+   vẽ lại đầu tiên, và người dùng gõ giá thứ hai xong bấm Enter thì không
+   có gì xảy ra. */
+document.addEventListener("keydown", (ev) => { SurveyUI.handleKey(ev); });
+
 document.addEventListener("click", async (ev) => {
   const el = (s) => ev.target.closest(s);
 
   // Màn mở đầu phủ toàn màn hình: nó phải được hỏi TRƯỚC mọi định tuyến
   // khác, không thì một cú chạm xuyên qua nó rơi vào tab đang nằm dưới.
   if (await Welcome.handleClick(ev.target)) return;
+  /* Màn khảo sát phủ toàn màn hình như hai màn bản đồ, nên nó phải được
+     hỏi TRƯỚC mọi định tuyến theo tab: lúc nó đang mở, S.tab vẫn là "me",
+     và mọi nhánh phụ thuộc tab sẽ im lặng nuốt cú chạm. */
+  if (await SurveyUI.handleClick(ev.target)) return;
 
   // Phần tử của feed đi qua community.js…
   if (S.tab === "community" && Community.handleClick(ev.target)) return;
@@ -3193,7 +3483,40 @@ document.addEventListener("click", async (ev) => {
 
   if (el("[data-act='clearJournal']")) { journal.clear(); renderJournal(); return toast("Journal cleared"); }
 
+  /* ── chia hoá đơn ────────────────────────────────────── */
+  if (el("[data-act='splitOpen']")) return openSplit();
+  const sn = el("[data-act='splitN']");
+  if (sn) {
+    S.split.n = Number(sn.dataset.n);
+    /* Thêm người thì họ chưa thuộc dòng nào — người dùng tự chạm để thêm.
+       Tự gán họ vào MỌI dòng nghe có vẻ tiện, nhưng nó âm thầm đổi số
+       tiền của ba người kia mà không ai bấm gì. */
+    return renderSplit();
+  }
+  const sw = el("[data-act='splitWho']");
+  if (sw) {
+    const r = S.split.rows[Number(sw.dataset.r)];
+    const i = Number(sw.dataset.i);
+    r.who.has(i) ? r.who.delete(i) : r.who.add(i);
+    return renderSplit();
+  }
+
+  /* ── cảnh báo khi đi bộ ──────────────────────────────── */
+  if (el("[data-act='nearbyWatch']")) return toggleWatch();
+  if (el("[data-act='walkHide']")) { $("#walkwarn").classList.remove("on"); return; }
+  const wo = el("[data-act='walkOpen']");
+  if (wo) { $("#walkwarn").classList.remove("on"); return showPlace(wo.dataset.place); }
+
+  /* ── khảo sát giá ────────────────────────────────────── */
+  if (el("[data-act='surveyOpen']")) return openSurvey();
+
   /* ── mục Dữ liệu ─────────────────────────────────────── */
+  if (el("[data-act='surveyDownload']")) {
+    if (!S._builtPrices) return toast("Build the table first");
+    download(S._builtPrices, "prices.json");
+    return toast("prices.json downloaded");
+  }
+
   if (el("[data-act='dataExport']")) {
     const rows = await History.exportAll();
     /* Tải về một TỆP, không phải chép vào clipboard như nút Export cũ.
@@ -3437,7 +3760,19 @@ Img.onChange(() => {
 });
 
 // cho phép kiểm thử pipeline mà không cần camera
+/* Đổi ngôn ngữ thì vẽ lại MÀN ĐANG MỞ, không phải tải lại trang: tải lại
+   sẽ mất kết quả quét đang hiện, mất vị trí cuộn, và mất cả phiên chia
+   hoá đơn đang dở. Mọi màn đều dựng HTML từ đầu mỗi lần vẽ nên chỉ cần
+   gọi lại đúng hàm vẽ của tab hiện tại. */
+onLang(() => {
+  const again = { map: renderMap, eat: renderEat, journal: renderJournal,
+    me: renderMe, community: renderCommunity };
+  again[S.tab]?.();
+  renderTabs();
+});
+
 window.__nonla = { S, handleText, judgeRows, go, showDish, showPlace, ocr, doScan, Img,
+  checkNearby, toggleWatch,
   canSync, syncData, pullHistory };
 
 boot().catch((e) => { console.error(e); document.body.innerHTML =

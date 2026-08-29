@@ -68,12 +68,33 @@ ok("từ vô nghĩa không khớp bừa", matchDish("zzzqqq xkcd", dishes) === n
    JSON.stringify(matchDish("zzzqqq xkcd", dishes)));
 
 console.log("\n── verdict ─────────────────────────────────");
-const hoian = prices["hoian-oldtown"].items;
-eq("55k cao lầu là bình thường", verdict(55000, hoian["cao-lau"]).level, "ok");
-eq("70k cao lầu là cao", verdict(70000, hoian["cao-lau"]).level, "warn");
-eq("150k cao lầu là rất cao", verdict(150000, hoian["cao-lau"]).level, "high");
-eq("120k nước dừa là rất cao", verdict(120000, hoian["nuoc-dua"]).level, "high");
-eq("% lệch so với trung vị", verdict(120000, hoian["nuoc-dua"]).pct, 380);
+/* Dải giá DỰNG TAY, không lấy từ prices.json.
+   Bản trước đọc thẳng bảng giá thật rồi khẳng định "70k cao lầu là cao".
+   Nó kiểm verdict() nhưng lấy ngưỡng từ dữ liệu sống, nên mỗi lần bảng
+   giá được cập nhật hợp lệ là phép thử đỏ lên — và người đọc đi tìm lỗi
+   trong verdict(), thứ không hề đổi. Đúng chuyện vừa xảy ra khi nâng giá
+   lên mặt bằng 2026: cao lầu 50k → 70k, và 70k thành đúng trung vị.
+   Dải cố định ở đây kiểm ĐÚNG cái đáng kiểm: luật xếp mức. */
+const vBand = { p25: 40_000, p50: 50_000, p75: 60_000, p95: 80_000, n: 34 };
+eq("giá trong dải là bình thường", verdict(55000, vBand).level, "ok");
+eq("trên p75 là cao", verdict(70000, vBand).level, "warn");
+eq("trên p95 là rất cao", verdict(150000, vBand).level, "high");
+eq("% lệch so với trung vị", verdict(150000, vBand).pct, 200);
+
+/* Bảng giá thật thì kiểm TÍNH HỢP LỆ, không kiểm từng con số: dữ liệu
+   được phép đổi, cấu trúc thì không. Một dải rỗng (p25 = p75) khiến mọi
+   giá rơi hết vào "vượt khoảng" — phán quyết mất nghĩa mà không ai thấy. */
+{
+  let broken = 0, empty = 0;
+  for (const z of Object.values(prices)) {
+    for (const it of Object.values(z.items || {})) {
+      if (!(it.p25 <= it.p50 && it.p50 < it.p75 && it.p75 < it.p95)) broken++;
+      if (it.p75 - it.p25 <= 0) empty++;
+    }
+  }
+  ok("mọi dải giá đúng thứ tự p25≤p50<p75<p95", broken === 0, String(broken));
+  ok("không dải giá nào rỗng", empty === 0, String(empty));
+}
 eq("không có dữ liệu", verdict(50000, undefined).level, "unknown");
 
 console.log("\n── readNotes / zeroSlip ────────────────────");
