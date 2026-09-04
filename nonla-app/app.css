@@ -1683,19 +1683,19 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .sayhere:active{background:rgba(14,43,36,.8)}
 
 /* ── khối "vì sao lại nói thế" ─────────────────────── */
-.why{margin-top:12px;border:1px solid var(--line);border-radius:16px;
+.why,.fold{margin-top:12px;border:1px solid var(--line);border-radius:16px;
   background:var(--giay);overflow:hidden}
-.why summary{display:flex;align-items:center;gap:9px;padding:13px 14px;
+.why summary,.fold summary{display:flex;align-items:center;gap:9px;padding:13px 14px;
   min-height:48px;font-size:14px;font-weight:650;color:var(--then);
   cursor:pointer;list-style:none}
-.why summary::-webkit-details-marker{display:none}
+.why summary::-webkit-details-marker,.fold summary::-webkit-details-marker{display:none}
 /* Mũi chỉ hướng vẽ bằng CSS, không thêm một icon nữa vào bộ: nó chỉ có
    một việc là cho biết khối này mở ra được. */
-.why summary::after{content:"";margin-left:auto;width:8px;height:8px;flex:0 0 auto;
+.why summary::after,.fold summary::after{content:"";margin-left:auto;width:8px;height:8px;flex:0 0 auto;
   border-right:2px solid var(--muc-nhat);border-bottom:2px solid var(--muc-nhat);
   transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s}
-.why[open] summary::after{transform:rotate(-135deg) translate(-2px,-2px)}
-.why[open] summary{border-bottom:1px solid var(--line)}
+.why[open] summary::after,.fold[open] summary::after{transform:rotate(-135deg) translate(-2px,-2px)}
+.why[open] summary,.fold[open] summary{border-bottom:1px solid var(--line)}
 
 /* Chấm màu = bậc tin cậy. Cùng bảng màu với chấm phán quyết ở hàng kết
    quả, nên người dùng không phải học hai hệ ký hiệu. */
@@ -1837,3 +1837,14 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .po-total{display:flex;justify-content:space-between;align-items:baseline;
   margin-top:12px;padding-top:11px;border-top:2px solid var(--vien-dam);font-size:17px}
 .po-total b{font-size:20px}
+
+/* Thân khối gập: đệm trong để nút bên trong không dính mép. */
+.fold .foldin{padding:4px 12px 12px}
+.fold .foldin .btn{margin-top:8px}
+/* Một dòng cảnh báo gọn thay cho một khối cho mỗi bẫy. Bấm mới mở chi tiết. */
+.trapline{display:flex;align-items:center;gap:9px;margin-top:10px;padding:11px 13px;
+  border-radius:14px;background:var(--canh-bao-nen,#fdf4ea);
+  border:1px solid var(--canh-bao-vien,rgba(181,101,29,.35));font-size:14px}
+/* Chấm cam của dòng cảnh báo bẫy đơn vị — cùng vai trò với .wdot của khối
+   "vì sao", nên dùng chung kích thước để không phải học hai hệ ký hiệu. */
+.trapdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:#b5651d}

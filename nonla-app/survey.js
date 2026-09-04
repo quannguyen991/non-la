@@ -87,18 +87,41 @@ const all = () => quiet(new Promise((res, rej) => {
  * @param {{zone:string, dishId:string, price:number, placeId?:string,
  *          placeName?:string, note?:string}} r
  */
-export function add(r) {
+/* Quét lại đúng tấm thực đơn đó lần nữa KHÔNG phải một quan sát thứ hai.
+   Giá niêm yết không đổi giữa hai cú bấm cách nhau ba giây, nên đếm nó hai
+   lần là tự bơm cỡ mẫu — mà cỡ mẫu chính là thứ trust.js dùng để quyết định
+   có được gọi một dải giá là "đã đo" hay không. Bơm nó lên là nói dối bằng
+   một con số, đúng loại lỗi cả repo này dựng hàng rào để chặn.
+
+   Bảy ngày: đủ dài để chặn việc quét lại trong cùng chuyến đi, đủ ngắn để
+   tháng sau quán tăng giá thì lần quét mới vẫn được tính. */
+const CUA_SO_TRUNG_LAP = 7 * 24 * 60 * 60 * 1000;
+
+/** Đã có bản ghi y hệt trong bảy ngày qua chưa. */
+async function daCo(zone, dishId, price, placeId) {
+  const rows = await all();
+  const tu = Date.now() - CUA_SO_TRUNG_LAP;
+  return rows.some((x) => x.ts >= tu && x.zone === zone && x.dishId === dishId
+    && x.price === price && (x.placeId || "") === (placeId || ""));
+}
+
+export async function add(r) {
   const price = Math.round(Number(r.price) || 0);
   // 500đ tới 20 triệu: chặn cả lỗi gõ thiếu số 0 lẫn gõ thừa. Một tô phở
   // 5.000đ hay 5.000.000đ đều là lỗi ngón tay, và một bản ghi rác lọt vào
   // sẽ kéo lệch cả dải mà không ai truy ra được.
   if (!r.zone || !r.dishId || price < 500 || price > 20_000_000) {
-    return Promise.resolve(null);
+    return null;
   }
+  if (await daCo(r.zone, r.dishId, price, r.placeId)) return null;
   return tx("readwrite", (s) => s.add({
     ts: Date.now(), zone: r.zone, dishId: r.dishId, price,
     placeId: r.placeId || "", placeName: (r.placeName || "").slice(0, 60),
     note: (r.note || "").slice(0, 140),
+    /* "scan" = đọc được từ thực đơn, "hand" = người dùng tự gõ. Giữ lại vì
+       hai nguồn có kiểu sai khác nhau: OCR đọc nhầm số, còn tay thì gõ nhầm
+       phím. Tách được nguồn thì sau này lọc được riêng từng loại. */
+    src: r.src === "scan" ? "scan" : "hand",
   }));
 }
 

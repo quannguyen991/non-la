@@ -752,17 +752,27 @@ function judgeRows(pairs) {
    mỗi khối tự nuốt lỗi của mình và biến mất thay vì kéo theo phần còn lại. */
 const anToan = (fn) => (...a) => { try { return fn(...a); } catch { return ""; } };
 
-const trapHTML = anToan(function (traps) {
+/* MỘT DÒNG, không phải một khối cho mỗi bẫy.
+   Bản trước in ra một hộp cảnh báo cho từng dòng dính bẫy cộng một hộp nữa
+   cho từng khoản phụ thu — một tấm thực đơn hải sản đủ đẩy bốn hộp màu cam
+   chen trên màn hình và dìm mất chính bảng giá. Ở đây gói lại thành một
+   dòng đếm; ai cần chi tiết thì chạm để mở. */
+const trapLineHTML = anToan(function (traps) {
   if (!traps) return "";
   const t = traps.traps || [], s = traps.surcharges || [];
   if (!t.length && !s.length) return "";
+
+  const so = t.length + s.length;
   return `
-    <h2 class="sect">${esc(T("Read the unit, not just the number"))}</h2>
-    ${t.map((x) => `<div class="warnbox">${I.alertDot}<span>
-        <b>${esc(x.text.slice(0, 46))}</b><br>${esc(Units.describe(x.unit))}
-        ${x.price && x.unit.gam ? `<br><small>${esc(T("Tap to work out the real total"))}</small>` : ""}
-      </span></div>`).join("")}
-    ${s.map((x) => `<div class="warnbox">${I.alertDot}<span>${esc(Units.describeSurcharge(x))}</span></div>`).join("")}`;
+    <details class="fold">
+      <summary><span class="trapdot"></span>${
+        esc(so === 1 ? T("1 line needs a second look") : `${so} ${T("lines need a second look")}`)}</summary>
+      <div class="foldin">
+        ${t.map((x) => `<p class="src"><b>${esc(x.text.slice(0, 44))}</b><br>${
+          esc(Units.describe(x.unit))}</p>`).join("")}
+        ${s.map((x) => `<p class="src">${esc(Units.describeSurcharge(x))}</p>`).join("")}
+      </div>
+    </details>`;
 });
 
 /* Dải giá SUY RA cho món vùng này chưa đo. Cố tình để thành một khối riêng,
@@ -900,21 +910,35 @@ function showMenuResult(rows, conf, traps = null) {
     <h3>Menu · ${esc(z.name)}</h3>
     <p class="src">${rows.length} item${rows.length===1?"":"s"} read · ${esc(basis)} · updated ${esc(z.updated)}${conf!=null?` · OCR confidence ${Math.round(conf)}%`:""}</p>
     ${wave()}
-    ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">No prices found in that shot. Move closer, hold steady, or enter them by hand below.</p>`}
-    ${trapHTML(traps)}
-    ${predictedHTML(predictedFor(rows))}
-    ${manualBlock()}
-    ${/* Lối vào đếm tiền thối cũng nằm ở đây, không chỉ ở màn hoá đơn.
-         Phần lớn người dùng quét THỰC ĐƠN rồi gọi món rồi trả tiền — họ
-         không quét lại tờ hoá đơn lần nữa, nên nếu nút chỉ có ở màn kia
-         thì con đường phổ biến nhất lại là con đường không có nút. */""}
-    ${rows.filter((r) => r.id).length >= MenuTax.MIN_PAIRS
-      ? `<button class="btn sec" data-act="taxStart">${esc(T("Compare with the other menu"))}</button>` : ""}
-    ${S.preorder.rows.length ? `<button class="btn pri" data-act="poOpen">${esc(T("Work out the bill before ordering"))}</button>` : ""}
-    ${rows.some((r) => r.id) ? `<button class="btn sec" data-act="chOpen">${esc(T("Check my change"))}</button>` : ""}
-    ${!rows.length ? `<button class="btn pri" data-act="noMenu">${esc(T("There is no menu — show me dishes"))}</button>` : ""}
-    <button class="btn sec" data-act="show">${esc(T("Say it in Vietnamese"))}</button>
-    ${seeded ? `<p class="seedwarn">Reference prices here are estimates, not a completed field survey. Every line says which it is, and tapping one shows where the number came from.</p>` : ""}
+    ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">No prices found in that shot. Move closer, hold steady, or enter by hand.</p>`}
+    ${trapLineHTML(traps)}
+    ${/* Lối vào đếm tiền thối và so hai tấm thực đơn nằm trong khối gập bên
+         dưới, không mất đi đâu — phần lớn người dùng quét THỰC ĐƠN rồi gọi
+         món rồi trả tiền, nên hai lối đó vẫn phải có mặt ở màn này, chỉ là
+         không tranh chỗ với việc chính. */""}
+    ${/* MỘT nút chính, phần còn lại gập lại.
+          Người dùng đang đứng trước quầy hàng và người bán đang nhìn. Sáu nút
+          bày ra cùng lúc nghĩa là phải ĐỌC sáu nhãn rồi mới chọn được — mà
+          chính đặc tả sản phẩm viết "mọi thao tác thừa là thao tác không xảy
+          ra". Nút hay dùng nhất nằm ngoài; năm nút còn lại nằm sau một lần
+          chạm, không mất đi đâu cả. */""}
+    ${rows.length
+      ? `<button class="btn pri" data-act="poOpen">${esc(T("Work out the bill"))}</button>`
+      : `<button class="btn pri" data-act="noMenu">${esc(T("No menu? Tap a dish instead"))}</button>`}
+
+    <details class="fold">
+      <summary>${esc(T("More"))}</summary>
+      <div class="foldin">
+        ${predictedHTML(predictedFor(rows))}
+        ${rows.length ? `<button class="btn sec" data-act="noMenu">${esc(T("No menu? Tap a dish instead"))}</button>` : ""}
+        ${rows.some((r) => r.id) ? `<button class="btn sec" data-act="chOpen">${esc(T("Check my change"))}</button>` : ""}
+        ${rows.filter((r) => r.id).length >= MenuTax.MIN_PAIRS
+          ? `<button class="btn sec" data-act="taxStart">${esc(T("Compare with the other menu"))}</button>` : ""}
+        <button class="btn sec" data-act="show">${esc(T("Say it in Vietnamese"))}</button>
+        ${manualBlock()}
+        ${seeded ? `<p class="seedwarn">Reference prices here are estimates, not a completed field survey. Tap any line to see where its number came from.</p>` : ""}
+      </div>
+    </details>
     <button class="btn sec" data-act="close">Close</button>`);
 }
 
@@ -1387,11 +1411,31 @@ function predictedFor(rows) {
 }
 
 function logScan(rows, kind) {
+  let ghi = 0;
   for (const r of rows) {
     if (!r.id) continue;
     journal.add({ kind, id: r.id, label: r.label, price: r.price, level: r.v.level,
       over: r.v.level === "high" && r.st ? r.price - r.st.p50 : 0, zone: S.zone });
+
+    /* MỖI LẦN QUÉT LÀ MỘT PHÉP ĐO, KHÔNG CHỈ MỘT CÂU TRA CỨU.
+       Cho tới bản này, một lần quét đọc được 5–30 dòng giá có toạ độ và có
+       mốc thời gian, rồi vứt hết ngay sau khi vẽ xong thẻ kết quả — chỉ giữ
+       lại một dòng trong nhật ký hoạt động, mà nhật ký thì bị cắt bớt khi đầy.
+
+       Kho giá thật (survey.js) và đường dẫn nó vào bảng giá (localprices.js)
+       đã có sẵn từ trước; thiếu đúng dòng này. Nối vào thì một người đi ăn
+       ba bữa mỗi ngày đóng góp vài chục quan sát mà không phải gõ gì, và
+       trust.js sẽ tự đổi nhãn từ "estimate" sang "measured" khi đủ mẫu.
+
+       Chỉ ghi vào máy của chính người dùng. Không có gì rời khỏi thiết bị ở
+       bản này — lời hứa "ảnh quét không rời khỏi máy" không đổi, và dữ liệu
+       trích ra cũng vậy cho tới khi có màn xin phép tường minh. */
+    if (kind === "menu" || kind === "bill") {
+      Survey.add({ zone: S.zone, dishId: r.id, price: r.price, src: "scan" });
+      ghi++;
+    }
   }
+  if (ghi) refreshTally();
 }
 
 /* ── Tab Eat ──────────────────────────────────────────────
