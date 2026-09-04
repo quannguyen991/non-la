@@ -37,6 +37,10 @@
 // v37: bảng dịch mở rộng cho các màn mới + màn Journal đọc lại các lần so
 // thực đơn. Không thêm tệp nào, nhưng phải bump: bản đã cài giữ nguyên cache
 // v36 thì i18n.js cũ ở lại và mọi nhãn mới hiện ra bằng tiếng Anh.
+// v38: units.js + predict.js + eaterydish.js — bẫy đơn vị tính, dự đoán ô
+// bảng giá còn trống, và suy món từ tên quán. Cả ba đều nằm trong dòng
+// import của app.js, nên thiếu bất kỳ tệp nào trong SHELL là máy đang
+// offline mở app ra CHẾT NGAY — mất cả app, không phải mất một màn hình.
 // v36: localprices.js — giá khảo sát dùng ngay trên máy. Thiếu tệp là chết ở
 // dòng import, và mất luôn đường duy nhất để số khảo sát thật thay được số
 // ước lượng trong tay người dùng.
@@ -56,7 +60,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v37";
+const CACHE = "nonla-v38";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -70,7 +74,7 @@ const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css", "./community.css", "./welcome.css", "./you.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./route.js",
   "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
-  "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js",
+  "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js", "./units.js", "./predict.js", "./eaterydish.js",
   "./manifest.json", "./icon.svg",
   "./data/dishes.json", "./data/prices.json", "./data/places.json",
   "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./data/trips.json",

@@ -35,6 +35,9 @@ import * as MenuTax from "./menutax.js";
 import * as Postcard from "./postcard.js";
 import * as LocalPrices from "./localprices.js";
 import * as Welcome from "./welcome.js";
+import * as Units from "./units.js";
+import * as Predict from "./predict.js";
+import { inferDishes } from "./eaterydish.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -740,7 +743,120 @@ function judgeRows(pairs) {
   });
 }
 
-function showMenuResult(rows, conf) {
+/* Cảnh báo bẫy đơn vị. Mô tả ĐƠN VỊ, không quy kết người bán: bán hải sản
+   theo lạng là cách bán bình thường, vấn đề nằm ở chỗ khách không đọc được
+   đơn vị chứ không nằm ở động cơ của quán. */
+/* Ba khối dưới đây là phần THÊM VÀO. Chúng nằm chung một template với phán
+   quyết giá — thứ người dùng đang đứng trước quầy hàng cần đọc. Một lỗi
+   trong phần thêm mà làm hỏng cả tấm thẻ là đánh đổi tệ nhất có thể, nên
+   mỗi khối tự nuốt lỗi của mình và biến mất thay vì kéo theo phần còn lại. */
+const anToan = (fn) => (...a) => { try { return fn(...a); } catch { return ""; } };
+
+const trapHTML = anToan(function (traps) {
+  if (!traps) return "";
+  const t = traps.traps || [], s = traps.surcharges || [];
+  if (!t.length && !s.length) return "";
+  return `
+    <h2 class="sect">${esc(T("Read the unit, not just the number"))}</h2>
+    ${t.map((x) => `<div class="warnbox">${I.alertDot}<span>
+        <b>${esc(x.text.slice(0, 46))}</b><br>${esc(Units.describe(x.unit))}
+        ${x.price && x.unit.gam ? `<br><small>${esc(T("Tap to work out the real total"))}</small>` : ""}
+      </span></div>`).join("")}
+    ${s.map((x) => `<div class="warnbox">${I.alertDot}<span>${esc(Units.describeSurcharge(x))}</span></div>`).join("")}`;
+});
+
+/* Dải giá SUY RA cho món vùng này chưa đo. Cố tình để thành một khối riêng,
+   không trộn vào các dòng đã đo phía trên: một con số suy ra mà nằm cùng
+   hàng với một con số đo được là đúng thứ trust.js sinh ra để chặn. */
+const predictedHTML = anToan(function (preds) {
+  if (!preds.length) return "";
+  return `
+    <h2 class="sect">${esc(T("Not measured here — estimated from nearby zones"))}</h2>
+    ${preds.map(({ label, p }) => `<div class="row" style="cursor:default">
+      <span class="dot" data-l="unknown"></span>
+      <span><span class="nm">${esc(label)}</span><span class="note">${esc(T("estimate"))} · ${
+        esc(T("from"))} ${p.basis.dishZones} ${esc(T("other zones"))}</span></span>
+      <span class="amt" data-l="unknown">${money(p.p25)}–${money(p.p75)}<small>${
+        esc(p.fromSeed ? T("seed estimate") : T("estimate"))}</small></span>
+    </div>`).join("")}
+    <p class="seedwarn">${esc(T("These are worked out from prices in other zones, not measured here. Treat them as a rough bearing, not a verdict."))}</p>`;
+});
+
+/* ── Chế độ "không có thực đơn" ──────────────────────────────
+   Cả app tới giờ giả định có CHỮ để chĩa camera vào. Nhưng chỗ bị hớ nặng
+   nhất lại là chỗ không có thực đơn nào: xe đẩy, gánh hàng rong, quán không
+   niêm yết. Người bán nói một con số, và đó đúng là lúc app hiện tại câm.
+
+   Lối ra không phải bắt khách gõ tên món — họ không đọc được tiếng Việt và
+   đang vội. Lối ra là CHẠM VÀO ẢNH món trước mặt.
+   ──────────────────────────────────────────────────────────── */
+const noMenuHTML = anToan(function () {
+  const z = zone();
+  const co = new Set(Object.keys(z.items || {}));
+  /* Món vùng này có dải giá xếp trước — đó là những món app trả lời được
+     ngay. Món còn lại vẫn hiện, vì thứ trước mặt khách không quan tâm bảng
+     giá của ta đầy tới đâu. */
+  const ds = [...(S.dishes || [])].sort((a, b) =>
+    (co.has(b.id) ? 1 : 0) - (co.has(a.id) ? 1 : 0));
+  return `
+    <h3>${esc(T("No menu here?"))}</h3>
+    <p class="src">${esc(T("Tap what is in front of you. No typing, no Vietnamese needed."))} · ${esc(z.name)}</p>
+    ${wave()}
+    <div class="dishgrid">
+      ${ds.map((d) => {
+        const st = stat(d.id);
+        return `<button data-dish="${esc(d.id)}">
+          ${dishPhoto(d, "1/1").replace('class="ph"', 'class="ph sq"')}
+          <span class="lbl">${esc(d.vi)}</span>
+          <span class="rng">${st ? `${fmtVND(st.p25)}–${fmtVND(st.p75)}` : "—"}</span>
+        </button>`;
+      }).join("")}
+    </div>
+    <button class="btn sec" data-act="close">Close</button>`;
+});
+
+/* ── Ước tính hoá đơn TRƯỚC khi gọi ──────────────────────────
+   Bill Check soát tờ hoá đơn — tức là can thiệp sau khi tiền đã tiêu, lúc
+   chỉ còn cãi nhau. Đặc tả sản phẩm tự viết luận điểm trung tâm là "đúng
+   năm giây giữa lúc nghe giá và lúc gật đầu"; soát hoá đơn đứng sai phía
+   của năm giây đó. Màn này đứng đúng phía.
+   ──────────────────────────────────────────────────────────── */
+const preorderHTML = anToan(function () {
+  const po = S.preorder || { rows: [], surcharges: [] };
+  const chon = po.rows.filter((r) => r.qty > 0);
+  const tong = chon.reduce((s, r) => s + r.price * r.qty, 0);
+  /* Dòng tính theo trọng lượng KHÔNG được cộng vào tổng: đơn giá nhân số
+     suất là một con số sai, và sai theo hướng làm khách yên tâm nhầm. */
+  const treo = po.traps || [];
+  const themVAT = (po.surcharges || []).filter((s) => s.pct).reduce((s, x) => s + x.pct, 0);
+
+  return `
+    <h3>${esc(T("Before you order"))}</h3>
+    <p class="src">${esc(T("Tap + for what you plan to order. Nothing is sent anywhere."))}</p>
+    ${wave()}
+    ${po.rows.length ? po.rows.map((r, i) => `
+      <div class="po-row">
+        <span><span class="nm">${esc(r.label)}</span>
+          <span class="sub">${money(r.price)}${r.st ? ` · ${esc(T("typical"))} ${money(r.st.p25)}–${money(r.st.p75)}` : ""}</span></span>
+        <span class="po-step">
+          <button data-act="poMinus" data-i="${i}" aria-label="less">−</button>
+          <span class="n">${r.qty}</span>
+          <button data-act="poPlus" data-i="${i}" aria-label="more">+</button>
+        </span>
+      </div>`).join("") : `<p class="muted">${esc(T("Scan a menu first, then come back here."))}</p>`}
+
+    <div class="po-total"><span>${esc(T("Expected total"))}</span><b>${money(tong)}</b></div>
+    ${themVAT ? `<div class="warnbox">${I.alertDot}<span>${
+      esc(T("Menu says prices exclude"))} ${themVAT}% — ${esc(T("expect about"))} <b>${money(Math.round(tong * (1 + themVAT / 100)))}</b>.</span></div>` : ""}
+    ${treo.length ? `<div class="warnbox">${I.alertDot}<span>${
+      esc(T("Not counted above, because the price depends on weight:"))} ${
+      esc(treo.map((t) => t.text.slice(0, 28)).join(" · "))}. ${esc(T("Ask the weight first."))}</span></div>` : ""}
+    <div class="warnbox infobox">${I.clock}<span>${
+      esc(T("This is what the menu says you will pay. Extras nobody mentioned — wet towels, tea, peanuts — are not on it."))}</span></div>
+    <button class="btn sec" data-act="close">Close</button>`;
+});
+
+function showMenuResult(rows, conf, traps = null) {
   /* Đang chờ tấm thứ hai: lần quét này không phải một tra cứu giá mà là
      nửa sau của một phép so sánh. Đi thẳng sang màn kia. */
   if (S.tax.waiting) {
@@ -765,6 +881,15 @@ function showMenuResult(rows, conf) {
      con số đó từ đâu ra. */
   S.billRows = null;
 
+  /* Giữ lại nguyên liệu cho màn ước tính trước khi gọi. Lấy ở đây vì đây là
+     chỗ duy nhất có đủ ba thứ cùng lúc: các dòng đã đọc, bẫy đơn vị, và
+     phụ thu ghi ở chân thực đơn. */
+  S.preorder = {
+    rows: rows.filter((r) => r.price > 0).map((r) => ({ ...r, qty: 0 })),
+    surcharges: traps?.surcharges || [],
+    traps: traps?.traps || [],
+  };
+
   const seeded = rows.some((r) => r.st?.seed);
   /* Trước đây dòng này in "compared with ~34 nearby places", lấy trung
      bình trường n của các mục seed. Không có 34 quán nào — n của dữ liệu
@@ -776,6 +901,8 @@ function showMenuResult(rows, conf) {
     <p class="src">${rows.length} item${rows.length===1?"":"s"} read · ${esc(basis)} · updated ${esc(z.updated)}${conf!=null?` · OCR confidence ${Math.round(conf)}%`:""}</p>
     ${wave()}
     ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">No prices found in that shot. Move closer, hold steady, or enter them by hand below.</p>`}
+    ${trapHTML(traps)}
+    ${predictedHTML(predictedFor(rows))}
     ${manualBlock()}
     ${/* Lối vào đếm tiền thối cũng nằm ở đây, không chỉ ở màn hoá đơn.
          Phần lớn người dùng quét THỰC ĐƠN rồi gọi món rồi trả tiền — họ
@@ -783,7 +910,9 @@ function showMenuResult(rows, conf) {
          thì con đường phổ biến nhất lại là con đường không có nút. */""}
     ${rows.filter((r) => r.id).length >= MenuTax.MIN_PAIRS
       ? `<button class="btn sec" data-act="taxStart">${esc(T("Compare with the other menu"))}</button>` : ""}
+    ${S.preorder.rows.length ? `<button class="btn pri" data-act="poOpen">${esc(T("Work out the bill before ordering"))}</button>` : ""}
     ${rows.some((r) => r.id) ? `<button class="btn sec" data-act="chOpen">${esc(T("Check my change"))}</button>` : ""}
+    ${!rows.length ? `<button class="btn pri" data-act="noMenu">${esc(T("There is no menu — show me dishes"))}</button>` : ""}
     <button class="btn sec" data-act="show">${esc(T("Say it in Vietnamese"))}</button>
     ${seeded ? `<p class="seedwarn">Reference prices here are estimates, not a completed field survey. Every line says which it is, and tapping one shows where the number came from.</p>` : ""}
     <button class="btn sec" data-act="close">Close</button>`);
@@ -1232,8 +1361,29 @@ function handleText(text, conf) {
   if (S.mode === "cash") return showCashResult(text);
   const pairs = parseMenu(text);
   const rows = judgeRows(pairs);
+  /* Bẫy đơn vị đọc từ VĂN BẢN THÔ, không đọc từ rows: parseMenu() đã bỏ
+     phần đuôi "/100g" đi để lấy được cặp tên-giá, nên tới rows thì thông
+     tin đơn vị không còn nữa. Đây là chỗ duy nhất còn giữ nguyên dòng gốc. */
+  const traps = Units.scanTraps(String(text || "").split(/\r?\n/));
   if (S.mode === "bill") { showBillResult(rows); logScan(rows, "bill"); }
-  else { showMenuResult(rows, conf); logScan(rows, "menu"); }
+  else { showMenuResult(rows, conf, traps); logScan(rows, "menu"); }
+}
+
+/* Dải giá suy ra cho những món vùng này chưa có số đo.
+   Trả về mảng rỗng khi không suy được — im lặng đúng hơn một con số bịa. */
+function predictedFor(rows) {
+  try {
+  const zones = S.prices;              // S.prices CHÍNH LÀ bảng vùng, không bọc thêm lớp nào
+  if (!zones || !S.zone) return [];
+  const base = Predict.dishBase(zones), factor = Predict.zoneFactor(zones, base);
+  const out = [];
+  for (const r of rows) {
+    if (!r.id || r.v.level !== "unknown") continue;
+    const p = Predict.predict(zones, S.zone, r.id, { base, factor });
+    if (p) out.push({ ...r, p });
+  }
+  return out;
+  } catch { return []; }
 }
 
 function logScan(rows, kind) {
@@ -3174,6 +3324,28 @@ function openBigMap() {
    quyết, không có khoảng giá, và nói thẳng điều đó. Đây là chỗ dễ trượt
    nhất của cả tính năng: chỉ cần mượn cái pill "Fair Price" cho đẹp là
    app bịa ra một tuyên bố mà không có một lần quét nào chống lưng. */
+/* Món quán này nhiều khả năng bán, suy từ chính tên quán. Đây là SUY LUẬN
+   từ biển hiệu, không phải thực đơn đã đọc — nên nó dẫn người dùng sang dải
+   giá của vùng, và không bao giờ nói quán này bán bao nhiêu tiền. */
+const likelyDishesHTML = anToan(function (e) {
+  const hits = inferDishes(e, S.dishes || []).filter((h) => h.confidence >= 0.6).slice(0, 4);
+  if (!hits.length) return "";
+  return `
+    <h2 class="sect">${esc(T("Probably serves"))}</h2>
+    ${hits.map(({ id, confidence }) => {
+      const d = dishById(id), st = stat(id);
+      return `<button class="row" data-dish="${esc(id)}">
+        <span class="dot" data-l="${st ? "ok" : "unknown"}"></span>
+        <span><span class="nm">${esc(d?.vi || id)}</span>
+          <span class="note">${esc(d?.en || "")} · ${esc(T("from the name"))}${
+            confidence < 0.9 ? ` · ${esc(T("less sure"))}` : ""}</span></span>
+        <span class="amt">${st ? `${money(st.p25)}–${money(st.p75)}` : "—"}<small>${
+          esc(T("local range"))}</small></span>
+      </button>`;
+    }).join("")}
+    <p class="src">${esc(T("Worked out from the name on the sign, not from a menu we have read."))}</p>`;
+});
+
 function showEatery(e, metres = null) {
   setEdge(null);
   const KIND = { restaurant: "Restaurant", cafe: "Café", street: "Street food" };
@@ -3190,6 +3362,7 @@ function showEatery(e, metres = null) {
       tracked ? `<span class="pill unknown">${I.question}Price data under “${esc(tracked.name)}”</span>`
               : `<span class="pill unknown">${I.question}No price data yet</span>`}</div>
     ${wave()}
+    ${likelyDishesHTML(e)}
     ${e.hours ? `<h2 class="sect">Opening hours</h2>
       <p class="muted">${esc(e.hours)}</p>` : ""}
     ${e.veg ? `<div class="warnbox infobox">${I.check}<span>Tagged as serving
@@ -3968,6 +4141,24 @@ document.addEventListener("click", async (ev) => {
       tags: f.place.known.map((k) => dishById(k)?.vi || k),
     });
   }
+  /* Lối vào lưới món khi không có gì để quét. Không phụ thuộc tab nào đang
+     mở, vì tình huống này xảy ra ở bất cứ đâu người dùng đang đứng. */
+  if (el("[data-act='noMenu']")) return openSheet(noMenuHTML());
+
+  if (el("[data-act='poOpen']")) return openSheet(preorderHTML());
+  {
+    const plus = el("[data-act='poPlus']"), minus = el("[data-act='poMinus']");
+    if (plus || minus) {
+      const i = +(plus || minus).dataset.i;
+      const r = S.preorder?.rows?.[i];
+      if (r) {
+        r.qty = Math.max(0, Math.min(20, r.qty + (plus ? 1 : -1)));
+        openSheet(preorderHTML());   // vẽ lại để tổng đổi theo ngay
+      }
+      return;
+    }
+  }
+
   if (el("[data-act='save']")) return toast("Saved to this device");
   if (el("[data-act='notif']")) return toast("No alerts right now");
 
