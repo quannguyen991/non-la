@@ -1,0 +1,182 @@
+/* ══════════════════════════════════════════════════════════════
+   _style.css — kiểu chung cho hai tài liệu trong docs/
+
+   Dùng cho MÀN HÌNH lẫn BẢN IN. Chrome headless đọc đúng tệp này khi in
+   ra PDF (tools/in-pdf.py), nên mọi luật @page nằm ở đây chứ không nằm
+   rải trong từng tài liệu.
+
+   Ảnh KHÔNG bao giờ đặt height bằng mm. Chrome khi in tính lại chiều cao
+   theo mm rồi kéo giãn ảnh cho vừa — méo hết tỉ lệ. Dùng aspect-ratio và
+   để chiều rộng quyết định.
+   ══════════════════════════════════════════════════════════════ */
+
+@page { size: A4; margin: 18mm 15mm 16mm; }
+@page :first { margin: 0; }
+
+:root {
+  --ink: #1B2420;
+  --deep: #0E2B24;        /* xanh sơn mài — màu nền app */
+  --deep-2: #12362D;
+  --deep-l: #E7EFEA;
+  --gold: #A9821B;
+  --gold-l: #FBF4E2;
+  --terra: #A6462A;
+  --terra-l: #FBEFEA;
+  --jade: #1F6B4F;
+  --jade-l: #EAF6F0;
+  --line: #DCD9CE;
+  --muted: #6C7169;
+  --paper: #FBF9F3;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  margin: 0; background: #fff; color: var(--ink);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 10.5pt; line-height: 1.66;
+}
+p { margin: 0 0 8px; }
+b, strong { color: #101a16; }
+code { font-family: Consolas, "Courier New", monospace; font-size: .92em;
+  background: #F2F0E8; padding: 1px 4px; border-radius: 3px; }
+
+/* ── bìa ───────────────────────────────────────────────────── */
+.cover {
+  width: 210mm; height: 297mm; page-break-after: always; position: relative;
+  overflow: hidden; color: #fff;
+  background: linear-gradient(158deg, #08201B 0%, #0E2B24 44%, #1B4B3C 100%);
+}
+.cover .halo { position: absolute; border-radius: 50%; background: #C9A227; opacity: .10; }
+.cover .h1 { width: 460px; height: 460px; top: -160px; right: -140px; }
+.cover .h2 { width: 320px; height: 320px; bottom: -120px; left: -100px; opacity: .07; }
+.cover .inner { position: relative; padding: 32mm 20mm 0; }
+.cover .kick {
+  display: inline-block; letter-spacing: .24em; font-size: 9.5pt; font-weight: 600;
+  border: 1.2px solid rgba(255,255,255,.5); padding: 6px 16px; border-radius: 3px;
+  margin-bottom: 14mm; text-transform: uppercase;
+}
+.cover h1 {
+  font-family: Cambria, Georgia, serif; font-size: 50pt; line-height: 1.02;
+  margin: 0 0 5mm; font-weight: 700; letter-spacing: -1px;
+}
+.cover h1 span {
+  display: block; font-family: "Segoe UI", Arial, sans-serif; font-size: 17pt;
+  font-weight: 400; color: #D8C489; margin-top: 7mm; letter-spacing: 0; line-height: 1.45;
+}
+.cover .rule { width: 78px; height: 4px; background: #C9A227; border-radius: 2px; margin: 9mm 0; }
+.cover .sub { font-size: 12pt; color: #CFE0D6; max-width: 140mm; line-height: 1.7; }
+.cover .facts { position: absolute; left: 20mm; right: 20mm; bottom: 34mm; display: flex; }
+.cover .fact { flex: 1; border-left: 2.5px solid #C9A227; padding: 2px 0 2px 12px; margin-right: 10px; }
+.cover .fact b { display: block; font-size: 19pt; line-height: 1.15; color: #fff; font-family: Cambria, Georgia, serif; }
+.cover .fact i { font-style: normal; font-size: 8.6pt; color: #A9C4B4; letter-spacing: .05em; }
+.cover .foot {
+  position: absolute; left: 20mm; right: 20mm; bottom: 15mm; font-size: 9pt; color: #93AFA1;
+  border-top: 1px solid rgba(255,255,255,.22); padding-top: 5mm;
+  display: flex; justify-content: space-between;
+}
+
+/* ── tiêu đề ───────────────────────────────────────────────── */
+/* Chương KHÔNG ép sang trang mới.
+   Ép thì mỗi chương ngắn hơn một trang để lại một khoảng trắng lớn, còn chương
+   dài hơn một trang chút xíu đẻ ra một trang chỉ có ba dòng. Đo trên bản in
+   đầu tiên: 11/28 trang lấp chưa tới 55%. Nên để chữ chảy liên tục, và đánh
+   dấu đầu chương bằng khoảng thở cùng một đường kẻ — chỉ những chỗ tự gắn
+   .newpage mới thật sự sang trang. */
+h1.ch {
+  break-before: auto; break-after: avoid-page; page-break-after: avoid;
+  font-family: Cambria, Georgia, serif; font-size: 22pt;
+  color: var(--deep); margin: 11mm 0 4mm; line-height: 1.18; font-weight: 700;
+  border-bottom: 2px solid #E3E0D5; padding-bottom: 3.5mm;
+}
+h1.ch .n {
+  display: inline-block; min-width: 30px; color: var(--gold);
+  font-size: 15pt; vertical-align: 2px;
+}
+h2 {
+  font-size: 13pt; color: var(--deep); margin: 7mm 0 2.5mm; font-weight: 700;
+  page-break-after: avoid; border-bottom: 1.4px solid var(--line); padding-bottom: 2mm;
+}
+h3 {
+  font-size: 11.2pt; color: var(--deep-2); margin: 5mm 0 1.5mm; font-weight: 700;
+  page-break-after: avoid;
+}
+.lead {
+  font-size: 11pt; color: #3B443E; font-style: italic;
+  border-left: 3.5px solid var(--gold); padding: 2px 0 2px 14px; margin: 0 0 6mm; line-height: 1.72;
+}
+
+/* ── mục lục ───────────────────────────────────────────────── */
+.toc { columns: 2; column-gap: 12mm; margin-top: 4mm; }
+.toc a { display: block; text-decoration: none; color: var(--ink); font-size: 10pt;
+  padding: 3.4px 0; border-bottom: 1px dotted #DDD9CD; break-inside: avoid; }
+.toc a span { color: var(--gold); font-weight: 700; display: inline-block; width: 26px; }
+
+/* ── bảng ──────────────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; font-size: 9.6pt; page-break-inside: avoid; }
+th { background: var(--deep); color: #fff; text-align: left; padding: 6px 9px; font-weight: 600; font-size: 9.2pt; }
+td { padding: 5.5px 9px; border-bottom: 1px solid #E6E3D9; vertical-align: top; }
+tr:nth-child(even) td { background: #FAF8F2; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── khối nhấn ─────────────────────────────────────────────── */
+.box { border: 1px solid var(--line); border-left: 4px solid var(--gold);
+  background: var(--gold-l); padding: 9px 13px; margin: 4mm 0; page-break-inside: avoid; }
+.box.jade { border-left-color: var(--jade); background: var(--jade-l); }
+.box.terra { border-left-color: var(--terra); background: var(--terra-l); }
+.box b:first-child { display: block; margin-bottom: 3px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin: 4mm 0; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.5mm; margin: 4mm 0; }
+.card { border: 1px solid var(--line); border-radius: 4px; padding: 9px 12px;
+  background: var(--paper); page-break-inside: avoid; }
+.card b { display: block; color: var(--deep); font-size: 10.4pt; margin-bottom: 2px; }
+.card .t { display: block; font-size: 8.6pt; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gold); font-weight: 700; margin-bottom: 3px; }
+.card p { font-size: 9.6pt; margin: 0; color: #444B45; }
+
+ul, ol { margin: 0 0 8px; padding-left: 18px; }
+li { margin-bottom: 3.5px; }
+
+.stat-row { display: flex; gap: 4mm; margin: 4mm 0; }
+.stat { flex: 1; border-top: 3px solid var(--deep); padding-top: 5px; }
+.stat b { display: block; font-family: Cambria, Georgia, serif; font-size: 17pt; color: var(--deep); line-height: 1.1; }
+.stat i { font-style: normal; font-size: 8.6pt; color: var(--muted); }
+
+/* ── ảnh màn hình ──────────────────────────────────────────── */
+.shots { display: grid; gap: 5mm; margin: 4mm 0 6mm; page-break-inside: avoid; }
+.shots.two { grid-template-columns: 1fr 1fr; }
+.shots.three { grid-template-columns: repeat(3, 1fr); }
+figure { margin: 0; page-break-inside: avoid; }
+figure img {
+  display: block; width: 100%; aspect-ratio: 390 / 844; object-fit: cover; object-position: top;
+  border: 1px solid var(--line); border-radius: 6px; background: #fff;
+}
+figure.wide img { aspect-ratio: 1440 / 900; }
+figure.tall img { aspect-ratio: 390 / 844; }
+figcaption { font-size: 8.8pt; color: var(--muted); margin-top: 2mm; line-height: 1.5; }
+figcaption b { color: var(--deep); }
+
+/* ── hàng giải thích giao diện ─────────────────────────────── */
+.ui { border-collapse: collapse; width: 100%; font-size: 9.6pt; margin: 3mm 0 5mm; }
+.ui td { border-bottom: 1px solid #E6E3D9; padding: 6px 9px; vertical-align: top; }
+.ui td:first-child { width: 34%; font-weight: 600; color: var(--deep); }
+.ui tr:nth-child(even) td { background: #FAF8F2; }
+
+.tag { display: inline-block; font-size: 8.4pt; font-weight: 700; letter-spacing: .04em;
+  padding: 1.5px 7px; border-radius: 20px; vertical-align: 1px; }
+.tag.ok { background: var(--jade-l); color: #14543C; border: 1px solid #BFDCCE; }
+.tag.warn { background: var(--gold-l); color: #7A5D0B; border: 1px solid #E4D3A0; }
+.tag.bad { background: var(--terra-l); color: #8A3720; border: 1px solid #E7C3B6; }
+.tag.grey { background: #F0EEE6; color: #5C6159; border: 1px solid #DDD9CD; }
+
+.foot-note { font-size: 8.8pt; color: var(--muted); border-top: 1px solid var(--line);
+  padding-top: 3mm; margin-top: 6mm; }
+.nobreak { page-break-inside: avoid; }
+.newpage { page-break-before: always; }
+
+@media screen {
+  body { background: #EDEAE0; }
+  .cover, .page { margin: 0 auto; }
+  .page { max-width: 190mm; background: #fff; padding: 16mm 15mm; }
+}

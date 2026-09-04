@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Nón Lá — Hồ sơ dự án đầy đủ</title>
+<link rel="stylesheet" href="_style.css">
+
+<style>
+/* ── trang phần ───────────────────────────────────────────────
+   TẤM NGĂN NẰM TRONG LỀ, KHÔNG TRÀN MÉP. Đã thử hai cách tràn và bỏ cả hai:
+     · `@page part { margin:0 }` — tràn đúng, nhưng đổi luôn cách Chrome
+       phân trang phần còn lại của cuốn, mà đây là thứ không đáng đánh đổi
+       cho một tấm bìa phụ;
+     · lề âm −18/−15/−16mm — Chrome không kéo khối ra khỏi vùng chữ, chỉ để
+       lại một dải trắng lệch ở hai mép.
+   Chiều cao 243mm là để khối vừa TRỌN vùng chữ: đo thử với 297mm thì mỗi
+   tấm ngăn thừa ra một dải và đẻ thêm một trang xanh cụt (59 trang thay vì
+   57). Bo góc để nhìn ra ngay đây là một tấm bìa phụ có chủ ý. */
+.part { width:100%; height:243mm; page-break-before:always; page-break-after:always;
+  position:relative; overflow:hidden; color:#fff; border-radius:5px;
+  background:linear-gradient(158deg,#08201B 0%,#0E2B24 44%,#1B4B3C 100%); }
+.part .inner { position:relative; padding:52mm 18mm 0; }
+.part .kick { display:inline-block; letter-spacing:.26em; font-size:9.5pt; font-weight:600;
+  color:#C9A227; margin-bottom:10mm; text-transform:uppercase; }
+.part h1 { font-family:Cambria,Georgia,serif; font-size:38pt; line-height:1.05; margin:0;
+  font-weight:700; letter-spacing:-.6px; }
+.part .rule { width:70px; height:4px; background:#C9A227; border-radius:2px; margin:8mm 0; }
+.part .sub { font-size:12pt; color:#CFE0D6; max-width:130mm; line-height:1.7; }
+.part .plist { margin-top:14mm; max-width:150mm; }
+.part .plist div { font-size:10.4pt; color:#C3D8CB; padding:5px 0;
+  border-top:1px solid rgba(255,255,255,.16); }
+.part .plist div:last-child { border-bottom:1px solid rgba(255,255,255,.16); }
+.part .plist span { display:inline-block; width:34px; color:#C9A227; font-weight:700; font-size:9.4pt; }
+
+/* ── mục lục hai phần ───────────────────────────────────────── */
+h2.tocpart { margin:9mm 0 3mm; border-bottom:1.4px solid var(--line); padding-bottom:2mm; }
+h2.tocpart .tocsub { display:block; font-size:9.4pt; font-weight:400; color:var(--muted);
+  margin-top:2px; font-style:italic; }
+.toc2 a { display:flex; align-items:baseline; gap:6px; text-decoration:none; color:var(--ink);
+  font-size:10.2pt; padding:4px 0; }
+.toc2 a .k { flex:0 0 30px; color:var(--gold); font-weight:700; font-size:9.4pt; }
+.toc2 a .t { flex:0 0 auto; }
+.toc2 a .d { flex:1 1 auto; border-bottom:1px dotted #CFCBBE; transform:translateY(-3px); }
+.toc2 a .p { flex:0 0 auto; font-variant-numeric:tabular-nums; color:var(--deep); font-weight:600; }
+
+/* Chương đầu của mỗi phần bắt đầu ngay sau trang phần, nên không cần
+   khoảng thở phía trên — trang phần đã là khoảng thở. */
+.part + div.page > h1.ch:first-child { margin-top:0; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <span class="halo h1"></span><span class="halo h2"></span>
+  <div class="inner">
+    <span class="kick">Hồ sơ đầy đủ · bản 04/09/2026</span>
+    <h1>Nón Lá<span>Giới thiệu dự án và hướng dẫn giao diện</span></h1>
+    <div class="rule"></div>
+    <p class="sub">Trợ lý camera cho khách quốc tế tại Việt Nam. Chĩa máy vào thực đơn,
+      hoá đơn hoặc xấp tiền — app đọc ngay trên điện thoại, đối chiếu với khoảng giá phổ
+      biến của đúng khu vực đó, và nói cho bạn biết con số trước mặt có bình thường không.
+      Cuốn này gộp hai tài liệu: phần giới thiệu dự án cùng danh mục tính năng, và phần
+      hướng dẫn giao diện có ảnh chụp từ chính bản đang chạy.</p>
+  </div>
+  <div class="facts">
+    <div class="fact"><b>6</b><i>VÙNG ĐÃ CÓ DỮ LIỆU</i></div>
+    <div class="fact"><b>34</b><i>TÍNH NĂNG</i></div>
+    <div class="fact"><b>26</b><i>ẢNH CHỤP MÀN HÌNH</i></div>
+    <div class="fact"><b>641</b><i>PHÉP THỬ, XANH HẾT</i></div>
+  </div>
+  <div class="foot"><span>Hồ sơ dự án đầy đủ</span><span>nonla-app.vercel.app</span></div>
+</section>
+<div class="page"><h1 class="ch" id="muc-luc">Mục lục</h1>
+<h2 class="tocpart">Phần I · Giới thiệu dự án<span class="tocsub">Nón Lá là gì, giải việc gì, và làm được tới đâu</span></h2>
+<nav class="toc2">
+<a href="#s0"><span class="k">0</span><span class="t">Trả lời đề bài Đấu Trường Khởi Nghiệp 2026</span><span class="d"></span><span class="p">5</span></a>
+<a href="#s1"><span class="k">1</span><span class="t">Ba lớp: khách · người bán · địa phương</span><span class="d"></span><span class="p">13</span></a>
+<a href="#s2"><span class="k">2</span><span class="t">Nón Lá là gì</span><span class="d"></span><span class="p">19</span></a>
+<a href="#s3"><span class="k">3</span><span class="t">Vấn đề đang giải</span><span class="d"></span><span class="p">20</span></a>
+<a href="#s4"><span class="k">4</span><span class="t">Sáu nguyên tắc không đổi</span><span class="d"></span><span class="p">21</span></a>
+<a href="#s5"><span class="k">5</span><span class="t">Phán quyết giá hoạt động ra sao</span><span class="d"></span><span class="p">22</span></a>
+<a href="#s6"><span class="k">6</span><span class="t">Danh mục tính năng</span><span class="d"></span><span class="p">24</span></a>
+<a href="#s7"><span class="k">7</span><span class="t">Dữ liệu: có gì, từ đâu</span><span class="d"></span><span class="p">28</span></a>
+<a href="#s8"><span class="k">8</span><span class="t">Kiến trúc kỹ thuật</span><span class="d"></span><span class="p">30</span></a>
+<a href="#s9"><span class="k">9</span><span class="t">Bản web máy tính</span><span class="d"></span><span class="p">32</span></a>
+<a href="#s10"><span class="k">10</span><span class="t">Lớp cộng đồng &amp; quyền riêng tư</span><span class="d"></span><span class="p">33</span></a>
+<a href="#s11"><span class="k">11</span><span class="t">Chất lượng đã kiểm chứng</span><span class="d"></span><span class="p">34</span></a>
+<a href="#s12"><span class="k">12</span><span class="t">Hiện trạng và lộ trình</span><span class="d"></span><span class="p">36</span></a>
+<a href="#s13"><span class="k">13</span><span class="t">Vì sao khó sao chép</span><span class="d"></span><span class="p">38</span></a>
+<a href="#s14"><span class="k">14</span><span class="t">Phụ lục: bản đồ mã nguồn</span><span class="d"></span><span class="p">39</span></a>
+</nav>
+<h2 class="tocpart">Phần II · Hướng dẫn giao diện<span class="tocsub">Từng màn hình, từng nút, và điều xảy ra sau khi bấm</span></h2>
+<nav class="toc2">
+<a href="#m0"><span class="k">0</span><span class="t">Trước khi bắt đầu</span><span class="d"></span><span class="p">42</span></a>
+<a href="#m00"><span class="k">0.1</span><span class="t">Bảng ký hiệu chung</span><span class="d"></span><span class="p">42</span></a>
+<a href="#a0"><span class="k">A0</span><span class="t">Lần mở đầu tiên</span><span class="d"></span><span class="p">42</span></a>
+<a href="#a2"><span class="k">A2</span><span class="t">Màn Quét</span><span class="d"></span><span class="p">45</span></a>
+<a href="#a3"><span class="k">A3</span><span class="t">Thẻ kết quả — đọc từng dòng</span><span class="d"></span><span class="p">48</span></a>
+<a href="#a4"><span class="k">A4</span><span class="t">“Vì sao Nón Lá nói thế”</span><span class="d"></span><span class="p">49</span></a>
+<a href="#a5"><span class="k">A5</span><span class="t">Đếm tiền thối &amp; chia hoá đơn</span><span class="d"></span><span class="p">51</span></a>
+<a href="#a6"><span class="k">A6</span><span class="t">Chìa cho người bán</span><span class="d"></span><span class="p">52</span></a>
+<a href="#a7"><span class="k">A7</span><span class="t">Tab Eat</span><span class="d"></span><span class="p">54</span></a>
+<a href="#a8"><span class="k">A8</span><span class="t">Tab Nearby</span><span class="d"></span><span class="p">57</span></a>
+<a href="#a9"><span class="k">A9</span><span class="t">Ba màn hình bản đồ</span><span class="d"></span><span class="p">59</span></a>
+<a href="#a10"><span class="k">A10</span><span class="t">Tab Community</span><span class="d"></span><span class="p">61</span></a>
+<a href="#a11"><span class="k">A11</span><span class="t">Tab You</span><span class="d"></span><span class="p">62</span></a>
+<a href="#a12"><span class="k">A12</span><span class="t">Khảo sát giá</span><span class="d"></span><span class="p">64</span></a>
+<a href="#b1"><span class="k">B1</span><span class="t">Bản web máy tính — khung trang</span><span class="d"></span><span class="p">66</span></a>
+<a href="#b2"><span class="k">B2</span><span class="t">Chín trang web</span><span class="d"></span><span class="p">68</span></a>
+<a href="#c1"><span class="k">C1</span><span class="t">Sự cố thường gặp</span><span class="d"></span><span class="p">70</span></a>
+<a href="#c2"><span class="k">C2</span><span class="t">Mẹo dùng nhanh</span><span class="d"></span><span class="p">70</span></a>
+</nav>
+</div>
+
+<section class="part">
+  <span class="halo h1"></span>
+  <div class="inner">
+    <span class="kick">Phần I</span>
+    <h1>Giới thiệu dự án</h1>
+    <div class="rule"></div>
+    <p class="sub">Nón Lá là gì, giải việc gì, và làm được tới đâu</p>
+    <div class="plist"><div><span>0</span>Trả lời đề bài Đấu Trường Khởi Nghiệp 2026</div><div><span>1</span>Ba lớp: khách · người bán · địa phương</div><div><span>2</span>Nón Lá là gì</div><div><span>3</span>Vấn đề đang giải</div><div><span>4</span>Sáu nguyên tắc không đổi</div><div><span>5</span>Phán quyết giá hoạt động ra sao</div><div><span>6</span>Danh mục tính năng</div><div><span>7</span>Dữ liệu: có gì, từ đâu</div><div><span>8</span>Kiến trúc kỹ thuật</div><div><span>9</span>Bản web máy tính</div><div><span>10</span>Lớp cộng đồng &amp; quyền riêng tư</div><div><span>11</span>Chất lượng đã kiểm chứng</div><div><span>12</span>Hiện trạng và lộ trình</div><div><span>13</span>Vì sao khó sao chép</div><div><span>14</span>Phụ lục: bản đồ mã nguồn</div></div>
+  </div>
+</section>
+<!-- ══════════════════ BÌA ══════════════════ -->
+
+
+<!-- ══════════════════ MỤC LỤC ══════════════════ -->
+<div class="page">
+
+
+<h2 style="margin-top:10mm">Một đoạn tóm tắt</h2>
+<p>Nón Lá là một <b>ứng dụng web tiến bộ (PWA)</b> chạy thẳng trong trình duyệt điện
+thoại, không cần cài từ cửa hàng. Nó giải một việc rất hẹp nhưng xảy ra vài lần mỗi
+ngày với mọi khách quốc tế ở Việt Nam: <b>đứng trước một con số mà không biết nó có
+bình thường không.</b></p>
+
+<p>Người dùng chĩa camera vào tấm thực đơn. Ảnh <b>không rời khỏi máy</b> — chữ được
+đọc ngay trên điện thoại bằng Tesseract. Từng dòng món được khớp với bộ 77 món Việt,
+rồi so với phân phối giá <code>p25 / p50 / p75 / p95</code> đã ghi nhận cho đúng khu vực
+đang đứng. Kết quả là ba mức: <span class="tag ok">bình thường</span>
+<span class="tag warn">cao hơn 75% chỗ khác</span> <span class="tag bad">vượt hẳn</span> —
+kèm một dòng nói rõ con số tham chiếu ấy là <b>ước lượng</b> hay <b>đã đo</b>.</p>
+
+<p>Quanh cái lõi đó là hơn ba mươi tính năng nữa, tất cả xếp theo <b>ba khoảnh khắc
+của một bữa ăn</b>: trước khi gọi món, ngay tại quầy, và sau khi rời quán. Toàn bộ
+chạy được khi tắt hẳn mạng.</p>
+
+<div class="stat-row">
+  <div class="stat"><b>219</b><i>DÒNG GIÁ THAM CHIẾU</i></div>
+  <div class="stat"><b>77</b><i>CƠ SỞ THEO DÕI</i></div>
+  <div class="stat"><b>51</b><i>ĐIỂM ĐI TRONG NGÀY</i></div>
+  <div class="stat"><b>5</b><i>NGÔN NGỮ GIAO DIỆN</i></div>
+</div>
+</div>
+
+<!-- ══════════════════ 1 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s0"><span class="n">0</span>Trả lời đề bài Đấu Trường Khởi Nghiệp 2026</h1>
+
+<div class="box jade">
+  <b>Câu định vị</b>
+  Nón Lá biến <b>dữ liệu giá địa phương đang rời rạc và khó tiếp cận</b> thành một
+  <b>hạ tầng thông tin minh bạch cho du lịch</b> — giúp du khách hiểu đúng để mua đúng,
+  và giúp người bán minh bạch hơn để bán tốt hơn, đồng thời quảng bá được giá trị ẩm thực
+  địa phương.<br><br>
+  Và câu ngắn hơn, dùng khi chỉ có một dòng: <b>Nón Lá không buộc tội người bán. Nón Lá
+  giúp du khách hiểu con số, hỏi đúng câu, và giải quyết trước khi trả tiền.</b><br><br>
+  Cấu trúc ba lớp — <b>khách · người bán · địa phương</b> — và ranh giới của từng lớp nằm
+  ở <b>chương 1</b>.
+</div>
+
+<p class="lead">Đề bài yêu cầu làm rõ bốn điều. Chương này trả lời đúng bốn điều đó, theo
+đúng thứ tự — và không mượn một con số nào chúng tôi không tự đo được.</p>
+
+<h2>Đề bài nói gì</h2>
+<p>Chủ đề mùa 2 là <b>“Saving for the Future — Kiến tạo kỷ nguyên xanh”</b>, dựng trên
+Luật Thực hành tiết kiệm, chống lãng phí số 110/2025/QH15 và chủ đề năm 2026 của Chính
+phủ: <i>“Tiết kiệm năng lượng — Thịnh vượng tương lai”</i>. Điểm mấu chốt nằm ở cách
+booklet mở rộng chữ <i>saving</i>:</p>
+
+<div class="box">
+  <b>Trích booklet chính thức</b>
+  “Nguồn lực không chỉ giới hạn ở năng lượng hay tài nguyên thiên nhiên, mà còn bao gồm
+  <b>thời gian, tri thức, công nghệ, dữ liệu, tài chính và các nguồn lực cộng đồng</b>.”
+  Và: “Trong một thế giới mà nguồn lực luôn hữu hạn, lợi thế cạnh tranh không chỉ đến từ
+  việc sở hữu nhiều hơn, mà còn từ <b>khả năng sử dụng hiệu quả hơn những gì đang có</b>.”
+</div>
+
+<table>
+  <tr><th style="width:8%" class="num">#</th><th style="width:36%">Đề bài đòi</th><th>Nón Lá trả lời bằng</th></tr>
+  <tr><td class="num"><b>①</b></td><td>Vấn đề thực tiễn cần giải quyết</td>
+      <td>Bốn khoảng trống của khách quốc tế tại quầy hàng — và bất đối xứng thông tin về giá đứng sau cả bốn</td></tr>
+  <tr><td class="num"><b>②</b></td><td>Nguồn lực đang bị lãng phí hoặc chưa được khai thác hiệu quả</td>
+      <td>Năm nguồn lực, đều nằm trong danh sách đề bài: <b>dữ liệu</b> giá, <b>năng lực</b> chiếc điện thoại đã có trong túi, <b>uy tín</b> của người bán tử tế, <b>thời gian</b> của cả hai phía, và <b>hạ tầng du lịch</b> đã đầu tư</td></tr>
+  <tr><td class="num"><b>③</b></td><td>Giải pháp đổi mới sáng tạo nâng cao hiệu quả sử dụng nguồn lực</td>
+      <td>Một quy trình <b>khép kín tại quầy</b> — đọc số, đối chiếu dữ liệu vùng, chỉ ra nguyên nhân dễ hiểu nhầm, đưa câu hỏi cần hỏi, và đưa cả câu tiếng Việt cho người bán trả lời — cộng <b>một lớp riêng cho người bán</b> để họ tự minh bạch và tự giải thích <span style="color:#6C7169">(chương 1)</span></td></tr>
+  <tr><td class="num"><b>④</b></td><td>Giá trị bền vững tạo ra, đo lường được</td>
+      <td>Một chuỗi đo có đơn vị ở từng bậc, cộng một mô hình doanh thu nói rõ ai trả tiền và ai <b>không được phép</b> trả tiền</td></tr>
+</table>
+
+<h2>① Vấn đề thực tiễn</h2>
+<p>Vấn đề <b>không phải</b> “khách du lịch bị chặt chém”. Đó là triệu chứng, và nói như
+thế là buộc tội cả một ngành nghề dựa trên giai thoại. Bốn khoảng trống thật, xảy ra
+trong đúng vài phút đứng trước quầy, là:</p>
+
+<div class="grid2">
+  <div class="card"><span class="t">Khoảng trống 01</span><b>Không có điểm neo giá</b>
+    <p>Một bát mì 95.000₫ nghe vẫn “rẻ” với người vừa trả 12 đô ở nhà — trong khi cả phố
+    bán 60.000–90.000₫. Không ai bị lừa ở đây cả; chỉ là không có gì để so.</p></div>
+  <div class="card"><span class="t">Khoảng trống 02</span><b>Không đọc được đơn vị</b>
+    <p><code>/100g</code>, <i>lạng</i>, <i>thời giá</i>, phụ thu chưa gộp. Một lạng là 100
+    gam — người Việt biết, khách không. Con cá 800 gam thành 800.000₫, và tờ hoá đơn hoàn
+    toàn đúng.</p></div>
+  <div class="card"><span class="t">Khoảng trống 03</span><b>Không phân biệt được mệnh giá</b>
+    <p>20.000₫ và 500.000₫ đều xanh lơ; 10.000₫ và 200.000₫ đều nâu đỏ. Nhầm một tờ là
+    mất 480.000₫ — và nó xảy ra với cả người bán trung thực.</p></div>
+  <div class="card"><span class="t">Khoảng trống 04</span><b>Không biết nói gì</b>
+    <p>Ngay cả khi biết giá đang cao, khách không có câu nào để nói ra. Mọi màn hình của
+    mọi app đều viết cho một người đọc — người đứng sau quầy không có gì để đọc cả.</p></div>
+</div>
+
+<p>Không công cụ nào trong luồng thông thường của khách trả lời đủ câu hỏi thật:
+<b>“Con số này có bình thường ở đúng khu này không, và tôi nên xử lý thế nào ngay bây
+giờ?”</b> App bản đồ cho biết địa điểm và điểm sao. App dịch dịch chữ. Trợ lý AI đoán một
+con số không nguồn, không ngày, không cỡ mẫu — và cần mạng.</p>
+
+<p>Đứng sau cả bốn khoảng trống là một thứ khô khan hơn nhưng đúng hơn: <b>ở nơi giao dịch
+xảy ra một lần, bằng tiền mặt, giữa hai người không có lịch sử với nhau, một bên biết giá
+và bên kia không.</b> Bất đối xứng ấy tạo ra ba tổn thất, và chỉ tổn thất đầu tiên là của
+khách:</p>
+<ol>
+  <li><b>Khách trả nhiều hơn mức cần thiết</b> — và tệ hơn tiền, họ mang theo cảm giác bị
+    lợi dụng suốt phần còn lại của chuyến đi.</li>
+  <li><b>Người bán tử tế không được thưởng.</b> Một quán bán đúng giá suốt mười năm không
+    có cách nào chứng minh điều đó với người khách lần đầu ghé. Sự tử tế của họ là một tài
+    sản <b>không sinh lợi</b>.</li>
+  <li><b>Uy tín điểm đến bị bào mòn.</b> Vài trường hợp đủ để một con phố mang tiếng, và
+    tiếng xấu đó rơi lên đầu tất cả những người bán đúng giá ở đó.</li>
+</ol>
+
+<div class="box terra">
+  <b>Và đây là chỗ vấn đề tự lộ ra</b>
+  Chúng tôi <b>không trích một con số thống kê nào</b> về mức độ chặt chém ở Việt Nam —
+  vì không có nguồn nào đo được. Hiện tượng này <b>ai cũng kể mà không ai có số liệu</b>.
+  Một vấn đề không đo được thì không quản lý được, không cải thiện được, và không chứng
+  minh được là đã cải thiện. <b>Chính khoảng trống đo lường ấy mới là thứ Nón Lá nhận
+  làm.</b>
+</div>
+
+<h2>② Nguồn lực đang bị lãng phí</h2>
+<p>Đề bài liệt kê rõ những gì được tính là nguồn lực. Năm thứ dưới đây đều nằm trong danh
+sách đó, và cả năm đều đang bị bỏ không mỗi ngày — không phải vì ai đó cẩu thả, mà vì chưa
+có ai nhặt.</p>
+
+<table>
+  <tr><th style="width:21%">Nguồn lực</th><th>Đang bị lãng phí thế nào</th><th style="width:27%">Trạng thái đo được</th></tr>
+  <tr><td><b>Dữ liệu giá địa phương</b><br><span style="font-size:9pt;color:#6C7169">nêu đích danh trong đề bài</span></td>
+      <td>Giá món nằm rải rác trên thực đơn, hoá đơn, bài đăng và trí nhớ cá nhân — <b>không chuẩn hoá theo món, theo vùng, theo đơn vị</b>. Mỗi ngày hàng nghìn cái giá được nhìn thấy rồi quên đi, nên hôm sau người khách tiếp theo lại bắt đầu từ con số không.</td>
+      <td><code>eateries.json</code> đã có <b>2.481 quán</b> với tên và toạ độ thật từ OpenStreetMap — và <b>0% trong số đó có giá</b>. Bộ khung đã sẵn, phần ruột thì trống.</td></tr>
+  <tr><td><b>Năng lực thiết bị sẵn có</b><br><span style="font-size:9pt;color:#6C7169">công nghệ</span></td>
+      <td>Chiếc điện thoại trong túi khách đã có camera, bộ xử lý và trình duyệt, nhưng gần như chỉ dùng để chụp ảnh và dịch. Không cần mua thêm phần cứng nào để nó trở thành một thiết bị đo giá.</td>
+      <td>Toàn bộ đường chính — đọc chữ, khớp món, phán quyết — chạy <b>trên máy</b>, <b>0 lượt gọi máy chủ</b>, và chạy được khi tắt hẳn mạng.</td></tr>
+  <tr><td><b>Uy tín người bán tử tế</b><br><span style="font-size:9pt;color:#6C7169">nguồn lực cộng đồng</span></td>
+      <td>Sự tử tế không được ghi nhận ở đâu cả nên không đổi được thành khách, trong khi tiếng xấu thì lan miễn phí. Và khi không có công cụ giải thích, một chênh lệch giá rất dễ biến thành cãi vã.</td>
+      <td>Cơ chế nhãn <b>Đúng Giá</b> đã dựng xong: cấp <b>tự động</b> sau 20 lượt quét độc lập, <b>tự động mất</b> khi giá trôi ra ngoài khoảng của khu. Hiện chưa quán thật nào mang nhãn — vì chưa có lượt quét thật nào.</td></tr>
+  <tr><td><b>Thời gian</b><br><span style="font-size:9pt;color:#6C7169">nêu đích danh trong đề bài</span></td>
+      <td>Của khách: dò hỏi, mặc cả, đi lòng vòng tìm “chỗ an toàn”, ngồi ăn trong trạng thái ngờ vực. Của người bán: giải thích lại cùng một cái giá cho từng người khách, bằng thứ tiếng mình không nói được.</td>
+      <td>Một lượt quét trả phán quyết cho cả tấm thực đơn trong khoảng <b>0,4 giây</b> sau lần khởi động đầu.</td></tr>
+  <tr><td><b>Hạ tầng du lịch đã đầu tư</b></td>
+      <td>Đường, khách sạn, di tích, nhân lực đã có sẵn. Khi khách không quay lại và không giới thiệu người khác, phần hạ tầng ấy chạy dưới công suất — một dạng lãng phí không ai nhìn thấy vì nó không có hoá đơn.</td>
+      <td><b>Chưa đo được</b>, và chúng tôi ghi rõ là chưa. Đây là lập luận cơ chế, không phải một phép đo.</td></tr>
+</table>
+
+<div class="box">
+  <b>Đúng chữ của đề bài</b>
+  “Một nguồn tài nguyên chưa được khai thác hợp lý có thể trở thành nền tảng cho một mô
+  hình kinh doanh mới.” Nguồn tài nguyên ấy, ở đây, là <b>những cái giá đang bị nhìn thấy
+  rồi quên đi</b>. Nón Lá không tạo ra nguồn lực mới — nó nhặt một thứ đang bị vứt đi và
+  biến thành tài sản dùng chung.
+</div>
+
+<h2>③ Giải pháp đổi mới nằm ở đâu</h2>
+<p>Không nằm ở OCR. OCR, bản đồ và dịch tự động đều đã tồn tại và đều có sẵn miễn phí.
+Điểm đổi mới là Nón Lá ghép chúng thành <b>một quy trình khép kín tại đúng chỗ có ma
+sát</b>:</p>
+
+<p style="text-align:center;font-size:10.6pt;margin:5mm 0;line-height:1.9">
+<b>Quét con số</b> → <b>đối chiếu dữ liệu địa phương</b> → <b>nói rõ mức tin cậy</b> →
+<b>chỉ ra nguyên nhân dễ gây hiểu nhầm</b> → <b>đưa câu cần hỏi</b> →
+<b>đưa câu tiếng Việt cho người bán trả lời</b></p>
+
+<h3>Ba khối sản phẩm</h3>
+<table>
+  <tr><th style="width:24%">Khối</th><th>Trả lời câu hỏi gì</th></tr>
+  <tr><td><b>Price Lens</b><br><span style="font-size:9pt;color:#6C7169">trước khi gọi món</span></td>
+      <td>Giá này nằm ở đâu trong phân phối giá của khu? Đây là số <b>đã đo</b> hay số <b>ước lượng</b>? Dòng này có đơn vị đặc biệt hay phụ thu nào không?</td></tr>
+  <tr><td><b>Resolve at Counter</b><br><span style="font-size:9pt;color:#6C7169">ngay tại quầy</span></td>
+      <td>Không dừng ở cảnh báo mà đưa hướng xử lý: hỏi lại đơn vị · xác nhận tổng tiền · hỏi phí phục vụ · đối chiếu hai tấm thực đơn · <b>chìa màn hình có câu tiếng Việt cho người bán đọc</b>.</td></tr>
+  <tr><td><b>Cash &amp; Bill Guard</b><br><span style="font-size:9pt;color:#6C7169">lúc trả tiền</span></td>
+      <td>Tờ này là mệnh giá nào? Tiền thối có đủ không, và nếu thiếu thì thiếu đúng bằng chênh lệch giữa hai tờ hay bị nhầm? Hoá đơn có dòng nào không nằm trong những món đã gọi?</td></tr>
+</table>
+
+<h3>Và một cơ chế mà không công cụ nào khác có</h3>
+<p>Hiện tại, một lần quét thực đơn là <b>một câu hỏi</b>. Nhưng để trả lời câu hỏi đó, app
+đã phải đọc ra 5–30 dòng <i>(tên món, giá)</i>, đã khớp xong tên món với bộ 77 món, và đã
+biết người dùng đang đứng ở đâu. Tức là mỗi lần quét <b>đã sẵn là</b> 5–30 quan sát giá có
+toạ độ và có mốc thời gian — rồi bị bỏ đi ngay sau khi vẽ xong thẻ kết quả.</p>
+
+<div class="box jade">
+  <b>Cùng một thao tác, hai giá trị</b>
+  Người dùng không phải làm thêm động tác nào. Câu hỏi của họ, khi được gộp lại với câu
+  hỏi của những người khác, <b>chính là</b> câu trả lời cho người tiếp theo. Đó đúng là
+  “sử dụng hiệu quả hơn những gì đang có” theo nghĩa đen nhất: không thêm nguồn lực, chỉ
+  thôi vứt đi thứ đang có.
+</div>
+
+<p>Ràng buộc chúng tôi tự đặt: gửi lên <b>các dòng đã trích</b> — quán, món, giá, thời
+điểm — <b>chứ không gửi ảnh</b>. Lời hứa “ảnh quét không rời khỏi máy” giữ nguyên, và việc
+đóng góp là một công tắc người dùng tự bật, nói rõ ở màn xin phép chứ không giấu trong
+điều khoản.</p>
+
+<div class="box terra">
+  <b>Nguyên tắc chặn lạm dụng, viết từ dòng mã đầu tiên</b>
+  Hệ thống <b>không bao giờ gọi một cơ sở kinh doanh là lừa đảo</b>. Nó nêu mức lệch giá
+  kèm cỡ mẫu và ngày cập nhật, rồi để người dùng tự quyết định. Một công cụ đo giá mà
+  trở thành công cụ tố cáo sẽ bị chính người bán tẩy chay — và mất luôn nguồn dữ liệu của
+  mình.
+</div>
+
+<h2>④ Giá trị tạo ra, và ai trả tiền</h2>
+
+<h3>Giá trị kinh tế</h3>
+<ul>
+  <li><b>Khách</b> giảm nguy cơ trả nhầm vì đọc sai đơn vị hoặc đưa nhầm mệnh giá.</li>
+  <li><b>Người bán trung thực</b> giảm tranh chấp, và lần đầu có một cách chứng minh mình
+    bán đúng giá mà không phải tự nói.</li>
+  <li><b>Khách sạn, hostel, công ty tour</b> có thêm một công cụ đưa cho khách — thứ giúp
+    họ giảm khiếu nại mà không tốn nhân sự.</li>
+  <li><b>Địa phương</b> có một bộ dữ liệu giá minh bạch của chính khu mình, thứ hiện không
+    ai có.</li>
+</ul>
+
+<h3>Mô hình doanh thu</h3>
+<p>Khách du lịch dùng <b>miễn phí</b> — khách là phía tạo ra dữ liệu, thu tiền ở đó là chặn
+ngay nguồn nuôi cả hệ thống. Doanh thu đến từ bốn phía có lợi ích thương mại: nhà hàng
+(gói thực đơn đa ngôn ngữ và QR minh bạch) · khách sạn, hostel, công ty tour (phí tích hợp
+kèm dữ liệu theo điểm đến) · ban quản lý khu du lịch và cơ quan quản lý (dashboard mặt bằng
+giá) · và gói quảng bá trải nghiệm địa phương. <b>Bảng đầy đủ ở chương 1</b>, cùng lý do vì
+sao gói cơ bản cho người bán nhỏ phải miễn phí.</p>
+<div class="box terra">
+  <b>Ranh giới không bán</b>
+  Nhà hàng <b>không được mua quyền thay đổi kết quả đánh giá</b>. Cả hai nhãn của hệ thống
+  đều do máy cấp và do máy thu hồi; tiền chỉ mua được chỗ hiển thị và công cụ, không mua
+  được phán quyết. Bỏ ranh giới này là mất toàn bộ lý do tồn tại của sản phẩm — và mất
+  luôn niềm tin của phía trả tiền thật sự, là khách.
+</div>
+
+<h3>Giá trị xã hội</h3>
+<ul>
+  <li>Giảm xung đột giữa khách quốc tế và người bán, bằng cách đưa cho <b>cả hai phía</b>
+    cùng một con số và một câu nói được.</li>
+  <li>Giảm bất bình đẳng thông tin do rào cản ngôn ngữ — giao diện có sẵn tiếng Anh, Việt,
+    Hàn, Trung, Nhật, đúng nhóm khách đông nhất ở miền Trung.</li>
+  <li>Bảo vệ <b>cả</b> khách lẫn cơ sở kinh doanh nghiêm túc, thay vì chỉ đứng về một phía.</li>
+</ul>
+
+<h3>Giá trị môi trường — nói vừa đúng mức</h3>
+<p>Đây là chân yếu nhất của dự án, và chúng tôi <b>không</b> nói quá. Nón Lá không phải một
+dự án môi trường; nó là một dự án về dữ liệu và niềm tin. Phần liên quan tới bền vững là
+thật nhưng khiêm tốn, và chia làm hai loại:</p>
+
+<p><b>Đo được, vì là hệ quả trực tiếp của kiến trúc:</b></p>
+<table>
+  <tr><th style="width:34%">Việc</th><th>Nón Lá</th><th>Trợ lý AI đa phương thức</th></tr>
+  <tr><td>Đọc một tấm thực đơn</td><td><b>0 lượt gọi máy chủ</b> — bộ đọc chữ chạy trong trình duyệt trên máy khách</td><td>1 lượt suy luận mô hình lớn ở trung tâm dữ liệu, mỗi lần hỏi</td></tr>
+  <tr><td>Tra khoảng giá</td><td>0 — bảng giá sáu vùng nằm sẵn trong máy</td><td>1 lượt suy luận nữa</td></tr>
+  <tr><td>Khi mất mạng</td><td>Chạy đủ: đọc chữ, tra giá, bản đồ, nhật ký</td><td>Không dùng được</td></tr>
+  <tr><td>Cài đặt</td><td>PWA — mở link là dùng, không tải app nặng về máy</td><td>App riêng</td></tr>
+</table>
+
+<p><b>Có lý nhưng chưa đo được — nêu ra như giả thuyết, không nêu như thành tích:</b> lớp
+thông tin số thay cho việc in nhiều bản thực đơn đa ngôn ngữ; khách hiểu đúng đơn vị và
+khẩu phần nên bớt gọi dư; và dữ liệu theo vùng có thể giúp phân bổ khách sang những điểm
+ít đông hơn thay vì dồn vào vài khu quá tải.</p>
+
+<div class="box">
+  <b>Nói thẳng về việc nhắm giải</b>
+  Nếu xét riêng giải <i>“Dự án chuyển đổi xanh bền vững”</i>, Nón Lá <b>không phải ứng viên
+  mạnh nhất</b> — và chúng tôi không định giả vờ là. Dự án hợp hơn với ba giải:
+  <b>Dự án đột phá</b> (khai mở một nguồn dữ liệu chưa ai có), <b>Dự án mang dấu ấn cộng
+  đồng</b> (kết quả thực nghiệm tạo ra ngay trong quá trình thi), và <b>Dự án triển vọng</b>
+  (mô hình sống được ngoài đời thực, không chỉ nằm trên slide).
+</div>
+
+<h2>Chuỗi đo: nguồn lực khai mở → giá trị tạo ra</h2>
+<p>Sáu bậc dưới đây có đơn vị ở từng bậc và đọc thẳng ra từ cơ sở dữ liệu, không qua một
+bản khảo sát cảm tính nào. Kể cả khi con số hôm nay đang là 0, chúng tôi vẫn để nguyên
+số 0 ở đó.</p>
+
+<table>
+  <tr><th style="width:6%" class="num">Bậc</th><th>Đại lượng</th><th style="width:16%">Đơn vị</th>
+      <th style="width:13%" class="num">Hôm nay</th><th style="width:19%" class="num">Mốc sau 30 ngày</th></tr>
+  <tr><td class="num">1</td><td>Lượt quét thực đơn có bật đóng góp</td><td>lượt</td><td class="num">0</td><td class="num">500</td></tr>
+  <tr><td class="num">2</td><td>Dòng giá thật thu được</td><td>dòng <i>(quán, món, giá, ngày)</i></td><td class="num">0</td><td class="num">2.000</td></tr>
+  <tr><td class="num">3</td><td>Món thoát khỏi số ước lượng <span class="tag grey">estimate</span> → <span class="tag ok">surveyed</span></td><td>món · cần 5 mẫu/món</td><td class="num">0/219</td><td class="num">35/219</td></tr>
+  <tr><td class="num">4</td><td>Vùng có bảng giá đo thật</td><td>vùng</td><td class="num">0/6</td><td class="num">1/6</td></tr>
+  <tr><td class="num">5</td><td>Quán đạt nhãn Đúng Giá</td><td>quán · cần 20 lượt quét/quán</td><td class="num">0</td><td class="num">10</td></tr>
+  <tr><td class="num">6</td><td>Chỉ số giá khu phố công bố công khai</td><td>bản/tháng</td><td class="num">0</td><td class="num">1</td></tr>
+</table>
+
+<p>Ba bậc đầu là <b>nguồn lực được khai mở</b>; ba bậc sau là <b>giá trị tạo ra</b>. Bậc 6
+là thứ chuyển dự án từ <i>một cái app</i> thành <i>một hạ tầng thông tin</i>: khi “Chỉ số
+giá Phố cổ Hội An tháng 11” tồn tại và có cỡ mẫu đi kèm, nó là thứ báo chí và cơ quan quản
+lý dùng được — và hiện không ai ở Việt Nam đang có.</p>
+
+<h2>Bước tiến rõ ràng qua từng vòng</h2>
+<table>
+  <tr><th style="width:23%">Mốc</th><th>Việc chốt xong</th><th style="width:27%">Bằng chứng nộp được</th></tr>
+  <tr><td><b>Vòng 1</b> · 01–15/10<br>Hồ sơ &amp; video</td>
+      <td>Nối vòng đóng góp dữ liệu: mỗi lần quét ghi lại thành quan sát giá có toạ độ, có công tắc đồng ý</td>
+      <td>Bản chạy công khai, hồ sơ này, bộ phép thử xanh</td></tr>
+  <tr><td><b>Vòng 1</b> · 16–31/10<br>Mini Contest</td>
+      <td><b>Khảo sát thực địa vùng đầu tiên</b> — 175–205 mẫu giá thật cho một khu</td>
+      <td>Vùng đầu tiên chuyển nhãn <i>estimate</i> → <i>surveyed</i>, nhìn thấy trên giao diện</td></tr>
+  <tr><td><b>Vòng 2</b> · 01–15/11<br>Đề án &amp; tranh biện</td>
+      <td>Nhãn Đúng Giá cấp cho những quán thật đầu tiên; tấm dán QR tại quầy</td>
+      <td>Ảnh tấm dán ngoài đường + số quán đạt nhãn, cấp bằng máy</td></tr>
+  <tr><td><b>Vòng 3</b> · 29/11<br>Chung kết gọi vốn</td>
+      <td>Công bố Chỉ số giá số đầu tiên; chốt mô hình doanh thu quanh nhãn và dữ liệu</td>
+      <td>Bản chỉ số công khai kèm cỡ mẫu, và đường đi từ dữ liệu tới doanh thu</td></tr>
+</table>
+
+<h2>Vì sao đây không phải “một app chụp ảnh” mà AI làm tốt hơn</h2>
+<p>Câu này chắc chắn sẽ được hỏi, nên trả lời trước, và trả lời thật.</p>
+<p><b>Đọc ảnh không phải lợi thế của Nón Lá.</b> Một mô hình đa phương thức đọc thực đơn
+tốt hơn, dịch tốt hơn, giải thích món tốt hơn. Chúng tôi không cạnh tranh ở đó.</p>
+<p>Nhưng hỏi một trợ lý AI <i>“95k cho một bát cao lầu ở Hội An có bình thường không?”</i>
+thì nó trả về một con số rất tự tin, <b>không nguồn, không ngày, không cỡ mẫu</b>, lấy từ
+dữ liệu huấn luyện có thể đã hai năm tuổi — và người dùng không có cách nào biết đúng hay
+sai. Nó cũng cần mạng, đúng vào lúc khách vừa xuống sân bay chưa có eSIM.</p>
+<table class="ui">
+  <tr><td>Cái AI đang làm</td><td><b>Đoán</b> một cái giá từ tri thức chung, không kiểm chứng được</td></tr>
+  <tr><td>Cái Nón Lá làm</td><td><b>Đo</b> giá tại chỗ, ghi lại, gộp thành phân phối theo vùng và theo tháng, và luôn khai rõ con số dựa trên mấy mẫu</td></tr>
+</table>
+<p>Khác biệt không nằm ở mô hình mà nằm ở <b>chỗ dữ liệu đến từ đâu</b> — cộng camera,
+offline, và quy trình xử lý ngay tại quầy. Một mô hình ngôn ngữ có thể học lại trong một
+đêm; bảng giá đo thật của Phố cổ tháng này thì chỉ người đứng ở đó mới tạo ra được.</p>
+
+<h2>Điều phải sửa trước khi nộp — nói trước, thay vì để Ban Giám khảo tìm ra</h2>
+<div class="box terra">
+  <b>Chưa có một dòng giá nào qua khảo sát thực địa</b>: 153/219 ô giá là số viết tay,
+  66 ô còn lại được dựng từ giá tra trên menu công bố và bài hướng dẫn — có nguồn để chỉ
+  tay vào, nhưng vẫn không phải số ai đó đo tại quầy. Tên cơ sở trong bản chạy là
+  <b>tên mô tả chứ không phải tên quán có thật</b>. App tự khai cả hai điều đó ở mọi phán
+  quyết. Nghĩa là phần <i>công cụ</i> đã xong — đo, gộp, phán quyết, gắn nhãn, kiểm chứng
+  bằng 719 phép thử — còn phần <i>dữ liệu thật</i> thì đang ở vạch xuất phát.
+</div>
+<p>Đây là rủi ro lớn nhất của hồ sơ: nếu bản demo vẫn hiện nhiều cơ sở mang nhãn Đúng Giá
+hay vượt khoảng, câu hỏi đầu tiên của giám khảo sẽ là <i>“các em đã đo những quán này
+chưa?”</i>. Năm việc phải xong trước ngày nộp:</p>
+<ol>
+  <li><b>Khảo sát thật ít nhất một khu vực</b> — Hoàn Kiếm cần 175 mẫu, Hội An 205.</li>
+  <li><b>Gắn ngày và số mẫu cho từng dòng giá</b>, hiện ra ngay cạnh con số.</li>
+  <li><b>Không kết luận về một cơ sở cụ thể</b> khi chưa đủ dữ liệu của chính cơ sở đó.</li>
+  <li><b>Tách rõ hai thứ đang dễ bị đọc lẫn:</b> <i>giá tham chiếu của vùng</i> và
+    <i>dữ liệu của một cơ sở</i>.</li>
+  <li><b>Chỉ dùng nhãn “đã khảo sát”</b> khi có bằng chứng thật đứng sau.</li>
+</ol>
+<p>Chúng tôi coi việc nói ra danh sách này là điểm mạnh của hồ sơ chứ không phải điểm yếu:
+nó cho thấy chính xác đồng vốn đầu tiên sẽ đi vào đâu, và kết quả sẽ đo bằng thước nào.</p>
+
+<h1 class="ch" id="s1"><span class="n">1</span>Ba lớp: khách · người bán · địa phương</h1>
+<p class="lead">Một công cụ chỉ đứng về phía khách sẽ bị chính người bán tẩy chay — và mất
+luôn nguồn dữ liệu của mình. Chương này là bản nâng cấp quan trọng nhất của dự án: mở lớp
+thứ hai cho người bán, và lớp thứ ba cho địa phương.</p>
+
+<div class="box jade">
+  <b>Định vị đã chốt</b>
+  Nón Lá là <b>nền tảng minh bạch hoá giao dịch và quảng bá giá trị ẩm thực địa phương</b>
+  cho du khách quốc tế.<br><br>
+  <b>Không</b> phải app chống người bán. <b>Không</b> phải app tìm quán rẻ nhất. Mà là
+  <b>lớp trung gian giúp hai bên hiểu nhau</b> — khách hiểu đúng để mua đúng, người bán
+  minh bạch hơn để bán tốt hơn.
+</div>
+
+<h2>Vì sao phải có lớp người bán</h2>
+<p>Bản hiện tại chỉ có một chiều: khách quét, app phán quyết. Chiều ấy có ba chỗ hỏng, và
+cả ba đều nghiêm trọng.</p>
+<div class="grid3">
+  <div class="card"><span class="t">Hỏng 01</span><b>Người bán thấy mình bị soi</b>
+    <p>Một công cụ chỉ đo và chỉ cảnh báo, không cho người bị đo nói lại câu nào, thì sớm
+    muộn cũng bị coi là kẻ rình rập. Không ai hợp tác với thứ đó.</p></div>
+  <div class="card"><span class="t">Hỏng 02</span><b>Không có ai để hỏi</b>
+    <p>App phát hiện được ma sát nhưng không giải quyết được ma sát. Chênh lệch giá vẫn
+    nằm nguyên đó, chỉ thêm một người đang bực.</p></div>
+  <div class="card"><span class="t">Hỏng 03</span><b>Dữ liệu chỉ có một nguồn</b>
+    <p>Toàn bộ dữ liệu phải do khách đi thu. Người biết rõ giá nhất — chính người bán —
+    lại không có cách nào đóng góp.</p></div>
+</div>
+
+<h2>Sai lầm phải tránh: Nón Lá không phải app tìm giá rẻ nhất</h2>
+<p>Đây là ranh giới quan trọng nhất của cả chương này, và nếu vượt qua thì sản phẩm quay
+sang <b>làm hại</b> đúng những người nó muốn bảo vệ.</p>
+<p>Một món đắt hơn mặt bằng có thể vì rất nhiều lý do lương thiện: nguyên liệu tốt hơn,
+khẩu phần lớn hơn, vị trí đặc biệt, phí phục vụ đã gộp, cách chế biến truyền thống tốn
+công, hoặc giá trị văn hoá và trải nghiệm đi kèm. Một hệ thống chỉ biết xếp hạng theo giá
+sẽ đẩy cả một con phố về đáy, và người chịu thiệt đầu tiên là người làm tử tế nhất.</p>
+
+<div class="box terra">
+  <b>Đổi câu hỏi của sản phẩm</b>
+  Nón Lá không trả lời <i>“giá này cao hay thấp?”</i><br>
+  Nón Lá trả lời <b>“giá này khác mặt bằng ở chỗ nào, và vì lý do gì?”</b><br><br>
+  Câu thứ hai khó hơn nhiều, và chính nó là thứ cần lớp người bán mới trả lời được.
+</div>
+
+<h2>Ba tính năng cho người bán</h2>
+
+<h3>① Thực đơn minh bạch đa ngôn ngữ, có mã QR</h3>
+<p>Người bán tạo hoặc cập nhật thực đơn của chính mình, rồi app sinh một mã QR để dán tại
+quầy. Mỗi dòng ghi rõ:</p>
+<div class="grid2">
+  <div class="card"><b>Con số phải rõ</b>
+    <p>Giá <b>kèm đúng đơn vị</b>: theo phần · theo con · theo 100 g · theo lạng.
+    Phí phục vụ, phụ thu và <i>thời giá</i> khai riêng, không giấu trong một con số.
+    Khẩu phần dự kiến.</p></div>
+  <div class="card"><b>Món phải hiểu được</b>
+    <p>Tên tiếng Việt giữ nguyên, kèm bản dịch Anh · Hàn · Trung · Nhật. Ảnh món. Thành
+    phần dễ gây dị ứng — đậu phộng, mắm tôm, hải sản.</p></div>
+</div>
+<table class="ui">
+  <tr><td>Đã có sẵn để dùng lại</td><td>Bộ 77 món với mô tả, thành phần nhạy cảm, câu gọi món và phiên âm; giao diện năm thứ tiếng; và <code>units.js</code> — module hiểu <code>/100g</code>, <i>lạng</i>, <i>thời giá</i>, phụ thu, đã có phép thử.</td></tr>
+  <tr><td>Phần phải xây mới</td><td>Quyền ghi cho người bán, trình soạn thực đơn, và mã QR trỏ về trang thực đơn của quán đó.</td></tr>
+  <tr><td>Người bán được gì</td><td>Bớt phải giải thích lặp lại · giảm hiểu nhầm khi khách không nói tiếng Việt · thực đơn tiếp cận được khách quốc tế · quầy trông chuyên nghiệp hơn.</td></tr>
+</table>
+
+<h3>② Màn hình “Giải thích cho khách”</h3>
+<p>Khi Nón Lá thấy một mức giá lệch khỏi mặt bằng, app <b>không kết luận quán sai</b>. Nó
+mở cho người bán một danh sách lý do chọn nhanh, và hiển thị lại cho khách <b>bằng đúng
+thứ tiếng khách đang dùng</b>:</p>
+<p style="margin:3mm 0 5mm"><span class="tag grey">Khẩu phần lớn</span>
+<span class="tag grey">Giá tính theo 100 g</span>
+<span class="tag grey">Đã gồm phí phục vụ</span>
+<span class="tag grey">Nguyên liệu đặc biệt</span>
+<span class="tag grey">Món theo mùa</span>
+<span class="tag grey">Thực đơn cũ chưa cập nhật</span>
+<span class="tag grey">Lý do khác</span></p>
+<p>Đây là chỗ app chuyển từ <b>phát hiện ma sát</b> sang <b>giải quyết ma sát</b> — và nó
+dùng lại đúng màn hình <i>“Chìa cho người bán”</i> đã có: chữ rất to, xoay ngược được, đọc
+từ khoảng cách hai người cách nhau một cái bàn.</p>
+
+<div class="box">
+  <b>Ranh giới: lời giải thích là lời của người bán, không phải phán quyết của hệ thống</b>
+  Mọi câu hiện lên phải mang nhãn rõ ràng rằng đây là <b>người bán nói</b>. Nón Lá không
+  xác nhận, không bác bỏ. Nó chỉ đảm bảo lời giải thích ấy tới được người cần nghe, bằng
+  thứ tiếng người đó đọc được — việc mà trước nay rào cản ngôn ngữ vẫn chặn.
+</div>
+
+<h3>③ Hồ sơ giá trị địa phương</h3>
+<p>Chỗ này rất dễ làm hỏng thành một cuốn cẩm nang du lịch chung chung. Cách giữ cho nó
+sắc: <b>văn hoá không phải một tab riêng — nó là câu trả lời cho câu hỏi “vì sao giá này
+khác”.</b></p>
+<p>Tri thức ở <b>cấp món</b> thì app đã có sẵn cho cả 77 món: món đó là gì, vùng nào,
+thành phần cần lưu ý, gọi thế nào, đọc thế nào. Ví dụ mô tả cao lầu trong dữ liệu hiện
+tại đã ghi rằng sợi mì chỉ làm được bằng nước của <i>một cái giếng cổ</i> trong phố — và
+đó chính là một phần lý do vì sao giá của nó không giống bát mì thường.</p>
+<p>Cái còn thiếu là tri thức ở <b>cấp quán</b>, thứ chỉ người bán mới viết được:</p>
+<ul>
+  <li>Nguyên liệu địa phương nào được dùng, lấy từ đâu;</li>
+  <li>Câu chuyện gia đình hoặc làng nghề đứng sau món;</li>
+  <li>Cách ăn đúng — thứ tự, gia vị đi kèm, món uống hợp;</li>
+  <li>Dịp văn hoá gắn với món;</li>
+  <li>Người làm hoặc nghệ nhân đứng sau sản phẩm.</li>
+</ul>
+<p>Khi có lớp này, câu hỏi của khách đổi từ <i>“cái này bao nhiêu tiền?”</i> sang
+<i>“tôi đang mua một món ăn, hay một trải nghiệm văn hoá?”</i> — và một mức giá cao hơn
+mặt bằng lần đầu tiên có chỗ để tự giải thích.</p>
+
+<h2>Hai huy hiệu, hai ý nghĩa — đừng để lẫn</h2>
+<p>Dự án sẽ có hai nhãn, và chúng đo hai thứ hoàn toàn khác nhau. Gộp làm một là hỏng cả
+hai.</p>
+<table>
+  <tr><th style="width:24%">Nhãn</th><th>Nói điều gì</th><th style="width:26%">Ai quyết định</th></tr>
+  <tr><td><span class="tag ok">Đúng Giá</span></td>
+      <td>Giá của quán này <b>nằm trong khoảng</b> của khu, theo số liệu đo được</td>
+      <td><b>Máy đo.</b> Cấp tự động sau 20 lượt quét độc lập, tự động mất khi giá trôi ra ngoài khoảng. Người bán không tác động được.</td></tr>
+  <tr><td><span class="tag warn">Thực đơn Minh bạch</span><br><span style="font-size:9pt;color:#6C7169">Transparent Menu Partner</span></td>
+      <td>Quán này <b>công khai và giải thích rõ ràng</b> thông tin cho khách — <b>không</b> có nghĩa là rẻ nhất hay ngon nhất</td>
+      <td><b>Hành vi của người bán</b>, kiểm được bằng máy theo sáu tiêu chí bên dưới.</td></tr>
+</table>
+<p>Tiêu chí của nhãn Thực đơn Minh bạch, công khai để ai cũng tự đối chiếu được:</p>
+<ol>
+  <li>Thực đơn ghi rõ <b>đơn vị</b> cho mọi dòng;</li>
+  <li>Giá được <b>cập nhật gần đây</b>;</li>
+  <li>Có khai <b>phụ thu và phí phục vụ</b>;</li>
+  <li>Có ít nhất <b>một ngôn ngữ</b> ngoài tiếng Việt;</li>
+  <li>Có <b>phản hồi</b> khi khách cần xác nhận;</li>
+  <li>Không còn <b>dữ liệu mâu thuẫn chưa được giải thích</b>.</li>
+</ol>
+<div class="box terra">
+  <b>Không nhãn nào mua được bằng tiền</b>
+  Cả hai nhãn đều do máy cấp và do máy thu hồi. Tiền mua được chỗ hiển thị và công cụ,
+  không mua được phán quyết. Bỏ ranh giới này là mất toàn bộ lý do tồn tại của sản phẩm —
+  và mất luôn niềm tin của phía thực sự trả tiền cho nó, là khách.
+</div>
+
+<h2>Một cái bẫy kỹ thuật phải chặn ngay từ thiết kế</h2>
+<p>Khi người bán được quyền ghi giá, xuất hiện ngay một rủi ro mà toàn bộ giá trị của dự
+án phụ thuộc vào: <b>giá do người bán khai không được lẫn vào giá đo được.</b> Một quán có
+thể khai 45.000₫ và thu 90.000₫; nếu hệ thống trộn hai loại số này thì bảng giá tham chiếu
+bị đầu độc, và mọi phán quyết sau đó đều sai.</p>
+<table>
+  <tr><th style="width:26%">Loại số</th><th>Nguồn</th><th style="width:24%">Dùng để làm gì</th></tr>
+  <tr><td><b>Giá niêm yết</b></td><td>Người bán tự khai trong thực đơn</td><td>Hiển thị cho khách trước khi gọi món</td></tr>
+  <tr><td><b>Giá đo được</b></td><td>Quét thực đơn thật, hoá đơn thật, và khảo sát thực địa</td><td>Dựng phân phối giá của khu và ra phán quyết</td></tr>
+</table>
+<div class="box jade">
+  <b>Và chính khoảng cách giữa hai con số ấy là một tín hiệu</b>
+  Khi giá niêm yết và giá đo được lệch nhau ở cùng một quán, đó là một dữ kiện đáng chú ý
+  — không phải một lời buộc tội, mà là một câu hỏi rất cụ thể để hỏi lại: một thực đơn in
+  từ năm ngoái, một suất lớn hơn, hay một phần đã gồm phí phục vụ đều giải thích được cùng
+  một khoảng chênh.
+</div>
+
+<h3>Ranh giới này đã được dựng, và dựng ở ba tầng</h3>
+<p>Đây không còn là một dự định. Phần tách hai loại số đã cài đặt xong, với ba lớp chặn
+chồng lên nhau — quên một tầng thì vẫn còn hai:</p>
+<table>
+  <tr><th class="num" style="width:8%">Tầng</th><th style="width:30%">Ở đâu</th><th>Chặn bằng cách nào</th></tr>
+  <tr><td class="num"><b>1</b></td><td>Cơ sở dữ liệu<br><code>supabase/menu.sql</code></td>
+      <td><b>Hai bảng rời nhau</b>: <code>price_observations</code> giữ số đo được,
+      <code>menu_items</code> giữ giá quán khai. Không câu truy vấn nào gộp nhầm được, kể
+      cả khi người viết nó không biết chuyện này.</td></tr>
+  <tr><td class="num"><b>2</b></td><td>Ràng buộc cột</td>
+      <td>Cột <code>src</code> của bảng quan sát chỉ nhận
+      <code>scan · hand · survey · bill</code> — <b>không có</b> <code>declared</code>.
+      Gửi lên là bị chặn ngay tại máy chủ.</td></tr>
+  <tr><td class="num"><b>3</b></td><td>Máy khách<br><code>nonla-app/pricesrc.js</code></td>
+      <td>Chỗ <b>duy nhất</b> trong mã nguồn được phép trả lời câu “số này có vào dải
+      không”, cộng một chốt an toàn nêu đúng số dòng bị loại thay vì im lặng bỏ qua.</td></tr>
+</table>
+<p>Danh sách nguồn ở tầng 2 và tầng 3 phải trùng nhau, và <code>test.mjs</code>
+<b>đọc cả hai tệp rồi so lại</b> — hai bản sao của cùng một luật thì sớm muộn cũng trôi
+khỏi nhau, nên phép thử giữ hộ. Bộ phép thử hiện là <b>420 phép, xanh hết</b>, trong đó
+28 phép mới cho riêng ranh giới này: ca đắt nhất là một quán khai giá rất thấp để kéo dải
+của cả khu xuống, và phép thử khoá lại rằng nó <b>không xê dịch được một bách phân vị
+nào</b>, cũng không thổi được cỡ mẫu lên.</p>
+
+<h2>Vòng lặp giá trị mới</h2>
+<p style="text-align:center;font-size:10.4pt;margin:5mm 0;line-height:2">
+<b>Người bán tạo thực đơn rõ ràng</b> → <b>khách quét và hiểu đúng</b> →
+<b>nếu có chênh lệch thì hai bên trao đổi ngay tại quầy</b> →
+<b>khách quyết định trong minh bạch</b> → <b>người bán nhận doanh thu</b> →
+<b>dữ liệu được cập nhật</b> → <b>món địa phương đến được nhiều khách hơn</b></p>
+<p>Ở vòng này Nón Lá không còn là một <i>công cụ cảnh báo</i>. Nó là
+<b>hạ tầng niềm tin cho du lịch địa phương</b> — và mỗi vòng quay lại làm dữ liệu dày thêm
+cho vòng sau.</p>
+
+<h2>Ba lớp sản phẩm — chốt cấu trúc</h2>
+<table>
+  <tr><th style="width:20%">Lớp</th><th>Có gì</th><th style="width:20%">Trạng thái</th></tr>
+  <tr><td><b>Cho khách</b></td>
+      <td>Quét thực đơn · hiểu giá kèm nguồn gốc · kiểm tiền và hoá đơn · chìa câu tiếng Việt để hỏi người bán</td>
+      <td><span class="tag ok">đã chạy</span></td></tr>
+  <tr><td><b>Cho người bán</b></td>
+      <td>Thực đơn rõ đơn vị · dịch đa ngôn ngữ · mã QR tại quầy · màn giải thích chênh lệch · hồ sơ giá trị địa phương của quán</td>
+      <td><span class="tag warn">đang xây</span></td></tr>
+  <tr><td><b>Cho địa phương</b></td>
+      <td>Dữ liệu giá theo khu và theo tháng · món đặc trưng · câu chuyện văn hoá · mức độ tham gia của các cơ sở</td>
+      <td><span class="tag grey">theo sau lớp 2</span></td></tr>
+</table>
+
+<div class="box">
+  <b>Và ranh giới để không phồng thành một siêu app du lịch</b>
+  Nón Lá <b>không</b> làm đặt bàn, <b>không</b> làm thanh toán, <b>không</b> làm bảng xếp
+  hạng sao, <b>không</b> làm feed khám phá. Lõi giữ nguyên một câu:
+  <b>minh bạch giao dịch tại đúng thời điểm gọi món và thanh toán.</b> Mọi thứ khác chỉ
+  được thêm vào nếu nó phục vụ đúng khoảnh khắc đó.
+</div>
+
+<h2>Mô hình kinh doanh của ba lớp</h2>
+<p>Khách du lịch dùng <b>miễn phí</b>, và điều đó không đổi: khách là phía tạo ra dữ liệu,
+thu tiền ở đó là chặn ngay nguồn nuôi cả hệ thống. Doanh thu đến từ phía có lợi ích thương
+mại:</p>
+<table>
+  <tr><th style="width:34%">Nguồn</th><th>Bán cái gì</th></tr>
+  <tr><td>Nhà hàng, quán ăn</td><td>Gói thực đơn đa ngôn ngữ · gói QR thực đơn minh bạch · gói hồ sơ món địa phương</td></tr>
+  <tr><td>Khách sạn · hostel · công ty tour</td><td>Phí tích hợp: bản nhúng cho khách của họ, kèm dữ liệu theo điểm đến</td></tr>
+  <tr><td>Ban quản lý khu du lịch · cơ quan quản lý</td><td>Dashboard mặt bằng giá theo tháng, theo phường, kèm cỡ mẫu và mức độ tham gia</td></tr>
+  <tr><td>Gói quảng bá trải nghiệm địa phương</td><td>Giới thiệu món, làng nghề, nghệ nhân — <b>tách hoàn toàn khỏi kết quả giá</b></td></tr>
+</table>
+<div class="box jade">
+  <b>Gói cơ bản cho người bán nhỏ phải miễn phí</b>
+  Một xe bún vỉa hè không trả phí phần mềm, và cũng là nơi khách cần minh bạch nhất. Nếu
+  gói cơ bản có phí thì đúng nhóm cần nhất sẽ đứng ngoài, dữ liệu thiếu đúng chỗ quan
+  trọng nhất, và nhãn minh bạch biến thành nhãn của người có tiền. Thu tiền ở gói nâng cao
+  và ở ba nhóm phía trên, không thu ở cửa vào.
+</div>
+<p>Kèm theo đó là một việc rất thực tế: nhiều người bán nhỏ sẽ không tự dựng được thực đơn
+số. Nên bước tiếp theo phải có <b>đường hỗ trợ tại chỗ</b> — một người ngồi xuống làm cùng
+trong mười phút. Đây cũng chính là cách thu dữ liệu thật đầu tiên, và là việc một đội học
+sinh làm được bằng chân của mình ở Hội An hay Hoàn Kiếm.</p>
+
+<h2>Vì sao bản này mạnh hơn hẳn về mặt khởi nghiệp</h2>
+<table class="ui">
+  <tr><td>Bản chỉ có lớp khách</td><td>“Tiết kiệm tiền cho khách du lịch” — một app tiện ích, người bán không có lý do hợp tác, dữ liệu phải đi xin.</td></tr>
+  <tr><td>Bản ba lớp</td><td>“Tiết kiệm <b>niềm tin</b>, bảo vệ <b>sinh kế địa phương</b>, và biến <b>dữ liệu địa phương</b> thành giá trị kinh tế bền vững” — hai phía đều có lợi, nên cả hai phía đều nuôi dữ liệu.</td></tr>
+</table>
+<p>Và nó khớp chặt hơn với đề bài: nguồn lực được khai mở không chỉ là dữ liệu giá, mà còn
+là <b>uy tín và câu chuyện văn hoá của người bán</b> — hai thứ đang tồn tại sẵn ở mỗi con
+phố, chưa được ghi lại ở đâu, và không tốn thêm tài nguyên nào để tạo ra.</p>
+
+<h1 class="ch" id="s2"><span class="n">2</span>Nón Lá là gì</h1>
+<p class="lead">Một trợ lý camera cho người không đọc được thứ tiếng in trên tấm bảng
+giá trước mặt — và không có ai bên cạnh để hỏi.</p>
+
+<h2>Sản phẩm trong một câu</h2>
+<p>Chĩa máy vào thực đơn, hoá đơn hoặc xấp tiền; Nón Lá đọc, đối chiếu với giá phổ
+biến của khu vực, và trả lời đúng một câu hỏi: <b>“cái này có bình thường không?”</b></p>
+
+<h2>Ai dùng</h2>
+<div class="grid3">
+  <div class="card"><span class="t">Chính</span><b>Khách quốc tế</b>
+    <p>Vừa xuống sân bay, eSIM chưa kích hoạt, đang đứng trước một tấm thực đơn không
+    đọc được và một xấp tiền có sáu số 0.</p></div>
+  <div class="card"><span class="t">Thứ hai</span><b>Khách Hàn · Trung · Nhật</b>
+    <p>Nhóm đông nhất ở Hội An và Đà Nẵng, và cũng là nhóm dễ hớ nhất vì không đọc
+    được cả biển giá lẫn hoá đơn. Giao diện có sẵn tiếng của họ.</p></div>
+  <div class="card"><span class="t">Nguồn dữ liệu</span><b>Người Việt tại chỗ</b>
+    <p>Chế độ khảo sát giá viết riêng cho người bản địa đi dọc một con phố và gõ giá
+    thật — mười giây một món.</p></div>
+</div>
+
+<h2>Khác gì Google Maps</h2>
+<table>
+  <tr><th style="width:26%"></th><th>Google Maps / TripAdvisor</th><th>Nón Lá</th></tr>
+  <tr><td><b>Câu trả lời</b></td><td>“Chỗ này mấy sao, đi thế nào”</td>
+      <td>“Con số trên tấm thực đơn này có bình thường ở khu này không”</td></tr>
+  <tr><td><b>Đơn vị dữ liệu</b></td><td>đánh giá của người dùng</td>
+      <td>phân phối giá theo từng món, từng vùng</td></tr>
+  <tr><td><b>Khi mất mạng</b></td><td>gần như không dùng được</td>
+      <td>chạy đủ: đọc chữ, tra giá, bản đồ, nhật ký</td></tr>
+  <tr><td><b>Lúc đang căng</b></td><td>không có gì cho khoảnh khắc đứng ở quầy</td>
+      <td>màn xoay ngược cho người bán, đếm tiền thối, soát hoá đơn</td></tr>
+  <tr><td><b>Nói về người bán</b></td><td>điểm sao — một lời phán</td>
+      <td>chỉ nêu mức lệch và cỡ mẫu, không kết luận</td></tr>
+</table>
+
+<div class="box jade">
+  <b>Điểm khác biệt cốt lõi</b>
+  Sao đánh giá nói về <i>ấn tượng</i>. Nón Lá nói về <i>con số</i>. Một quán 4,8 sao vẫn
+  có thể tính 180.000₫ cho bát mì mà cả phố bán 45.000₫, và không có ngôi sao nào cho
+  người khách biết điều đó trước khi họ gọi món.
+</div>
+</div>
+
+<!-- ══════════════════ 2 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s3"><span class="n">3</span>Vấn đề đang giải</h1>
+<p class="lead">Bốn cách mất tiền, khác nhau về cơ chế, nên phải giải bằng bốn tính năng
+khác nhau chứ không phải một.</p>
+
+<h3>① Không biết mặt bằng giá</h3>
+<p>Khách không có gì để so. Một bát cao lầu 95.000₫ ở Hội An nghe vẫn “rẻ” với người
+vừa trả 12 đô cho một bát mì ở nhà — trong khi cả phố bán 60.000–90.000₫. Không ai bị
+lừa ở đây cả; chỉ là <b>thiếu một điểm neo</b>.</p>
+
+<h3>② Không đọc được đơn vị</h3>
+<p>“Cá song 100.000<b>/100g</b>” và “tôm 120.000<b>/lạng</b>”. Một lạng là 100 gam —
+người Việt biết, khách không. Con cá 800 gam thành 800.000₫, và tờ hoá đơn hoàn toàn
+đúng. Đây là dạng chênh lệch lớn nhất về tiền tuyệt đối, và <b>không phải lỗi của ai</b>
+ngoài cái khoảng trống ngôn ngữ.</p>
+
+<h3>③ Nhầm mệnh giá</h3>
+<p>Tiền polymer Việt Nam có hai cặp gần như cùng màu:</p>
+<table>
+  <tr><th>Cặp dễ nhầm</th><th>Màu</th><th class="num">Nhầm một tờ là mất</th></tr>
+  <tr><td>20.000₫ ↔ 500.000₫</td><td>đều xanh lơ</td><td class="num">480.000₫</td></tr>
+  <tr><td>10.000₫ ↔ 200.000₫</td><td>đều nâu đỏ</td><td class="num">190.000₫</td></tr>
+</table>
+<p>Gần bằng ba bữa ăn cho một cú lóng ngóng dưới ánh đèn quán — và nó xảy ra với cả
+người bán trung thực, vì hai tờ đó thật sự giống nhau.</p>
+
+<h3>④ Không có tiếng nói tại chỗ</h3>
+<p>Ngay cả khi biết giá đang cao, khách không có câu nào để nói ra. Mọi màn hình của
+mọi app đều viết cho <i>một</i> người đọc: chính họ. Người đứng sau quầy không có gì
+để đọc cả.</p>
+
+<div class="box terra">
+  <b>Điều Nón Lá cố tình KHÔNG làm</b>
+  Không dựng công cụ mặc cả, không chấm điểm quán, không mở đường tố cáo. Thứ khách du
+  lịch thiếu không phải vũ khí — mà là một điểm neo và một câu nói được.
+</div>
+
+<h2>Vì sao bây giờ</h2>
+<ul>
+  <li><b>OCR đã đủ nhẹ để chạy trên máy.</b> Tesseract với dữ liệu huấn luyện tiếng Việt
+    đọc một tấm thực đơn trong khoảng 0,4 giây sau lần khởi động đầu — không cần gửi ảnh
+    đi đâu, nên lời hứa riêng tư là thật chứ không phải chính sách.</li>
+  <li><b>OpenStreetMap đã phủ đủ dày.</b> 2.481 hàng quán trong sáu khu lõi du lịch, kèm
+    toạ độ và tên — đủ để dựng một lớp bản đồ vector tự vẽ chạy được cả khi mất mạng.</li>
+  <li><b>PWA đã chạy được offline thật.</b> Service worker giữ toàn bộ vỏ app, dữ liệu
+    sáu vùng và dữ liệu huấn luyện OCR trong máy.</li>
+</ul>
+</div>
+
+<!-- ══════════════════ 3 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s4"><span class="n">4</span>Sáu nguyên tắc không đổi</h1>
+<p class="lead">Đây là phần khó sao chép nhất của dự án. Mỗi nguyên tắc đều đã có lúc
+xung đột với một tính năng trông rất hấp dẫn, và tính năng là thứ bị bỏ.</p>
+
+<div class="grid2">
+  <div class="card"><span class="t">01</span><b>Không bao giờ gọi ai là lừa đảo</b>
+    <p>Hệ thống nêu mức lệch giá kèm cỡ mẫu và ngày cập nhật, rồi để người dùng tự
+    quyết. Chữ dùng ở mọi chỗ là “chênh lệch”, không phải “chặt chém”.</p></div>
+  <div class="card"><span class="t">02</span><b>Không in ra số mình không đo</b>
+    <p>Dữ liệu hạt giống tự khai là hạt giống ở <i>mọi</i> phán quyết. Bản mockup có
+    “4,8 ★” trên mỗi thẻ — đã bỏ hết, vì app không có một dòng dữ liệu đánh giá nào.</p></div>
+  <div class="card"><span class="t">03</span><b>Ảnh quét không rời khỏi máy</b>
+    <p>OCR chạy tại chỗ. Ảnh người dùng <i>chủ động</i> đăng lên cộng đồng thì có gửi —
+    và toạ độ GPS trong EXIF bị xoá trước khi gửi.</p></div>
+  <div class="card"><span class="t">04</span><b>Không bịa ra tài khoản của ai</b>
+    <p>App không biết quán nào có trang Facebook nào. Nên mọi liên kết mạng xã hội là
+    liên kết <i>tìm kiếm</i>, và giao diện tự khai đúng điều đó.</p></div>
+  <div class="card"><span class="t">05</span><b>Không có bức tường đăng nhập</b>
+    <p>Toàn bộ giá trị nằm sẵn trong máy. Tài khoản chỉ mở thêm một thứ — đăng bài lên
+    máy chủ chung — nên nó xin, không ép.</p></div>
+  <div class="card"><span class="t">06</span><b>Không bao giờ để người dùng bí</b>
+    <p>Mọi màn hình có lối nhập tay. Camera hỏng, OCR đọc sai, mất mạng, không có dữ
+    liệu vùng — luôn còn một đường đi tiếp.</p></div>
+</div>
+
+<h2>Nguyên tắc số 2 tốn kém đến mức nào</h2>
+<p>Dữ liệu hạt giống trong <code>data/prices.json</code> mang một trường <code>n</code> —
+34, 51, 22 — và giao diện từng in nó ra thành <i>“so với ~34 quán quanh đây”</i>. Không
+có 34 quán nào cả: <code>n</code> của dữ liệu hạt giống là số hư cấu. In nó ra như một
+phép đo là biến một con số bịa thành một bằng chứng.</p>
+<p>Chỗ chữa nằm ở <code>trust.js</code>: mỗi khoảng giá được gắn <b>bậc nguồn gốc</b>, và
+giao diện chỉ được nói đúng những gì bậc đó cho phép.</p>
+
+<table>
+  <tr><th>Bậc</th><th>Điều kiện</th><th>Giao diện được nói gì</th></tr>
+  <tr><td><span class="tag grey">ước lượng</span></td><td>dải còn cờ <code>seed</code></td>
+      <td>“khoảng giá ước lượng” — <b>cấm</b> nhắc tới cỡ mẫu</td></tr>
+  <tr><td><span class="tag warn">có ghi chép</span></td><td>người dùng đã tự khảo sát 1–4 mẫu</td>
+      <td>nói được số mẫu thật, vẫn kèm ghi chú chưa đủ</td></tr>
+  <tr><td><span class="tag ok">đã đo</span></td><td>≥ 5 mẫu khảo sát thật, cờ <code>seed</code> biến mất</td>
+      <td>nói thẳng số mẫu và ngày đo</td></tr>
+  <tr><td><span class="tag ok">đã đo nhiều</span></td><td>cỡ mẫu lớn, có <code>surveyedAt</code></td>
+      <td>trình bày đầy đủ như một phép đo</td></tr>
+</table>
+
+<div class="box">
+  <b>Vì sao chuyện này đáng một chương</b>
+  Sản phẩm nói với người đi du lịch rằng một cái giá là bình thường hay quá cao, và họ
+  mang câu đó ra đứng trước một người bán hàng có thật. Nếu con số phía sau là số bịa,
+  thì cái app này đang mượn uy tín của một phép đo không tồn tại.
+</div>
+</div>
+
+<!-- ══════════════════ 4 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s5"><span class="n">5</span>Phán quyết giá hoạt động ra sao</h1>
+<p class="lead">Từ pixel tới một dòng chữ người ta dám mang ra dùng: năm bước, và bước
+nào cũng có chỗ để tra ngược.</p>
+
+<h2>Đường đi của một dòng thực đơn</h2>
+<table>
+  <tr><th style="width:16%">Bước</th><th>Việc</th><th>Nằm ở</th></tr>
+  <tr><td><b>1 · Ảnh</b></td><td>Lấy khung hình từ camera, không lưu, không gửi</td><td><code>app.js</code></td></tr>
+  <tr><td><b>2 · Chữ</b></td><td>Tesseract <code>vie</code> đọc tại máy — đo được 92% tin cậy, ~2,6s lần đầu rồi ~0,4s</td><td>tesseract.js</td></tr>
+  <tr><td><b>3 · Tách dòng</b></td><td>Tìm cặp “tên món ↔ con số”, hiểu cả <code>45k</code>, <code>45.000</code>, <code>45,000</code></td><td><code>match.js</code></td></tr>
+  <tr><td><b>4 · Khớp món</b></td><td>Chuẩn hoá tiếng Việt rồi khớp mờ — đọc nát <code>Caolâ`u</code> vẫn ra <i>cao lầu</i></td><td><code>match.js</code></td></tr>
+  <tr><td><b>5 · Phán quyết</b></td><td>So với p25/p50/p75/p95 của đúng vùng, gắn nhãn và bậc nguồn gốc</td><td><code>match.js</code> + <code>trust.js</code></td></tr>
+</table>
+
+<h2>Ba mức, và ranh giới của chúng</h2>
+<table>
+  <tr><th>Nhãn</th><th>Điều kiện</th><th>Giao diện</th></tr>
+  <tr><td><span class="tag ok">bình thường</span></td><td>giá ≤ p75</td>
+      <td>chấm xanh, không có viền cảnh báo</td></tr>
+  <tr><td><span class="tag warn">cao hơn 75% chỗ khác</span></td><td>p75 &lt; giá ≤ p95</td>
+      <td>chấm hổ phách, viền hổ phách quanh màn hình</td></tr>
+  <tr><td><span class="tag bad">vượt hẳn · +N%</span></td><td>giá &gt; p95</td>
+      <td>chấm đỏ, viền đỏ, kèm phần trăm lệch so với trung vị</td></tr>
+  <tr><td><span class="tag grey">chưa đủ dữ liệu</span></td><td>vùng chưa có dòng giá cho món đó</td>
+      <td>gạch ngang — <b>không đoán bừa</b></td></tr>
+</table>
+
+<div class="box jade">
+  <b>Vì sao là bách phân vị, không phải giá trung bình</b>
+  Một dòng OCR đọc sai — 50.000 thành 500.000 — làm trung bình vô dụng. Bách phân vị
+  không nhúc nhích. Ngưỡng “cao” đặt ở p95 chứ không phải p75 vì báo động sai là thứ
+  giết niềm tin nhanh nhất: thà im lặng vài ca còn hơn kêu oan một lần.
+</div>
+
+<h2>Ô trống trong bảng giá</h2>
+<p>Bảng giá là một lưới <i>vùng × món</i>, và lưới ấy sẽ không bao giờ đầy: không quán nào
+ở Hoàn Kiếm bán cao lầu. Cho tới gần đây, ô trống nghĩa là app im lặng — đúng nhưng vô
+dụng với người đang đứng trước một cái giá.</p>
+<p>Module <code>predict.js</code> (đã xong lõi và phép thử) tách giá thành hai thành phần
+rồi suy ra ô trống:</p>
+<p style="text-align:center;font-size:12pt;margin:4mm 0"><code>giá(vùng, món) ≈ nền(món) × hệ số(vùng)</code></p>
+<ul>
+  <li><b>nền(món)</b> — trung vị của món đó trên mọi vùng đang có nó;</li>
+  <li><b>hệ số(vùng)</b> — vùng này đắt hơn mặt bằng chung bao nhiêu lần, lấy trung vị tỉ
+    lệ trên những món vùng đó đã có.</li>
+</ul>
+<p>Mọi kết quả suy ra mang cờ <code>predicted</code>, và nếu nền còn là hạt giống thì mang
+thêm cờ <code>fromSeed</code> — giao diện <b>không được phép</b> trình bày chúng giống một
+con số đã đo. Phép kiểm định bỏ-một-ra trên dữ liệu thật cho sai số trung vị dưới 25%.</p>
+</div>
+
+<!-- ══════════════════ 5 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s6"><span class="n">6</span>Danh mục tính năng</h1>
+<p class="lead">Xếp theo ba khoảnh khắc của một bữa ăn, cộng hai lớp nền phía dưới.
+Ba mươi tư mục, trong đó ba mục cuối đang trên đường vào giao diện.</p>
+
+<h2>A · Trước khi gọi món — tra cứu</h2>
+<table class="ui">
+  <tr><td>A1 · Price Lens</td><td>Quét thực đơn: OCR trên máy → khớp mờ tên món → so p25–p95 → ba mức. Là lõi của cả sản phẩm.</td></tr>
+  <tr><td>A2 · Nhập tay</td><td>Có ở mọi màn hình kết quả. Camera hỏng, chữ mờ, thực đơn viết tay — vẫn tra được.</td></tr>
+  <tr><td>A3 · Tab <i>Eat</i></td><td>77 món: món đó là gì, thành phần dễ gây dị ứng, khoảng giá phổ biến, câu gọi món kèm phiên âm và nút phát âm.</td></tr>
+  <tr><td>A4 · Tab <i>Nearby</i></td><td>Đếm thật từ dữ liệu: bao nhiêu cơ sở Đúng Giá, bao nhiêu vượt khoảng. Bảy bộ lọc, khay thẻ cuộn ngang.</td></tr>
+  <tr><td>A5 · Bản đồ 2.5D</td><td>Phối cảnh nghiêng dựng bằng mã: mặt đất xoay 22° rồi nén 0,56, nhà dựng đứng lên. Ghim đi qua đúng phép biến hình nên luôn đứng đúng phố.</td></tr>
+  <tr><td>A6 · Bản đồ chi tiết</td><td>Kéo, phóng, lọc ba mức tin cậy, định vị, chạm ghim ra thẻ. <b>Hai lớp nền</b>: có mạng thì dùng ảnh bản đồ thật của OpenStreetMap; tile hỏng, bị chặn hoặc mất mạng thì lớp vector tự vẽ nằm sẵn bên dưới lộ ra. Không dùng thư viện bản đồ nào.</td></tr>
+  <tr><td>A7 · Tranh vẽ tay</td><td>Cả sáu vùng có tranh màu nước nhìn từ trên cao, <b>neo vào toạ độ thật</b> bằng hai mốc — nên khoảng cách và hướng giữa các ghim là thật.</td></tr>
+  <tr><td>A8 · Must-Try Food Map</td><td>Bản đồ ẩm thực dùng lại đúng tấm tranh đã neo, hiện trạng thái thật từ dữ liệu chứ không phải điểm sao.</td></tr>
+  <tr><td>A9 · Tuyến đi bộ</td><td>Thời gian đi bộ được <b>tính</b> bằng haversine ở 4,2 km/h rồi làm tròn lên, không ghi cứng. Đường đã đi vẽ liền nét, đoạn còn lại nét đứt.</td></tr>
+  <tr><td>A10 · Đi trong ngày</td><td>51 điểm quanh sáu vùng. Khoảng cách tính thật và ghi rõ là đường chim bay; thời gian đi là chữ do người viết, và trình bày đúng như thế.</td></tr>
+  <tr><td>A11 · Liên kết ra ngoài</td><td>Toạ độ có thật → trỏ thẳng (<code>geo:</code>, Google Maps, chỉ đường, OSM). Mạng xã hội không biết gì → chỉ mở ô tìm kiếm.</td></tr>
+</table>
+
+<h2>B · Tại quầy — khoảnh khắc có ma sát</h2>
+<table class="ui">
+  <tr><td>B1 · Chìa cho người bán</td><td>Màn hình <b>xoay ngược</b>, chữ rất to, chỉ chứa một câu tiếng Việt. Khoảng giá tham chiếu nằm ở nửa của bạn và không bao giờ đi lên khối chữ lớn.</td></tr>
+  <tr><td>B2 · Bộ câu tại chỗ</td><td>Mười một câu thường dùng kèm phiên âm — trong đó có <i>“Tôi bị dị ứng đậu phộng”</i>, câu duy nhất mà nói chậm một phút có thể thành chuyện cấp cứu.</td></tr>
+  <tr><td>B3 · Cash Guard</td><td>Đọc mệnh giá tờ polymer, cộng tổng, và bắt lỗi nhầm một bậc số 0.</td></tr>
+  <tr><td>B4 · Bill Check</td><td>Đối chiếu hoá đơn với những món đã gọi trong phiên, chỉ ra dòng lạ.</td></tr>
+  <tr><td>B5 · Đếm tiền thối</td><td>Không dừng ở “thiếu 480.000₫”: nói tiếp rằng con số ấy <i>đúng bằng</i> chênh lệch giữa hai tờ hay bị nhầm — hãy xem lại tờ trong tay.</td></tr>
+  <tr><td>B6 · Chia hoá đơn</td><td>Chia theo người, gán từng món cho từng người, tính phần mỗi người phải trả.</td></tr>
+  <tr><td>B7 · So hai tấm thực đơn</td><td>Tính năng duy nhất <b>sinh ra dữ kiện mới</b>: đo chênh lệch giữa tấm tiếng Việt ngoài cửa và tấm tiếng Anh trong bàn. Trả về một phép đo, không phải một lời buộc tội.</td></tr>
+  <tr><td>B8 · Viền cảnh báo</td><td>Cả màn hình viền hổ phách hoặc đỏ theo mức nặng nhất trong lần quét — nhìn một cái là biết, không phải đọc.</td></tr>
+  <tr><td>B9 · Nhắc khi đi bộ</td><td>Bật trong <i>You</i>: khi tới gần một cơ sở đang vượt khoảng giá, hiện một dải bấm được. Vị trí ở lại trên máy, không gửi đi đâu.</td></tr>
+</table>
+
+<h2 class="newpage" style="margin-top:0">C · Sau bữa ăn — quay lại và kể lại</h2>
+<table class="ui">
+  <tr><td>C1 · Nhật ký</td><td>Mọi lượt quét tự ghi vào IndexedDB riêng, có trạng thái đã đồng bộ, xuất ra được. Bản ghi cũ trong <code>localStorage</code> được chuyển sang đúng một lần, không vứt.</td></tr>
+  <tr><td>C2 · Bưu thiếp</td><td>Vẽ bằng canvas nên mọi máy ra một khổ. <b>Không có</b> dòng “bạn đã tiết kiệm được X” — app không biết bạn sẽ trả bao nhiêu nếu không có nó.</td></tr>
+  <tr><td>C3 · Cộng đồng</td><td>Đăng nhận xét kèm ảnh và giá đã trả; ảnh nén 1280px và bị xoá EXIF GPS trước khi gửi. Kiểm duyệt bằng báo cáo: ba người báo thì bài tự ẩn.</td></tr>
+  <tr><td>C4 · Chế độ sổ tay</td><td>Chưa nối máy chủ thì bài <b>ở lại đúng cái máy vừa gõ ra nó</b> (IndexedDB), hiện trong feed như bài thật, mang nhãn <i>this phone only</i>.</td></tr>
+  <tr><td>C5 · Huy hiệu</td><td>Bốn mốc: lần quét đầu, 20 lượt quét, 10 món, 5 ghi chép. Đếm từ dữ liệu thật trên máy.</td></tr>
+</table>
+
+<h2>D · Lớp nền — dữ liệu và niềm tin</h2>
+<table class="ui">
+  <tr><td>D1 · Bậc nguồn gốc</td><td><code>trust.js</code> gắn nhãn nguồn cho từng con số và khoá lại điều giao diện được phép nói. Xem mục 3.</td></tr>
+  <tr><td>D2 · “Vì sao Nón Lá nói thế”</td><td>Khối gập, mặc định đóng. Mở ra là bốn mốc p25/p50/p75/p95 và một câu giải thích ranh giới của phán quyết.</td></tr>
+  <tr><td>D3 · Khảo sát giá tại chỗ</td><td>Màn hình riêng cho người dựng dữ liệu: món xếp theo <i>số mẫu còn thiếu</i>, Enter là lưu, mỗi bản ghi có nút hoàn tác ngay bên cạnh. Ghi thẳng vào IndexedDB, không đợi mạng.</td></tr>
+  <tr><td>D4 · Dùng ngay số vừa đo</td><td><code>localprices.js</code> trộn dải đã khảo sát vào bảng giá lúc khởi động — chỉ lưu <i>phần đè</i>, nên bản cập nhật sau vẫn tới được máy đó.</td></tr>
+  <tr><td>D5 · Xuất dữ liệu</td><td>Tải về <code>prices.json</code> đã trộn, để đưa số khảo sát vào bản phát hành.</td></tr>
+  <tr><td>D5b · Đổ cả bảng khảo sát<br><code>tools/ingest-survey.mjs</code></td><td>Đường còn lại của vòng dữ liệu: một buổi đi bộ ghi vào bảng tính CSV (<code>zone,dish,price,venue,unit,english_menu,posted,note</code>), rồi đổ cả bảng vào <code>prices.json</code> một lần — thay vì gõ từng món trong app.</td></tr>
+  <tr><td>D6 · Năm ngôn ngữ</td><td>English · Tiếng Việt · 한국어 · 中文 · 日本語. Tên món <b>giữ nguyên tiếng Việt</b> ở mọi ngôn ngữ — đó là thứ người dùng phải chỉ vào thực đơn và đọc lên.</td></tr>
+  <tr><td>D7 · Chạy offline</td><td>Service worker giữ 53 tệp: vỏ app, các stylesheet, dữ liệu sáu vùng, tranh nền; dữ liệu huấn luyện OCR và font nạp theo nhu cầu rồi nằm lại trong cache.</td></tr>
+  <tr><td>D8 · Xưởng icon</td><td>Dán khoá API của chính bạn, sinh 27 icon minh hoạ lúc chạy. Khoá không vào <code>localStorage</code>, tối đa 3 lượt gọi song song, hỏng thì rơi về hình SVG dựng sẵn.</td></tr>
+</table>
+
+<h2>E · Ba lớp suy luận mới — vừa nối vào giao diện</h2>
+<p>Ba module dưới đây có lõi thuần, phép thử riêng, và đã có <b>khối hiển thị riêng</b> trên
+màn hình. Điểm chung của cả ba: chúng đưa ra thứ app <i>suy ra</i>, nên mỗi thứ nằm trong
+một khối tách bạch với những con số đã đo — trộn chung là đúng điều <code>trust.js</code>
+sinh ra để chặn.</p>
+<table class="ui">
+  <tr><td>E1 · Bẫy đơn vị<br><code>units.js</code><br><span style="font-weight:400;font-size:9pt;color:#6C7169">khối <i>“Read the unit, not just the number”</i></span></td>
+      <td>Bắt bốn cách một dòng thực đơn nói thật mà vẫn gây hiểu nhầm: giá theo trọng lượng (<code>/100g</code>), đơn vị <i>lạng</i>, <i>thời giá</i>, và phụ thu chưa gộp. <b>Không tự đoán trọng lượng con cá</b> — chỉ ra dòng nào tính theo cân và đưa một phép nhân để khách tự hỏi rồi tự tính. Đọc từ <b>văn bản thô</b>, vì bước tách cặp tên-giá đã cắt mất phần đuôi <code>/100g</code>.</td></tr>
+  <tr><td>E2 · Điền ô trống<br><code>predict.js</code><br><span style="font-weight:400;font-size:9pt;color:#6C7169">khối <i>“Not measured here — estimated from nearby zones”</i></span></td>
+      <td>Suy giá cho cặp <i>vùng × món</i> chưa có dữ liệu, kèm cờ <code>predicted</code> và <code>fromSeed</code>. Cố tình là một khối <b>riêng</b>, không trộn vào các dòng đã đo phía trên. Xem mục 4.</td></tr>
+  <tr><td>E3 · Nối quán với món<br><code>eaterydish.js</code><br><span style="font-weight:400;font-size:9pt;color:#6C7169">khối <i>“Probably serves”</i> trên thẻ quán OSM</span></td>
+      <td>2.481 quán OSM có tên và toạ độ nhưng không quán nào ghi <i>bán món gì</i>. Module suy ra từ chính tên quán — “Phở Thìn”, “Bánh mì Phượng” — khớp trọn từ chứ không khớp mờ, chỉ nhận mức tin cậy từ 0,6 trở lên, và <b>không bao giờ nói quán đó bán bao nhiêu tiền</b>: nó dẫn người dùng sang dải giá của vùng.</td></tr>
+</table>
+
+<div class="box terra">
+  <b>Cả ba khối đều tự nuốt lỗi của mình</b>
+  Chúng được bọc trong một hàm an toàn: hỏng thì khối đó biến mất, phần còn lại của thẻ
+  kết quả vẫn nguyên. Một lỗi trong phần <i>thêm</i> mà làm hỏng cả tấm thẻ phán quyết giá
+  — thứ người dùng đang đứng trước quầy cần đọc — là đánh đổi tệ nhất có thể.
+</div>
+</div>
+
+<!-- ══════════════════ 6 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s7"><span class="n">7</span>Dữ liệu: có gì, từ đâu</h1>
+<p class="lead">Sáu vùng lõi du lịch, cùng một đường ống, không vùng nào là bản dán tay.</p>
+
+<table>
+  <tr><th>Vùng</th><th class="num">Đoạn đường</th><th class="num">Mốc</th><th class="num">Món có giá</th>
+      <th class="num">Cơ sở</th><th class="num">Quán OSM</th><th class="num">Đi trong ngày</th></tr>
+  <tr><td><b>Hội An · Phố cổ</b></td><td class="num">559</td><td class="num">35</td><td class="num">49</td><td class="num">8</td><td class="num">370</td><td class="num">11</td></tr>
+  <tr><td><b>Hà Nội · Hoàn Kiếm</b></td><td class="num">1.117</td><td class="num">27</td><td class="num">35</td><td class="num">14</td><td class="num">562</td><td class="num">10</td></tr>
+  <tr><td><b>TP.HCM · Quận 1</b></td><td class="num">1.666</td><td class="num">25</td><td class="num">40</td><td class="num">13</td><td class="num">409</td><td class="num">7</td></tr>
+  <tr><td><b>Đà Nẵng · Sông Hàn</b></td><td class="num">1.271</td><td class="num">38</td><td class="num">37</td><td class="num">15</td><td class="num">416</td><td class="num">8</td></tr>
+  <tr><td><b>Đà Nẵng · Biển Mỹ Khê</b></td><td class="num">1.062</td><td class="num">18</td><td class="num">29</td><td class="num">13</td><td class="num">397</td><td class="num">6</td></tr>
+  <tr><td><b>Huế · Kinh thành</b></td><td class="num">1.902</td><td class="num">39</td><td class="num">29</td><td class="num">14</td><td class="num">327</td><td class="num">9</td></tr>
+  <tr><td><b>Cộng</b></td><td class="num"><b>7.577</b></td><td class="num"><b>182</b></td><td class="num"><b>219</b></td><td class="num"><b>77</b></td><td class="num"><b>2.481</b></td><td class="num"><b>51</b></td></tr>
+</table>
+
+<h2>Bảy tệp dữ liệu</h2>
+<table class="ui">
+  <tr><td><code>dishes.json</code></td><td>77 món: tri thức, thành phần nhạy cảm, câu gọi món, phiên âm.</td></tr>
+  <tr><td><code>prices.json</code></td><td>219 dòng giá p25/p50/p75/p95 cho sáu vùng, mỗi dòng có cờ nguồn gốc: 153 dòng viết tay, 66 dòng dựng từ menu công bố kèm ngày tra và số dòng nguồn.</td></tr>
+  <tr><td><code>menuref.json</code></td><td>170 món có trên menu nhưng ngoài danh mục 77 món — tôm sú rang me, lẩu cá kèo, bún thang. Có bảng này thì quét thực đơn nhà hàng mới ra phán quyết thay vì im lặng.</td></tr>
+  <tr><td><code>places.json</code></td><td>77 cơ sở theo dõi: 61 Đúng Giá, 11 vượt khoảng, 5 chưa đủ dữ liệu.</td></tr>
+  <tr><td><code>maps.json</code></td><td>Hình học sáu vùng: sông, biển, phố, mốc, và khối <code>art</code> neo tranh vào toạ độ.</td></tr>
+  <tr><td><code>eateries.json</code></td><td>2.481 quán từ OpenStreetMap, mỗi bản ghi gắn sẵn vùng.</td></tr>
+  <tr><td><code>trips.json</code></td><td>51 điểm đi trong ngày quanh sáu vùng.</td></tr>
+</table>
+
+<h2>Ba điều phải nói thẳng về dữ liệu</h2>
+<div class="box terra">
+  <b>① Giá hiện tại vẫn là ước lượng, chưa phải số đo</b>
+  219 ô giá chia làm hai loại, và app gọi tên đúng từng loại chứ không gộp: <b>153 ô là
+  số viết tay</b> (nhãn <i>estimate</i>), <b>66 ô ở Hội An · Hoàn Kiếm · Quận 1 được dựng
+  từ 300 dòng giá tra trên menu công bố, bài hướng dẫn và review</b>, kèm ngày tra và số
+  dòng nguồn (nhãn vẫn là <i>estimate</i>, khối “Why Nón Lá says this” nói rõ dựa trên bao
+  nhiêu dòng menu). Loại thứ hai có nguồn để chỉ tay vào, nhưng <b>không quán nào được đo
+  tại quầy</b> — và menu công bố thiên về quán có website nên đầu rẻ của thị trường vẫn
+  thiếu. App tự khai điều này ở mọi phán quyết và trong tab <i>You</i>. Chế độ khảo sát
+  (D3–D5) mới là đường ra: một người đi bộ dọc một con phố, mười giây một món; bốn buổi
+  như thế là một vùng có dữ liệu thật.
+</div>
+<div class="box">
+  <b>② Tên cơ sở là tên mô tả, không phải tên quán có thật</b>
+  Mỗi bản ghi mang một phán quyết giá, và gắn phán quyết hạt giống lên tên một hàng
+  quán thật là nói một điều app chưa đo được về một người có thật.
+</div>
+<div class="box jade">
+  <b>③ Giá ở dải biển cố tình cao hơn trong phố 25–40%</b>
+  Đó không phải lỗi nhập liệu mà là thông tin: khách nên biết mình đang trả thêm bao
+  nhiêu để ngồi nhìn ra biển.
+</div>
+
+<h2>Nguồn và giấy phép</h2>
+<p>Toạ độ, tên phố, đường bờ và điểm tham quan lấy từ <b>OpenStreetMap (ODbL)</b> qua
+Overpass, đi qua <code>tools/fetch-zones.py</code> rồi <code>tools/merge-zones.mjs</code>.
+Tranh nền sinh bằng mô hình ảnh rồi neo tay vào hai mốc có toạ độ thật.</p>
+
+<div class="box">
+  <b>Một chi tiết cho thấy dữ liệu được đọc chứ không chỉ được tải</b>
+  Biển không phải <code>natural=water</code> trong OpenStreetMap — nó là
+  <code>natural=coastline</code>, một đường <i>mở</i> chạy dọc bờ với đất ở bên trái. Vùng
+  Mỹ Khê phải tự khép đường bờ thành mảng bằng hai góc ở cạnh đông của khung. Thiếu bước
+  đó thì màn hình ra một dải phố treo lơ lửng cạnh một khoảng trắng — và <b>không có gì
+  báo lên</b>.
+</div>
+</div>
+
+<!-- ══════════════════ 7 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s8"><span class="n">8</span>Kiến trúc kỹ thuật</h1>
+<p class="lead">Không có bước build, không có <code>node_modules</code>, không có framework.
+Đẩy nguyên thư mục lên là chạy.</p>
+
+<h2>Vì sao chọn PWA thuần</h2>
+<div class="grid2">
+  <div class="card"><b>Không cửa hàng ứng dụng</b>
+    <p>Khách ở lại Việt Nam trung bình vài ngày. Bắt họ tải một app 40MB để tra giá một
+    bát mì là mất người dùng ngay ở bước đầu. Mở link là dùng được.</p></div>
+  <div class="card"><b>Offline là điều kiện, không phải tính năng</b>
+    <p>Người cần app này nhất là người vừa xuống sân bay, eSIM chưa kích hoạt. Nên mọi
+    lựa chọn kỹ thuật đều phải sống sót khi tắt hẳn mạng.</p></div>
+  <div class="card"><b>Không phụ thuộc engine bản đồ nào</b>
+    <p>Google Maps cấm cache tile; Mapbox cần khoá trả tiền. Nên bản đồ ở đây tự đặt tile
+    OpenStreetMap bằng chính phép chiếu của app, và luôn có một lớp vector tự vẽ nằm dưới
+    để hiện lên khi tile không tải được.</p></div>
+  <div class="card"><b>Đổi hosting là chuyện copy thư mục</b>
+    <p>Không bước build nghĩa là Vercel, GitHub Pages hay Cloudflare Pages đều nhận
+    nguyên trạng. Không khoá vào nhà cung cấp nào.</p></div>
+</div>
+
+<h2>Bản đồ mã nguồn theo tầng</h2>
+<table>
+  <tr><th style="width:22%">Tầng</th><th>Tệp</th><th>Có phép thử</th></tr>
+  <tr><td><b>Lõi thuần</b><br><span style="font-size:8.8pt;color:#6C7169">không phụ thuộc DOM</span></td>
+      <td><code>match.js</code> · <code>geo.js</code> · <code>iso.js</code> · <code>artmap.js</code> ·
+          <code>citymap.js</code> · <code>route.js</code> · <code>links.js</code> · <code>posts.js</code> ·
+          <code>photo.js</code> · <code>outbox.js</code> · <code>trust.js</code> · <code>menutax.js</code> ·
+          <code>change.js</code> · <code>units.js</code> · <code>predict.js</code> · <code>eaterydish.js</code></td>
+      <td>✔ toàn bộ</td></tr>
+  <tr><td><b>Màn hình tự chứa</b></td>
+      <td><code>bigmap.js</code> · <code>foodmap.js</code> · <code>community.js</code> ·
+          <code>surveyui.js</code> · <code>showcard.js</code> · <code>welcome.js</code> · <code>postcard.js</code></td>
+      <td>qua <code>audit.js</code></td></tr>
+  <tr><td><b>Lưu trữ</b></td>
+      <td><code>history.js</code> · <code>localdb.js</code> · <code>survey.js</code> ·
+          <code>localprices.js</code> · <code>outbox.js</code></td>
+      <td>✔ lõi thuần</td></tr>
+  <tr><td><b>Ra ngoài</b></td>
+      <td><code>cloud.js</code> (chỗ <i>duy nhất</i> biết HTTP của lớp cộng đồng) ·
+          <code>auth.js</code> · <code>imgsvc.js</code></td>
+      <td>qua cấu hình</td></tr>
+  <tr><td><b>Điều phối</b></td><td><code>app.js</code> — camera, OCR, định tuyến, sáu màn hình</td><td>qua <code>audit.js</code></td></tr>
+</table>
+
+<h2>Hai quyết định kiến trúc đáng nêu</h2>
+<h3>Bản đồ là hình học, nhà cửa là kết cấu</h3>
+<p><code>maps.json</code> không chứa hình khối công trình. Nhà và cây được sinh ra dọc tim
+đường bằng <b>nhiễu tất định</b> — vẽ lại bao nhiêu lần cũng ra đúng một phố, nhưng không
+tốn một byte dữ liệu nào. Thông tin thật nằm ở ghim, ở mốc và ở thẻ.</p>
+
+<h3>Tranh vẽ tay neo bằng đúng hai mốc</h3>
+<p>Ở quy mô vài trăm mét, một tranh phối cảnh so với mặt đất là <b>phép đồng dạng</b> —
+xoay, phóng, tịnh tiến, không cắt xiên — và hai mốc xác định trọn vẹn ba đại lượng đó.
+Nên chỉ cần chấm hai điểm dễ nhận trong tranh mà dữ liệu đã có toạ độ thật.</p>
+<div class="box">
+  <b>Và chỗ nào không neo chắc được thì nói ra</b>
+  Bốn vùng neo vào vật mốc chấm được. Riêng Mỹ Khê neo bằng ước lượng — cả vùng là một
+  dải bờ gần thẳng, không vật mốc nào chấm chắc; sai số ngang ước chừng ±100m, và ghi
+  thẳng trong <code>art._note</code> của vùng đó. Tranh Huế thì <b>không bắc-ở-trên</b>:
+  người vẽ quay cảnh 56° cho Kinh thành vuông góc khung, và phép neo hai mốc mang sẵn góc
+  quay ấy.
+</div>
+</div>
+
+<!-- ══════════════════ 8 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s9"><span class="n">9</span>Bản web máy tính</h1>
+<p class="lead">Chín trang cho màn hình rộng, dùng <b>chung một kho dữ liệu</b> với bản
+điện thoại — không có bản sao thứ hai của giá và cơ sở.</p>
+
+<p>Điện thoại là nơi dùng app; máy tính là nơi người ta <i>tìm hiểu</i> về nó và đọc kỹ.
+Nên bản web không cố bắt chước bản điện thoại: nó bày bản đồ, khoảng giá và cộng đồng
+cạnh nhau, và luôn có một lối sang bản điện thoại cho hai việc chỉ điện thoại làm được
+— quét bằng camera và chạy offline.</p>
+
+<table>
+  <tr><th style="width:22%">Trang</th><th>Nội dung</th></tr>
+  <tr><td><b>Explore</b><br><code>index.html</code></td><td>Trang chủ: chọn vùng, bốn lối vào theo nhu cầu (street food · coffee · sit-down · fair price only), cơ sở nổi bật, bài cộng đồng mới, dải món kèm khoảng giá.</td></tr>
+  <tr><td><b>Explore by map</b><br><code>map.html</code></td><td>Bản đồ vùng khổ rộng và danh sách cơ sở đang theo dõi.</td></tr>
+  <tr><td><b>Place</b><br><code>place.html</code></td><td>Trang một cơ sở: kiểm giá, món đặc trưng, mốc tham quan trong 400m, lưu lại, báo giá, cơ sở lân cận.</td></tr>
+  <tr><td><b>Scan Menu</b><br><code>scan.html</code></td><td>Tra giá bằng cách gõ tay, xem mặt bằng giá của khu vực. (Quét camera thuộc về bản điện thoại.)</td></tr>
+  <tr><td><b>Community</b><br><code>community.html</code></td><td>Feed, món được nhắc nhiều nhất, hỏi cộng đồng, danh sách người đóng góp.</td></tr>
+  <tr><td><b>Journal</b><br><code>journal.html</code></td><td>Nơi đã lưu, lượt kiểm giá gần đây, ghi chép chuyến đi.</td></tr>
+  <tr><td><b>Helpers</b><br><code>helpers.html</code></td><td>Bảng xếp hạng người đóng góp, huy hiệu, cách trở thành người hỗ trợ tin cậy.</td></tr>
+  <tr><td><b>Log in · Sign up</b></td><td>Hai trang tài khoản, kèm khối nói rõ <i>những gì chạy được khi không có tài khoản</i>.</td></tr>
+</table>
+
+<h2>Ba luật của bản web</h2>
+<ul>
+  <li><b>Không có kho dữ liệu riêng.</b> Bản web đọc thẳng <code>data/*.json</code> của app.
+    Một bản sao thứ hai chắc chắn sẽ lệch, và lúc lệch thì hai bản của cùng một sản phẩm
+    nói hai con số khác nhau về cùng một bát mì.</li>
+  <li><b>Khối nào sống bằng dữ liệu của người dùng thì để trống khi chưa đăng nhập</b> — và
+    nói thẳng là cần đăng nhập. Đổ dữ liệu mẫu vào cho đỡ trống là dạy người ta tin vào
+    một thứ không phải của họ.</li>
+  <li><b>Số liệu trên trang phải đếm thật từ dữ liệu</b>, không viết tay. Một con số trang
+    trí sai lệch là thứ đầu tiên phá niềm tin của cả trang.</li>
+</ul>
+
+<h2>Hộp trò chuyện</h2>
+<p>Mọi trang có một hộp chat ở góc phải, nạp động sau khung trang. Nó <b>đọc dữ liệu của
+vùng đang chọn</b> để trả lời — nên câu trả lời đứng trên cùng bảng giá mà phần còn lại
+của trang đang hiện, thay vì là kiến thức chung chung về Việt Nam.</p>
+</div>
+
+<!-- ══════════════════ 9 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s10"><span class="n">10</span>Lớp cộng đồng &amp; quyền riêng tư</h1>
+<p class="lead">Ba lời hứa, và cách mỗi lời hứa được giữ bằng mã chứ không bằng chính sách.</p>
+
+<table>
+  <tr><th style="width:30%">Lời hứa</th><th>Giữ bằng cách nào</th></tr>
+  <tr><td><b>Ảnh quét không rời máy</b></td>
+      <td>OCR chạy bằng tesseract.js ngay trong trình duyệt. Không có endpoint nào nhận ảnh quét — <code>cloud.js</code> là chỗ duy nhất biết HTTP, và nó không có đường nào cho ảnh camera.</td></tr>
+  <tr><td><b>Ảnh đăng lên không mang toạ độ</b></td>
+      <td><code>photo.js</code> nén ảnh về 1280px chất lượng 0,72 bằng cách <b>vẽ lại qua canvas</b> — bản gửi đi là ảnh mới, không mang theo EXIF. Toạ độ được đọc ra <i>trước</i> khi vẽ lại, chỉ để tính khoảng cách tới quán, rồi bỏ.</td></tr>
+  <tr><td><b>Vị trí ở lại trên máy</b></td>
+      <td>Tính năng nhắc khi đi bộ so toạ độ với dữ liệu đã nằm sẵn trong máy. Không có lượt gọi mạng nào trong đường đi đó.</td></tr>
+</table>
+
+<h2>Xác thực bài đăng: gắn nhãn, không chặn</h2>
+<p>Bài đăng xa quán vẫn được gửi và hiện lên feed bình thường, chỉ kèm thêm dòng
+<i>“posted away from the venue”</i>. Ảnh không có EXIF và người dùng không cho phép định
+vị thì không tính được khoảng cách — bài vẫn đăng, chỉ là không có nhãn đó.</p>
+
+<h2>Kiểm duyệt</h2>
+<p>Ba người khác nhau báo cáo thì bài tự ẩn, thực hiện bằng trigger phía cơ sở dữ liệu và
+đã kiểm bằng SQL. Chưa có: lọc ảnh nhạy cảm bằng AI, dò ảnh lấy cắp, phát hiện cụm tài
+khoản đăng bài có tổ chức — ba thứ này cần một edge function và tiền API.</p>
+
+<div class="box terra">
+  <b>Một khoảng hở còn để mở, và nó được ghi ra</b>
+  Ảnh nằm trong bucket công khai. Trigger kiểm duyệt chỉ đổi trạng thái dòng trong bảng
+  bài viết — tệp ảnh vẫn còn ở URL công khai, ai đã có URL đó vẫn xem được dù bài đã bị
+  ẩn khỏi feed.
+</div>
+
+<h2>Khi chưa nối máy chủ</h2>
+<p>Bản đang chạy để <code>config.js</code> rỗng, nên tab Community chạy ở <b>chế độ sổ
+tay</b>: bài ở lại trên máy, dùng lại đúng đường nén ảnh của nhánh gửi lên máy chủ. Trong
+sổ tay riêng không có người lạ nào, nên thẻ quán hiện thẳng ghi chép của chính người đang
+đọc — không giấu sau ngưỡng “ba đánh giá mới hiện sao” như feed công khai.</p>
+<p>Và ghi chép trong sổ tay <b>không bao giờ</b> chạm vào phán quyết giá. Chúng hiện song
+song với dải giá tham chiếu, không thay nó.</p>
+</div>
+
+<!-- ══════════════════ 10 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s11"><span class="n">11</span>Chất lượng đã kiểm chứng</h1>
+<p class="lead">Hai tầng phép thử, vì chúng bắt hai loại lỗi khác nhau — và một tầng thứ
+ba kiểm chính dữ liệu.</p>
+
+<div class="stat-row">
+  <div class="stat"><b>420</b><i>PHÉP THỬ LÕI · <code>node test.mjs</code></i></div>
+  <div class="stat"><b>249</b><i>PHÉP THỬ TƯƠNG TÁC · <code>audit.js</code></i></div>
+  <div class="stat"><b>0</b><i>PHÉP THỬ TRƯỢT</i></div>
+  <div class="stat"><b>92%</b><i>ĐỘ TIN CẬY OCR TIẾNG VIỆT</i></div>
+</div>
+
+<h2>Tầng 1 — lõi logic, chạy trong Node</h2>
+<p>420 phép thử phủ: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá, đọc
+mệnh giá tiền, phát hiện nhầm bậc số 0, toàn bộ phép chiếu / khoảng cách / khung nhìn của
+bản đồ, lõi thuần lớp cộng đồng, cách dựng liên kết ra ngoài, bẫy đơn vị, mô hình suy giá,
+phép suy món từ tên quán, và ranh giới giữa giá niêm yết với giá đo được.</p>
+
+<h2>Tầng 2 — đường tương tác, chạy trong trình duyệt</h2>
+<p>Bộ <code>audit.js</code> — <b>249 phép kiểm, xanh hết</b> ở lần chạy ngày 04/09/2026 —
+kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi
+tab có dọn sạch trạng thái cũ không. Tầng này tồn tại vì hai lỗi từng lọt qua tầng một —
+lõi logic đúng hoàn toàn mà người dùng vẫn không bấm được:</p>
+<ul>
+  <li>chạm một món ở tab <i>Eat</i> mở thẻ chi tiết <b>bên trong một khối đang ẩn</b>, nên
+    bấm mà không thấy gì;</li>
+  <li>viền cảnh báo đỏ từ lần quét trước <b>còn treo trên tab khác</b> sau khi đổi tab.</li>
+</ul>
+<p>Cộng ba luật riêng: mọi liên kết mạng xã hội phải là liên kết <i>tìm kiếm</i>; màn mở
+đầu phải phủ trên thanh nav và luôn có lối đi tiếp không cần tài khoản; bấm <i>Post</i>
+trong chế độ sổ tay phải thực sự ghi thêm một bài xuống máy.</p>
+
+<h2>Tầng 3 — kiểm chính dữ liệu</h2>
+<p>Đây là tầng ít gặp nhất và có lẽ đáng nói nhất: phép thử đọc <code>data/*.json</code> và
+bắt lỗi <i>nội dung</i>, không phải lỗi mã.</p>
+<table>
+  <tr><th>Luật</th><th>Bắt được gì</th></tr>
+  <tr><td>Món mồ côi</td><td>món không vùng nào bán</td></tr>
+  <tr><td>Dòng giá trỏ hụt</td><td>dòng giá của một món không tồn tại trong <code>dishes.json</code></td></tr>
+  <tr><td>Dải ngược</td><td>p25 &gt; p95</td></tr>
+  <tr><td>Nhãn gán sớm</td><td>cơ sở mang nhãn Đúng Giá khi chưa đủ hai mươi lượt quét</td></tr>
+  <tr><td>Chỗ nằm hai nơi</td><td>một điểm vừa là mốc tham quan trong khung bản đồ, vừa là “chuyến đi trong ngày” — app tự mâu thuẫn: một bên bảo đi bộ ba phút, một bên bảo bắt taxi</td></tr>
+</table>
+<p>Lớp này bắt được ba lỗi ngay lần chạy đầu, trong đó có một cơ sở bán trà đá ở một vùng
+không có dòng giá trà đá — lỗi đã nằm sẵn trong dữ liệu và vẫn đang hiện ra màn hình dưới
+dạng một dấu gạch.</p>
+
+<h2>Đã đo được</h2>
+<table>
+  <tr><th>Hạng mục</th><th>Kết quả</th></tr>
+  <tr><td>Chuỗi pixel → OCR → khớp → phán quyết</td><td>Đúng, kể cả khi OCR đọc nát <code>Cao lầu</code> thành <code>Caolâ`u</code></td></tr>
+  <tr><td>Chạy khi tắt hẳn server</td><td>Boot được, OCR được, phán quyết được</td></tr>
+  <tr><td>Bản đồ chi tiết khi tắt server</td><td>Mở được, kéo/phóng/lọc được, chạm ghim ra thẻ</td></tr>
+  <tr><td>Đăng bài khi tắt mạng</td><td>Bài vào hàng chờ IndexedDB, gửi lại được khi có sóng</td></tr>
+  <tr><td>Service worker</td><td>53 tệp trong danh sách cài đặt, cộng dữ liệu huấn luyện OCR nạp theo nhu cầu</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════ 11 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s12"><span class="n">12</span>Hiện trạng và lộ trình</h1>
+
+<h2>Đã chạy thật</h2>
+<div class="grid3">
+  <div class="card"><b>Quét &amp; phán quyết</b><p>Thực đơn · tiền mặt · hoá đơn · nhập tay, kèm bậc nguồn gốc cho từng con số.</p></div>
+  <div class="card"><b>Bản đồ sáu vùng</b><p>2.5D, bản đồ chi tiết vector, tranh vẽ tay neo toạ độ, bản đồ ẩm thực, tuyến đi bộ.</p></div>
+  <div class="card"><b>Tại quầy</b><p>Chìa cho người bán, đếm tiền thối, chia hoá đơn, so hai tấm thực đơn.</p></div>
+  <div class="card"><b>Sau bữa ăn</b><p>Nhật ký, bưu thiếp, cộng đồng ở chế độ sổ tay, huy hiệu.</p></div>
+  <div class="card"><b>Nền dữ liệu</b><p>Khảo sát tại chỗ, dùng ngay số vừa đo, xuất dữ liệu, năm ngôn ngữ.</p></div>
+  <div class="card"><b>Bản web</b><p>Chín trang dùng chung dữ liệu, hộp trò chuyện đọc dữ liệu vùng.</p></div>
+</div>
+
+<h2>Vừa nối xong trong đợt này</h2>
+<ol>
+  <li><b>Bẫy đơn vị</b> (<code>units.js</code>) — nhóm sai lệch lớn nhất về tiền tuyệt đối,
+    trước đợt này app hoàn toàn không thấy. Nay có khối riêng trên thẻ kết quả.</li>
+  <li><b>Điền ô trống bảng giá</b> (<code>predict.js</code>) — biến “chưa có dữ liệu” thành
+    một câu trả lời có ghi rõ mức tin cậy, trong một khối tách khỏi các dòng đã đo.</li>
+  <li><b>Nối quán với món</b> (<code>eaterydish.js</code>) — mắt xích còn thiếu giữa 2.481
+    quán OSM và bảng giá theo vùng, hiện thành khối <i>“Probably serves”</i> trên thẻ quán.</li>
+  <li><b>Đổ bảng khảo sát bằng CSV</b> (<code>tools/ingest-survey.mjs</code>) — khép nốt
+    vòng dữ liệu từ ngoài đường về <code>prices.json</code>.</li>
+</ol>
+
+<h2>Chưa làm — và vì sao</h2>
+<table>
+  <tr><th style="width:34%">Hạng mục</th><th>Ghi chú thẳng</th></tr>
+  <tr><td>Khảo sát giá thực địa</td><td>Việc quan trọng nhất còn lại. Công cụ đã xong, chỉ còn công đi bộ: bốn buổi cho một vùng.</td></tr>
+  <tr><td>Nhận diện mệnh giá bằng thị giác</td><td>Hiện dựa vào OCR con số in trên tờ tiền. Tốt khi tờ phẳng và số hướng lên; kém khi bị gấp.</td></tr>
+  <tr><td>Deal Recorder · Culture Lens · Local Compass</td><td>Đã có đặc tả, chưa cài đặt.</td></tr>
+  <tr><td>Địa điểm do người dùng tự thêm</td><td>Lớp cộng đồng mới có nhận xét và ảnh cho quán <i>có sẵn</i>.</td></tr>
+  <tr><td>Hồ sơ công khai, theo dõi, nhắn tin, điểm đóng góp</td><td>Chưa có. Cần lớp tài khoản bật lên trước.</td></tr>
+  <tr><td>Kiểm duyệt bằng AI</td><td>Cần edge function và chi phí API.</td></tr>
+  <tr><td>Bộ đọc EXIF: marker TEM</td><td>Hiếm gặp trong ảnh chụp từ điện thoại, chưa gây lỗi nào ghi nhận được, nhưng vẫn là khoảng trống chưa vá.</td></tr>
+</table>
+
+<h2>Thứ tự đề xuất cho chặng tới</h2>
+<table>
+  <tr><th class="num" style="width:12%">Ưu tiên</th><th>Việc</th><th>Vì sao</th></tr>
+  <tr><td class="num"><b>1</b></td><td>Khảo sát thật một vùng — Hội An hoặc Hoàn Kiếm</td><td>Biến hai bậc cao nhất của <code>trust.js</code> từ mã chết thành thứ người dùng thấy được. Đây là con số biết nói cho vòng sau.</td></tr>
+  <tr><td class="num"><b>2</b></td><td><b>Mở lớp người bán</b>: thực đơn rõ đơn vị, dịch đa ngôn ngữ, mã QR tại quầy, màn giải thích chênh lệch <span style="color:#6C7169">(chương 1)</span></td><td>Đây là bước nâng cấp lớn nhất còn lại. Nó biến dữ liệu từ thứ phải đi xin thành thứ hai phía cùng nuôi, và biến app từ công cụ cảnh báo thành hạ tầng niềm tin.</td></tr>
+  <tr><td class="num"><b>3</b></td><td>Tách <b>giá niêm yết</b> khỏi <b>giá đo được</b> trong lược đồ dữ liệu <span class="tag ok">đã xong</span></td><td>Điều kiện bắt buộc <i>trước</i> khi người bán được quyền ghi, và nay đã cài đặt ở ba tầng — hai bảng rời nhau, ràng buộc cột, và <code>pricesrc.js</code>. Chi tiết ở chương 1.</td></tr>
+  <tr><td class="num"><b>4</b></td><td>Đo lại chất lượng ba lớp suy luận mới trên dữ liệu thật</td><td>Bẫy đơn vị và suy món từ tên quán hiện được đo trên dữ liệu hạt giống. Có số khảo sát rồi mới biết ngưỡng tin cậy 0,6 là chặt hay lỏng.</td></tr>
+  <tr><td class="num"><b>5</b></td><td>Bật lớp cộng đồng thật</td><td>Cần cấu hình máy chủ, không cần viết thêm tính năng.</td></tr>
+  <tr><td class="num"><b>6</b></td><td>Nhận diện mệnh giá bằng thị giác</td><td>Thay đường OCR con số bằng một model nhỏ, để tờ tiền bị gấp vẫn đọc được.</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════ 12 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s13"><span class="n">13</span>Vì sao khó sao chép</h1>
+<p class="lead">Phần dễ sao chép nhất của dự án này là giao diện. Phần khó nhất là những
+chỗ nó <b>từ chối</b> làm một việc dễ.</p>
+
+<div class="grid2">
+  <div class="card"><span class="t">Rào 01</span><b>Dữ liệu giá theo món, theo vùng</b>
+    <p>Không mua được, không cào được. Nó chỉ đến từ người đi bộ dọc một con phố và gõ giá
+    thật. Công cụ để làm việc đó đã nằm trong app.</p></div>
+  <div class="card"><span class="t">Rào 02</span><b>Kỷ luật về những gì được nói</b>
+    <p>Bỏ “4,8 ★” khỏi mọi thẻ, bỏ “so với ~34 quán”, bỏ “bạn đã tiết kiệm X đồng”. Mỗi
+    lần bỏ là một con số đẹp bị mất — và là lý do phần còn lại đáng tin.</p></div>
+  <div class="card"><span class="t">Rào 03</span><b>Offline thật, không phải nhãn dán</b>
+    <p>Kéo theo cả một chuỗi quyết định: không nhúng bản đồ, không gọi model qua mạng cho
+    đường chính, dữ liệu vùng đóng gói sẵn, OCR nằm trong cache.</p></div>
+  <div class="card"><span class="t">Rào 04</span><b>Hiểu đúng ma sát tại quầy</b>
+    <p>Màn xoay ngược cho người bán đọc là thứ chỉ nghĩ ra được khi đã đứng ở đó. Không
+    một bản mockup nào đề xuất nó.</p></div>
+</div>
+
+<h2>Ba chi tiết cho thấy chiều sâu</h2>
+<ul>
+  <li><b>Ngưỡng “ba đánh giá mới hiện sao” bị tắt trong sổ tay riêng.</b> Ngưỡng ấy tồn tại
+    để một người tự khen mình không đẩy con số 5,0 lên trước mặt người lạ. Trong sổ tay
+    riêng không có người lạ nào — nên giấu ghi chép của chính người đang đọc sau một ngưỡng
+    thống kê là biến việc ghi lại thành công cốc.</li>
+  <li><b>Khi không tồn tại mức phóng nào vừa phủ kín khung vừa chứa hết ghim,</b> bản đồ
+    tranh bỏ ràng buộc phủ kín và để hở một dải nền giấy. Một ghim bị cắt mất nửa là app
+    nói có 4 quán rồi chỉ cho thấy 3; dải nền hở chỉ là kém đẹp.</li>
+  <li><b>TikTok không có liên kết chia sẻ từ web</b> và Facebook cần một URL trang, mà một
+    địa điểm thì không phải một trang — nên hai chỗ đó app chép chú thích vào clipboard và
+    <i>nói tên chúng ra</i>, thay vì lặng lẽ bỏ nút đi để người dùng đi tìm mà không hiểu vì
+    sao nó không có ở đó.</li>
+</ul>
+
+<div class="box jade">
+  <b>Nguyên tắc cuối, và là nguyên tắc gốc</b>
+  Hệ thống không bao giờ gọi một cơ sở kinh doanh là lừa đảo. Nó nêu mức lệch giá kèm cỡ
+  mẫu và ngày cập nhật, rồi để người dùng tự quyết định.
+</div>
+</div>
+
+<!-- ══════════════════ 13 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="s14"><span class="n">14</span>Phụ lục: bản đồ mã nguồn</h1>
+
+<table>
+  <tr><th style="width:24%">Tệp</th><th>Việc</th></tr>
+  <tr><td><code>index.html</code></td><td>vỏ ứng dụng</td></tr>
+  <tr><td><code>app.css</code></td><td>hệ thiết kế — sơn mài Việt và ngọc bích</td></tr>
+  <tr><td><code>app.js</code></td><td>camera, OCR, định tuyến, sáu màn hình</td></tr>
+  <tr><td><code>match.js</code></td><td>chuẩn hoá, khớp mờ, phán quyết giá</td></tr>
+  <tr><td><code>trust.js</code></td><td>bậc nguồn gốc của mỗi con số</td></tr>
+  <tr><td><code>pricesrc.js</code></td><td>một con số giá đến từ đâu, và nó có được vào dải không</td></tr>
+  <tr><td><code>units.js</code></td><td>bẫy đơn vị: /100g, lạng, thời giá, phụ thu</td></tr>
+  <tr><td><code>predict.js</code></td><td>suy giá cho ô trống, kèm cờ tin cậy</td></tr>
+  <tr><td><code>eaterydish.js</code></td><td>suy món một quán bán từ tên quán</td></tr>
+  <tr><td><code>menutax.js</code></td><td>đo chênh lệch giữa hai tấm thực đơn</td></tr>
+  <tr><td><code>change.js</code></td><td>đếm tiền thối, chỉ ra cặp tờ dễ nhầm</td></tr>
+  <tr><td><code>showcard.js</code></td><td>màn xoay ngược cho người bán đọc</td></tr>
+  <tr><td><code>postcard.js</code></td><td>bưu thiếp tổng kết vẽ bằng canvas</td></tr>
+  <tr><td><code>geo.js</code> · <code>iso.js</code> · <code>citymap.js</code></td><td>phép chiếu, phối cảnh nghiêng, kết cấu đô thị</td></tr>
+  <tr><td><code>artmap.js</code></td><td>neo tranh vẽ tay vào toạ độ thật</td></tr>
+  <tr><td><code>bigmap.js</code> · <code>foodmap.js</code></td><td>bản đồ chi tiết và bản đồ ẩm thực</td></tr>
+  <tr><td><code>route.js</code></td><td>tuyến đi bộ: giải chặng, đo quãng đường</td></tr>
+  <tr><td><code>survey.js</code> · <code>surveyui.js</code></td><td>khảo sát giá tại chỗ</td></tr>
+  <tr><td><code>localprices.js</code></td><td>trộn dải đã khảo sát vào bảng giá</td></tr>
+  <tr><td><code>history.js</code> · <code>localdb.js</code> · <code>outbox.js</code></td><td>nhật ký, sổ tay trên máy, hàng chờ gửi lại</td></tr>
+  <tr><td><code>community.js</code> · <code>cloud.js</code> · <code>auth.js</code></td><td>lớp cộng đồng và tài khoản</td></tr>
+  <tr><td><code>photo.js</code></td><td>nén ảnh và xoá EXIF GPS</td></tr>
+  <tr><td><code>links.js</code></td><td>liên kết ra bản đồ và mạng xã hội</td></tr>
+  <tr><td><code>welcome.js</code></td><td>bốn màn giới thiệu rồi bước tài khoản</td></tr>
+  <tr><td><code>i18n.js</code></td><td>năm ngôn ngữ, khoá chính là chuỗi tiếng Anh đầy đủ</td></tr>
+  <tr><td><code>imgsvc.js</code></td><td>sinh icon lúc chạy, có lối lui SVG</td></tr>
+  <tr><td><code>sw.js</code></td><td>offline: network-first cho vỏ app, cache-first cho CDN</td></tr>
+  <tr><td><code>audit.js</code></td><td>phép thử tương tác chạy trong trình duyệt</td></tr>
+  <tr><td><code>test.mjs</code></td><td>420 phép thử lõi, gồm cả lớp kiểm chính dữ liệu</td></tr>
+  <tr><td><code>../supabase/menu.sql</code></td><td>giá người bán tự khai, tách hẳn khỏi bảng quan sát</td></tr>
+  <tr><td><code>web/</code></td><td>chín trang bản máy tính, dùng chung dữ liệu và kho ảnh</td></tr>
+</table>
+
+<h2>Chạy và triển khai</h2>
+<table class="ui">
+  <tr><td>Chạy tại máy</td><td><code>python -m http.server 8899 --bind 127.0.0.1</code> trong <code>nonla-app/</code></td></tr>
+  <tr><td>Phép thử lõi</td><td><code>node test.mjs</code></td></tr>
+  <tr><td>Phép thử tương tác</td><td>mở app rồi dán vào console: <code>import('./audit.js').then(m =&gt; m.run())</code></td></tr>
+  <tr><td>Triển khai</td><td><code>vercel deploy --prod --cwd nonla-app</code> — hoặc đẩy nguyên thư mục lên bất kỳ hosting tĩnh nào</td></tr>
+</table>
+
+<p class="foot-note">Tài liệu dựng ngày 04/09/2026 từ chính mã nguồn và dữ liệu trong kho.
+Số liệu dữ liệu (vùng, món, dòng giá, cơ sở, quán OSM, điểm đi trong ngày, tệp trong danh
+sách cài đặt) được <b>đếm lại</b> từ <code>data/*.json</code> và <code>sw.js</code> cùng ngày;
+số phép thử lấy từ lần chạy <code>node test.mjs</code> và <code>audit.js</code> cùng ngày.
+Riêng các con số về OCR — 92% tin cậy, ~2,6s lần đầu rồi ~0,4s — là kết quả đo trước đó
+ghi trong <code>README.md</code> của kho, không đo lại trong lần dựng này. Dự án đang được
+sửa liên tục, nên hãy đối chiếu lại trước khi trích dẫn vào hồ sơ nộp.</p>
+</div>
+
+<section class="part">
+  <span class="halo h1"></span>
+  <div class="inner">
+    <span class="kick">Phần II</span>
+    <h1>Hướng dẫn giao diện</h1>
+    <div class="rule"></div>
+    <p class="sub">Từng màn hình, từng nút, và điều xảy ra sau khi bấm</p>
+    <div class="plist"><div><span>0</span>Trước khi bắt đầu</div><div><span>0.1</span>Bảng ký hiệu chung</div><div><span>A0</span>Lần mở đầu tiên</div><div><span>A2</span>Màn Quét</div><div><span>A3</span>Thẻ kết quả — đọc từng dòng</div><div><span>A4</span>“Vì sao Nón Lá nói thế”</div><div><span>A5</span>Đếm tiền thối &amp; chia hoá đơn</div><div><span>A6</span>Chìa cho người bán</div><div><span>A7</span>Tab Eat</div><div><span>A8</span>Tab Nearby</div><div><span>A9</span>Ba màn hình bản đồ</div><div><span>A10</span>Tab Community</div><div><span>A11</span>Tab You</div><div><span>A12</span>Khảo sát giá</div><div><span>B1</span>Bản web máy tính — khung trang</div><div><span>B2</span>Chín trang web</div><div><span>C1</span>Sự cố thường gặp</div><div><span>C2</span>Mẹo dùng nhanh</div></div>
+  </div>
+</section>
+<!-- ══════════════════ BÌA ══════════════════ -->
+
+
+<!-- ══════════════════ MỤC LỤC ══════════════════ -->
+<div class="page">
+
+
+<h1 class="ch" id="m0">
+  <span class="n">0</span>Trước khi bắt đầu</h1>
+
+<h2>Hai bản, và bản nào cho việc gì</h2>
+<table>
+  <tr><th style="width:26%"></th><th>Bản điện thoại (PWA)</th><th>Bản máy tính</th></tr>
+  <tr><td><b>Mở ở đâu</b></td><td><code>/</code> — gốc của trang</td><td><code>/web/</code></td></tr>
+  <tr><td><b>Quét bằng camera</b></td><td>✔ có</td><td>✘ không — dùng lối gõ tay</td></tr>
+  <tr><td><b>Chạy khi tắt mạng</b></td><td>✔ đầy đủ</td><td>✘ cần mạng</td></tr>
+  <tr><td><b>Bản đồ</b></td><td>2.5D + bản đồ chi tiết + bản đồ ẩm thực</td><td>bản đồ khổ rộng</td></tr>
+  <tr><td><b>Bố cục</b></td><td>một cột, thanh tab dưới đáy</td><td>nhiều cột, thanh nav trên đỉnh</td></tr>
+  <tr><td><b>Dùng khi</b></td><td>đang đi, đang đứng trước quầy</td><td>ngồi đọc kỹ, lên kế hoạch trước chuyến đi</td></tr>
+</table>
+<p>Hai bản <b>dùng chung một kho dữ liệu</b>. Đổi vùng ở bản này thì bản kia cũng nhớ, vì
+lựa chọn vùng nằm trong bộ nhớ của trình duyệt.</p>
+
+<h2>Cài ra màn hình chính</h2>
+<p>Mở <code>nonla-app.vercel.app</code> bằng trình duyệt điện thoại → menu trình duyệt →
+<b>Add to Home Screen</b>. Sau lần mở đầu tiên là dùng được offline.</p>
+<div class="box">
+  <b>Camera cần HTTPS</b>
+  Bản deploy có sẵn HTTPS. Chạy tại máy thì <code>127.0.0.1</code> cũng được miễn trừ —
+  còn mở qua địa chỉ IP nội bộ (<code>192.168.x.x</code>) thì trình duyệt sẽ chặn camera,
+  và app rơi về lối gõ tay.
+</div>
+</div>
+
+<!-- ══════════════════ KÝ HIỆU ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="m00"><span class="n">0.1</span>Bảng ký hiệu chung</h1>
+<p class="lead">Ba bộ ký hiệu này lặp lại ở mọi màn hình. Nắm được ba bảng dưới đây là đọc
+được toàn bộ app.</p>
+
+<h2>① Màu phán quyết giá</h2>
+<table>
+  <tr><th style="width:22%">Ký hiệu</th><th>Nghĩa</th><th>Ranh giới</th></tr>
+  <tr><td><span class="tag ok">chấm xanh</span></td><td>giá bình thường</td><td>≤ p75 của vùng</td></tr>
+  <tr><td><span class="tag warn">chấm hổ phách</span></td><td>cao hơn 75% chỗ khác</td><td>p75 &lt; giá ≤ p95</td></tr>
+  <tr><td><span class="tag bad">chấm đỏ · +N%</span></td><td>vượt hẳn khoảng giá</td><td>&gt; p95, kèm % lệch so với trung vị</td></tr>
+  <tr><td><span class="tag grey">gạch ngang</span></td><td>chưa đủ dữ liệu</td><td>vùng chưa có dòng giá cho món đó</td></tr>
+</table>
+<p>Mức nặng nhất trong một lần quét còn được vẽ thành <b>viền màu quanh cả màn hình</b> —
+nhìn một cái là biết, không cần đọc.</p>
+
+<h2>② Nhãn nguồn gốc của con số</h2>
+<p>Đi ngay sau khoảng giá, trong cùng một cái liếc mắt. Đây là chỗ app nói cho bạn biết
+nó đang <i>đoán</i> hay đang <i>trình bày một phép đo</i>.</p>
+<table>
+  <tr><th style="width:26%">Nhãn</th><th>Nghĩa</th></tr>
+  <tr><td><code>estimate</code></td><td>Khoảng giá ước lượng, chưa qua khảo sát thực địa. Bản đang chạy hầu hết là bậc này.</td></tr>
+  <tr><td><code>1–4 recorded</code></td><td>Bạn đã tự ghi vài giá thật, chưa đủ để thay số ước lượng.</td></tr>
+  <tr><td><code>surveyed</code></td><td>Từ 5 mẫu khảo sát thật trở lên — vùng này đã ngừng dùng số ước lượng cho món đó.</td></tr>
+</table>
+
+<h2>③ Ghim trên bản đồ</h2>
+<table>
+  <tr><th style="width:34%">Ghim</th><th>Nghĩa</th></tr>
+  <tr><td>Giọt nước xanh rêu + dấu tick</td><td>Cơ sở <b>Đúng Giá</b>, đã xác minh qua nhiều lượt quét</td></tr>
+  <tr><td>Giọt nước đỏ + chấm than</td><td>Cơ sở đang <b>vượt khoảng giá</b> địa phương</td></tr>
+  <tr><td>Giọt nước nâu + dấu hỏi</td><td>Chưa đủ dữ liệu để nói gì</td></tr>
+  <tr><td>Giọt nước vàng đồng + sao</td><td>Mốc tham quan <b>must-see</b></td></tr>
+  <tr><td>Chấm vàng nhỏ + sao</td><td>Mốc phụ — chỉ hiện khi phóng gần</td></tr>
+</table>
+<div class="box jade">
+  <b>Lọc theo giá không bao giờ ẩn mốc tham quan</b>
+  Mốc là khung định hướng. Người dùng lọc để chọn quán, chứ không phải để xoá Chùa Cầu
+  khỏi bản đồ rồi mất luôn chỗ bám.
+</div>
+</div>
+
+<!-- ══════════════════ A0 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a0"><span class="n">A0</span>Lần mở đầu tiên</h1>
+<p class="lead">Hai bước, và <b>cả hai đều bỏ qua được</b>. Sau đó không bao giờ hiện lại,
+trừ khi bạn tự gọi ra ở tab You.</p>
+
+<div class="shots two">
+  <figure><img src="anh/01-welcome.jpg" alt="Màn giới thiệu thứ nhất">
+    <figcaption><b>Bước 1 · Bốn màn giới thiệu.</b> Màn đầu không nói một tính năng nào —
+      chỉ nói app này dùng để làm gì và cho ai. Ba màn sau lần lượt là giá, bản đồ, và
+      người. Nút <i>Skip</i> luôn ở đó.</figcaption></figure>
+  <figure><img src="anh/01b-account.jpg" alt="Bước đặt tên hiển thị">
+    <figcaption><b>Bước 2 · Tên hiển thị.</b> Không mật khẩu, không email. Khi chưa nối
+      máy chủ, màn này nói thẳng “không có máy chủ phía sau” thay vì dựng một ô đăng nhập
+      đẹp đẽ rồi để nó luôn báo lỗi.</figcaption></figure>
+</div>
+
+<table class="ui">
+  <tr><td>Next / mũi tên</td><td>Sang màn giới thiệu tiếp theo. Bốn chấm dưới ảnh cho biết đang ở màn nào.</td></tr>
+  <tr><td>Skip</td><td>Bỏ qua thẳng tới bước tài khoản.</td></tr>
+  <tr><td>Display name</td><td>Tên gắn lên mọi thứ bạn viết. Bỏ trống cũng đi tiếp được.</td></tr>
+  <tr><td>Start exploring</td><td>Vào app. Từ đây thanh tab dưới đáy mới xuất hiện.</td></tr>
+</table>
+
+<div class="box">
+  <b>Vì sao không có bức tường đăng nhập</b>
+  Toàn bộ giá trị của Nón Lá — quét thực đơn, soi giá, bản đồ, nhật ký — nằm sẵn trong
+  máy và chạy được khi tắt hẳn mạng. Tài khoản chỉ mở thêm <i>một</i> thứ: đăng bài lên
+  máy chủ chung. Nên nó xin, không ép.
+</div>
+
+<h2 id="a1" style="margin-top:9mm">A1 · Thanh điều hướng</h2>
+<p>Năm chỗ, cố định ở đáy màn hình mọi lúc — trừ khi đang mở một màn hình phủ toàn khung
+(bản đồ, khảo sát, chìa cho người bán), lúc đó thanh nav ẩn đi để nhường chỗ.</p>
+<table class="ui">
+  <tr><td>🗺 <b>Nearby</b></td><td>Bản đồ vùng, cơ sở đang theo dõi, tuyến đi bộ, điểm đi trong ngày.</td></tr>
+  <tr><td>🍜 <b>Eat</b></td><td>77 món: món đó là gì, giá phổ biến, cách gọi món.</td></tr>
+  <tr><td>☀ <b>Nút tròn vàng giữa</b></td><td>Mở màn Quét. Đây là nút to nhất và ở giữa vì đó là việc app sinh ra để làm.</td></tr>
+  <tr><td>👥 <b>Community</b></td><td>Bài viết kèm ảnh và giá đã trả.</td></tr>
+  <tr><td>👤 <b>You</b></td><td>Cài đặt, huy hiệu, nhật ký quét, dữ liệu, khảo sát giá.</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════ A2 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a2"><span class="n">A2</span>Màn Quét</h1>
+<p class="lead">Màn hình mặc định. Bốn chế độ, và ba trong bốn chế độ ấy chạy hoàn toàn
+trên máy.</p>
+
+<div class="shots two">
+  <figure><img src="anh/02-scan.jpg" alt="Màn quét, chế độ Menu">
+    <figcaption><b>Chế độ Menu.</b> Khung ngắm hình mặt trống đồng, dòng gợi ý ở dưới, và
+      nhãn <i>OFFLINE READY</i> khi service worker đã nạp xong.</figcaption></figure>
+  <figure><img src="anh/17-cash.jpg" alt="Màn quét, chế độ Cash">
+    <figcaption><b>Chế độ Cash.</b> Đổi chế độ thì dòng gợi ý đổi theo: <i>“Lay the notes
+      flat, big number facing up.”</i></figcaption></figure>
+</div>
+
+<h2>Bốn chế độ</h2>
+<table class="ui">
+  <tr><td><b>Menu</b> · offline</td><td>Đọc tấm thực đơn: tách từng cặp “tên món ↔ giá”, khớp với 77 món, so với khoảng giá của vùng.</td></tr>
+  <tr><td><b>Cash</b> · offline</td><td>Đọc mệnh giá các tờ polymer đang cầm, cộng tổng, và cảnh báo nếu có dấu hiệu nhầm một bậc số 0.</td></tr>
+  <tr><td><b>Bill</b> · offline</td><td>Đối chiếu tờ hoá đơn với những món đã gọi trong phiên, chỉ ra dòng lạ.</td></tr>
+  <tr><td><b>Dish</b> · <span class="tag warn">cần mạng</span></td><td>Nhận diện chính món ăn trong đĩa. Là chế độ <i>duy nhất</i> cần kết nối — nhận diện vật thể không có model nào đủ nhỏ để chạy trên máy.</td></tr>
+</table>
+
+<h2>Các thành phần khác trên màn này</h2>
+<table class="ui">
+  <tr><td>Nhãn <b>OFFLINE READY</b></td><td>Service worker đã nạp xong: từ giờ tắt mạng vẫn dùng được.</td></tr>
+  <tr><td>Khung ngắm</td><td>Chỉ là chỉ dẫn thị giác — OCR đọc cả khung hình, không chỉ phần trong khung.</td></tr>
+  <tr><td>Nút <b>Say it in Vietnamese</b></td><td>Mở màn chìa cho người bán (mục A6). Đặt ngay ở đây vì đây <i>là</i> chỗ bạn đang đứng khi cần nó: trước quầy, máy đã cầm sẵn trên tay.</td></tr>
+  <tr><td>Nút tròn vàng dưới đáy</td><td>Chụp và đọc.</td></tr>
+</table>
+
+<h2>Khi không có camera</h2>
+<div class="shots two">
+  <figure><img src="anh/12a-manual.jpg" alt="Thẻ nhập tay khi không có camera">
+    <figcaption><b>Không bao giờ để người dùng bí.</b> Máy không có camera, trang không
+      chạy trên HTTPS, hoặc bạn chưa cấp quyền — app nói thẳng lý do và mở ngay khối
+      <i>Enter by hand</i>.</figcaption></figure>
+  <figure><img src="anh/12-menu-result.jpg" alt="Thẻ kết quả sau khi gõ tay">
+    <figcaption><b>Kết quả từ một dòng gõ tay.</b> Cao lầu 95.000₫ ở Hội An → <i>above
+      75%</i>, khoảng thường gặp 60.000–90.000₫, và nhãn <code>estimate</code> nói rõ con
+      số tham chiếu ấy chưa qua khảo sát.</figcaption></figure>
+</div>
+</div>
+
+<!-- ══════════════════ A3 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a3"><span class="n">A3</span>Thẻ kết quả — đọc từng dòng</h1>
+<p class="lead">Thẻ trượt lên từ đáy sau mỗi lần quét. Đây là màn hình quan trọng nhất
+của cả sản phẩm, nên đáng bóc từng phần.</p>
+
+<table>
+  <tr><th style="width:30%">Phần</th><th>Nói gì</th></tr>
+  <tr><td><b>Tiêu đề</b><br><i>Menu · Hội An · Phố cổ</i></td>
+      <td>Chế độ quét và vùng đang so. So nhầm vùng là ra một phán quyết sai hoàn toàn, nên vùng luôn hiện ngay dòng đầu.</td></tr>
+  <tr><td><b>Dòng nguồn</b><br><i>1 item read · Compared against estimated ranges · updated 2026-08</i></td>
+      <td>Đọc được mấy dòng, đang so với loại dữ liệu nào, và bảng giá cập nhật lần cuối khi nào. Nếu quét bằng camera thì có thêm độ tin cậy OCR.</td></tr>
+  <tr><td><b>Mỗi dòng món</b></td>
+      <td>Chấm màu · tên món đã khớp · khoảng giá thường gặp · nhãn nguồn gốc · giá bạn thấy · quy đổi ra đô · nhãn phán quyết. <b>Chạm vào dòng</b> để mở thẻ chi tiết của món.</td></tr>
+  <tr><td><b>Read the unit, not just the number</b><br><span style="font-weight:400;font-size:9pt;color:#6C7169">chỉ hiện khi có bẫy đơn vị</span></td>
+      <td>Dòng nào tính theo trọng lượng (<code>/100g</code>, <i>/lạng</i>), dòng nào ghi <i>thời giá</i>, và phụ thu chưa gộp vào con số. App <b>không đoán trọng lượng</b> con cá trên bàn — nó chỉ ra dòng đó tính theo cân và đưa phép nhân để bạn hỏi rồi tự tính. <b>Một lạng = 100 gam.</b></td></tr>
+  <tr><td><b>Not measured here — estimated from nearby zones</b><br><span style="font-weight:400;font-size:9pt;color:#6C7169">chỉ hiện khi có món chưa đo</span></td>
+      <td>Món mà vùng này chưa có số đo nào, nhưng suy được từ các vùng khác. Là một khối <b>tách hẳn</b> khỏi các dòng phía trên — một con số suy ra nằm cùng hàng với một con số đo được là đúng thứ app tồn tại để chặn.</td></tr>
+  <tr><td><b>Enter by hand</b></td>
+      <td>Luôn có, kể cả khi quét thành công — dùng để thêm một món OCR đọc sót.</td></tr>
+  <tr><td><b>Check my change</b></td>
+      <td>Sang màn đếm tiền thối, mang theo tổng tiền của lần quét này.</td></tr>
+  <tr><td><b>Compare with the other menu</b></td>
+      <td>Chỉ hiện khi đọc được đủ số dòng: bắt đầu phép so hai tấm thực đơn.</td></tr>
+  <tr><td><b>Say it in Vietnamese</b></td>
+      <td>Chìa màn hình cho người bán đọc.</td></tr>
+  <tr><td><b>Dải cảnh báo cuối thẻ</b></td>
+      <td>Hiện khi có ít nhất một dòng dựa trên dữ liệu ước lượng.</td></tr>
+</table>
+
+<div class="box">
+  <b>Vì sao nhãn nguồn gốc đi ngay sau khoảng giá</b>
+  Người đọc phải thấy “60–90k” và “estimate” trong cùng một cái liếc mắt. Tách ra thành
+  một dòng riêng ở đáy thẻ là để lời khẳng định đi một mình.
+</div>
+
+<h1 class="ch" id="a4"><span class="n">A4</span>“Vì sao Nón Lá nói thế”</h1>
+<p class="lead">Khối gập, mặc định đóng. Người đang đứng trước quầy cần câu trả lời, không
+cần bài giảng — nhưng người đã bị một phán quyết làm cho ngờ vực phải tìm được đường đi
+tới tận nguồn mà không rời màn hình.</p>
+
+<div class="shots two">
+  <figure><img src="anh/15-why.jpg" alt="Khối giải thích phán quyết">
+    <figcaption>Mở ra là bốn mốc của phân phối giá và một câu nói rõ ranh giới của phán
+      quyết.</figcaption></figure>
+  <div>
+    <table class="ui">
+      <tr><td>Cheap end</td><td>p25 — một phần tư số chỗ bán rẻ hơn mức này</td></tr>
+      <tr><td>Middle</td><td>p50 — trung vị</td></tr>
+      <tr><td>Dear end</td><td>p75 — <b>ranh giới của “bình thường”</b></td></tr>
+      <tr><td>Called high above</td><td>p95 — vượt mức này mới bị gọi là cao</td></tr>
+      <tr><td>Record what you paid</td><td>Mở thẳng màn khảo sát giá cho đúng món này</td></tr>
+    </table>
+    <p style="font-size:9.6pt">Hai dòng cuối cùng chính là toàn bộ phán quyết: <i>một cái
+    giá được gọi là bình thường cho tới mốc “dear end”, và bị gọi là cao khi vượt qua con
+    số cuối.</i></p>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════ A5 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a5"><span class="n">A5</span>Đếm tiền thối &amp; chia hoá đơn</h1>
+
+<div class="shots two">
+  <figure><img src="anh/16-change.jpg" alt="Màn đếm tiền thối">
+    <figcaption><b>Check my change.</b> Chạm các tờ đã đưa, rồi chạm các tờ nhận lại. App
+      trừ hộ và <i>gọi tên</i> khoảng chênh nếu có.</figcaption></figure>
+  <div>
+    <h3>Cách dùng</h3>
+    <ol>
+      <li><b>The bill</b> — tổng tiền, đã điền sẵn từ lần quét trước, sửa được.</li>
+      <li><b>You handed over</b> — chạm từng mệnh giá bạn đưa; chạm nhiều lần cho nhiều tờ.</li>
+      <li><b>You got back</b> — chạm từng tờ nhận lại.</li>
+      <li>Kết quả hiện ngay: khớp, thừa, hay thiếu bao nhiêu.</li>
+    </ol>
+    <h3>Chỗ tính năng này khác một cái máy tính</h3>
+    <p>Khi số tiền không khớp, app không dừng ở “thiếu 480.000₫”. Nó nói tiếp rằng con số
+    ấy <b>đúng bằng</b> chênh lệch giữa hai tờ hay bị nhầm — <b>20.000₫ và 500.000₫ đều
+    xanh lơ</b>, <b>10.000₫ và 200.000₫ đều nâu đỏ</b> — và mời bạn xem lại tờ đang cầm
+    trong tay.</p>
+  </div>
+</div>
+
+<div class="box jade">
+  <b>Và nó không kết luận ai sai</b>
+  Đưa nhầm tờ là chuyện xảy ra với cả hai phía. Màn hình này nói về <i>tờ tiền</i>, không
+  nói về <i>người</i>.
+</div>
+
+<h2>Chia hoá đơn</h2>
+<p>Mở từ thẻ kết quả hoá đơn khi có từ hai món trở lên.</p>
+<table class="ui">
+  <tr><td>Hàng số người</td><td>Chọn 2–6 người. Đổi số thì phần chia tính lại ngay.</td></tr>
+  <tr><td>Mỗi món một hàng</td><td>Chạm để gán món đó cho từng người; một món chia được cho nhiều người.</td></tr>
+  <tr><td>Dòng tổng</td><td>Số tiền từng người phải trả, tính từ đúng những món đã gán.</td></tr>
+</table>
+
+<h2>So hai tấm thực đơn</h2>
+<p>Ở phố du lịch, không hiếm quán treo một tấm biển giá tiếng Việt ngoài cửa và đưa một
+tấm thực đơn tiếng Anh vào bàn, với những con số khác nhau cho cùng một món. Đây là tính
+năng duy nhất trong app <b>sinh ra dữ kiện mới</b> thay vì tra dữ kiện có sẵn.</p>
+<ol>
+  <li>Quét tấm thứ nhất như bình thường.</li>
+  <li>Bấm <b>Compare with the other menu</b> — app chuyển sang trạng thái chờ tấm thứ hai.</li>
+  <li>Quét tấm thứ hai. Màn so sánh mở ra ngay, không qua thẻ kết quả.</li>
+  <li>Nút <b>đảo chiều</b> để đổi vai hai tấm nếu bạn quét nhầm thứ tự.</li>
+</ol>
+<div class="box terra">
+  <b>Kết quả là một phép đo, không phải một lời buộc tội</b>
+  Hai tấm chênh nhau có mấy lý do hoàn toàn lương thiện: tấm tiếng Anh in từ năm ngoái;
+  suất “cho khách” nhiều thịt hơn suất bình dân; tấm ngoài cửa là giá mang về. Chữ dùng ở
+  mọi chỗ là <i>“chênh lệch”</i>, không phải <i>“chặt”</i>.
+</div>
+</div>
+
+<!-- ══════════════════ A6 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a6"><span class="n">A6</span>Chìa cho người bán</h1>
+<p class="lead">Mọi màn hình khác trong app viết cho một người đọc: bạn. Nhưng khoảnh khắc
+có ma sát thật lại có <b>hai</b> người — và cho tới màn này, chưa có gì trên màn hình
+dành cho người kia.</p>
+
+<div class="shots two">
+  <figure><img src="anh/10-showcard.jpg" alt="Màn chìa cho người bán">
+    <figcaption>Chữ đủ to để đọc từ khoảng cách hai người cách nhau một cái bàn, dưới
+      nắng, không cần chạm vào.</figcaption></figure>
+  <div>
+    <h3>Ba phần của màn hình</h3>
+    <table class="ui">
+      <tr><td>Khối lớn ở trên</td><td><b>Phần của người bán.</b> Chỉ có một câu tiếng Việt, và số lượng nếu đang gọi món.</td></tr>
+      <tr><td>Khối nhỏ ở dưới</td><td><b>Phần của bạn.</b> Phiên âm để đọc theo, nghĩa bằng thứ tiếng bạn đang chọn, và nút loa phát âm.</td></tr>
+      <tr><td>Hàng chip dưới cùng</td><td>Đổi câu: <i>How much? · Menu · This one · Not spicy…</i></td></tr>
+      <tr><td>Nút ⇅ góc phải</td><td>Xoay ngược chữ 180° để chìa qua bàn mà không phải xoay cả máy.</td></tr>
+    </table>
+    <h3>Mười một câu có sẵn</h3>
+    <p style="font-size:9.6pt">Bao nhiêu tiền · Cho xem thực đơn có giá · Cho tôi món này ·
+    Ít cay thôi · Tôi ăn chay · <b>Tôi bị dị ứng đậu phộng</b> · Mang về · Cho xin hoá đơn ·
+    Cho xem lại hoá đơn · Trả tiền mặt · Cảm ơn.</p>
+  </div>
+</div>
+
+<div class="box terra">
+  <b>Ranh giới quan trọng nhất của cả tính năng này</b>
+  Phần chìa ra cho người bán chỉ chứa <b>điều bạn muốn nói</b>. Khoảng giá thường gặp nằm
+  ở nửa của bạn, chữ nhỏ, và <b>không bao giờ</b> đi lên khối chữ lớn. Một app chìa vào
+  mặt người bán dòng “chỗ này thường bán 40–50k” là một app biến mọi bữa ăn thành một
+  cuộc đối chất — và tệ hơn: nó dựa lời buộc tội ấy trên một dải giá mà chính app thừa
+  nhận là số ước lượng.
+</div>
+
+<div class="box">
+  <b>Vì sao câu dị ứng đậu phộng nằm ngay trong danh sách chính</b>
+  Đậu phộng rang có mặt trong rất nhiều món Việt, và đây là câu duy nhất ở đây mà nói
+  chậm một phút có thể thành chuyện cấp cứu.
+</div>
+</div>
+
+<!-- ══════════════════ A7 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a7"><span class="n">A7</span>Tab Eat</h1>
+<p class="lead">Trả lời câu hỏi trước cả câu hỏi về giá: <i>“món này là món gì, và ăn ở
+đâu?”</i></p>
+
+<div class="shots two">
+  <figure><img src="anh/03-eat.jpg" alt="Tab Eat">
+    <figcaption><b>Đầu tab.</b> Một cơ sở Đúng Giá được đưa lên đầu — kèm lý do bằng số
+      lượt quét độc lập, không phải bằng điểm sao.</figcaption></figure>
+  <figure><img src="anh/04-dish.jpg" alt="Thẻ chi tiết một món">
+    <figcaption><b>Thẻ chi tiết món.</b> Mở ra khi chạm một thẻ món ở bất kỳ đâu trong
+      app.</figcaption></figure>
+</div>
+
+<h2>Các khối trên tab Eat</h2>
+<table class="ui">
+  <tr><td>Hàng nút trên cùng</td><td>Quay lại màn Quét · mở <b>Must-Try Food Map</b> · chia sẻ · lưu địa điểm.</td></tr>
+  <tr><td>Cơ sở nổi bật</td><td>Ảnh, tên, phố, hạng quán, nhãn Đúng Giá, và một câu nói rõ nó dựa trên bao nhiêu lượt quét độc lập.</td></tr>
+  <tr><td>Ba ô dữ kiện</td><td><i>Known for</i> — món quán làm; <i>Typical price</i> — khoảng giá của vùng; <i>Best time</i> — giờ ăn của người địa phương.</td></tr>
+  <tr><td>Signature dishes</td><td>Khay cuộn ngang những món quán đó bán, kèm giá của chính quán.</td></tr>
+  <tr><td>Ô tìm món</td><td>Gõ tiếng Việt hoặc tiếng Anh; khớp cả tên gọi khác.</td></tr>
+  <tr><td>More dishes here</td><td>Mọi món khác có giá trong vùng này.</td></tr>
+</table>
+
+<h2>Trong thẻ chi tiết món có gì</h2>
+<table class="ui">
+  <tr><td>Món đó là gì</td><td>Một đoạn mô tả — nguyên liệu, ăn thế nào, khác gì món trông giống nó.</td></tr>
+  <tr><td>Thành phần cần lưu ý</td><td>Đậu phộng, mắm tôm, thịt heo, hải sản — những thứ người ăn kiêng hoặc dị ứng cần biết trước.</td></tr>
+  <tr><td>Khoảng giá thường gặp</td><td>Kèm nhãn nguồn gốc, và khối “vì sao nói thế”.</td></tr>
+  <tr><td>Nút phát âm</td><td>Đọc tên món bằng giọng tiếng Việt để bạn chỉ vào thực đơn và nói theo.</td></tr>
+  <tr><td>Ăn ở đâu</td><td>Những cơ sở trong vùng có bán món này, kèm giá của từng chỗ.</td></tr>
+  <tr><td>Khối liên kết ra ngoài</td><td>Bản đồ trỏ thẳng tới điểm; mạng xã hội chỉ mở ô <i>tìm kiếm</i> — app không biết quán nào có tài khoản nào và không đoán.</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════ A8 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a8"><span class="n">A8</span>Tab Nearby</h1>
+
+<div class="shots two">
+  <figure><img src="anh/05-nearby.jpg" alt="Tab Nearby">
+    <figcaption><b>Bản đồ 2.5D dựng bằng mã.</b> Mặt đất xoay 22° rồi nén 0,56, nhà cửa
+      dựng đứng lên. Ghim đi qua đúng phép biến hình ấy nên vẫn đứng trên đúng con phố
+      của nó.</figcaption></figure>
+  <figure><img src="anh/11-place.jpg" alt="Thẻ một cơ sở">
+    <figcaption><b>Thẻ cơ sở.</b> Mở khi chạm một thẻ trong khay hoặc một ghim trên bản
+      đồ.</figcaption></figure>
+</div>
+
+<h2>Đọc từ trên xuống</h2>
+<table class="ui">
+  <tr><td>Hai con số đầu trang</td><td>Bao nhiêu cơ sở <b>Đúng Giá</b>, bao nhiêu cơ sở <b>vượt khoảng</b> trong vùng. Đếm thật từ dữ liệu, không ghi cứng.</td></tr>
+  <tr><td>Hàng chip lọc</td><td><i>All · Fair Price · Above range · Must-Try Food · Cultural Sights · Cafés · Hidden Gems.</i> Nút tròn cuối hàng giải thích từng bộ lọc.</td></tr>
+  <tr><td>Khối bản đồ</td><td>Chạm vào để mở bản đồ chi tiết. Hai nút nổi: định vị bạn, và mở bản đồ toàn khung.</td></tr>
+  <tr><td>Khay thẻ cuộn ngang</td><td>Cơ sở khớp bộ lọc, xếp theo <b>số lượt quét độc lập</b> — càng nhiều lần được xác nhận càng đứng trước. <i>See all</i> mở hết danh sách.</td></tr>
+  <tr><td>Thẻ tuyến đi bộ</td><td><i>Lantern Walk Route</i> — mở màn tuyến.</td></tr>
+  <tr><td>Thẻ cảnh báo</td><td>Cơ sở đang vượt khoảng giá, hiện riêng để không lẫn vào khay trên.</td></tr>
+  <tr><td>Dải mốc tham quan</td><td>Must-see của vùng, kèm ghi chú và ảnh.</td></tr>
+  <tr><td>Đi trong ngày</td><td>Điểm đến ngoài khung bản đồ, kèm <b>khoảng cách đường chim bay</b> tính thật. Vùng nào app đã có dữ liệu thì thẻ có nút chuyển thẳng sang vùng đó.</td></tr>
+</table>
+
+<h2>Trong thẻ cơ sở có gì</h2>
+<table class="ui">
+  <tr><td>Trạng thái</td><td>Đúng Giá / Trên khoảng / Chưa đủ dữ liệu, kèm tháng bắt đầu đạt trạng thái đó.</td></tr>
+  <tr><td>Bảng giá theo món</td><td>Giá của chính quán, so với khoảng giá vùng cho từng món.</td></tr>
+  <tr><td>Khoảng cách</td><td>Hiện khi bạn đã cho phép định vị.</td></tr>
+  <tr><td>Nhận xét cộng đồng</td><td>Ở chế độ sổ tay thì hiện thẳng ghi chép của chính bạn, kèm ngày và số tiền đã trả.</td></tr>
+  <tr><td>Liên kết ra ngoài</td><td>Mở bằng app bản đồ của máy · Google Maps · chỉ đường đi bộ · OpenStreetMap · tìm trên mạng xã hội.</td></tr>
+  <tr><td>Write a review</td><td>Viết nhận xét kèm ảnh và giá đã trả.</td></tr>
+</table>
+
+<div class="box">
+  <b>Khay thẻ không có sao đánh giá</b>
+  Dữ liệu của app là số lượt quét và mức lệch giá, không phải điểm bình chọn. Chỗ đó hiện
+  tháng bắt đầu đạt Đúng Giá, thay vì một con số 4,8 bịa ra.
+</div>
+</div>
+
+<!-- ══════════════════ A9 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a9"><span class="n">A9</span>Ba màn hình bản đồ</h1>
+<p class="lead">Chúng dùng chung một phép chiếu và một bộ nét vẽ — dựng ba engine bản đồ
+là cách chắc chắn để ba màn hình nói ba vị trí khác nhau cho cùng một quán.</p>
+
+<div class="shots two">
+  <figure><img src="anh/06-bigmap.jpg" alt="Bản đồ chi tiết">
+    <figcaption><b>Bản đồ chi tiết.</b> Kéo, phóng, lọc, định vị, chạm ghim ra thẻ. Khi có
+      mạng thì nền là ảnh bản đồ thật của OpenStreetMap; khi tile không tải được thì lớp
+      vector tự vẽ nằm sẵn bên dưới hiện lên — <b>bản đồ không bao giờ trắng</b>.</figcaption></figure>
+  <figure><img src="anh/07-foodmap.jpg" alt="Bản đồ ẩm thực">
+    <figcaption><b>Must-Try Food Map.</b> Dùng lại đúng tấm tranh vẽ tay đã neo toạ độ, và
+      hiện <i>trạng thái thật</i> từ dữ liệu chứ không phải điểm sao.</figcaption></figure>
+</div>
+
+<table class="ui">
+  <tr><td>Kéo · phóng</td><td>Một ngón để kéo, hai ngón để phóng, hoặc dùng hai nút +/−.</td></tr>
+  <tr><td>Lọc ba mức tin cậy</td><td>Đúng Giá · vượt khoảng · chưa đủ dữ liệu.</td></tr>
+  <tr><td>Định vị</td><td>Đưa khung nhìn về chỗ bạn đứng. Vị trí không rời khỏi máy.</td></tr>
+  <tr><td>Chạm ghim</td><td>Mở thẻ cơ sở kèm khoảng cách từ chỗ bạn đứng.</td></tr>
+  <tr><td>Mốc phụ</td><td>Ẩn khi phóng xa — đổ cả mười mấy mốc ra cùng lúc là cách chắc chắn để không mốc nào nổi bật.</td></tr>
+  <tr><td>Lớp quán OpenStreetMap</td><td>Bật khi phóng đủ gần (app nhắc <i>“Zoom in to see eateries”</i>): 2.481 quán quanh sáu vùng. Đây là lớp <b>“quanh đây có gì”</b>, không phải lớp đã quét giá.</td></tr>
+</table>
+
+<h2>Thẻ một quán OpenStreetMap</h2>
+<p>Khác hẳn thẻ cơ sở đang theo dõi: quán ở lớp này <b>chưa được quét giá lần nào</b>, nên
+thẻ <b>không</b> có nhãn phán quyết, <b>không</b> có khoảng giá của quán, và nói thẳng điều
+đó ra. Mượn cái nhãn <i>Fair Price</i> cho đẹp là bịa ra một tuyên bố không có lần quét nào
+chống lưng.</p>
+<table class="ui">
+  <tr><td><i>Probably serves</i></td><td>Món quán nhiều khả năng bán, <b>suy từ chính tên quán</b> — “Phở Thìn”, “Bánh mì Phượng”. Mỗi dòng ghi rõ <i>from the name</i>, và thêm <i>less sure</i> khi mức tin cậy thấp.</td></tr>
+  <tr><td>Con số bên phải mỗi dòng</td><td><b>Dải giá của vùng</b> cho món đó — không phải giá của quán này. App không biết quán này bán bao nhiêu, và không đoán.</td></tr>
+  <tr><td>Chạm một dòng</td><td>Mở thẻ chi tiết món, nơi có khoảng giá đầy đủ và khối “vì sao”.</td></tr>
+</table>
+
+<h2>Màn tuyến đi bộ</h2>
+<p>Mở từ thẻ <i>Lantern Walk Route</i>. Dùng lại đúng khung vẽ của bản đồ chi tiết, chỉ
+thay phần khung viền.</p>
+<ul>
+  <li><b>Đường đã đi vẽ liền nét, đoạn còn lại vẫn nét đứt</b> — nhìn một cái là biết mình
+    đang ở đâu mà không cần đọc con số.</li>
+  <li>Trong chế độ tuyến, mốc phụ ẩn hẳn: màn hình này nói về bốn chặng.</li>
+  <li><b>Thời gian đi bộ được tính, không ghi cứng</b> — suy từ toạ độ thật ở tốc độ
+    4,2 km/h và <b>làm tròn lên</b>. Nói 5 phút rồi người ta đi mất 6 thì lần sau họ không
+    tin con số nào của app nữa.</li>
+</ul>
+
+<div class="box">
+  <b>Tranh vẽ tay không phải bản đồ khảo sát</b>
+  Bố cục phố trong tranh là ấn tượng của người vẽ. Hai mốc neo tranh vào toạ độ thật và ấn
+  định tỉ lệ cùng góc xoay, nên <b>khoảng cách và hướng giữa các ghim là thật</b>; vị trí
+  tuyệt đối so với từng mái nhà thì không. Bản đồ chính xác là bản vector ở
+  <i>Open full map</i>.
+</div>
+</div>
+
+<!-- ══════════════════ A10 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a10"><span class="n">A10</span>Tab Community</h1>
+
+<div class="shots two">
+  <figure><img src="anh/08-community.jpg" alt="Tab Community">
+    <figcaption>Feed đọc được ngay cả khi chưa đăng nhập. Bản đang chạy chưa nối máy chủ
+      nên tab này chạy ở <b>chế độ sổ tay</b>.</figcaption></figure>
+  <div>
+    <h3>Hai chế độ, hai luật khác nhau</h3>
+    <table style="font-size:9.4pt">
+      <tr><th></th><th>Feed máy chủ</th><th>Sổ tay trên máy</th></tr>
+      <tr><td>Ai đọc được</td><td>mọi người</td><td>chỉ máy này</td></tr>
+      <tr><td>Nút trên bài</td><td>Report</td><td>Delete</td></tr>
+      <tr><td>Sao trung bình</td><td>từ 3 đánh giá trở lên</td><td>không có — hiện thẳng ghi chép</td></tr>
+      <tr><td>Ảnh</td><td>Storage của máy chủ</td><td>trong máy, trần 60 bài</td></tr>
+    </table>
+    <p style="font-size:9.6pt"><b>Vì sao sổ tay không có ngưỡng “ba đánh giá”:</b> ngưỡng
+    ấy tồn tại để một người tự khen mình không đẩy được con số 5,0 lên trước mặt người lạ.
+    Trong sổ tay riêng không có người lạ nào.</p>
+  </div>
+</div>
+
+<h2>Đăng một bài</h2>
+<ol>
+  <li>Chọn quán trong danh sách cơ sở của vùng.</li>
+  <li>Chấm sao, viết nhận xét, và — phần có ích nhất — <b>ghi số tiền đã trả cho món nào</b>.</li>
+  <li>Đính ảnh nếu muốn. Ảnh được nén về 1280px và <b>vẽ lại qua canvas</b>, nên bản gửi đi
+    không mang theo EXIF, tức là không mang theo toạ độ GPS.</li>
+  <li>Bấm <b>Post</b>. Mất mạng thì bài vào hàng chờ và tự gửi lại khi có sóng.</li>
+</ol>
+
+<table class="ui">
+  <tr><td>Nhãn <i>this phone only</i></td><td>Bài đang nằm trong sổ tay riêng, chưa lên máy chủ.</td></tr>
+  <tr><td>Nhãn <i>posted away from the venue</i></td><td>Ảnh hoặc vị trí cho thấy bài viết ở xa quán. App <b>gắn nhãn chứ không chặn</b>.</td></tr>
+  <tr><td>Report</td><td>Ba người khác nhau báo cáo thì bài tự ẩn khỏi feed.</td></tr>
+</table>
+
+<div class="box jade">
+  <b>Ghi chép cộng đồng không bao giờ chạm vào phán quyết giá</b>
+  Chúng hiện song song với dải giá tham chiếu, không thay nó. Một người khen một quán
+  không làm cái giá ở đó trở nên bình thường.
+</div>
+</div>
+
+<!-- ══════════════════ A11 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a11"><span class="n">A11</span>Tab You</h1>
+<p class="lead">Mọi thứ về bạn và về chiếc máy này: cài đặt, huy hiệu, nhật ký, dữ liệu.</p>
+
+<div class="shots two">
+  <figure><img src="anh/09-you.jpg" alt="Tab You">
+    <figcaption><b>Đầu tab.</b> Ba con số đếm từ dữ liệu thật trên máy, và bốn huy hiệu có
+      thanh tiến trình.</figcaption></figure>
+  <figure><img src="anh/13-journal.jpg" alt="Nhật ký quét">
+    <figcaption><b>Nhật ký quét.</b> Mọi lượt quét tự ghi lại, kể cả khi tắt mạng.
+      Xuất ra được, xoá cả cụm được.</figcaption></figure>
+</div>
+
+<h2>Mục Settings — từng hàng một</h2>
+<table class="ui">
+  <tr><td>🌐 <b>Language</b></td><td>Năm ngôn ngữ, và giá trị hiện ra là <b>tên bản địa</b> — “한국어”, không phải “Korean”. Một danh sách viết toàn tiếng Anh thì đúng nhóm người cần nó nhất lại không nhận ra dòng của mình. Đặt ở ngay đầu mục vì người cần nó nhất là người không đọc được thứ tiếng đang hiện.</td></tr>
+  <tr><td>🕘 <b>Scan history</b></td><td>Mở nhật ký. Số bên phải là số bản ghi đang có.</td></tr>
+  <tr><td>📍 <b>Where you are</b></td><td>Đổi vùng trong sáu vùng. Đổi vùng là đổi toàn bộ bảng giá đang dùng để phán quyết.</td></tr>
+  <tr><td>🎯 <b>Use my location</b></td><td>Tự chọn vùng gần bạn nhất.</td></tr>
+  <tr><td>⚠ <b>Warn me while I walk</b></td><td>Bật thì khi tới gần một cơ sở đang vượt khoảng giá, app hiện một dải bấm được. <b>Vị trí ở lại trên máy này, không gửi đi đâu.</b></td></tr>
+  <tr><td>🛡 <b>Works offline</b></td><td>Hàng chỉ báo trạng thái, không mở gì — nên nó <i>không có mũi tên</i>. Cho biết cache đã sẵn sàng chưa.</td></tr>
+  <tr><td>▶ <b>Replay the tour</b></td><td>Xem lại bốn màn giới thiệu của lần mở đầu tiên.</td></tr>
+  <tr><td>✎ <b>Illustrated icons</b></td><td>Khối gập: xưởng icon. Dán khoá API của bạn, bấm <i>Draw all icons</i> để sinh 27 icon minh hoạ. Khoá <b>không</b> được lưu vào máy — tải lại trang là nhập lại; hỏng thì rơi về hình SVG dựng sẵn.</td></tr>
+  <tr><td>🪙 <b>How verdicts work</b></td><td>Khối gập: giải thích ngắn cách app so giá và ranh giới của ba mức.</td></tr>
+</table>
+
+<h2>Mục Account và Your data</h2>
+<table class="ui">
+  <tr><td>Account</td><td>Đổi tên hiển thị; khi có máy chủ thì thêm đăng nhập bằng mã 6 số qua email.</td></tr>
+  <tr><td>Record what you paid</td><td>Mở màn <b>khảo sát giá</b> (mục A12). Đặt trong mục Dữ liệu chứ không phải một tab riêng: đây là việc của người <i>dựng</i> dữ liệu, không phải của khách du lịch.</td></tr>
+  <tr><td>Xuất dữ liệu</td><td>Tải nhật ký và bảng giá đã trộn số khảo sát của bạn.</td></tr>
+  <tr><td>Xoá dữ liệu</td><td>Xoá cả cụm. Nhật ký và bài viết nằm ở hai kho riêng nên “xoá lịch sử” không bao giờ đụng nhầm vào bài.</td></tr>
+  <tr><td>Make a postcard</td><td>Chỉ hiện khi đã có gì để đếm. Vẽ một tấm bưu thiếp tổng kết bằng canvas để gửi về nhà — <b>không</b> có dòng “bạn đã tiết kiệm được X đồng”, vì app không biết bạn sẽ trả bao nhiêu nếu không có nó.</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════ A12 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="a12"><span class="n">A12</span>Khảo sát giá</h1>
+<p class="lead">Màn hình viết cho một người đang đứng trước quầy: một tay cầm điện thoại,
+mắt liếc bảng giá, người bán đang nhìn. Mười giây một món.</p>
+
+<div class="shots two">
+  <figure><img src="anh/14-survey.jpg" alt="Màn khảo sát giá">
+    <figcaption>Món xếp theo <b>số mẫu còn thiếu</b>, ít nhất lên trước — người khảo sát
+      không phải nhớ hôm qua đã làm tới đâu, màn hình nhớ hộ.</figcaption></figure>
+  <div>
+    <h3>Vòng làm việc</h3>
+    <ol>
+      <li>Gõ chỗ đang đứng vào ô trên cùng — không bắt buộc, nhưng giúp bạn tự kiểm lại
+        việc của mình sau này.</li>
+      <li>Chạm một món → con trỏ <b>nhảy thẳng</b> vào ô giá.</li>
+      <li>Gõ số, bấm <b>Enter</b> là lưu. Không có nút xác nhận, không có hộp thoại.</li>
+      <li>Lưu xong con trỏ nhảy ngược về danh sách món. Một vòng, không lần nào phải với
+        tay lên đầu màn hình.</li>
+      <li>Mỗi bản ghi vừa lưu có <b>nút hoàn tác ngay bên cạnh</b> — cách sửa lỗi gõ nhanh
+        nhất là xoá rồi gõ lại.</li>
+    </ol>
+    <h3>Con số bên phải mỗi món</h3>
+    <p style="font-size:9.6pt"><code>0/5</code> — đã ghi được mấy mẫu trên năm mẫu cần. Đủ
+    năm là vùng này <b>ngừng dùng số ước lượng</b> cho món đó, và nhãn nguồn gốc trên mọi
+    phán quyết đổi từ <code>estimate</code> sang <code>surveyed</code>.</p>
+  </div>
+</div>
+
+<table class="ui">
+  <tr><td>Chạy offline</td><td>Ghi thẳng vào bộ nhớ máy, không đợi mạng. Phố cổ mất sóng là chuyện thường, và mất một buổi khảo sát vì rớt wifi thì không ai đi khảo sát lần thứ hai.</td></tr>
+  <tr><td>Không có nút “Đồng bộ”</td><td>Số khảo sát không tự đi đâu cả. Chúng nằm trên máy cho tới khi bạn chủ động xuất ra.</td></tr>
+  <tr><td>Dùng được ngay</td><td>Dải đã đủ mẫu được trộn vào bảng giá lúc khởi động — không phải đợi bản phát hành sau.</td></tr>
+  <tr><td>Xuất ra</td><td>Nút tải <code>prices.json</code> đã trộn, để đưa số khảo sát vào bản phát hành chính thức.</td></tr>
+</table>
+
+<div class="box jade">
+  <b>Vì sao màn hình này quan trọng hơn vẻ ngoài của nó</b>
+  Trong 219 dòng giá đang chạy, 153 dòng là <b>số viết tay</b> và 66 dòng dựng từ giá tra
+  trên menu công bố — <b>không dòng nào được đo tại quầy</b>. Mọi tính năng khác chỉ làm
+  tăng giá trị của một nền móng chưa có thật. Đây là đường ra: một người đi bộ dọc một
+  con phố, bốn buổi như thế là một vùng có dữ liệu thật.
+</div>
+</div>
+
+<!-- ══════════════════ B1 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="b1"><span class="n">B1</span>Bản web máy tính — khung trang</h1>
+<p class="lead">Chín trang, dùng chung một khung trên và một chân trang do JavaScript dựng
+— sửa một chỗ là cả bộ theo.</p>
+
+<figure class="wide"><img src="anh/w1-home.jpg" alt="Trang chủ bản web">
+  <figcaption><b>Trang Explore.</b> Góc trái là tên sản phẩm <i>đứng yên</i> và tên vùng
+    thành một <i>nút đổi vùng</i> ngay dưới — vùng là thứ người ta đổi luôn. Góc phải là
+    hộp trò chuyện, đọc dữ liệu của đúng vùng đang mở.</figcaption></figure>
+
+<h2>Thanh trên</h2>
+<table class="ui">
+  <tr><td>Khối thương hiệu</td><td>Logo và chữ <b>Nón Lá</b> đứng yên; ngay dưới là nút vùng — bấm ra danh sách sáu vùng, mỗi dòng kèm số cơ sở và số điểm tham quan, vì câu hỏi thật của người bấm vào không phải “vùng nào” mà “đổi sang đó thì có gì”.</td></tr>
+  <tr><td>Năm mục nav</td><td><b>Explore · Scan Menu · Community · Journal · Helpers.</b> Trang bản đồ và trang cơ sở không có mục riêng — chúng là con của Explore, nên đứng ở đó mục Explore vẫn sáng.</td></tr>
+  <tr><td>Phone app</td><td>Mở bản điện thoại. Có ở mọi trang, vì bản web không quét được bằng camera và không chạy offline.</td></tr>
+  <tr><td>Log in · Create account</td><td>Hai trang tài khoản.</td></tr>
+</table>
+
+<h2>Hộp trò chuyện</h2>
+<p>Ở góc phải mọi trang, nạp sau khung trang nên không làm chậm lần vẽ đầu. Nó
+<b>đọc bảng giá và danh sách quán của vùng đang mở</b> để trả lời, và tự khai ngay dưới ô
+nhập rằng những con số ấy là dữ liệu hạt giống, chưa phải khảo sát thực địa.</p>
+
+<h2>Chân trang</h2>
+<p>Bốn giá trị của sản phẩm, một nút sang bản điện thoại, và <b>dòng tự khai</b>: giá là
+dữ liệu hạt giống; tên cơ sở là tên mô tả chứ không phải tên quán có thật; toạ độ, tên
+phố và điểm tham quan lấy từ OpenStreetMap (ODbL).</p>
+
+<div class="box">
+  <b>Khối nào cần đăng nhập thì để trống và nói thẳng</b>
+  Bản đang chạy chưa bật lớp tài khoản, nên những khối sống bằng dữ liệu của người dùng —
+  nhật ký, nơi đã lưu, tiến trình đóng góp — hiện một ô khoá kèm lời giải thích, chứ
+  <b>không</b> đổ dữ liệu mẫu vào cho đỡ trống. Đổ dữ liệu mẫu là dạy người ta tin vào một
+  thứ không phải của họ.
+</div>
+</div>
+
+<!-- ══════════════════ B2 ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="b2"><span class="n">B2</span>Chín trang web</h1>
+
+<h2>Explore — <code>index.html</code></h2>
+<table class="ui">
+  <tr><td>Khối mở đầu</td><td>Câu hỏi lớn theo tên vùng, dòng số liệu đếm thật (bao nhiêu cơ sở, bao nhiêu món có giá, bao nhiêu điểm tham quan, cập nhật tháng nào), và bộ chọn ngôn ngữ.</td></tr>
+  <tr><td><i>What are you after?</i></td><td>Bốn lối vào nhanh: <b>Street food · Coffee · Sit-down · Fair price only</b> — mở thẳng bản đồ với bộ lọc tương ứng.</td></tr>
+  <tr><td><i>Which area?</i></td><td>Sáu chip vùng.</td></tr>
+  <tr><td>Ba thẻ hành động</td><td>Quét thực đơn · Mở bản đồ · Vào cộng đồng.</td></tr>
+  <tr><td><i>Top tracked spots</i></td><td>Cơ sở nổi bật, kèm câu nói rõ: nhãn trạng thái đến từ lượt quét tích luỹ, <b>không bao giờ gán bằng tay</b>, và <b>mất tự động</b> khi giá trôi ra ngoài khoảng của vùng.</td></tr>
+  <tr><td><i>From the community</i></td><td>Bài mới nhất.</td></tr>
+  <tr><td><i>What a dish costs here</i></td><td>Dải món kèm khoảng giá của vùng.</td></tr>
+</table>
+
+<div class="shots two">
+  <figure class="wide"><img src="anh/w2-map.jpg" alt="Trang bản đồ bản web">
+    <figcaption><b>Explore by map.</b> Bản đồ khổ rộng và danh sách cơ sở đang theo dõi
+      cạnh nhau.</figcaption></figure>
+  <figure class="wide"><img src="anh/w7-place.jpg" alt="Trang một cơ sở">
+    <figcaption><b>Place.</b> Trang riêng cho từng cơ sở.</figcaption></figure>
+</div>
+
+<table class="ui">
+  <tr><td><b>Explore by map</b><br><code>map.html</code></td><td>Bản đồ vùng và khối <i>Tracked spots</i>. Nhận tham số lọc từ trang chủ (<code>?f=street</code>, <code>?f=cafe</code>, <code>?f=sit</code>, <code>?f=fair</code>).</td></tr>
+  <tr><td><b>Place</b><br><code>place.html?id=…</code></td><td><i>Price check</i> — giá của quán so với khoảng giá vùng; <i>Signature dishes</i>; <i>Sights within 400 m</i>; <i>Save this spot</i>; <i>Report a price</i>; <i>Nearby tracked spots</i>.</td></tr>
+</table>
+
+<div class="shots two">
+  <figure class="wide"><img src="anh/w3-scan.jpg" alt="Trang Scan Menu bản web">
+    <figcaption><b>Scan Menu.</b> Trên máy tính không có camera nên trang này là lối
+      <i>Check a dish by hand</i>, kèm khối <i>What this area pays</i>.</figcaption></figure>
+  <figure class="wide"><img src="anh/w4-community.jpg" alt="Trang Community bản web">
+    <figcaption><b>Community.</b> Feed, <i>Most talked-about dishes</i>, <i>Ask the
+      community</i>, và danh sách <i>Contributors</i>.</figcaption></figure>
+</div>
+
+<div class="shots two">
+  <figure class="wide"><img src="anh/w5-journal.jpg" alt="Trang Journal bản web">
+    <figcaption><b>Journal.</b> <i>Saved spots · Recent menu checks · Travel notes.</i>
+      Nhật ký đi theo tài khoản chứ không theo trình duyệt, nên khi chưa đăng nhập thì
+      khối này để trống và nói rõ vì sao.</figcaption></figure>
+  <figure class="wide"><img src="anh/w6-helpers.jpg" alt="Trang Helpers bản web">
+    <figcaption><b>Trusted helpers.</b> <i>Leaderboard · Badges · How to become a trusted
+      helper · Your progress · Recently verified spots.</i></figcaption></figure>
+</div>
+
+<table class="ui">
+  <tr><td><b>Log in</b> · <b>Sign up</b></td><td>Hai trang tài khoản. Trang đăng ký có riêng một khối <i>What works without an account</i> — nói thẳng rằng gần như mọi thứ vẫn chạy khi không đăng ký.</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════ C ══════════════════ -->
+<div class="page">
+<h1 class="ch" id="c1"><span class="n">C1</span>Sự cố thường gặp</h1>
+
+<table>
+  <tr><th style="width:34%">Hiện tượng</th><th>Nguyên nhân và cách xử lý</th></tr>
+  <tr><td><b>Camera không lên</b></td>
+      <td>Camera cần HTTPS. Bản deploy có sẵn; chạy tại máy thì dùng <code>127.0.0.1</code>, không dùng địa chỉ IP nội bộ. Nếu đang chờ cấp quyền, app sẽ tự nhắc sau 4 giây và luôn mở lối gõ tay.</td></tr>
+  <tr><td><b>OCR đọc sai tên món</b></td>
+      <td>Khớp mờ chịu được sai chính tả khá nặng, nhưng không phải mọi ca. Gõ tay đúng dòng đó ở khối <i>Enter by hand</i> — nhanh hơn chụp lại.</td></tr>
+  <tr><td><b>Một dòng ra dấu gạch</b></td>
+      <td>Vùng đang chọn chưa có dòng giá cho món đó. Đây là chủ ý: app không đoán bừa. Kiểm lại vùng ở <i>You → Where you are</i>.</td></tr>
+  <tr><td><b>Chụp tiền bị đọc sai</b></td>
+      <td>Nhận diện mệnh giá dựa vào con số in trên tờ tiền. Trải phẳng tờ tiền, để số hướng lên, tránh bóng loá. Tờ bị gấp thì gõ tay.</td></tr>
+  <tr><td><b>Bấm Post mà bài không lên máy chủ</b></td>
+      <td>Bản đang chạy chưa nối máy chủ. Bài <i>vẫn được lưu</i> trên máy này và hiện trong feed với nhãn <i>this phone only</i>.</td></tr>
+  <tr><td><b>Bản đồ trống</b></td>
+      <td>Vùng chưa nạp xong. Đợi vài giây rồi mở lại; nếu vẫn trống thì tải lại trang một lần để service worker nạp lại dữ liệu vùng.</td></tr>
+  <tr><td><b>Icon minh hoạ không sinh được</b></td>
+      <td>Thiếu khoá API, gọi hỏng, hoặc môi trường chặn request ra ngoài. App nói thẳng ra giao diện và dùng hình SVG dựng sẵn — mọi thứ khác vẫn chạy.</td></tr>
+  <tr><td><b>Đổi ngôn ngữ mà tên món không đổi</b></td>
+      <td>Đúng như thiết kế. Tên món giữ nguyên tiếng Việt ở mọi ngôn ngữ, vì đó là thứ bạn phải chỉ vào thực đơn và đọc lên cho người bán nghe.</td></tr>
+</table>
+
+<h1 class="ch" id="c2">
+  <span class="n">C2</span>Mẹo dùng nhanh</h1>
+
+<div class="grid2">
+  <div class="card"><span class="t">Trước chuyến đi</span><b>Mở app một lần khi còn wifi</b>
+    <p>Lần mở đầu tiên nạp toàn bộ dữ liệu sáu vùng và bộ đọc chữ vào máy. Sau đó tắt hẳn
+    mạng vẫn dùng đủ.</p></div>
+  <div class="card"><span class="t">Vừa tới nơi</span><b>Bấm <i>Use my location</i></b>
+    <p>Trong <i>You</i>. App tự chọn vùng gần nhất, nên bảng giá dùng để phán quyết là bảng
+    đúng chỗ bạn đang đứng.</p></div>
+  <div class="card"><span class="t">Trước khi gọi món</span><b>Quét cả tấm thực đơn, đừng quét một dòng</b>
+    <p>Một lần chụp đọc được nhiều dòng, và mức nặng nhất được vẽ thành viền quanh màn
+    hình.</p></div>
+  <div class="card"><span class="t">Khi có nghi ngờ</span><b>Chạm vào dòng, mở “vì sao”</b>
+    <p>Bốn con số ở đó cho biết phán quyết dựa trên cái gì — và nhãn nguồn gốc cho biết
+    nó đáng tin tới đâu.</p></div>
+  <div class="card"><span class="t">Ở quầy</span><b>Chìa máy, đừng tranh luận</b>
+    <p>Màn xoay ngược chỉ chứa điều bạn muốn nói. Khoảng giá tham chiếu không bao giờ đi
+    lên phần người bán đọc.</p></div>
+  <div class="card"><span class="t">Trước khi rời quán</span><b>Đếm tiền thối</b>
+    <p>Nhất là khi vừa đưa một tờ xanh lơ. 20.000₫ và 500.000₫ trông giống nhau dưới ánh
+    đèn quán hơn bạn nghĩ.</p></div>
+  <div class="card"><span class="t">Nếu bạn ở Việt Nam</span><b>Ghi vài giá thật</b>
+    <p><i>You → Record what you paid.</i> Năm mẫu cho một món là vùng đó ngừng dùng số ước
+    lượng cho món ấy — với mọi người dùng máy đó.</p></div>
+  <div class="card"><span class="t">Cuối chuyến</span><b>Làm một tấm bưu thiếp</b>
+    <p>Mọi con số trên tấm ảnh đều lấy từ lịch sử quét thật của bạn.</p></div>
+</div>
+
+<p class="foot-note">Ảnh trong tài liệu này chụp tự động từ bản đang chạy ngày 04/09/2026,
+ở khổ máy 390×844 cho bản điện thoại và 1440×900 cho bản máy tính. Vùng mặc định là
+Hội An · Phố cổ. Chụp lại bất cứ lúc nào bằng <code>tools/shots.mjs</code>.</p>
+</div>
+</body>
+</html>

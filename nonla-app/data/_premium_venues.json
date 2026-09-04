@@ -1,0 +1,205 @@
+{
+ "_note": "Quán mà giá cao là do phân khúc, không phải do chặt chém — hai câu khác hẳn nhau với người đang đứng trước cái menu. CHƯA ĐƯỢC NỐI VÀO APP, và tệp mang tiền tố _ vì thế: đối chiếu 22 cái tên này với data/eateries.json chỉ khớp được 7, trong đó vài cái khớp nhầm sang vùng khác ('Garden' ở Đà Nẵng nhận là 'Secret Garden 158 Pasteur' ở Quận 1). Dán nhãn 'phân khúc cao cấp' lên nhầm một quán có thật thì tệ hơn hẳn không dán gì. Giữ lại ở đây để khi nào có cách nhận diện quán chắc chắn hơn thì dùng. KHÔNG phải bảng xếp hạng ngon dở, và không đầy đủ.",
+ "_source": "food_prices_hoi_an_hoan_kiem_hcm.xlsx",
+ "_lookupAt": "2026-09-04",
+ "venues": [
+  {
+   "zone": "hoian-oldtown",
+   "name": "NAYUU – Four Seasons The Nam Hai",
+   "segment": "Omakase Nhật",
+   "band": "1.800.000–3.000.000đ/người",
+   "known": "Trải nghiệm omakase cao cấp",
+   "maps": "https://maps.google.com/?q=NAYUU%20Four%20Seasons%20The%20Nam%20Hai%20Hoi%20An",
+   "src": "https://www.fourseasons.com/hoian/dining/"
+  },
+  {
+   "zone": "hoian-oldtown",
+   "name": "Lá Sen – Four Seasons The Nam Hai",
+   "segment": "Việt đương đại",
+   "band": "1.200.000–2.200.000đ/người",
+   "known": "Set/menu Việt cao cấp",
+   "maps": "https://maps.google.com/?q=L%C3%A1%20Sen%20Four%20Seasons%20The%20Nam%20Hai%20Hoi%20An",
+   "src": "https://www.fourseasons.com/hoian/dining/"
+  },
+  {
+   "zone": "hoian-oldtown",
+   "name": "Red Bean Hoi An",
+   "segment": "Việt hiện đại",
+   "band": "690.000đ/người buffet cuối tuần; món lẻ cao hơn local",
+   "known": "BBQ buffet, lobster, ribs, king prawns",
+   "maps": "https://maps.google.com/?q=Red%20Bean%20Hoi%20An",
+   "src": "https://hoian.redbeanrestaurants.com/"
+  },
+  {
+   "zone": "hoian-oldtown",
+   "name": "Morning Glory Original",
+   "segment": "Việt truyền thống nâng cấp",
+   "band": "120.000–250.000đ/món",
+   "known": "Cao lầu, bánh xèo, bò lá lốt",
+   "maps": "https://maps.google.com/?q=Morning%20Glory%20Original%20Hoi%20An",
+   "src": "https://www.thevietnamguides.com/food-guide/best-restaurants-hoi-an/"
+  },
+  {
+   "zone": "hoian-oldtown",
+   "name": "Home Hoi An",
+   "segment": "Việt cao cấp",
+   "band": "550.000đ+/người",
+   "known": "Menu Việt trình bày cao cấp",
+   "maps": "https://maps.google.com/?q=Home%20Hoi%20An%20Home%20Vietnamese%20Restaurant",
+   "src": "https://secretgardenhoian.com/"
+  },
+  {
+   "zone": "hoian-oldtown",
+   "name": "The Temple Restaurant & Lounge",
+   "segment": "Fine dining",
+   "band": "Từ khoảng 100.000đ/người; món cao cấp cao hơn",
+   "known": "Foie gras, steak tartare, profiteroles",
+   "maps": "https://maps.google.com/?q=The%20Temple%20Restaurant%20Hoi%20An",
+   "src": "https://blisshoian.com/news/best-restaurants-in-hoi-an-for-every-taste-budget/"
+  },
+  {
+   "zone": "hanoi-hoankiem",
+   "name": "Hibana by Koki",
+   "segment": "Teppanyaki omakase",
+   "band": "Khoảng 2.500.000–4.200.000đ/người",
+   "known": "Nguyên liệu Nhật cao cấp",
+   "maps": "https://maps.google.com/?q=Hibana%20by%20Koki%20Hanoi",
+   "src": "https://www.trip.com/toplist/tripbest/recommend/hanoi/best-fine-dining/100900005492/"
+  },
+  {
+   "zone": "hanoi-hoankiem",
+   "name": "Gia",
+   "segment": "Fine dining Việt",
+   "band": "Khoảng 1.800.000–2.800.000đ/người",
+   "known": "Tasting menu Việt đương đại",
+   "maps": "https://maps.google.com/?q=Gia%20Restaurant%20Hanoi",
+   "src": "https://www.trip.com/toplist/tripbest/recommend/hanoi/best-fine-dining/100900005492/"
+  },
+  {
+   "zone": "hanoi-hoankiem",
+   "name": "Le Beaulieu – Sofitel Legend Metropole",
+   "segment": "Pháp cao cấp",
+   "band": "Khoảng 1.200.000–2.500.000đ/người",
+   "known": "French set menu",
+   "maps": "https://maps.google.com/?q=Le%20Beaulieu%20Sofitel%20Legend%20Metropole%20Hanoi",
+   "src": "https://www.trip.com/toplist/tripbest/recommend/hanoi/best-fine-dining/100900005492/"
+  },
+  {
+   "zone": "hanoi-hoankiem",
+   "name": "Cau Go Vietnamese Cuisine",
+   "segment": "Việt nhìn hồ",
+   "band": "Khoảng 300.000–500.000đ/người; món 50.000–350.000đ",
+   "known": "Chả cá, tôm, lẩu, món Việt chia sẻ",
+   "maps": "https://maps.google.com/?q=Cau%20Go%20Vietnamese%20Cuisine%20Hanoi",
+   "src": "https://www.caugorestaurant.com/menu"
+  },
+  {
+   "zone": "hanoi-hoankiem",
+   "name": "The Rhythms Restaurant",
+   "segment": "Việt hiện đại",
+   "band": "Khoảng 600.000–800.000đ/người",
+   "known": "Set/menu nâng cấp, view hồ",
+   "maps": "https://maps.google.com/?q=The%20Rhythms%20Restaurant%20Hanoi",
+   "src": "https://lasinfoniavietnam.com/what-makes-fine-dining-special/"
+  },
+  {
+   "zone": "hanoi-hoankiem",
+   "name": "Uu Dam Chay",
+   "segment": "Chay cao cấp",
+   "band": "Khoảng 400.000–500.000đ/người",
+   "known": "Lẩu chay, món chay trình bày đẹp",
+   "maps": "https://maps.google.com/?q=Uu%20Dam%20Chay%20Hanoi",
+   "src": "https://www.vietnamairlines.com/id/en/useful-information/travel-guide/an-toi-ha-noi"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "Anan Saigon",
+   "segment": "1 sao Michelin / New Vietnamese",
+   "band": "US$115–145 food only ≈ 3,000.000–3,800.000đ/người",
+   "known": "Tasting menu, bánh xèo taco, cơm tấm",
+   "maps": "https://maps.google.com/?q=Anan%20Saigon",
+   "src": "https://anansaigon.com/"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "AKUNA Restaurant",
+   "segment": "Fine dining",
+   "band": "Khoảng 3.500.000–5.500.000đ/người",
+   "known": "Tasting menu cao cấp",
+   "maps": "https://maps.google.com/?q=AKUNA%20Restaurant%20Ho%20Chi%20Minh%20City",
+   "src": "https://www.trip.com/toplist/tripbest/ho-chi-minh-city-best-fine-dining-100900005514/"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "CoCo Dining",
+   "segment": "Fine dining",
+   "band": "Khoảng 3.000.000–4.300.000đ/người",
+   "known": "Tasting menu Việt hiện đại",
+   "maps": "https://maps.google.com/?q=CoCo%20Dining%20Ho%20Chi%20Minh%20City",
+   "src": "https://www.trip.com/toplist/tripbest/ho-chi-minh-city-best-fine-dining-100900005514/"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "Long Trieu – The Reverie",
+   "segment": "Cantonese fine dining",
+   "band": "Khoảng 3.200.000–4.800.000đ/người",
+   "known": "Dim sum và món Quảng Đông cao cấp",
+   "maps": "https://maps.google.com/?q=Long%20Trieu%20The%20Reverie%20Saigon",
+   "src": "https://www.trip.com/toplist/tripbest/ho-chi-minh-city-best-fine-dining-100900005514/"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "Square One – Park Hyatt Saigon",
+   "segment": "Fine dining",
+   "band": "Khoảng 1.500.000–3.000.000đ/người",
+   "known": "Việt/Âu trong khách sạn 5 sao",
+   "maps": "https://maps.google.com/?q=Square%20One%20Park%20Hyatt%20Saigon",
+   "src": "https://guide.michelin.com/us/en/ho-chi-minh/ho-chi-minh_2978179/restaurants"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "Vietnam House",
+   "segment": "Việt cao cấp",
+   "band": "Khoảng 1.000.000–2.200.000đ/người",
+   "known": "Món Việt hiện đại",
+   "maps": "https://maps.google.com/?q=Vietnam%20House%20Ho%20Chi%20Minh%20City",
+   "src": "https://guide.michelin.com/us/en/ho-chi-minh/ho-chi-minh_2978179/restaurants"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "The Deck Saigon",
+   "segment": "Ven sông / cao cấp",
+   "band": "Khoảng 800.000–1.800.000đ/người",
+   "known": "Hải sản, món Âu-Á, view sông",
+   "maps": "https://maps.google.com/?q=The%20Deck%20Saigon",
+   "src": "https://www.foodandwine.com/ho-chi-minh-city-vietnam-11742075"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "Hoa Túc",
+   "segment": "Việt đương đại",
+   "band": "Khoảng 600.000–1.200.000đ/người",
+   "known": "Set món Việt, cocktail/wine pairing",
+   "maps": "https://maps.google.com/?q=Hoa%20Tuc%20Saigon",
+   "src": "https://vietnamspot.ru/en/blog/ho-chi-minh-food"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "Secret Garden 158 Pasteur",
+   "segment": "Việt gia đình / rooftop",
+   "band": "Khoảng 250.000–550.000đ/người",
+   "known": "Gỏi đu đủ, món cơm nhà Việt",
+   "maps": "https://maps.google.com/?q=Secret%20Garden%20158%20Pasteur%20Ho%20Chi%20Minh%20City",
+   "src": "https://www.foodandwine.com/ho-chi-minh-city-vietnam-11742075"
+  },
+  {
+   "zone": "hcmc-district1",
+   "name": "Hum Vegetarian",
+   "segment": "Chay cao cấp",
+   "band": "Khoảng 220.000–500.000đ/người",
+   "known": "Món chay, lẩu chay",
+   "maps": "https://maps.google.com/?q=Hum%20Vegetarian%20Ho%20Chi%20Minh%20City",
+   "src": "https://talessgn.com/vegetarian-dinner-ho-chi-minh-city/"
+  }
+ ]
+}

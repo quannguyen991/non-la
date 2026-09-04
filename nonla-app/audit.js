@@ -1096,8 +1096,11 @@ export async function run({ verbose = true } = {}) {
 
     const dishId = "cao-lau";
     const zone = A.S.zone;
-    const before = Tr.provenance(A.S.prices[zone].items[dishId], 0).level;
-    ck("trước khi khảo sát, dải là số ước lượng", before === "seed", before);
+    /* Không chốt vào đúng chữ "seed": từ khi nạp giá tra từ menu, dải này
+       đọc ra bậc "sourced". Điều phép thử cần biết là dải CHƯA ĐƯỢC ĐO,
+       chứ không phải nó mang nhãn nào. */
+    const before = Tr.provenance(A.S.prices[zone].items[dishId], 0);
+    ck("trước khi khảo sát, dải là số ước lượng", !Tr.isMeasured(before), before.level);
 
     const was = await Sv.count();
     for (const p of [62000, 65000, 60000, 68000, 63000, 66000]) {

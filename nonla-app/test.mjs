@@ -23,11 +23,16 @@ import { t as tr, setLang } from "./i18n.js";
 import { detectUnit, detectSurcharges, scanTraps, estimate, describe } from "./units.js";
 import { median as pMedian, dishBase, zoneFactor, predict, crossValidate } from "./predict.js";
 import { inferDishes, linkAll } from "./eaterydish.js";
+import { NGUON, NGUON_QUAN_SAT, MIN_MAU, MIN_DOI_CHIEU, vaoDai, laDoDuoc,
+         loc, bachPhanVi, dungDai, phatHienTron, soSanhKhaiVaDo } from "./pricesrc.js";
+import { index as refIndex, lookup as refLookup, bandOf as refBand } from "./menuref.js";
+import { classify, usableFor, rawBand, tidyBand, mergeBand, tidy } from "../tools/menuband.mjs";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
 const prices = JSON.parse(readFileSync("./data/prices.json", "utf8")).zones;
 const eateries = JSON.parse(readFileSync("./data/eateries.json", "utf8")).eateries;
+const menuref = JSON.parse(readFileSync("./data/menuref.json", "utf8"));
 
 let pass = 0, fail = 0;
 const eq = (name, got, want) => {
@@ -970,6 +975,322 @@ console.log("\n── suy món từ tên quán ───────────
     JSON.stringify(link.rows.filter((r) => r.dishes.length > 5).slice(0, 2)));
   ok("mọi tin cậy nằm trong khoảng 0–1",
     link.rows.every((r) => r.dishes.every((h) => h.confidence > 0 && h.confidence <= 1)));
+}
+
+/* ── giá niêm yết vs giá đo được ─────────────── */
+{
+  console.log("\n── giá niêm yết vs giá đo được ─────────────");
+
+  /* Cột quan trọng nhất của cả module: nguồn nào được dựng thành dải. */
+  eq("người bán tự khai KHÔNG vào dải", vaoDai(NGUON.DECLARED), false);
+  eq("dữ liệu hạt giống KHÔNG vào dải", vaoDai(NGUON.SEED), false);
+  ok("bốn nguồn quan sát đều vào dải",
+    [NGUON.SCAN, NGUON.HAND, NGUON.SURVEY, NGUON.BILL].every(vaoDai));
+  eq("khai không phải số đo của bên thứ ba", laDoDuoc(NGUON.DECLARED), false);
+  eq("nguồn lạ thì không vào dải", vaoDai("marketing"), false);
+
+  /* Đây là ca đắt nhất nếu để lọt: một quán khai giá rất thấp để kéo dải
+     của cả khu xuống, làm chính giá của mình trông bình thường. */
+  const that = [40000, 45000, 45000, 50000, 55000].map((price) => ({ price, src: NGUON.SCAN }));
+  const phaHoai = [...that, { price: 5000, src: NGUON.DECLARED },
+                            { price: 5000, src: NGUON.DECLARED }];
+  const daiSach = dungDai(that);
+  const daiBanTay = dungDai(phaHoai);
+  eq("giá quán tự khai không xê dịch được dải",
+    [daiBanTay.p25, daiBanTay.p50, daiBanTay.p75, daiBanTay.p95],
+    [daiSach.p25, daiSach.p50, daiSach.p75, daiSach.p95]);
+  eq("cỡ mẫu cũng không bị thổi lên", daiBanTay.n, 5);
+  eq("và số dòng bị loại được nói ra, không im lặng", daiBanTay.boQua, 2);
+
+  eq("lý do loại ghi đúng thủ phạm",
+    loc([{ price: 5000, src: NGUON.DECLARED }]).loai[0].viSao, "nguoi_ban_tu_khai");
+  eq("giá âm hoặc hỏng cũng bị loại",
+    loc([{ price: 0, src: NGUON.SCAN }, { price: "x", src: NGUON.SCAN }]).dung.length, 0);
+
+  eq("dưới ngưỡng mẫu thì không dựng dải",
+    dungDai(that.slice(0, MIN_MAU - 1)), null);
+  ok("chỉ toàn giá khai thì không bao giờ có dải",
+    dungDai(Array.from({ length: 50 }, () => ({ price: 45000, src: NGUON.DECLARED }))) === null);
+
+  /* Bách phân vị phải khớp percentile_cont của PostgreSQL, vì view
+     price_ranges phía máy chủ dùng đúng hàm đó. Lệch nhau thì cùng một
+     tập dữ liệu ra hai con số, và không ai nhìn thấy cho tới lúc đối chiếu. */
+  eq("bách phân vị nội suy như percentile_cont",
+    bachPhanVi([10, 20, 30, 40], 0.25), 17.5);
+  eq("p50 của mảng chẵn là trung điểm", bachPhanVi([10, 20, 30, 40], 0.5), 25);
+  eq("mảng một phần tử", bachPhanVi([42], 0.95), 42);
+  eq("mảng rỗng trả null, không trả 0", bachPhanVi([], 0.5), null);
+
+  eq("chốt an toàn bắt được dòng bẩn",
+    phatHienTron([{ price: 1, src: NGUON.SCAN }, { price: 2, src: NGUON.DECLARED }]).length, 1);
+  eq("mảng sạch thì chốt im lặng",
+    phatHienTron([{ price: 1, src: NGUON.HAND }]).length, 0);
+
+  /* Đối chiếu lời khai với số đo — một câu hỏi, không phải một kết luận. */
+  eq("chưa đủ mẫu thì không nói gì về quán",
+    soSanhKhaiVaDo(45000, { p50: 90000, n: MIN_DOI_CHIEU - 1 }).muc, "chua_du");
+  eq("chênh dưới ngưỡng thì coi là khớp",
+    soSanhKhaiVaDo(50000, { p50: 53000, n: 6 }).muc, "khop");
+  eq("thu cao hơn khai thì nêu ra để hỏi lại",
+    soSanhKhaiVaDo(45000, { p50: 90000, n: 6 }).muc, "thu_cao_hon_khai");
+  eq("thu thấp hơn khai thì nói rõ là không có gì phải làm",
+    soSanhKhaiVaDo(90000, { p50: 45000, n: 6 }).muc, "thu_thap_hon_khai");
+  eq("phần trăm chênh tính theo giá khai",
+    soSanhKhaiVaDo(45000, { p50: 90000, n: 6 }).phanTram, 100);
+  eq("quán chưa khai giá thì nói thế, không đoán",
+    soSanhKhaiVaDo(null, { p50: 90000, n: 9 }).muc, "chua_khai");
+  ok("không câu nào quy kết động cơ người bán",
+    [soSanhKhaiVaDo(45000, { p50: 90000, n: 6 }).cau,
+     soSanhKhaiVaDo(90000, { p50: 45000, n: 6 }).cau]
+      .every((c) => !/cheat|scam|dishonest|overcharg|rip/i.test(c)));
+
+  /* Kiểm CHÉO GIỮA HAI TỆP: danh sách nguồn trong pricesrc.js phải trùng
+     ràng buộc `check (src in (...))` của supabase/menu.sql. Hai bản sao
+     của cùng một luật thì sớm muộn cũng trôi khỏi nhau, và lúc trôi thì
+     máy chủ nhận một thứ mà máy khách tưởng là cấm. */
+  const sql = readFileSync("../supabase/menu.sql", "utf8");
+  const dong = /check\s*\(src in \(([^)]*)\)\)/.exec(sql);
+  const sqlSrc = dong ? [...dong[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]).sort() : [];
+  eq("nguồn quan sát khớp giữa pricesrc.js và menu.sql",
+    sqlSrc, [...NGUON_QUAN_SAT].sort());
+  ok("'declared' không có mặt trong ràng buộc của bảng quan sát",
+    !sqlSrc.includes(NGUON.DECLARED));
+
+  /* Và cái mà survey.js đang thực sự ghi ra phải nằm trong danh sách ấy. */
+  const svSrc = [...readFileSync("./survey.js", "utf8")
+    .matchAll(/src:\s*r\.src === "(\w+)" \? "(\w+)" : "(\w+)"/g)]
+    .flatMap((m) => [m[2], m[3]]);
+  ok("mọi src survey.js ghi ra đều là nguồn quan sát hợp lệ",
+    svSrc.length > 0 && svSrc.every((s) => NGUON_QUAN_SAT.includes(s)),
+    JSON.stringify(svSrc));
+}
+
+console.log("\n── lời hứa ở màn xin phép gửi giá ──────────");
+{
+  /* Màn xin phép nói: "đi" là món, giá, vùng, ngày, cách ghi — "ở lại" là
+     ảnh, tên chỗ tự gõ, vị trí. Câu đó chỉ đúng chừng nào thân request của
+     pushPrices còn khớp. Ba tệp phải khớp nhau và không tệp nào là nguồn sự
+     thật một mình: pricesync.js khai, cloud.js gửi, schema.sql nhận. */
+  const cloud = readFileSync("./cloud.js", "utf8");
+  const sync = readFileSync("./pricesync.js", "utf8");
+  const sql = readFileSync("../supabase/schema.sql", "utf8");
+
+  const than = /export const pushPrices[\s\S]*?\n\}\);/.exec(cloud)?.[0] || "";
+  ok("tìm được thân pushPrices", than.length > 0);
+
+  const doc = [...than.matchAll(/\br\.(\w+)/g)].map((m) => m[1]);
+  const khai = JSON.parse(/export const CHO_GUI = (\[[^\]]*\])/.exec(sync)?.[1] || "[]");
+
+  /* `id` được đọc thêm ngoài CHO_GUI vì nó thành client_id — chốt chống trùng,
+     không phải dữ liệu quan sát. Ngoài nó ra hai danh sách phải bằng nhau. */
+  eq("cloud.js không đọc trường nào ngoài CHO_GUI",
+    [...new Set(doc)].sort(), [...new Set([...khai, "id"])].sort());
+
+  for (const cam of ["placeName", "note"]) {
+    ok(`${cam} không rời khỏi máy`, !than.includes(cam));
+  }
+
+  const cot = new Set([...(/create table if not exists price_observations \(([\s\S]*?)\n\);/
+    .exec(sql)?.[1] || "").matchAll(/^\s{2}(\w+)\s/gm)].map((m) => m[1]));
+  const gui = [...than.matchAll(/^\s{4}(\w+):/gm)].map((m) => m[1]);
+  ok("mọi cột pushPrices gửi đều có thật trong lược đồ",
+    gui.length > 0 && gui.every((c) => cot.has(c)),
+    JSON.stringify(gui.filter((c) => !cot.has(c))));
+}
+
+console.log("\n── vỏ offline đủ tệp ───────────────────────");
+{
+  /* Một tệp thiếu trong SHELL không làm hỏng bản đang mở — nó làm hỏng lần
+     mở TIẾP THEO khi mất mạng, và lúc đó là màn trắng chứ không phải một lỗi
+     đọc được. Đã xảy ra một lần với units/predict/eaterydish. Kiểm bao đóng:
+     mọi tệp mà một tệp trong SHELL import cũng phải nằm trong SHELL. */
+  const sw = readFileSync("./sw.js", "utf8");
+  const shell = new Set([...(/const SHELL = \[([\s\S]*?)\];/.exec(sw)?.[1] || "")
+    .matchAll(/"\.\/([\w.-]+\.js)"/g)].map((m) => m[1]));
+  ok("đọc được SHELL", shell.size > 10, String(shell.size));
+
+  const thieu = [];
+  for (const f of shell) {
+    let src = "";
+    try { src = readFileSync(`./${f}`, "utf8"); } catch { thieu.push(`${f} (không có tệp)`); continue; }
+    for (const m of src.matchAll(/from\s+"\.\/([\w.-]+\.js)"/g)) {
+      if (!shell.has(m[1])) thieu.push(`${f} → ${m[1]}`);
+    }
+  }
+  eq("mọi import của tệp trong SHELL cũng nằm trong SHELL", thieu, []);
+}
+
+/* ── giá tra từ menu: phân loại dòng (tools/menuband.mjs) ─
+   Điều đáng kiểm nhất ở đây KHÔNG phải số học mà là đường biên phân khúc.
+   Một dòng fine dining lọt vào dải giá của món đường phố sẽ nống p95 lên
+   gấp mấy lần, và app sẽ chấm "bình thường" cho đúng cái giá nó sinh ra để
+   chặn. Lỗi đó im lặng: mọi phép thử số học vẫn xanh. */
+console.log("\n── menuband: phân khúc và cỡ suất ──────────");
+{
+  const c = (o) => classify({ name: "", group: "", venue: "", note: "", ...o });
+
+  eq("nhóm fine dining là phân khúc khác",
+    c({ name: "Phở bò phiên bản fine dining", group: "Món Việt hiện đại" }).tier, "premium");
+  eq("tên tự khai omakase", c({ name: "Teppanyaki omakase", group: "Fine dining" }).tier, "premium");
+  eq("quán bình dân là casual",
+    c({ name: "Cao lầu gà", group: "Món Hội An", venue: "Quán địa phương" }).tier, "casual");
+  eq("nhà hàng là nhà hàng",
+    c({ name: "Cao lầu phiên bản nhà hàng", venue: "Morning Glory Original" }).tier, "restaurant");
+
+  ok("giá theo người là giá dùng chung", c({ name: "Chả cá Thăng Long set/người" }).shared);
+  ok("phần nhóm là giá dùng chung", c({ name: "Lẩu bò phần nhóm", group: "Lẩu" }).shared);
+  /* "phần lớn" là CỠ SUẤT, không phải phân khúc: bò lá lốt phần lớn ở
+     Morning Glory là 180–350k, đĩa thường là 60–140k. Cùng tên, khác suất. */
+  ok("phần lớn cũng là suất dùng chung", c({ name: "Bò nướng lá lốt phần lớn" }).shared);
+
+  const fine = { name: "Bánh mì Little", group: "Món Việt hiện đại", venue: "Anan Saigon" };
+  ok("dòng fine dining không vào dải nào", !usableFor(fine, "each"));
+  const pot = { name: "Lẩu bò phần nhóm", group: "Lẩu", venue: "" };
+  ok("giá theo nhóm vào được dải của món bán theo nồi", usableFor(pot, "per pot"));
+  ok("nhưng không vào được dải của món bán theo tô", !usableFor(pot, "per bowl"));
+}
+
+console.log("\n── menuband: dựng dải từ khoảng giá ────────");
+{
+  eq("làm tròn theo bậc người ta niêm yết", [tidy(63_000), tidy(22_000), tidy(268_000)],
+    [60_000, 20_000, 250_000]);
+
+  const one = tidyBand(rawBand([{ low: 40_000, high: 80_000 }]));
+  ok("một dòng vẫn ra dải đúng thứ tự",
+    one.p25 <= one.p50 && one.p50 < one.p75 && one.p75 < one.p95, JSON.stringify(one));
+
+  /* Khoảng hẹp và khoảng rộng đóng góp khác nhau — đây là lý do dùng hỗn
+     hợp phân bố đều chứ không lấy trung bình của các giá bình quân. */
+  const wide = rawBand([{ low: 10_000, high: 200_000 }]);
+  const tight = rawBand([{ low: 100_000, high: 110_000 }]);
+  ok("khoảng rộng cho dải rộng", wide.p95 - wide.p25 > tight.p95 - tight.p25);
+
+  /* Cái bẫy chính của mergeBand: một dòng tra được KHÔNG được phép hất cả
+     dải cũ đi. Chè Hoàn Kiếm tra ra toàn quán ngồi bàn; thay thẳng thì trung
+     vị nhảy gấp đôi và cốc chè vỉa hè bị hét giá sẽ đọc ra "bình thường". */
+  const prev = { p25: 15_000, p50: 25_000, p75: 35_000, p95: 50_000 };
+  const one2 = mergeBand(prev, [{ low: 50_000, high: 120_000 }]);
+  /* Trung vị mới phải nằm GIỮA số cũ (25k) và trung vị của chính dòng tra
+     được (85k): không làm ngơ bằng chứng mới, cũng không giao cả ô cho một
+     dòng duy nhất. */
+  ok("một dòng đắt chỉ kéo được trung vị một phần đường",
+    one2.p50 > prev.p50 && one2.p50 < 85_000, JSON.stringify(one2));
+  const many = mergeBand(prev, Array(6).fill({ low: 50_000, high: 120_000 }));
+  ok("nhiều dòng thì áp đảo được số cũ", many.p50 >= 50_000, JSON.stringify(many));
+
+  ok("đầu rẻ của dải cũ không bị bỏ mất", one2.p25 <= prev.p25, JSON.stringify(one2));
+  ok("đầu đắt của dải cũ cũng không bị bỏ mất",
+    mergeBand({ ...prev, p95: 300_000 }, [{ low: 50_000, high: 120_000 }]).p95 >= 300_000);
+
+  const fresh = mergeBand(null, [{ low: 40_000, high: 80_000 }]);
+  ok("ô chưa có gì thì lấy nguyên số tra được", fresh.p50 > 0 && fresh.p25 <= fresh.p50);
+}
+
+/* ── nguồn của dải tra từ menu (trust.js) ─────────────────
+   Ranh giới phải giữ: CÓ NGUỒN không có nghĩa là ĐÃ ĐO. Menu công bố chỉ
+   nhìn thấy quán có website. Để bậc này trượt sang "surveyed" là lặp lại
+   đúng lỗi mà cả trust.js sinh ra để chấm dứt. */
+console.log("\n── trust: dải có nguồn nhưng chưa đo ───────");
+{
+  const src = { p25: 50_000, p50: 70_000, p75: 90_000, p95: 130_000,
+                n: 21, seed: true, sourced: true, listings: 4, srcAt: "2026-09-04" };
+
+  eq("dải tra từ menu có bậc riêng", provenance(src, 0).level, "sourced");
+  ok("nhưng vẫn KHÔNG được coi là đã đo", !isMeasured(provenance(src, 0)));
+  eq("nhãn ngắn vẫn là ước lượng", trustBadge(provenance(src, 0)), "estimate");
+  eq("không khai số mẫu", provenance(src, 0).samples, null);
+
+  const line = provenance(src, 0).line;
+  ok("nói ra số dòng menu đứng sau nó", line.includes("4 price listings"), line);
+  ok("nói ra ngày tra", line.includes("2026-09-04"), line);
+  ok("KHÔNG nhắc tới n hư cấu", !line.includes("21"), line);
+  ok("nói thẳng là chưa ai đo tại quầy", /nobody has checked/i.test(line), line);
+
+  /* Người dùng ghi giá của chính mình thì bậc phải nhảy lên như với seed —
+     đường đi tới số đo thật không được vì thêm một bậc mà bị chặn lại. */
+  eq("có mẫu của người dùng → thin", provenance(src, 2).level, "thin");
+  eq("đủ mẫu → ready", provenance(src, TRUST_MIN).level, "ready");
+
+  /* Dải đã khảo sát thật thì cờ cũ phải im: sourced không được nói to hơn
+     surveyedAt. */
+  const real = { p25: 55_000, p50: 60_000, p75: 65_000, p95: 80_000,
+                 n: 18, sourced: true, surveyedAt: "2026-09" };
+  ok("số đo thật vẫn thắng cờ sourced", isMeasured(provenance(real, 0)),
+    provenance(real, 0).level);
+}
+
+/* ── bảng tra món ngoài danh mục (menuref.js) ─────────────
+   Lý do tệp này tồn tại là để CHẶN một câu buộc tội sai, nên phần đáng kiểm
+   nhất là chỗ nó từ chối trả lời. */
+console.log("\n── menuref: tra món ngoài danh mục ─────────");
+{
+  const idx = refIndex([
+    { zone: "hcmc-district1", name: "Ốc hương rang muối", p25: 120_000, p50: 175_000,
+      p75: 210_000, p95: 250_000, listings: 1, tier: "restaurant" },
+    { zone: "hcmc-district1", name: "Bún chay", p25: 90_000, p50: 115_000,
+      p75: 130_000, p95: 150_000, listings: 1, tier: "restaurant" },
+    { zone: "hanoi-hoankiem", name: "Bún thang", p25: 60_000, p50: 90_000,
+      p75: 105_000, p95: 120_000, listings: 1, tier: "casual" },
+  ]);
+
+  eq("tra đúng tên thì trả lời",
+    refLookup(idx, "hcmc-district1", "Ốc hương rang muối")?.p50, 175_000);
+  eq("thừa chữ vẫn tra được",
+    refLookup(idx, "hcmc-district1", "Ốc hương rang muối đặc biệt")?.p50, 175_000);
+  eq("hoa thường và dấu không ảnh hưởng",
+    refLookup(idx, "hcmc-district1", "OC HUONG RANG MUOI")?.p50, 175_000);
+
+  /* Dice("bún chả","bún chay") = 0,92. Chỉ dựa vào độ giống nhau thì một tô
+     bún chả sẽ bị đem so với giá bún chay — đắt hơn gấp rưỡi. */
+  eq("bún chả KHÔNG được tra ra bún chay",
+    refLookup(idx, "hcmc-district1", "Bún chả"), null);
+  eq("thiếu chữ thì không khớp", refLookup(idx, "hcmc-district1", "Ốc hương"), null);
+
+  eq("vùng khác thì không trả lời",
+    refLookup(idx, "hanoi-hoankiem", "Ốc hương rang muối"), null);
+  eq("vùng lạ trả null", refLookup(idx, "khong-co-vung", "Bún thang"), null);
+  eq("tên rỗng trả null", refLookup(idx, "hanoi-hoankiem", ""), null);
+
+  const b = refBand(refLookup(idx, "hanoi-hoankiem", "Bún thang"), "2026-09-04");
+  eq("dải tra được đọc ra là có nguồn chưa đo", provenance(b, 0).level, "sourced");
+  ok("và không bao giờ đọc ra là đã đo", !isMeasured(provenance(b, 0)));
+  eq("phán quyết dùng được ngay", verdict(200_000, b).level, "high");
+  eq("giá nằm trong dải là bình thường", verdict(95_000, b).level, "ok");
+}
+
+/* ── dữ liệu tra từ menu đã nạp vào ───────────────────────
+   Kiểm chính TỆP đã ship, không phải hàm dựng ra nó: giữa hai lần chạy
+   tools/nhap-gia-menu.mjs, thứ người dùng cầm là tệp. */
+console.log("\n── dữ liệu menuref/prices đã nạp ───────────");
+{
+  const items = menuref.items || [];
+  const xau = (i) => !(i.p25 <= i.p50 && i.p50 < i.p75 && i.p75 < i.p95);
+  ok("menuref.json có dữ liệu", items.length > 100, String(items.length));
+  ok("mọi dải menuref đúng thứ tự", !items.some(xau),
+    JSON.stringify(items.find(xau) || null));
+  ok("mọi mục menuref thuộc một vùng có thật", items.every((i) => !!prices[i.zone]),
+    items.find((i) => !prices[i.zone])?.zone || "");
+  ok("menuref ghi ngày tra", !!menuref._lookupAt, menuref._lookupAt || "");
+
+  const sourced = Object.values(prices)
+    .flatMap((z) => Object.entries(z.items)).filter(([, it]) => it.sourced);
+  ok("prices.json có ô dựng từ menu", sourced.length > 40, String(sourced.length));
+  ok("ô nào có cờ sourced cũng đếm được số dòng nguồn",
+    sourced.every(([, it]) => it.listings > 0 && !!it.srcAt),
+    JSON.stringify(sourced.find(([, it]) => !(it.listings > 0 && it.srcAt)) || null));
+  /* Cờ seed phải Ở LẠI. Mọi cảnh báo "đây là số ước lượng" trong app.js,
+     predict.js và audit.js đều treo vào nó, và gỡ nó ra là đổi lấy một
+     tuyên bố không đúng: chưa ai đo những dải này tại quầy cả. */
+  ok("ô dựng từ menu vẫn mang cờ seed", sourced.every(([, it]) => it.seed === true));
+
+  /* Đường biên quan trọng nhất của cả lần nạp: không dải nào của món ăn
+     theo phần được mang giá fine dining. Bảng gốc có phở Quận 1 300–700k và
+     bánh mì Anan 250–500k; lọt vào đây thì p95 vọt lên và app hết chặn được
+     đúng cái nó sinh ra để chặn. */
+  const pho = prices["hcmc-district1"].items["pho-bo"];
+  ok("phở Quận 1 không nuốt giá phở fine dining", pho.p95 < 200_000, JSON.stringify(pho));
+  const bm = prices["hcmc-district1"].items["banh-mi"];
+  ok("bánh mì Quận 1 không nuốt giá bánh mì Anan", bm.p95 < 150_000, JSON.stringify(bm));
 }
 
 console.log("\n════════════════════════════════════════════");

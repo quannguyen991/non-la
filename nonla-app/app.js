@@ -31,6 +31,7 @@ import * as SurveyUI from "./surveyui.js";
 import * as Pricesync from "./pricesync.js";
 import * as ShowCard from "./showcard.js";
 import * as Trust from "./trust.js";
+import * as MenuRef from "./menuref.js";
 import * as Change from "./change.js";
 import * as MenuTax from "./menutax.js";
 import * as Postcard from "./postcard.js";
@@ -682,7 +683,10 @@ function rowHTML(r) {
   /* Nhãn nguồn đi NGAY SAU khoảng giá, không phải trong một dòng riêng ở
      đáy thẻ. Người đọc phải thấy "40–50k" và "estimate" trong cùng một
      cái liếc mắt — tách ra là để lời khẳng định đi một mình. */
-  const src = r.id ? Trust.badge(provOf(r.id)) : "";
+  /* Dòng tra từ menuref cũng phải mang nhãn nguồn. Bỏ trống ở đây là để
+     một dải giá đi một mình đúng chỗ người đọc dễ tin nó nhất. */
+  const src = r.id ? Trust.badge(provOf(r.id))
+    : r.ref ? Trust.badge(Trust.provenance(r.st, 0)) : "";
   const note = v.level === "unknown"
     ? T("Not enough data")
     : `${T("typical")} ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)}${src ? ` · ${src}` : ""}`;
@@ -737,6 +741,16 @@ function whyHTML(dishId) {
 
 function judgeRows(pairs) {
   return pairs.map(({ name, price }) => {
+    /* Bảng tra menu được hỏi TRƯỚC danh mục, và chỉ trả lời khi gần như
+       trúng đúng tên. Lý do nằm ở menuref.js: khớp mờ của match.js đủ lỏng
+       để kéo "Ốc hương rang muối" về ốc hút rồi phán quyết bằng dải giá của
+       một món rẻ bằng nửa. Món trong danh mục thì không mất gì — chúng
+       không có mặt trong bảng tra. */
+    const ref = MenuRef.lookup(S.menuRef, S.zone, name);
+    if (ref) {
+      const st = MenuRef.bandOf(ref, S.menuRefAt);
+      return { id: null, ref, label: ref.name, price, st, v: verdict(price, st) };
+    }
     const m = matchDish(name, S.dishes);
     const id = m?.dish.id || null;
     const st = id ? stat(id) : null;
@@ -1537,14 +1551,21 @@ function renderEat(filter = "") {
   const heroStat = f ? stat(f.dishId) : null;
 
   $("#eatBody").innerHTML = `
+    ${/* Ăn gì là một tab GỐC, nó không có chỗ nào để "quay lại" — mũi tên ở đây
+          trước kia đổ thẳng về màn quét, nên bấm back là mất chỗ đang đọc.
+          Bỏ luôn. Dấu trang cũng bỏ: nút "Save trusted spot" ngay dưới hero làm
+          đúng việc đó và nói rõ nó lưu cái gì. */""}
     <div class="eat-top">
-      <button class="iconbtn" aria-label="Back to scanner" data-act="goScan">${I.back}</button>
       <span class="kick"><span class="pag" aria-hidden="true">${I.pagoda}</span>
         <span>${esc(z.name)}</span></span>
       <button class="iconbtn" aria-label="Must-Try Food Map" data-act="foodMap">${I.pinSm}</button>
       <button class="iconbtn" aria-label="Share this place" data-act="share">${I.share}</button>
-      <button class="iconbtn" aria-label="Save this place" data-act="save">${I.bookmark}</button>
     </div>
+
+    ${/* Cùng hàng chọn vùng như tab Bản đồ. Thiếu nó thì app ship sáu vùng mà
+          màn Ăn gì không hề nói ra là có vùng nào khác — người dùng phải mò vào
+          tận tab Tôi mới đổi được, và kết luận là "app chỉ có Hội An". */""}
+    ${zoneRowHTML()}
 
     ${f ? `
     <section class="eat-hero">
@@ -1747,22 +1768,27 @@ function whereToEat(dishId) {
    cùng một con phố.
    ───────────────────────────────────────────────────────── */
 
+/* Thẻ "trên dải giá". Nguyên tắc gốc của sản phẩm: KHÔNG BAO GIỜ gọi một
+   cơ sở kinh doanh là lừa đảo. Bản trước phá nguyên tắc đó bằng hình thức —
+   nền hồng, một tam giác cảnh báo cỡ 132px làm hình mờ, một chấm than đỏ và
+   một nhãn đỏ, bốn tín hiệu báo động chồng lên nhau cho một câu chữ đã được
+   viết rất cẩn thận để KHÔNG kết tội. Và hình mờ còn nằm đè lên đúng dòng
+   "Known for", nên nó đọc ra như lỗi kết xuất chứ không ra trang trí.
+
+   Nay còn MỘT tín hiệu: cái nhãn. Số lần quét nhập vào dòng địa chỉ thay vì
+   đứng riêng một chip — nó là ngữ cảnh của phán quyết, không phải một phán
+   quyết thứ hai. */
 function alertCardHTML(p) {
   const known = p.known.map((k) => esc(dishById(k)?.vi || k)).join(" · ");
   return `<button class="alert-card" data-place="${esc(p.id)}">
-    <span class="warnmark" aria-hidden="true">${I.alert}</span>
     <span class="avwrap">
-      ${placePhoto(p, "1/1")
-        .replace('class="ph"', 'class="ph round"')}
+      ${placePhoto(p, "1/1").replace('class="ph"', 'class="ph round"')}
     </span>
-    <span>
-      <span class="top">
-        <span><span class="nm">${esc(p.name)}</span>
-          <span class="meta">${esc(p.street)} · ${esc(p.tier)}</span></span>
-        <span class="pill bad">${I.trendUp}Above range</span>
-      </span>
-      <span style="display:block;margin-top:8px"><span class="chip-scan">${p.scans} scans</span></span>
-      ${p.flag ? `<span class="why" role="status">${I.alertDot}<span>${esc(p.flag)}</span></span>` : ""}
+    <span class="body">
+      <span class="nm">${esc(p.name)}</span>
+      <span class="meta">${esc(p.street)} · ${esc(p.tier)} · ${p.scans} scans</span>
+      <span class="pill bad">${I.trendUp}Above range</span>
+      ${p.flag ? `<span class="reason" role="status">${esc(p.flag)}</span>` : ""}
       <span class="known"><b>Known for</b>${known}</span>
     </span>
   </button>`;
@@ -3915,7 +3941,6 @@ document.addEventListener("click", async (ev) => {
   }
 
   if (el("[data-act='allPlaces']")) { S.showAll = !S.showAll; renderMap(); return; }
-  if (el("[data-act='goScan']")) return go("scan");
 
   // ── tab Nearby: bộ lọc và định vị ──
   const exf = el("[data-exf]");
@@ -4162,7 +4187,9 @@ document.addEventListener("click", async (ev) => {
     localStorage.setItem("nl.zone", z);
     History.add("zone", { id: z, label: S.prices[z].en || S.prices[z].name }).then(scheduleSync);
     closeSheet();
-    go("map");
+    /* Ở tab Ăn gì, đổi vùng nghĩa là "xem món vùng khác" chứ không phải "mở bản
+       đồ vùng khác" — nhảy sang bản đồ là vứt mất đúng cái người ta đang đọc. */
+    go(S.tab === "eat" ? "eat" : "map");
     return toast("Now showing " + (S.prices[z].en || S.prices[z].name));
   }
 
@@ -4393,7 +4420,7 @@ async function boot() {
   // eateries.json là lớp "quanh đây có gì" lấy từ OpenStreetMap, KHÔNG phải
   // dữ liệu giá. Thiếu nó thì bản đồ vẫn chạy đủ — nên .catch về rỗng chứ
   // không để Promise.all đánh sập cả lượt khởi động vì một lớp phụ.
-  const [d, p, pl, mp, ea, ax, fm, tr] = await Promise.all([
+  const [d, p, pl, mp, ea, ax, fm, tr, mr] = await Promise.all([
     load("data/dishes.json"), load("data/prices.json"), load("data/places.json"),
     load("data/maps.json"),
     load("data/eateries.json").catch(() => ({ eateries: [] })),
@@ -4405,6 +4432,10 @@ async function boot() {
     // Điểm đi trong ngày. Cũng là lớp phụ: thiếu thì tab Nearby vắng một
     // khối, không phải đứng hình.
     load("data/trips.json").catch(() => ({ trips: {} })),
+    // Giá của những món ngoài danh mục 77 món. Thiếu thì app quay về đúng
+    // hành vi cũ — khớp mờ vào danh mục — nên không được để nó chặn khởi
+    // động.
+    load("data/menuref.json").catch(() => ({ items: [] })),
   ]);
   S.assets = { icons: new Set(ax.icons || []), photos: new Set(ax.photos || []) };
   S.famous = fm.places || [];
@@ -4419,6 +4450,8 @@ async function boot() {
   S.shipped = p.zones;              // bản gốc, để hoàn nguyên được
   S.places = pl.places;
   S.fx = p._fx || null;
+  S.menuRef = MenuRef.index(mr.items || []);
+  S.menuRefAt = mr._lookupAt || "";
   /* Bản ghi quán ăn phải mang `zone`. Bản xuất cũ chỉ có Hội An và không
      có trường đó — nếu ai đó chạy app với tệp cũ thì lớp này sẽ biến mất
      lặng lẽ, nên suy ngược `zone` từ khung của từng vùng thay vì bỏ qua. */

@@ -22,6 +22,19 @@
    Số mẫu người dùng tự ghi trên máy (survey.js) luôn là số thật, kể cả
    khi chưa đủ để thay dải — nên nó được đếm riêng và luôn nói ra.
 
+   BẬC THỨ BA: CÓ NGUỒN NHƯNG VẪN CHƯA ĐO
+   Từ khi nạp bộ giá tra từ menu (tools/nhap-gia-menu.mjs), một số dải mang
+   thêm cờ `sourced` và trường `listings`. Chúng vẫn là ước lượng — không
+   ai cầm máy tới quầy — nhưng khác dữ liệu seed ở một điểm kiểm chứng
+   được: đằng sau mỗi dải có bao nhiêu dòng menu công bố, tra ngày nào.
+   `listings` vì thế là số ĐẾM THẬT và được phép nói ra, khác hẳn `n`.
+
+   Điều dễ trượt nhất ở đây là để "có nguồn" trượt thành "đã đo". Menu công
+   bố chỉ nhìn thấy những quán có website và có người viết review — đúng
+   phần đắt tiền của thị trường. isMeasured() vì vậy vẫn trả false, và nhãn
+   ngắn vẫn là "estimate": chỗ khác nhau nằm ở câu giải thích, không nằm ở
+   mức tin cậy app tự nhận.
+
    VÌ SAO KHÔNG QUY VỀ MỘT SỐ PHẦN TRĂM ĐỘ TIN CẬY
    "Độ tin cậy 72%" nghe như một phép đo nhưng không đo cái gì cả, và nó
    chính là kiểu sai đã phải gỡ khỏi i18n.js. Ở đây trả về một BẬC có tên
@@ -41,7 +54,7 @@ export const MIN_SAMPLES = 5;
  *  bấm "Build price table". Gộp hai trạng thái ấy làm một sẽ dán nhãn
  *  "surveyed" lên một con số vẫn đang là ước lượng — đúng kiểu nói dối mà
  *  cả tệp này sinh ra để chấm dứt. */
-export const LEVELS = ["none", "seed", "thin", "ready", "fair", "strong"];
+export const LEVELS = ["none", "seed", "sourced", "thin", "ready", "fair", "strong"];
 
 const plural = (n, one, many = one + "s") => `${n} ${n === 1 ? one : many}`;
 
@@ -109,6 +122,25 @@ export function provenance(stat, surveyed = 0, updated = "") {
         + `replace the estimate with what you actually paid.`,
     };
   }
+  /* Dải dựng lại từ giá tra trên menu công bố. Vẫn là ước lượng, nhưng có
+     thứ để chỉ tay vào — nên câu giải thích nói ra được bao nhiêu dòng menu
+     và tra ngày nào, kèm đúng cái mà nguồn ấy không nhìn thấy. */
+  if (stat.sourced === true) {
+    const k = Number.isFinite(stat.listings) ? stat.listings : 0;
+    return {
+      level: "sourced", surveyed: 0, seed: true, samples: null, listings: k,
+      title: "Estimated from published menus",
+      short: "estimate",
+      line: `This range was built from ${plural(k, "price listing")} read off `
+        + "published menus, guides and reviews"
+        + `${stat.srcAt ? ` on ${stat.srcAt}` : ""}, together with the estimate `
+        + "this app shipped with. Nobody has checked it at the stall. Published "
+        + "menus also lean towards places with a website, so the cheapest stalls "
+        + "are under-represented. Recording what you pay is what turns this into "
+        + "a measurement.",
+    };
+  }
+
   return {
     level: "seed", surveyed: 0, seed: true, samples: null,
     title: "Estimated, not surveyed",
@@ -130,8 +162,8 @@ export const isMeasured = (p) => p.level === "fair" || p.level === "strong";
  * một chuỗi thừa nằm giữa giao diện.
  */
 export function badge(p) {
-  return { none: "", seed: "estimate", thin: "estimate", ready: "estimate",
-    fair: "surveyed", strong: "surveyed" }[p.level] ?? "";
+  return { none: "", seed: "estimate", sourced: "estimate", thin: "estimate",
+    ready: "estimate", fair: "surveyed", strong: "surveyed" }[p.level] ?? "";
 }
 
 /**

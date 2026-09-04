@@ -693,27 +693,24 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   border:1px solid rgba(176,32,26,.22);pointer-events:none;z-index:2}
 .alert-card:active{transform:scale(.97)}
 .alert-card>*{position:relative;z-index:1}
-.alert-card .warnmark{position:absolute;right:-10px;bottom:-18px;
-  width:clamp(96px,30vw,132px);aspect-ratio:1;color:var(--son);opacity:.07;
-  pointer-events:none}
-/* Ở khổ 390px, nhãn "Above range" chiếm gần nửa bề ngang và bóp cột tên
-   xuống còn ~90px — "Quán ven sông" vỡ thành ba dòng. Cho phép xuống hàng
-   thì tên được trọn bề ngang, nhãn tụt xuống dưới. */
-.alert-card .top{display:flex;flex-wrap:wrap;justify-content:space-between;
-  gap:8px 10px;align-items:flex-start}
-.alert-card .top>span:first-child{min-width:0;flex:1 1 100%}
-.alert-card .pill{flex:0 0 auto}
 .alert-card .nm{display:block;font-family:var(--disp);font-size:clamp(19px,5.6vw,22px);
   font-weight:600;color:var(--son-dam);letter-spacing:-.01em;line-height:1.2}
 .alert-card .meta{display:block;font-size:clamp(12.5px,3.6vw,14px);
   color:var(--muc-nhat);margin-top:3px}
-.alert-card .why{display:flex;gap:7px;align-items:flex-start;margin-top:10px;
+/* Cột nội dung là block thường, không phải lưới flex: sau khi bỏ chip số lần
+   quét thì mỗi phần tử chiếm trọn bề ngang, nên tên quán không còn bị nhãn
+   bóp xuống ba dòng ở khổ 390px và không cần luật wrap riêng nữa. */
+.alert-card .body{display:block;min-width:0}
+.alert-card .pill{margin-top:10px}
+/* Lời giải thích. Lớp KHÔNG được đặt tên "why": app.css còn một `.why` dùng
+   chung cho thẻ <details> gấp mở, và nó áp nền giấy cùng bo góc 16px lên đây
+   — dòng giải thích biến thành một cái hộp lơ lửng. Cùng tên, hai nghĩa. */
+.alert-card .reason{display:block;margin-top:12px;padding-left:11px;
+  border-left:2px solid rgba(176,32,26,.28);
   font-size:clamp(12.5px,3.6vw,14px);color:var(--son-dam);line-height:1.45}
-.alert-card .why svg{width:18px;height:18px;flex:0 0 auto;margin-top:1px;color:var(--son)}
 .alert-card .known{display:block;font-size:clamp(12px,3.5vw,13.5px);
   color:var(--muc-nhat);margin-top:10px;line-height:1.5}
 .alert-card .known b{display:block;font-weight:600;margin-bottom:2px}
-.alert-card .chip-scan{background:#F6E0DA;border-color:rgba(176,32,26,.18)}
 
 /* ── danh sách đầy đủ, mở bằng See all ─────────────── */
 .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:12px}
@@ -1709,7 +1706,7 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 /* Chấm màu = bậc tin cậy. Cùng bảng màu với chấm phán quyết ở hàng kết
    quả, nên người dùng không phải học hai hệ ký hiệu. */
 .wdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:var(--xam-ghim)}
-.wdot[data-l="seed"],.wdot[data-l="thin"]{background:var(--ho-phach)}
+.wdot[data-l="seed"],.wdot[data-l="sourced"],.wdot[data-l="thin"]{background:var(--ho-phach)}
 .wdot[data-l="ready"]{background:var(--dong)}
 .wdot[data-l="fair"],.wdot[data-l="strong"]{background:var(--ngoc)}
 
