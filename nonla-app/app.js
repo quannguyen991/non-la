@@ -28,6 +28,7 @@ import { t as T, LANGS, LANG_NOTE, current as curLang, setLang, onChange as onLa
 import * as History from "./history.js";
 import * as Survey from "./survey.js";
 import * as SurveyUI from "./surveyui.js";
+import * as Pricesync from "./pricesync.js";
 import * as ShowCard from "./showcard.js";
 import * as Trust from "./trust.js";
 import * as Change from "./change.js";
@@ -4317,6 +4318,10 @@ document.addEventListener("click", async (ev) => {
       // Xoá trên máy mà không xoá trên máy chủ là nói dối: lần đăng nhập
       // sau nó quay về nguyên vẹn.
       await Cloud.wipeActivity().catch((e) => toast(`Server copy not erased: ${e.message}`));
+      /* Giá đã đóng góp nằm ở BẢNG KHÁC, wipeActivity không chạm tới.
+         Màn xin phép ở surveyui.js hứa “xoá được từ màn Dữ liệu” — dòng
+         dưới là chỗ giữ lời hứa đó. Bỏ nó thì câu kia thành nói dối. */
+      await Pricesync.forget().catch((e) => toast(`Prices not erased: ${e.message}`));
     }
     renderMe();
     return toast("History erased");

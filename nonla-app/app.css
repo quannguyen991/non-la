@@ -1548,6 +1548,15 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 
 .sv-foot{display:grid;gap:8px;margin-top:18px}
 .sv-note{margin-top:8px;font-size:12px;line-height:1.5;color:var(--xam-ghim)}
+/* Màn xin phép gửi giá. Hai dòng "đi" và "ở lại" phải đọc được trong một
+   liếc mắt, nên chúng có gạch màu ở lề trái thay vì chỉ khác cỡ chữ. */
+.sv-consent{margin-top:18px;padding:14px;border:1px solid var(--line);border-radius:16px}
+.sv-consent h2{margin:0 0 10px;font-size:15px;line-height:1.4}
+.sv-consent p{margin:0 0 8px;font-size:13px;line-height:1.55;padding-left:10px;
+  border-left:3px solid var(--line)}
+.sv-consent .go{border-left-color:var(--ngoc-sau)}
+.sv-consent .stay{border-left-color:var(--xam-ghim)}
+.sv-consent .sv-foot{margin-top:12px}
 
 /* ── dải cảnh báo khi đi bộ ─────────────────────────────────
    Nằm ngay TRÊN thanh nav, không phải giữa màn hình: người dùng đang đi

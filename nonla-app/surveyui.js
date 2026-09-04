@@ -18,14 +18,16 @@
      · Mỗi bản ghi vừa lưu có nút hoàn tác ngay bên cạnh, vì cách sửa lỗi
        gõ nhanh nhất là xoá rồi gõ lại, không phải mở ra sửa.
 
-   VÌ SAO KHÔNG CÓ NÚT "ĐỒNG BỘ"
-   Số khảo sát không tự đi đâu cả. Chúng nằm trên máy cho tới khi người
-   khảo sát bấm Xuất hoặc Áp dụng. Đây là dữ liệu sẽ trở thành lời khẳng
-   định của app về giá cả của những cơ sở có thật — nó không được rời khỏi
-   tay người chịu trách nhiệm vì một lần tự động chạy nền.
+   VÌ SAO KHÔNG CÓ ĐỒNG BỘ NGẦM
+   Số khảo sát không tự đi đâu cả. Có một nút gửi lên bảng giá chung, nhưng
+   nó chỉ chạy khi người ta bấm, và lần bấm đầu tiên hiện ra đúng những
+   trường sẽ rời khỏi máy — xem manXinPhep() ở dưới. Đây là dữ liệu sẽ trở
+   thành lời khẳng định của app về giá cả của những cơ sở có thật; nó không
+   được rời khỏi tay người chịu trách nhiệm vì một lần chạy nền.
    ═══════════════════════════════════════════════════════════════ */
 
 import * as Survey from "./survey.js";
+import * as Pricesync from "./pricesync.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -35,6 +37,8 @@ const $ = (s, r = document) => r.querySelector(s);
 const M = {
   host: null, zone: "", zoneName: "", dishes: [], places: [], prices: null,
   tally: {}, recent: [], pick: null, place: "", cb: {},
+  // chờ gửi: đếm được kể cả trước khi hỏi xin phép, vì nút mang theo con số
+  cho: 0, hoi: false,
 };
 
 const k = (n) => `${Math.round(n / 1000)}k`;
@@ -58,6 +62,51 @@ function dishRows() {
       <span class="tick">${have}/${Survey.MIN_SAMPLES}</span>
     </button>`;
   }).join("");
+}
+
+/* ── chân màn: một việc chính, phần còn lại gấp lại ───────────
+   Ba nút ngang hàng thì người khảo sát phải đọc cả ba mới biết bấm cái nào.
+   Việc hằng ngày ở màn này có đúng một: đưa những giá vừa ghi đi tiếp. Xuất
+   tệp và dựng bảng giá là việc cuối buổi, mỗi tuần một lần — không đáng
+   chiếm chỗ ngang hàng với việc làm mỗi ngày. */
+function chanMan() {
+  if (M.hoi) return manXinPhep();
+  const n = M.cho;
+  const guiDuoc = Pricesync.canPush() && n > 0;
+  return `
+    <div class="sv-foot">
+      ${guiDuoc ? `<button class="btn pri" data-svact="contribute">Contribute ${n} price${n > 1 ? "s" : ""}</button>` : ""}
+      <details class="fold">
+        <summary>Export or apply</summary>
+        <div class="foldin">
+          <button class="btn sec" data-svact="export">Download survey</button>
+          <button class="btn sec" data-svact="apply">Build price table</button>
+        </div>
+      </details>
+    </div>
+    <p class="sv-note">Nothing is sent unless you tap it.</p>`;
+}
+
+/* Màn xin phép. Nói thẳng cái gì đi và cái gì ở lại, ngay tại đây, chứ không
+   phải một dòng "xem điều khoản" — người ta không mở điều khoản.
+
+   Hai danh sách dưới đây PHẢI khớp với thân request ở cloud.js/pushPrices.
+   Sửa một bên mà quên bên kia là biến câu này thành lời nói dối. */
+function manXinPhep() {
+  const n = M.cho;
+  return `
+    <div class="sv-consent">
+      <h2>Send ${n} price${n > 1 ? "s" : ""} to the shared table?</h2>
+      <p class="go"><b>Goes:</b> the dish, the price, the area, the date, and
+        whether you scanned it or typed it.</p>
+      <p class="stay"><b>Stays on this phone:</b> the photo you scanned, the place
+        name you typed, and where you are.</p>
+      <div class="sv-foot">
+        <button class="btn pri" data-svact="consentYes">Send</button>
+        <button class="btn sec" data-svact="consentNo">Not now</button>
+      </div>
+      <p class="sv-note">You can erase everything you sent later, from Data.</p>
+    </div>`;
 }
 
 function paint() {
@@ -113,12 +162,7 @@ function paint() {
           </div>`).join("")}
       </div>` : ""}
 
-    <div class="sv-foot">
-      <button class="btn sec" data-svact="export">Download survey</button>
-      <button class="btn sec" data-svact="apply">Build price table</button>
-    </div>
-    <p class="sv-note">Nothing here leaves the phone on its own. “Build price table”
-      shows you what would change before anything is written.</p>`;
+    ${chanMan()}`;
 
   // Con trỏ đi theo bước tiếp theo của việc, không đứng yên ở đầu màn.
   if (picked) $("#svPrice", M.host)?.focus();
@@ -138,6 +182,7 @@ async function save() {
   M.place = $("#svPlace", M.host)?.value || "";
   M.recent.unshift({ id, dishId: M.pick, price });
   M.tally[`${M.zone}|${M.pick}`] = (M.tally[`${M.zone}|${M.pick}`] || 0) + 1;
+  M.cho++;
   /* Bỏ chọn món sau khi lưu. Giữ nguyên thì lần gõ tiếp theo rất dễ là
      một giá THỨ HAI cho cùng món mà người gõ không để ý — và mẫu trùng
      lặp làm dải hẹp lại một cách giả tạo. */
@@ -154,6 +199,23 @@ async function undo(id) {
     M.tally[key] = Math.max(0, (M.tally[key] || 1) - 1);
   }
   M.recent = M.recent.filter((x) => x.id !== Number(id));
+  M.cho = await Pricesync.pending();
+  paint();
+}
+
+/* Gửi. Đếm lại số chờ TỪ KHO chứ không trừ dần trong đầu: một lô rớt
+   giữa chừng thì mốc đã gửi chỉ nhích tới lô cuối cùng thành công, và con
+   số duy nhất đúng là con số hỏi lại kho. */
+async function gui() {
+  M.hoi = false;
+  try {
+    const { sent } = await Pricesync.push();
+    M.cb.toast?.(sent ? `Sent ${sent}` : "Nothing new to send");
+  } catch (e) {
+    M.cb.toast?.(e.code === "no-auth" ? "Sign in first to contribute"
+      : `Not sent — ${e.message}`);
+  }
+  M.cho = await Pricesync.pending();
   paint();
 }
 
@@ -170,6 +232,7 @@ export async function open({ host, zone, zoneName, dishes, places, prices, onClo
   const have = new Set(Object.keys(prices?.items || {}));
   M.dishes = (dishes || []).filter((d) => have.has(d.id));
   M.tally = await Survey.tally();
+  M.cho = await Pricesync.pending();
   host.hidden = false;
   paint();
 }
@@ -190,6 +253,16 @@ export async function handleClick(target) {
   if (!a) return false;
   if (a.dataset.svact === "close") { close(); M.cb.onClose?.(); return true; }
   if (a.dataset.svact === "save") { await save(); return true; }
+  if (a.dataset.svact === "contribute") {
+    // Đã cho phép một lần rồi thì không hỏi lại mỗi buổi — hỏi lại mãi thì
+    // người ta bấm qua theo quán tính, và một câu hỏi bị bấm qua theo quán
+    // tính không còn là xin phép nữa.
+    if (Pricesync.consented()) await gui();
+    else { M.hoi = true; paint(); }
+    return true;
+  }
+  if (a.dataset.svact === "consentYes") { Pricesync.grant(); await gui(); return true; }
+  if (a.dataset.svact === "consentNo") { M.hoi = false; paint(); return true; }
   if (a.dataset.svact === "export") {
     M.cb.onApply?.("export");
     return true;

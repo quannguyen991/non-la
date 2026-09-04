@@ -31,6 +31,8 @@
 // v28: history.js — kho lịch sử hoạt động. Thiếu tệp này trong SHELL thì
 // máy đang offline mở app ra CHẾT NGAY ở dòng import của app.js, không
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
+// v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
+//      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
 // v29: survey.js + surveyui.js — chế độ khảo sát giá. Thiếu hai tệp này
 // trong SHELL thì máy đang offline mở app ra chết ngay ở dòng import của
 // app.js: mất cả app, không phải mất một màn hình.
@@ -64,7 +66,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v40";
+const CACHE = "nonla-v41";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -78,7 +80,7 @@ const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css", "./community.css", "./welcome.css", "./you.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./route.js",
   "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
-  "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js", "./units.js", "./predict.js", "./eaterydish.js",
+  "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js", "./units.js", "./predict.js", "./eaterydish.js", "./pricesync.js",
   "./manifest.json", "./icon.svg",
   "./data/dishes.json", "./data/prices.json", "./data/places.json",
   "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./data/trips.json",

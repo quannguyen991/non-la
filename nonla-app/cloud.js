@@ -161,3 +161,53 @@ export const pullActivity = ({ limit = 500, since = null } = {}) =>
 /** Xoá toàn bộ lịch sử của chính mình trên máy chủ. Dùng ở màn Dữ liệu:
  *  "xoá dữ liệu" mà chỉ xoá bản trên máy là nói dối người dùng. */
 export const wipeActivity = () => rest("activity?client_id=gte.0", { method: "DELETE" });
+
+/* ── giá quan sát được ────────────────────────────────────────
+   Cùng khuôn với activity ở trên: gửi theo lô, mỗi dòng mang client_id,
+   unique(owner, client_id) biến mọi lần gửi lại thành vô hại.
+
+   KHÁC MỘT ĐIỂM QUAN TRỌNG: activity đẩy phần dư vào `payload`, ở đây thì
+   KHÔNG. Bảng chỉ có đúng sáu cột dữ liệu và mọi thứ ngoài chúng ở lại
+   trên máy — `placeName` người khảo sát tự gõ và `note` không đi đâu cả.
+   Đó là lời hứa ở màn xin phép, và chỗ này là nơi nó được giữ. Thêm một
+   trường vào đây là phá lời hứa đó, không phải một thay đổi kỹ thuật. */
+export const pushPrices = (rows) => rest("price_observations", {
+  method: "POST",
+  prefer: "resolution=ignore-duplicates,return=minimal",
+  body: rows.map((r) => ({
+    client_id: r.id,
+    zone: r.zone,
+    dish_id: r.dishId,
+    price: r.price,
+    place_id: r.placeId || "",
+    src: r.src === "scan" ? "scan" : "hand",
+    observed_at: new Date(r.ts).toISOString(),
+  })),
+});
+
+/**
+ * Dải giá đã gộp của một vùng. Đọc được KHÔNG CẦN đăng nhập: view
+ * price_ranges cấp quyền cho anon và chỉ trả về ô có từ 5 quan sát trở
+ * lên, nên nó không lộ ai đã ghi gì.
+ */
+export const pullRanges = (zone) =>
+  rest(`price_ranges?select=zone,dish_id,p25,p50,p75,p95,n,updated_at`
+    + (zone ? `&zone=eq.${encodeURIComponent(zone)}` : ""))
+    .then((rows) => (rows || []).map((r) => ({
+      zone: r.zone, dishId: r.dish_id,
+      p25: r.p25, p50: r.p50, p75: r.p75, p95: r.p95,
+      n: r.n, updatedAt: r.updated_at,
+    })));
+
+/** Chỉ số giá theo tháng, cho trang công bố. Cũng mở cho anon. */
+export const pullIndex = ({ zone = null, dishId = null } = {}) =>
+  rest(`price_index_monthly?select=month,zone,dish_id,p50,n&order=month.asc`
+    + (zone ? `&zone=eq.${encodeURIComponent(zone)}` : "")
+    + (dishId ? `&dish_id=eq.${encodeURIComponent(dishId)}` : ""))
+    .then((rows) => (rows || []).map((r) => ({
+      month: r.month, zone: r.zone, dishId: r.dish_id, p50: r.p50, n: r.n,
+    })));
+
+/** Xoá mọi quan sát giá của chính mình trên máy chủ. Đối trọng của
+ *  pushPrices: rút lại quyền mà không xoá được thứ đã gửi là nói dối. */
+export const wipePrices = () => rest("price_observations?client_id=gte.0", { method: "DELETE" });
