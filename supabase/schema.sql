@@ -144,3 +144,98 @@ drop policy if exists activity_own_delete on activity;
 create policy activity_own_read   on activity for select using      (auth.uid() = owner);
 create policy activity_own_insert on activity for insert with check (auth.uid() = owner);
 create policy activity_own_delete on activity for delete using      (auth.uid() = owner);
+
+-- ═══════════════════════════════════════════════════════════════
+-- QUAN SÁT GIÁ — nơi mỗi lần quét trở thành một phép đo
+--
+-- VÌ SAO BẢNG NÀY KHÁC HẲN `activity`
+-- `activity` là nhật ký riêng tư: chỉ chủ nhân đọc. Bảng này thì ngược lại,
+-- nó SINH RA để gộp lại thành một bảng giá công khai — không ai đọc được
+-- thì nó vô nghĩa.
+--
+-- Nhưng từng dòng lại nói ra một người đã đứng ở đâu, lúc mấy giờ, ăn món
+-- gì. Mở select công khai trên bảng thô là phát tán lộ trình di chuyển của
+-- từng khách du lịch. Nên: KHÔNG có policy select nào trên bảng thô. Thế
+-- giới bên ngoài chỉ đọc được qua view `price_ranges` ở dưới.
+--
+-- Ngưỡng 5 trong view làm HAI việc bằng một con số: nó là cỡ mẫu tối thiểu
+-- để một dải giá có nghĩa thống kê (trùng MIN_SAMPLES của survey.js), và nó
+-- cũng là ngưỡng ẩn danh — dưới 5 quan sát thì một dòng trong kết quả gộp
+-- có thể truy ngược về một người.
+--
+-- Không dùng trung bình ở đâu cả. Phân vị chịu được điểm ngoại lai, còn
+-- trung bình thì một quán bán gấp mười lần đủ kéo lệch cả vùng.
+-- ═══════════════════════════════════════════════════════════════
+create table if not exists price_observations (
+  id         uuid primary key default gen_random_uuid(),
+  owner      uuid not null references auth.users on delete cascade,
+  client_id  bigint not null,
+  zone       text not null,
+  dish_id    text not null,
+  price      integer not null check (price between 500 and 20000000),
+  place_id   text not null default '',
+  src        text not null default 'scan' check (src in ('scan','hand')),
+  observed_at timestamptz not null,
+  created_at timestamptz not null default now(),
+  -- Cùng chốt chống trùng như activity: gửi lại cả lô khi mạng chập không
+  -- được phép nhân đôi cỡ mẫu — mà cỡ mẫu chính là căn cứ để gọi một dải
+  -- giá là "đã đo".
+  unique (owner, client_id)
+);
+
+create index if not exists price_obs_zone_dish_idx
+  on price_observations (zone, dish_id, observed_at desc);
+
+alter table price_observations enable row level security;
+
+drop policy if exists price_obs_own_insert on price_observations;
+drop policy if exists price_obs_own_read   on price_observations;
+drop policy if exists price_obs_own_delete on price_observations;
+
+-- Chỉ ba policy, và KHÔNG có select công khai. Người dùng đọc lại được
+-- chính quan sát của mình (để đối chiếu và để xoá), không đọc được của ai
+-- khác. Cũng không có update: một cái giá đã nhìn thấy lúc đó thì không
+-- sửa lại được — sai thì xoá và quan sát lại.
+create policy price_obs_own_insert on price_observations
+  for insert with check (auth.uid() = owner);
+create policy price_obs_own_read   on price_observations
+  for select using      (auth.uid() = owner);
+create policy price_obs_own_delete on price_observations
+  for delete using      (auth.uid() = owner);
+
+-- ── Dải giá gộp, đây mới là thứ công khai ──────────────────────
+-- security_invoker = off (mặc định cho view thường): view chạy bằng quyền
+-- của người tạo nên nó đọc xuyên qua RLS, và đó là chủ ý — nó chỉ trả về
+-- số đã gộp, không trả về dòng nào của ai.
+create or replace view price_ranges as
+select
+  zone,
+  dish_id,
+  (percentile_cont(0.25) within group (order by price))::int as p25,
+  (percentile_cont(0.50) within group (order by price))::int as p50,
+  (percentile_cont(0.75) within group (order by price))::int as p75,
+  (percentile_cont(0.95) within group (order by price))::int as p95,
+  count(*)::int                                            as n,
+  max(observed_at)                                         as updated_at
+from price_observations
+group by zone, dish_id
+having count(*) >= 5;
+
+grant select on price_ranges to anon, authenticated;
+
+-- ── Chỉ số giá theo tháng ──────────────────────────────────────
+-- Cùng phép gộp, thêm chiều thời gian. Đây là nguồn cho "Chỉ số giá phố cổ"
+-- công bố hàng tháng: giá theo món, theo vùng, theo tháng, kèm cỡ mẫu —
+-- thứ chưa ai ở Việt Nam đang có.
+create or replace view price_index_monthly as
+select
+  date_trunc('month', observed_at)::date                   as month,
+  zone,
+  dish_id,
+  (percentile_cont(0.50) within group (order by price))::int as p50,
+  count(*)::int                                            as n
+from price_observations
+group by 1, 2, 3
+having count(*) >= 5;
+
+grant select on price_index_monthly to anon, authenticated;
