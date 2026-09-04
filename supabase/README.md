@@ -12,8 +12,14 @@ Bốn bước, làm một lần.
    Tắt Confirm email vì khách du lịch nhập email rồi chờ mã 6 số — bắt họ bấm
    thêm một link xác nhận nữa là mất một nửa số người ở ngay bước đầu.
 
-Xong thì chép **Project URL** và **anon public key** (tab Settings → API) vào
-`nonla-app/config.js`. Cả hai đều là thông tin công khai; an toàn nằm ở RLS.
+Xong thì vào **Settings → API Keys**, chép **Project URL** và một **publishable
+key** vào `nonla-app/config.js`. Supabase đã đổi sang thế hệ khoá mới: khoá bắt
+đầu bằng `sb_publishable_` thay cho `anon` JWT cũ. Vai trò y hệt — công khai,
+nằm trong mọi bản web gửi ra, an toàn vẫn ở RLS — và cả hai header `apikey` lẫn
+`Authorization: Bearer` đều nhận nó, nên `auth.js` và `cloud.js` không phải sửa.
+Biến vẫn tên `SUPABASE_ANON` vì đó là chỗ hai tệp kia đọc.
+
+Khoá `sb_secret_` thì KHÔNG bao giờ chép vào repo — nó là service_role đội tên mới.
 
 ## Bảng quan sát giá — thêm 04/09/2026
 
