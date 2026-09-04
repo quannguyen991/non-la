@@ -37,6 +37,10 @@
 // v37: bảng dịch mở rộng cho các màn mới + màn Journal đọc lại các lần so
 // thực đơn. Không thêm tệp nào, nhưng phải bump: bản đã cài giữ nguyên cache
 // v36 thì i18n.js cũ ở lại và mọi nhãn mới hiện ra bằng tiếng Anh.
+// v39: app.js và app.css đổi — mỗi lần quét nay ghi vào kho giá, và màn kết
+// quả gộp năm nút vào một khối gập. Không bump thì máy đã cài giữ nguyên
+// app.js cũ: quét vẫn chạy nhưng không đóng góp quan sát nào, và người dùng
+// vẫn thấy sáu nút. Cả hai đều là lỗi im lặng, không ai báo.
 // v38: units.js + predict.js + eaterydish.js — bẫy đơn vị tính, dự đoán ô
 // bảng giá còn trống, và suy món từ tên quán. Cả ba đều nằm trong dòng
 // import của app.js, nên thiếu bất kỳ tệp nào trong SHELL là máy đang
@@ -60,7 +64,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v38";
+const CACHE = "nonla-v39";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
