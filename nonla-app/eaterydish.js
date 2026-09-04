@@ -44,6 +44,47 @@ const VUNG_CUA_MON = {
   hoian: "hoian", hanoi: "hanoi", saigon: "hcmc", danang: "danang", hue: "hue",
 };
 
+/* ── cuisine của OSM → món ────────────────────────────────────
+   Đây là TÍN HIỆU KHÁC HẲN tên quán: nó là tag do người vẽ bản đồ đặt,
+   không phải suy từ chữ trên biển. Nên nó đáng tin hơn, và độ phủ cũng cao
+   hơn — 42% quán có cuisine so với 15% đoán được từ tên.
+
+   RANH GIỚI QUAN TRỌNG: chỉ ánh xạ khi nó là ĐỊNH NGHĨA, không phải suy đoán.
+     coffee_shop → cà phê   là định nghĩa: quán cà phê thì bán cà phê.
+     vietnamese  → phở      là ĐOÁN. Một quán Việt ở Hoàn Kiếm có thể bán
+                            phở, bún chả, cơm bình dân, hoặc lẩu.
+   Nhóm thứ hai KHÔNG có mặt trong bảng này. Thà nói "nhà hàng Việt Nam" —
+   đúng và ít — còn hơn liệt kê năm món mà quán có thể không bán món nào.
+
+   Món gắn vùng vẫn đi qua bộ lọc vùng ở dưới, nên cà phê trứng chỉ hiện ở
+   Hà Nội và cà phê muối chỉ hiện ở Huế. */
+const MON_THEO_CUISINE = {
+  // Quán cà phê thì bán cà phê. Chỉ gán loại mặc định — cà phê trứng, cà phê
+  // muối, cà phê dừa là đặc sản, một quán bất kỳ chưa chắc có.
+  coffee_shop: ["ca-phe-sua-da"],
+  coffee:      ["ca-phe-sua-da"],
+  cafe:        ["ca-phe-sua-da"],
+  tea:         ["tra-da"],
+  bubble_tea:  ["tra-sua"],
+  juice:       ["nuoc-ep"],
+  smoothie:    ["sinh-to"],
+  sandwich:    ["banh-mi"],   // ở Việt Nam, quán "sandwich" là quán bánh mì
+  banh_mi:     ["banh-mi"],
+  pho:         ["pho-bo", "pho-ga"],
+  hotpot:      ["lau"],
+  seafood:     ["hai-san-can"],
+};
+
+/* ĐÃ CÂN NHẮC RỒI BỎ, đừng thêm lại:
+     noodle / noodles / soup → phở? mì Quảng? hủ tiếu? bún bò? Tag chỉ nói
+       "có sợi", không nói sợi nào. Bản trước có mục này và nó gán bún bò Huế
+       cho một quán tên "Bún chả cá Hờn" — đúng loại sai mà tệp này phải tránh.
+     rice → cơm tấm? cơm gà? cơm hến? Cùng vấn đề.
+     breakfast, street_food, barbecue, dessert, cake, vegetarian, chicken,
+     ice_cream → đều là loại hình, không phải món.
+   Thà phủ ít hơn mà mỗi liên kết đứng vững, còn hơn phủ rộng bằng phỏng đoán:
+   một liên kết sai kéo theo phán quyết giá so với dải giá của MỘT MÓN KHÁC HẲN. */
+
 /* Bỏ dấu xong thì vài tên món trùng với từ thường gặp trong tên quán:
      phở  ↔ phố   — "Phố Cổ", "Phố đi bộ"
      tre  ↔ Bến Tre
@@ -77,6 +118,13 @@ export function inferDishes(eatery, dishes = []) {
   const mon = normalize(eatery?.cuisine || "").replace(/[;_]/g, " ");
   if (!ten && !mon) return [];
 
+  /* Món suy từ tag cuisine. Tách riêng vì đây là tín hiệu do người vẽ bản đồ
+     đặt, không phải chữ trên biển — đáng tin hơn, và phủ rộng hơn nhiều. */
+  const tuCuisine = new Map();
+  for (const c of String(eatery?.cuisine || "").toLowerCase().split(/[;,]/)) {
+    for (const id of MON_THEO_CUISINE[c.trim()] || []) tuCuisine.set(id, true);
+  }
+
   const hits = [];
   for (const d of dishes) {
     // Phủ quyết theo ngữ cảnh trước mọi thứ khác: "Phố Cổ" không bán phở.
@@ -91,9 +139,12 @@ export function inferDishes(eatery, dishes = []) {
     for (const u of ungVien) {
       // Tên quán là tín hiệu mạnh nhất: chủ quán tự khai món trên biển.
       if (chuaTron(ten, u)) { best = { confidence: 0.9, via: "name", matched: u }; break; }
-      // cuisine của OSM yếu hơn: thường chỉ ghi "vietnamese", đôi khi ghi món.
-      if (chuaTron(mon, u) && !best) best = { confidence: 0.6, via: "cuisine", matched: u };
+      // Tên món viết thẳng trong tag cuisine (hiếm, nhưng có).
+      if (chuaTron(mon, u) && !best) best = { confidence: 0.7, via: "cuisine", matched: u };
     }
+    /* Ánh xạ định nghĩa từ loại hình quán. Không ghi đè tín hiệu tên quán —
+       tên cụ thể hơn loại hình, "Phở Thìn" nói nhiều hơn "cuisine=noodle". */
+    if (!best && tuCuisine.has(d.id)) best = { confidence: 0.75, via: "kind", matched: d.id };
     if (!best) continue;
 
     /* Món gắn vùng khác thì hạ tin cậy — nhưng KHÔNG áp cho món region "all"
@@ -126,7 +177,7 @@ export function inferDishes(eatery, dishes = []) {
  */
 export function linkAll(eateries = [], dishes = [], minConfidence = 0.6) {
   const rows = [];
-  const byVia = { name: 0, cuisine: 0 };
+  const byVia = { name: 0, cuisine: 0, kind: 0 };
   for (const e of eateries) {
     const got = inferDishes(e, dishes).filter((h) => h.confidence >= minConfidence);
     if (!got.length) continue;
