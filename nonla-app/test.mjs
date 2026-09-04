@@ -20,10 +20,14 @@ import { merge as mergePrices, count as countPrices,
          extract as extractPrices } from "./localprices.js";
 import { aggregate as aggregateTax } from "./menutax.js";
 import { t as tr, setLang } from "./i18n.js";
+import { detectUnit, detectSurcharges, scanTraps, estimate, describe } from "./units.js";
+import { median as pMedian, dishBase, zoneFactor, predict, crossValidate } from "./predict.js";
+import { inferDishes, linkAll } from "./eaterydish.js";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
 const prices = JSON.parse(readFileSync("./data/prices.json", "utf8")).zones;
+const eateries = JSON.parse(readFileSync("./data/eateries.json", "utf8")).eateries;
 
 let pass = 0, fail = 0;
 const eq = (name, got, want) => {
@@ -813,6 +817,159 @@ console.log("\n── i18n: các màn mới ────────────
   setLang("en");
   eq("tiếng Anh trả về chính câu gốc", tr("Check my change"), "Check my change");
   ok("mã ngôn ngữ lạ bị từ chối", setLang("xx") === false);
+}
+
+console.log("\n── bẫy đơn vị tính ─────────────────────────");
+{
+  const w = (line) => { const u = detectUnit(line); return u && `${u.kind}:${u.gam}`; };
+
+  eq("giá theo 100g", w("Cá song 100.000/100g"), "weight:100");
+  eq("lạng quy ra 100 gam", w("Tôm hùm 1.200.000 / lạng"), "weight:100");
+  eq("kg quy ra 1000 gam", w("Ghẹ 450.000/kg"), "weight:1000");
+  eq("cân quy ra 1000 gam", w("Cá 300.000/cân"), "weight:1000");
+  eq("thời giá là đơn vị mở", w("Cua biển — thời giá"), "open:null");
+  eq("market price cũng là đơn vị mở", w("Lobster — market price"), "open:null");
+
+  /* Đơn vị phần bình thường KHÔNG được cảnh báo: cảnh báo nhầm ở đây làm
+     khách nghi ngờ một quán bán đúng giá. */
+  ok("bát không phải bẫy", detectUnit("Phở bò 45.000 / bát").trap === false);
+  ok("ly không phải bẫy", detectUnit("Trà đá 3.000/ly").trap === false);
+  eq("dòng không nêu đơn vị", detectUnit("Bánh mì 30.000"), null);
+
+  /* Ba ca biên: mảnh của một con số tiền không được đọc thành trọng lượng. */
+  eq("giá có chữ đ không thành gam", detectUnit("Cơm gà 50.000 đ"), null);
+  eq("giá trơn không thành gam", detectUnit("Lẩu hải sản 500.000"), null);
+  eq("chữ gà không thành gam", detectUnit("Cơm gà Hội An 70.000"), null);
+
+  /* normalize() của match.js xoá mất %, + và / — nên tệp này phải tự chuẩn hoá.
+     Bốn phép thử sau chính là thứ bắt được lỗi đó. */
+  eq("chưa VAT, không nêu mức", detectSurcharges("Giá chưa bao gồm VAT"), [{ kind: "vat", pct: null }]);
+  eq("VAT có mức", detectSurcharges("Giá chưa gồm VAT 8%"), [{ kind: "vat", pct: 8 }]);
+  eq("phụ thu phần trăm", detectSurcharges("Phụ thu 10% cuối tuần"), [{ kind: "service", pct: 10 }]);
+  eq("dạng +5%", detectSurcharges("Service +5%"), [{ kind: "service", pct: 5 }]);
+
+  const sc = scanTraps([
+    "Cá song 100.000/100g", "Phở bò 45.000/bát", "Cua biển — thời giá",
+    "Tôm 900.000/kg", "Giá chưa bao gồm VAT, phụ thu 5%",
+  ]);
+  eq("quét cả thực đơn: đếm đúng số bẫy", sc.traps.length, 3);
+  eq("quét cả thực đơn: giữ được giá của dòng bẫy", sc.traps[0].price, 100000);
+  eq("quét cả thực đơn: bắt được cả hai khoản phụ thu", sc.surcharges.length, 2);
+
+  /* Phép nhân chỉ chạy khi đã có trọng lượng THẬT. Không có thì trả null,
+     tuyệt đối không đoán — cùng nguyên tắc với trust.js. */
+  eq("800g với đơn giá 100k/100g", estimate(100000, detectUnit("Cá song 100.000/100g"), 800),
+    { total: 800000, lan: 8 });
+  eq("không có trọng lượng thì không đoán", estimate(100000, detectUnit("Cá song 100.000/100g"), 0), null);
+  eq("đơn vị phần thì không nhân", estimate(45000, detectUnit("Phở 45.000/bát"), 800), null);
+  eq("thời giá thì không nhân", estimate(0, detectUnit("Cua — thời giá"), 800), null);
+
+  ok("câu mô tả lạng nói rõ 100 gam", /100 grams/.test(describe(detectUnit("Tôm 1.200.000/lạng"))));
+  eq("đơn vị phần không sinh câu cảnh báo", describe(detectUnit("Phở 45.000/bát")), "");
+}
+
+console.log("\n── dự đoán ô bảng giá còn trống ────────────");
+{
+  eq("trung vị lẻ", pMedian([3, 1, 2]), 2);
+  eq("trung vị chẵn", pMedian([1, 2, 3, 4]), 2.5);
+  eq("mảng rỗng trả null chứ không trả 0", pMedian([]), null);
+
+  /* Lưới dựng tay ba vùng. Cần ĐỦ BA: món d phải có mặt ở ít nhất hai vùng
+     thì mới dựng được nền cho nó, nên lưới hai vùng không bao giờ suy được
+     ô trống — đó là ràng buộc của mô hình, không phải lỗi. */
+  const flat = (v) => ({ p25: v, p50: v, p75: v });
+  const grid = {
+    re:  { items: { a: flat(20000), b: flat(40000), c: flat(60000), d: flat(80000) } },
+    mid: { items: { a: flat(25000), b: flat(50000), c: flat(75000), d: flat(100000) } },
+    dat: { items: { a: flat(30000), b: flat(60000), c: flat(90000) } },
+  };
+  const gb = dishBase(grid), gf = zoneFactor(grid, gb);
+  eq("nền của món lấy trung vị qua các vùng", gb.b.p50, 50000);
+  eq("món thiếu ở một vùng vẫn dựng được nền từ hai vùng kia", gb.d.nZones, 2);
+  eq("hệ số vùng rẻ", gf.re.factor, 0.8);
+  eq("hệ số vùng giữa", gf.mid.factor, 1);
+  eq("hệ số vùng đắt", gf.dat.factor, 1.2);
+
+  const pd = predict(grid, "dat", "d");
+  ok("suy được ô trống", pd !== null);
+  eq("giá suy ra theo đúng tỉ lệ vùng", pd.p50, 108000);   // nền 90k × 1,2
+  ok("kết quả luôn mang cờ predicted", pd.predicted === true);
+  eq("căn cứ nêu rõ món dựa trên mấy vùng", pd.basis.dishZones, 2);
+  eq("căn cứ nêu rõ hệ số đã dùng", pd.basis.factor, 1.2);
+
+  /* Ba trường hợp phải TỪ CHỐI đoán. Im lặng đúng hơn một con số bịa. */
+  eq("ô đã đo rồi thì không đè lên", predict(grid, "dat", "a"), null);
+  eq("vùng không tồn tại", predict(grid, "khong-co", "a"), null);
+  {
+    const thin = { x: { items: { p: { p25: 1, p50: 10000, p75: 1 } } },
+                   y: { items: { q: { p25: 1, p50: 10000, p75: 1 } } } };
+    eq("nền quá mỏng thì không đoán", predict(thin, "x", "q"), null);
+  }
+
+  /* Cờ seed phải lan sang kết quả suy ra: seed suy từ seed vẫn là seed. */
+  {
+    const sd = (v) => ({ p25: v, p50: v, p75: v, seed: true });
+    const s = {
+      m: { items: { a: sd(10000), b: sd(20000), c: sd(30000) } },
+      n: { items: { a: sd(10000), b: sd(20000), c: sd(30000), d: sd(40000) } },
+      o: { items: { a: sd(10000), b: sd(20000), c: sd(30000), d: sd(40000) } },
+    };
+    ok("dự đoán từ dữ liệu seed mang cờ fromSeed", predict(s, "m", "d").fromSeed === true);
+  }
+
+  /* Trên bảng giá thật của repo. */
+  const zf = zoneFactor(prices);
+  ok("mọi vùng thật đều đủ dữ liệu để có hệ số",
+    Object.values(zf).every((f) => f.factor !== null),
+    JSON.stringify(zf));
+
+  const cv = crossValidate(prices);
+  ok("kiểm định bỏ-một-ra chạy được trên dữ liệu thật", cv.n > 50, `n=${cv.n}`);
+  ok("sai số trung vị dưới 25%", cv.medianErrorPct < 25, `${cv.medianErrorPct}%`);
+  ok("mỗi dòng kiểm định đều có cả số thật lẫn số đoán",
+    cv.rows.every((r) => r.actual > 0 && r.predicted > 0));
+}
+
+console.log("\n── suy món từ tên quán ─────────────────────");
+{
+  const ids = (name, zone) => inferDishes({ name, zone }, dishes).map((h) => h.id);
+  const conf = (name, zone) => inferDishes({ name, zone }, dishes)[0]?.confidence;
+
+  eq("tên quán khai thẳng món", ids("Phở Thìn", "hanoi-hoankiem"), ["pho-bo"]);
+  eq("cao lầu ở Hội An", ids("Cao lầu Thanh", "hoian-oldtown"), ["cao-lau"]);
+
+  /* Bốn lớp lỗi dưới đây đều bắt được từ dữ liệu thật của repo, không phải
+     ca giả định. Mỗi phép thử tương ứng một lỗi đã sửa. */
+
+  // 1 · bỏ dấu xong "phở" trùng "phố" — quán ở Phố Cổ không vì thế mà bán phở
+  eq("Phố Cổ không bán phở", ids("Quán Phố Cổ", "hanoi-hoankiem"), []);
+  eq("phố đi bộ cũng vậy", ids("Cafe Phố đi bộ", "hanoi-hoankiem"), []);
+
+  // 2 · "tre" là món Huế thật, nhưng Bến Tre là tên tỉnh
+  eq("Bến Tre không phải món tre", ids("Dừa Bến Tre", "hcmc-district1"), []);
+
+  // 3 · món dài khớp rồi thì mảnh vụn của nó không được tính thành món riêng
+  eq("bún chả cá không đẻ ra bún chả và chả cá", ids("Bún chả cá Hờn", "danang-hanriver"),
+    ["bun-cha-ca"]);
+
+  // 4 · region "saigon" ứng với zone tiền tố "hcmc"; thiếu bảng ánh xạ thì
+  //     mọi món Sài Gòn bị phạt lệch vùng ngay giữa Sài Gòn
+  eq("cơm tấm ở Sài Gòn không bị phạt lệch vùng", conf("Cơm tấm Ba Ghiền", "hcmc-district1"), 0.9);
+  //     và món toàn quốc thì không bao giờ bị phạt, ở đâu cũng vậy
+  eq("món toàn quốc không bị phạt vùng", conf("Bánh mì Phượng", "hanoi-hoankiem"), 0.9);
+
+  eq("tên không có món nào", ids("Highlands Coffee", "hanoi-hoankiem"), []);
+
+  /* Chạy trên toàn bộ 2.481 quán thật: kiểm cả mã lẫn DỮ LIỆU, đúng tầng
+     kiểm mà repo này vốn đã dựng cho prices.json. */
+  const link = linkAll(eateries, dishes, 0.6);
+  ok("suy được món cho ít nhất 10% số quán", link.coverage >= 10, `${link.coverage}%`);
+  ok("mọi món suy ra đều tồn tại trong dishes.json",
+    link.rows.every((r) => r.dishes.every((h) => dishes.some((d) => d.id === h.id))));
+  ok("không quán nào bị gán quá 5 món", link.rows.every((r) => r.dishes.length <= 5),
+    JSON.stringify(link.rows.filter((r) => r.dishes.length > 5).slice(0, 2)));
+  ok("mọi tin cậy nằm trong khoảng 0–1",
+    link.rows.every((r) => r.dishes.every((h) => h.confidence > 0 && h.confidence <= 1)));
 }
 
 console.log("\n════════════════════════════════════════════");
