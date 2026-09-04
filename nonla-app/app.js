@@ -1430,8 +1430,13 @@ function logScan(rows, kind) {
        Chỉ ghi vào máy của chính người dùng. Không có gì rời khỏi thiết bị ở
        bản này — lời hứa "ảnh quét không rời khỏi máy" không đổi, và dữ liệu
        trích ra cũng vậy cho tới khi có màn xin phép tường minh. */
-    if (kind === "menu" || kind === "bill") {
-      Survey.add({ zone: S.zone, dishId: r.id, price: r.price, src: "scan" });
+    /* "manual" cũng tính. Người dùng gõ tay một cái giá vừa được báo chính là
+       việc survey.js sinh ra để phục vụ — loại nó ra là bỏ đúng đường đóng
+       góp đáng tin nhất, vì không có OCR đọc nhầm số ở giữa. Chỉ khác nguồn:
+       OCR sai kiểu đọc nhầm chữ số, tay sai kiểu bấm nhầm phím. */
+    const src = kind === "manual" ? "hand" : "scan";
+    if (kind === "menu" || kind === "bill" || kind === "manual") {
+      Survey.add({ zone: S.zone, dishId: r.id, price: r.price, src });
       ghi++;
     }
   }
