@@ -91,7 +91,15 @@ for (const [k, rows] of [...cells].sort()) {
   if (!z) { console.error(`vùng lạ: ${zone}`); continue; }
 
   const prev = z.items[dishId] || null;
-  const band = mergeBand(prev, rows);
+
+  /* CHẠY LẠI PHẢI RA ĐÚNG KẾT QUẢ LẦN ĐẦU.
+     mergeBand lấy min ở p25 và max ở p95, nên trộn vào chính kết quả lần
+     trước thì mỗi lần chạy dải lại nống ra một ít — chạy hai lần đã lệch 11
+     ô. Tệp này được viết để chạy lại mỗi khi có xlsx mới, nên nó phải trộn
+     vào dải TRƯỚC lần nạp đầu tiên. Dải ấy lưu lại ở `base`, và giữ nó cũng
+     là giữ đường quay về số viết tay gốc khi cần đối chiếu. */
+  const base = prev?.base || (prev && !prev.sourced ? prev : null);
+  const band = mergeBand(base, rows);
 
   z.items[dishId] = {
     ...band,
@@ -102,6 +110,7 @@ for (const [k, rows] of [...cells].sort()) {
     sourced: true,
     listings: rows.length,
     srcAt: AT,
+    ...(base ? { base: { p25: base.p25, p50: base.p50, p75: base.p75, p95: base.p95 } } : {}),
   };
   /* Vùng nào có ô đổi số thì mốc `updated` phải đổi theo. Giao diện in mốc
      ấy ra ngay dưới dải giá ("Typical range in Hội An · Phố cổ · 2026 · 08");
@@ -162,14 +171,16 @@ const menuDoc = {
 
 const AREA_ZONE = { "Hội An": "hoian-oldtown", "Hoàn Kiếm": "hanoi-hoankiem", "TP.HCM": "hcmc-district1" };
 const premiumDoc = {
-  _note: "Quán mà giá cao là do phân khúc, không phải do chặt chém — hai câu khác "
-    + "hẳn nhau với người đang đứng trước cái menu. CHƯA ĐƯỢC NỐI VÀO APP, và tệp "
-    + "mang tiền tố _ vì thế: đối chiếu 22 cái tên này với data/eateries.json chỉ "
-    + "khớp được 7, trong đó vài cái khớp nhầm sang vùng khác ('Garden' ở Đà Nẵng "
-    + "nhận là 'Secret Garden 158 Pasteur' ở Quận 1). Dán nhãn 'phân khúc cao cấp' "
-    + "lên nhầm một quán có thật thì tệ hơn hẳn không dán gì. Giữ lại ở đây để khi "
-    + "nào có cách nhận diện quán chắc chắn hơn thì dùng. KHÔNG phải bảng xếp hạng "
-    + "ngon dở, và không đầy đủ.",
+  _note: "Quán mà giá cao là do PHÂN KHÚC, không phải do chặt chém — hai câu khác hẳn "
+    + "nhau với người đang đứng trước cái menu. Mức giá ở đây là mức CHÍNH QUÁN hoặc bài "
+    + "hướng dẫn công bố, kèm đường dẫn nguồn; nó KHÔNG phải phán quyết của Nón Lá và "
+    + "không được hiển thị như phán quyết. KHÔNG phải bảng xếp hạng ngon dở, và không "
+    + "đầy đủ: đây là những quán bộ dữ liệu tra tới. "
+    + "Danh sách CỐ TÌNH không nối vào từng bản ghi trong eateries.json: đối chiếu tên "
+    + "chỉ nhận diện chắc chắn được 4/22 (Morning Glory Original, Anan Saigon, Cau Go, "
+    + "Secret Garden), và gắn nhãn 'phân khúc cao cấp' lên nhầm một quán có thật thì tệ "
+    + "hơn hẳn không gắn gì. App hiện nguyên danh sách để người đọc tự đối chiếu cái tên "
+    + "trước mặt mình.",
   _source: raw._source,
   _lookupAt: AT,
   venues: raw.premiumVenues.map((v) => ({
@@ -187,8 +198,9 @@ const premiumDoc = {
 priceDoc._schema = "p25/p50/p75/p95 tính bằng VND. n = số lượt ghi nhận — với mục "
   + "seed đây là số HƯ CẤU, đừng in ra như bằng chứng (xem trust.js). seed: chưa "
   + "ai đo tại quầy. sourced: dải được dựng lại từ giá tra trên menu công bố, kèm "
-  + "listings (số dòng menu, đếm thật) và srcAt (ngày tra) — vẫn mang cờ seed vì "
-  + "vẫn chưa phải số đo. surveyedAt: dải dựng từ khảo sát thật, khi đó seed biến mất.";
+  + "listings (số dòng menu, đếm thật), srcAt (ngày tra) và base (dải trước lần nạp "
+  + "đầu, để chạy lại vẫn ra đúng kết quả) — vẫn mang cờ seed vì vẫn chưa phải số đo. "
+  + "surveyedAt: dải dựng từ khảo sát thật, khi đó seed biến mất.";
 
 priceDoc._menuSource = {
   file: raw._source, lookupAt: AT,
@@ -200,7 +212,7 @@ priceDoc._menuSource = {
 if (!DRY) {
   writeFileSync(join(APP, "data/prices.json"), JSON.stringify(priceDoc), "utf8");
   writeFileSync(join(APP, "data/menuref.json"), JSON.stringify(menuDoc), "utf8");
-  writeFileSync(join(APP, "data/_premium_venues.json"), JSON.stringify(premiumDoc, null, 1), "utf8");
+  writeFileSync(join(APP, "data/premium.json"), JSON.stringify(premiumDoc), "utf8");
 }
 
 const fresh = changes.filter((c) => c.fresh);
@@ -210,7 +222,7 @@ console.log(`nguồn      : ${raw._source} · tra ngày ${AT}`);
 console.log(`dòng đọc   : ${raw.items.length}`);
 console.log(`vào dải giá: ${cells.size} ô (${changes.length - fresh.length} ô cũ đổi số, ${fresh.length} ô mới)`);
 console.log(`vào menuref: ${menuref.length} mục từ ${leftover.length} dòng`);
-console.log(`quán cao cấp: ${premiumDoc.venues.length} (để dành, chưa nối vào app)`);
+console.log(`quán cao cấp: ${premiumDoc.venues.length} → data/premium.json`);
 
 const line = (c) => `  ${c.zone.padEnd(15)} ${c.dishId.padEnd(22)} `
   + `${String(c.prev.p50).padStart(8)} → ${String(c.band.p50).padStart(8)}  `

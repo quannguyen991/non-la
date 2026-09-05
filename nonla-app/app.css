@@ -1395,6 +1395,33 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .trip-meta{font-size:11.5px;color:var(--dong-chu);font-variant-numeric:tabular-nums;
   margin-top:2px}
 
+/* ── quán thuộc phân khúc cao cấp ────────────────────────────
+   CỐ Ý không dùng .trip-card hay .ex-card: những thẻ ấy bấm được và dẫn
+   sang một màn của Nón Lá, còn đây là danh sách để ĐỌC, mỗi dòng dẫn ra
+   ngoài tới nguồn. Cho nó trông giống thẻ bấm được là hứa một cú chạm
+   không tồn tại.
+
+   Cũng không dùng màu cảnh báo. Cam/đỏ ở app này nghĩa là "giá vượt
+   khoảng" — mà mấy quán đây có làm gì sai đâu. Viền vàng đồng là màu của
+   khối thông tin, đúng thứ nó đang là. */
+.prem-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.prem{padding:11px 13px;border-radius:16px;background:#fff;
+  border:1.5px solid var(--vien);box-shadow:0 3px 12px rgba(14,43,36,.05)}
+.prem-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.prem-top b{font-family:var(--disp);font-size:clamp(14.5px,4vw,16.5px);
+  font-weight:600;color:var(--then);min-width:0}
+.prem-seg{font-size:11.5px;color:var(--dong-chu);background:var(--kem);
+  border-radius:999px;padding:2px 8px;white-space:nowrap}
+/* Số tiền để tabular-nums và không xuống dòng giữa chừng: đây là thứ người
+   đọc quét mắt qua, và một dải giá gãy làm đôi thì phải đọc lại từ đầu. */
+.prem-band{display:block;margin-top:4px;font-size:13px;font-weight:600;
+  color:var(--muc);font-variant-numeric:tabular-nums}
+.prem-known{display:block;margin-top:2px;font-size:12px;color:var(--muc-nhat)}
+.prem-links{display:flex;gap:14px;margin-top:7px}
+.prem-links a{font-size:12.5px;font-weight:600;color:var(--dong-chu);
+  text-decoration:underline;text-underline-offset:2px;
+  min-height:34px;display:inline-flex;align-items:center}
+
 /* ── màn mở đầu ──────────────────────────────────────────────
    Kiểu của nó nằm HẲN trong welcome.css, không còn một dòng nào ở đây.
    Màn đó chạy đúng một lần trong đời một lần cài app và là khối duy nhất

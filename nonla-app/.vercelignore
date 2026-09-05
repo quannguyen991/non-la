@@ -29,11 +29,10 @@ tools/
 _osm_raw_eateries.json
 data/_overpass_cache/
 
-# Bản chép thô của bảng giá xlsx (160 KB) và danh sách quán cao cấp. Cả hai
-# là ĐẦU VÀO của tools/nhap-gia-menu.mjs, không phải thứ app đọc lúc chạy:
-# app chỉ đọc data/prices.json và data/menuref.json do bước ấy sinh ra.
+# Bản chép thô của bảng giá xlsx, 160 KB. Là ĐẦU VÀO của
+# tools/nhap-gia-menu.mjs, không phải thứ app đọc lúc chạy: app chỉ đọc
+# data/prices.json, data/menuref.json và data/premium.json do bước ấy sinh ra.
 data/_menu_survey_raw.json
-data/_premium_venues.json
 
 # Kiểm thử và trang xem thử trong lúc phát triển
 test.mjs

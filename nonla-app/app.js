@@ -32,6 +32,7 @@ import * as Pricesync from "./pricesync.js";
 import * as ShowCard from "./showcard.js";
 import * as Trust from "./trust.js";
 import * as MenuRef from "./menuref.js";
+import * as Premium from "./premium.js";
 import * as Change from "./change.js";
 import * as MenuTax from "./menutax.js";
 import * as Postcard from "./postcard.js";
@@ -1987,6 +1988,51 @@ function tripCardHTML(t) {
   </button>`;
 }
 
+/* Khối "chỗ này vốn đắt".
+
+   Nó trả lời câu hỏi mà phán quyết giá KHÔNG trả lời được: một cái giá vượt
+   khoảng thường gặp có thể là chặt chém, mà cũng có thể là bảng giá bình
+   thường của một nhà hàng phân khúc khác. Đoán sai theo chiều nào cũng dở.
+
+   BA ĐIỀU KHỐI NÀY KHÔNG ĐƯỢC LÀM
+   · Không gắn nhãn lên một quán cụ thể trong danh sách quanh đây — xem đầu
+     premium.js: khớp tên chỉ chắc chắn được 4/22.
+   · Không nói mấy quán này đắt theo giọng Nón Lá. Số tiền là số CHÍNH QUÁN
+     hoặc bài hướng dẫn công bố, và mỗi dòng dẫn thẳng tới nguồn để người đọc
+     tự kiểm.
+   · Không xếp hạng ngon dở. Thứ tự ở đây là thứ tự tiền.
+   Một con số tiền đặt cạnh tên một nhà hàng có thật rất dễ đọc thành lời
+   buộc tội, nên phần chữ phải nói rõ đây không phải lời buộc tội nào cả. */
+function premiumSectionHTML() {
+  const list = Premium.forZone(S.premium, S.zone);
+  if (!list.length) return "";
+  const at = S.premium?._lookupAt || "";
+  return `
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>${esc(T("Priced for a different night"))}</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <p class="muted" style="margin:-2px 0 10px;font-size:13px">A high bill at one of these
+      is the bracket, not a markup. Figures are what the restaurant or a published guide
+      states${at ? `, read on ${esc(at)}` : ""} — not a Nón Lá verdict, and not a ranking.
+      Check the name in front of you against this list.</p>
+    <ul class="prem-list">
+      ${list.map((v) => `<li class="prem">
+        <div class="prem-top">
+          <b>${esc(v.name)}</b>
+          <span class="prem-seg">${esc(v.segment || "")}</span>
+        </div>
+        <span class="prem-band">${esc(v.band || "")}</span>
+        ${v.known ? `<small class="prem-known">${esc(v.known)}</small>` : ""}
+        <div class="prem-links">
+          ${v.maps ? `<a href="${esc(v.maps)}" target="_blank" rel="noopener noreferrer">Maps</a>` : ""}
+          ${v.src ? `<a href="${esc(v.src)}" target="_blank" rel="noopener noreferrer">Source</a>` : ""}
+        </div>
+      </li>`).join("")}
+    </ul>`;
+}
+
 function tripsSectionHTML() {
   const list = tripsOf();
   if (!list.length) return "";
@@ -2132,6 +2178,8 @@ function renderMap() {
       <span class="note">${I.clock}Still checking…</span>
     </div>
     <div class="mini-grid">${rest.map(miniCardHTML).join("")}</div>` : ""}
+
+    ${premiumSectionHTML()}
 
     ${sightsRailHTML()}
 
@@ -4420,7 +4468,7 @@ async function boot() {
   // eateries.json là lớp "quanh đây có gì" lấy từ OpenStreetMap, KHÔNG phải
   // dữ liệu giá. Thiếu nó thì bản đồ vẫn chạy đủ — nên .catch về rỗng chứ
   // không để Promise.all đánh sập cả lượt khởi động vì một lớp phụ.
-  const [d, p, pl, mp, ea, ax, fm, tr, mr] = await Promise.all([
+  const [d, p, pl, mp, ea, ax, fm, tr, mr, pv] = await Promise.all([
     load("data/dishes.json"), load("data/prices.json"), load("data/places.json"),
     load("data/maps.json"),
     load("data/eateries.json").catch(() => ({ eateries: [] })),
@@ -4436,6 +4484,9 @@ async function boot() {
     // hành vi cũ — khớp mờ vào danh mục — nên không được để nó chặn khởi
     // động.
     load("data/menuref.json").catch(() => ({ items: [] })),
+    // Quán thuộc phân khúc cao cấp. Lớp phụ: thiếu thì tab Nearby vắng một
+    // khối, không phải đứng hình.
+    load("data/premium.json").catch(() => ({ venues: [] })),
   ]);
   S.assets = { icons: new Set(ax.icons || []), photos: new Set(ax.photos || []) };
   S.famous = fm.places || [];
@@ -4452,6 +4503,7 @@ async function boot() {
   S.fx = p._fx || null;
   S.menuRef = MenuRef.index(mr.items || []);
   S.menuRefAt = mr._lookupAt || "";
+  S.premium = pv;
   /* Bản ghi quán ăn phải mang `zone`. Bản xuất cũ chỉ có Hội An và không
      có trường đó — nếu ai đó chạy app với tệp cũ thì lớp này sẽ biến mất
      lặng lẽ, nên suy ngược `zone` từ khung của từng vùng thay vì bỏ qua. */

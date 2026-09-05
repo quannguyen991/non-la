@@ -27,12 +27,14 @@ import { NGUON, NGUON_QUAN_SAT, MIN_MAU, MIN_DOI_CHIEU, vaoDai, laDoDuoc,
          loc, bachPhanVi, dungDai, phatHienTron, soSanhKhaiVaDo } from "./pricesrc.js";
 import { index as refIndex, lookup as refLookup, bandOf as refBand } from "./menuref.js";
 import { classify, usableFor, rawBand, tidyBand, mergeBand, tidy } from "../tools/menuband.mjs";
+import { bandFloor, forZone } from "./premium.js";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
 const prices = JSON.parse(readFileSync("./data/prices.json", "utf8")).zones;
 const eateries = JSON.parse(readFileSync("./data/eateries.json", "utf8")).eateries;
 const menuref = JSON.parse(readFileSync("./data/menuref.json", "utf8"));
+const premium = JSON.parse(readFileSync("./data/premium.json", "utf8"));
 
 let pass = 0, fail = 0;
 const eq = (name, got, want) => {
@@ -1291,6 +1293,90 @@ console.log("\n── dữ liệu menuref/prices đã nạp ──────�
   ok("phở Quận 1 không nuốt giá phở fine dining", pho.p95 < 200_000, JSON.stringify(pho));
   const bm = prices["hcmc-district1"].items["banh-mi"];
   ok("bánh mì Quận 1 không nuốt giá bánh mì Anan", bm.p95 < 150_000, JSON.stringify(bm));
+}
+
+/* ── quán thuộc phân khúc cao cấp (premium.js) ────────────
+   Danh sách này in TÊN NHÀ HÀNG CÓ THẬT kèm một con số tiền, nên nó là chỗ
+   dễ nói sai về một cơ sở kinh doanh nhất trong cả app. Phần đáng kiểm là
+   thứ tự và chuyện nó không nuốt mất mục nào. */
+console.log("\n── premium: quán ở bậc giá khác ────────────");
+{
+  eq("đọc số tiền có dấu phân cách nhóm", bandFloor("1.800.000–3.000.000đ/người"), 1_800_000);
+  eq("lấy mốc THẤP nhất, không phải mốc đầu tiên",
+    bandFloor("Khoảng 300.000–500.000đ/người; món 50.000–350.000đ"), 50_000);
+  /* "US$115–145" không có dấu phân cách nên bị bỏ qua — cố đọc nó ra tiền
+     Việt thì 115 thành một trăm mười lăm đồng và quán ấy tụt xuống cuối. */
+  eq("bỏ qua số không có dấu phân cách",
+    bandFloor("US$115–145 food only ≈ 3,000.000–3,800.000đ/người"), 3_000_000);
+  /* "158" trong "Secret Garden 158 Pasteur" là số nhà, không phải tiền. */
+  eq("không có tiền thì trả 0, không đoán", bandFloor("Secret Garden 158 Pasteur"), 0);
+  eq("chuỗi rỗng", bandFloor(""), 0);
+  eq("thiếu trường", bandFloor(undefined), 0);
+
+  const doc = { venues: [
+    { zone: "a", name: "Rẻ hơn", band: "220.000–500.000đ/người" },
+    { zone: "a", name: "Đắt nhất", band: "3.500.000–5.500.000đ/người" },
+    { zone: "b", name: "Vùng khác", band: "900.000đ/người" },
+    { zone: "a", name: "Không rõ giá", band: "hỏi quán" },
+    { zone: "a", band: "1.000.000đ" },
+  ] };
+  const a = forZone(doc, "a");
+  eq("chỉ lấy quán của vùng đang mở", a.map((v) => v.name),
+    ["Đắt nhất", "Rẻ hơn", "Không rõ giá"]);
+  eq("mục thiếu tên bị bỏ, không hiện ra một dòng trống", a.length, 3);
+  eq("vùng không có quán nào trả mảng rỗng", forZone(doc, "khong-co"), []);
+  eq("thiếu cả tài liệu cũng không nổ", forZone(null, "a"), []);
+
+  /* Dữ liệu THẬT đã ship, không phải dữ liệu dựng tay: giữa hai lần chạy
+     tools/nhap-gia-menu.mjs thì thứ người dùng cầm là tệp. */
+  const zones = new Set(premium.venues.map((v) => v.zone));
+  ok("premium.json có dữ liệu", premium.venues.length >= 20, String(premium.venues.length));
+  ok("mọi quán thuộc một vùng có thật", [...zones].every((z) => !!prices[z]),
+    [...zones].find((z) => !prices[z]) || "");
+  ok("quán nào cũng có tên và mức giá",
+    premium.venues.every((v) => v.name && v.band),
+    JSON.stringify(premium.venues.find((v) => !(v.name && v.band)) || null));
+  /* Mỗi dòng phải dẫn được tới nguồn. Một cái tên quán có thật đặt cạnh một
+     con số tiền mà không có đường kiểm chứng thì đọc ra như lời của Nón Lá,
+     và Nón Lá không hề đo mấy quán này. */
+  ok("quán nào cũng có đường dẫn nguồn", premium.venues.every((v) => !!v.src),
+    JSON.stringify(premium.venues.find((v) => !v.src) || null));
+  ok("premium.json ghi ngày tra", !!premium._lookupAt, premium._lookupAt || "");
+}
+
+/* ── nạp lại bộ giá menu phải ra đúng kết quả cũ ──────────
+   mergeBand lấy min ở p25 và max ở p95. Trộn vào chính kết quả lần trước thì
+   mỗi lần chạy dải lại nống ra một ít — đã đo được: chạy hai lần lệch 11 ô.
+   Mà tệp nhap-gia-menu.mjs sinh ra để chạy lại mỗi khi có xlsx mới. */
+console.log("\n── nạp lại bộ giá: chạy lại không trôi số ──");
+{
+  const goc = { p25: 15_000, p50: 25_000, p75: 35_000, p95: 50_000 };
+  const rows = [{ low: 50_000, high: 120_000 }];
+  const lan1 = mergeBand(goc, rows);
+  const sai = mergeBand(lan1, rows);              // trộn vào kết quả lần trước
+  const dung = mergeBand(goc, rows);              // trộn vào dải gốc — điều tool làm
+  /* Trôi ở đâu tuỳ ô: khi p25/p95 đã chạm hai đầu thì phần trôi rơi vào
+     giữa dải (p50 50k → 80k ở ví dụ này). Nên điều phải khẳng định là "khác
+     đi", chứ không phải "nống ra" — chốt vào một mốc cụ thể là bỏ lọt đúng
+     những ô trôi kiểu kia. */
+  ok("trộn vào kết quả lần trước thì dải trôi",
+    JSON.stringify(sai) !== JSON.stringify(lan1), JSON.stringify({ lan1, sai }));
+  eq("trộn vào dải gốc thì lần nào cũng như nhau", dung, lan1);
+
+  /* Và tệp đã ship phải giữ được dải gốc để làm việc đó. */
+  const sourced = Object.values(prices)
+    .flatMap((z) => Object.entries(z.items)).filter(([, it]) => it.sourced);
+  const coBase = sourced.filter(([, it]) => it.base);
+  ok("ô từng có dải cũ đều giữ lại dải gốc", coBase.length >= 50,
+    `${coBase.length}/${sourced.length}`);
+  ok("dải gốc luôn đủ bốn mốc",
+    coBase.every(([, it]) => ["p25", "p50", "p75", "p95"].every((k) => it.base[k] > 0)),
+    JSON.stringify(coBase.find(([, it]) =>
+      !["p25", "p50", "p75", "p95"].every((k) => it.base[k] > 0)) || null));
+  /* Dải gốc là số VIẾT TAY, không được lẫn cờ nguồn của lần nạp — nếu lẫn
+     thì lần chạy sau lại lấy nó làm base và vòng trôi số quay lại. */
+  ok("dải gốc không mang theo cờ sourced",
+    coBase.every(([, it]) => !it.base.sourced && !it.base.base));
 }
 
 console.log("\n════════════════════════════════════════════");
