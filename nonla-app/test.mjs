@@ -1258,6 +1258,19 @@ console.log("\n── menuref: tra món ngoài danh mục ───────�
   ok("và không bao giờ đọc ra là đã đo", !isMeasured(provenance(b, 0)));
   eq("phán quyết dùng được ngay", verdict(200_000, b).level, "high");
   eq("giá nằm trong dải là bình thường", verdict(95_000, b).level, "ok");
+
+  /* Dòng tra từ menuref phải ĐƯỢC ĐẾM trong câu tổng kết đầu tấm thẻ quét.
+     Bản đầu tiên dựng câu ấy bằng provOf(r.id), mà dòng menuref thì r.id là
+     null → bậc "none" → summary() lọc bỏ. Quét bốn dòng, cả bốn đều có dải
+     giá, mà tấm thẻ nói "for 2 dishes": app tự khai sai về chính việc nó vừa
+     làm. app.js giờ dựng bằng provOfRow(r), lấy dải ngay trong r.st. */
+  const catalogSeed = { p25: 50_000, p50: 70_000, p75: 90_000, p95: 130_000, n: 21, seed: true };
+  eq("dòng menuref được đếm chung với dòng danh mục",
+    trustSummary([provenance(catalogSeed, 0), provenance(b, 0)]),
+    "Compared against estimated ranges for 2 dishes");
+  ok("bỏ sót dòng menuref thì câu tổng kết đếm thiếu",
+    trustSummary([provenance(catalogSeed, 0), provenance(null, 0)])
+      !== trustSummary([provenance(catalogSeed, 0), provenance(b, 0)]));
 }
 
 /* ── dữ liệu tra từ menu đã nạp vào ───────────────────────

@@ -686,8 +686,7 @@ function rowHTML(r) {
      cái liếc mắt — tách ra là để lời khẳng định đi một mình. */
   /* Dòng tra từ menuref cũng phải mang nhãn nguồn. Bỏ trống ở đây là để
      một dải giá đi một mình đúng chỗ người đọc dễ tin nó nhất. */
-  const src = r.id ? Trust.badge(provOf(r.id))
-    : r.ref ? Trust.badge(Trust.provenance(r.st, 0)) : "";
+  const src = Trust.badge(provOfRow(r));
   const note = v.level === "unknown"
     ? T("Not enough data")
     : `${T("typical")} ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)}${src ? ` · ${src}` : ""}`;
@@ -714,6 +713,18 @@ const surveyedCount = (dishId, z = S.zone) => TALLY[`${z}|${dishId}`] || 0;
 
 /** Nguồn gốc dải giá của một món ở vùng đang mở. */
 const provOf = (dishId) => Trust.provenance(stat(dishId), surveyedCount(dishId), zone().updated);
+
+/* Nguồn gốc của MỘT DÒNG kết quả quét, không phải của một mã món.
+
+   Dòng tra từ menuref không có mã món trong danh mục 77 món, nên provOf(null)
+   trả về bậc "none" — và câu tổng kết đầu tấm thẻ đếm thiếu: quét bốn dòng,
+   cả bốn đều có dải giá, mà nó nói "compared against estimated ranges for 2
+   dishes". Một câu app tự nói sai về chính việc nó vừa làm.
+
+   Dải của dòng ấy nằm sẵn ở r.st. Số mẫu người dùng tự ghi thì bằng 0: TALLY
+   đánh theo mã món, mà dòng này không có mã món nào cả. */
+const provOfRow = (r) => (r.id ? provOf(r.id)
+  : Trust.provenance(r.st || null, 0, zone().updated));
 
 /* Khối "vì sao lại nói thế". Mặc định ĐÓNG.
    Người đang đứng trước quầy cần câu trả lời, không cần bài giảng về
@@ -920,7 +931,7 @@ function showMenuResult(rows, conf, traps = null) {
   /* Trước đây dòng này in "compared with ~34 nearby places", lấy trung
      bình trường n của các mục seed. Không có 34 quán nào — n của dữ liệu
      seed là số hư cấu. Trust.summary() nói đúng thứ đang có trong tay. */
-  const basis = Trust.summary(rows.map((r) => provOf(r.id)));
+  const basis = Trust.summary(rows.map(provOfRow));
 
   openSheet(`
     <h3>Menu · ${esc(z.name)}</h3>
