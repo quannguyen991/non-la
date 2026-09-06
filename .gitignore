@@ -18,3 +18,6 @@ nonla-app/data/_overpass_cache/
 # bộ nhớ đệm bytecode của Python trong tools/ — sinh lại được, không phải mã nguồn
 __pycache__/
 *.pyc
+
+# bản tải thô của sitemap GrabFood — 5MB giấy nháp, chạy lại lệnh là có
+docs/_sitemap-*.json

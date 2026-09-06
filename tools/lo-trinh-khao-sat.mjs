@@ -52,6 +52,19 @@ const byId = new Map(dishes.map((d) => [d.id, d]));
 const oGia = Object.keys(z.items);
 const quan = eateries.filter((e) => e.zone === ZONE);
 
+/* ── lớp quán thứ hai: sitemap GrabFood ─────────────────────
+   OSM cho toạ độ nhưng thưa tên phố (274/562 quán Hoàn Kiếm không có).
+   Sitemap công bố của GrabFood cho tên quán và tên phố nhưng KHÔNG có
+   toạ độ và KHÔNG có giá. Hai nguồn bù đúng chỗ thủng của nhau, nên
+   phiếu này gộp cả hai — và nói rõ dòng nào từ đâu.
+
+   Sinh bằng: node tools/quan-tu-sitemap.mjs */
+let themSitemap = [];
+try {
+  const sm = JSON.parse(readFileSync(join(GOC, "docs", `quan-sitemap-${ZONE}.json`), "utf8"));
+  themSitemap = sm.quan || [];
+} catch { /* chưa chạy quan-tu-sitemap.mjs — phiếu vẫn dựng được từ OSM */ }
+
 /* ── phố nào gợi ra món nào ─────────────────────────────────── */
 const pho = new Map();
 for (const e of quan) {
@@ -67,11 +80,26 @@ for (const e of quan) {
   }
 }
 
+/* Trộn lớp sitemap vào. Tên phố ở đó đã là slug, nên khôi phục về dạng
+   đọc được bằng cách gióng với tên phố OSM khi có; không có thì viết hoa
+   đầu từ. */
+const doc = (sl) => sl.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+for (const q of themSitemap) {
+  const ten = [...pho.keys()].find((k) =>
+    k.normalize("NFC").toLowerCase().replace(/^(phố|đường)\s+/, "").replace(/\s+/g, "-") === q.pho)
+    || doc(q.pho);
+  if (!pho.has(ten)) pho.set(ten, { ten, quan: [], mon: new Map(), tuSitemap: 0 });
+  const p = pho.get(ten);
+  p.tuSitemap = (p.tuSitemap || 0) + 1;
+  for (const id of q.mon || []) if (oGia.includes(id)) p.mon.set(id, Math.max(p.mon.get(id) || 0, 0.6));
+}
+
 /* Xếp phố: nhiều món gợi ra trước, rồi tới nhiều quán. Một buổi sáng có
    hạn, nên phố nào trả về nhiều ô giá nhất thì đi trước. */
 const dsPho = [...pho.values()]
   .filter((p) => p.mon.size > 0)
-  .sort((a, b) => b.mon.size - a.mon.size || b.quan.length - a.quan.length);
+  .sort((a, b) => b.mon.size - a.mon.size
+    || (b.quan.length + (b.tuSitemap || 0)) - (a.quan.length + (a.tuSitemap || 0)));
 
 /* ── món nào chưa phố nào gợi ra ────────────────────────────── */
 const daPhu = new Set(dsPho.flatMap((p) => [...p.mon.keys()]));
@@ -129,16 +157,19 @@ th{font:700 10px/1.4 system-ui,sans-serif;letter-spacing:.1em;text-transform:upp
   <b>${oGia.length * MIN_SAMPLES} lần gõ</b> · ${quan.length} quán OSM trong vùng</p>
 
 <p class="warn"><b>Phiếu này là gợi ý điểm xuất phát, không phải bản đồ đầy đủ.</b>
-Món được suy ra từ <i>tên quán</i> trên OpenStreetMap, nên nó chỉ thấy những quán tự đặt
-tên theo món — “Phở Thìn”, “Bánh mì Phượng”. Quán tên “Quán Ngon” bán mười món thì không
-suy ra được gì, và ${quan.length - [...pho.values()].reduce((s, p) => s + p.quan.length, 0)}
-quán trong vùng còn không có tên phố trong dữ liệu. Gặp bảng giá nào thì gõ bảng giá ấy,
-đừng bám phiếu.</p>
+Món được suy ra từ <i>tên quán</i>, nên nó chỉ thấy những quán tự đặt tên theo món —
+“Phở Thìn”, “Bánh mì Phượng”. Quán tên “Quán Ngon” bán mười món thì không suy ra được gì.
+Hai nguồn tên quán: OpenStreetMap (có toạ độ, nhưng ${quan.length - [...pho.values()].reduce((s2, p) => s2 + p.quan.length, 0)}
+quán không có tên phố) và sitemap công bố của GrabFood (có tên phố, <b>không có giá</b>).
+Vài phố dài — Bà Triệu, Hai Bà Trưng — chạy qua nhiều quận, nên khớp được tên phố không
+có nghĩa là quán ấy nằm trong khu này. Gặp bảng giá nào thì gõ bảng giá ấy, đừng bám phiếu.</p>
 
 <h2>Đi phố nào trước</h2>
 ${dsPho.slice(0, 14).map((p) => `<div class="pho">
   <b>${esc(p.ten)}</b>
-  <span class="q">${p.quan.length} quán · gợi ra ${p.mon.size} ô giá</span>
+  <span class="q">${p.quan.length + (p.tuSitemap || 0)} quán${
+    p.tuSitemap ? ` (${p.quan.length} có toạ độ, ${p.tuSitemap} từ sitemap)` : ""
+  } · gợi ra ${p.mon.size} ô giá</span>
   <div class="mon">${[...p.mon.entries()]
     .sort((a, b) => b[1] - a[1])
     .map(([id, c]) => `<span class="chip">${esc(ten(id))}<i> ${Math.round(c * 100)}%</i></span>`)
