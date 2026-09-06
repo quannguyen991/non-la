@@ -4509,6 +4509,291 @@
      "raoDon": false
     }
    ]
+  },
+  "ngoai-danh-muc/bun-oc/claude-haiku-4-5-20251001": {
+   "nhom": "ngoai-danh-muc",
+   "id": "bun-oc",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "How much should one bowl of bun oc cost at a street stall in Hanoi, Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 9,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 55000,
+    "med": 37500,
+    "cv": 0.202,
+    "ratio": 1.83
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs between 30,000 and 50,000 VND, with 40,000 VND being a common mid-range price as of recent years.\n\nIf you're looking for a single number: **40,000 VND**.",
+     "ms": 2296,
+     "so": [
+      30000,
+      50000,
+      40000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs between 30,000 and 50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard bowl as of recent years.\n\nPrices vary by stall location and reputation—busier, more established vendors in popular areas may charge toward the higher end, while smaller stalls in less touristy neighborhoods might be closer to 30,000 VND.",
+     "ms": 39196,
+     "so": [
+      30000,
+      50000,
+      40000,
+      30000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs between 40,000 and 80,000 VND, depending on the stall's location and reputation. Central areas and popular tourist spots tend toward the higher end, while local neighborhood stalls are usually on the lower end.\n\nA reasonable middle estimate would be around 50,000-60,000 VND for a standard bowl.",
+     "ms": 2762,
+     "so": [
+      40000,
+      80000,
+      50000,
+      60000
+     ],
+     "daiDien": 55000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs around 30,000–50,000 VND, with 40,000 VND being a common price point for a standard bowl in central areas.\n\nPrices vary by location and stall reputation—busier tourist areas or more established vendors might charge toward the higher end, while smaller stalls in local neighborhoods may be closer to 30,000 VND.",
+     "ms": 7896,
+     "so": [
+      30000,
+      50000,
+      40000,
+      30000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs between 40,000 and 80,000 VND, depending on the stall's location and reputation. Central tourist areas and more established vendors tend toward the higher end, while local neighborhood stalls are usually closer to 40,000-50,000 VND.\n\nA reasonable middle estimate would be around 50,000-60,000 VND for a standard bowl.",
+     "ms": 2653,
+     "so": [
+      40000,
+      80000,
+      40000,
+      50000,
+      50000,
+      60000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs between 30,000 and 50,000 VND, with 40,000 VND being a common price point as of recent years.\n\nThe exact price varies by stall location, quality, portion size, and whether it's in a touristy area versus a local neighborhood. Stalls in the Old Quarter or popular tourist zones may charge toward the higher end, while local stalls in residential areas tend to be closer to 30,000-35,000 VND.",
+     "ms": 3038,
+     "so": [
+      30000,
+      50000,
+      40000,
+      30000,
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical bowl of bún ốc (snail noodle soup) at a street stall in Hanoi costs around 40,000–60,000 VND, with 50,000 VND being a reasonable middle estimate for a standard portion.\n\nPrices vary by location and stall quality—busier tourist areas or better-known spots might charge slightly more, while neighborhood stalls in residential areas tend toward the lower end.",
+     "ms": 2142,
+     "so": [
+      40000,
+      60000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs between 25,000 and 40,000 VND, depending on the stall's location and quality. Central areas and popular tourist zones tend toward the higher end, while local neighborhood stalls are usually closer to 25,000–30,000 VND.\n\nA reasonable middle estimate would be around **30,000 VND**.",
+     "ms": 3888,
+     "so": [
+      25000,
+      40000,
+      25000,
+      30000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs between 30,000 and 50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard portion in 2024.\n\nPrices vary by stall location and quality—busier tourist areas or more established vendors may charge toward the higher end, while smaller neighborhood stalls might be closer to 30,000 VND.",
+     "ms": 6121,
+     "so": [
+      30000,
+      50000,
+      40000,
+      30000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bún ốc (snail noodle soup) at a street stall in Hanoi typically costs between 40,000 and 80,000 VND, depending on the stall's location and reputation. Central tourist areas and popular spots charge toward the higher end, while neighborhood stalls in local areas are closer to 40,000-50,000 VND.\n\nA reasonable middle estimate would be around **50,000-60,000 VND** for an average bowl at a typical street stall.",
+     "ms": 52840,
+     "so": [
+      40000,
+      80000,
+      40000,
+      50000,
+      50000,
+      60000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "ngoai-danh-muc/pha-lau/gpt-5.5": {
+   "nhom": "ngoai-danh-muc",
+   "id": "pha-lau",
+   "model": "gpt-5.5",
+   "hoi": "How much should one bowl of pha lau cost at a street stall in Ho Chi Minh City, Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 35000,
+    "med": 35000,
+    "cv": 0.068,
+    "ratio": 1.17
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "About `30,000 VND` for one bowl at a street stall in Ho Chi Minh City.",
+     "ms": 3983,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of phá lấu at a street stall in Ho Chi Minh City should cost about **35,000 VND**.",
+     "ms": 2319,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical street-stall bowl of **pha lau** in Ho Chi Minh City should cost about **35,000 VND**.",
+     "ms": 2126,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical street-stall bowl of `pha lau` in Ho Chi Minh City should cost about **35,000 VND**.",
+     "ms": 2875,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical bowl of **pha lau** at a street stall in Ho Chi Minh City should cost about **30,000 VND**.",
+     "ms": 2025,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A reasonable street-stall price for one bowl of phá lấu in Ho Chi Minh City is **35,000 VND**.",
+     "ms": 2009,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical street-stall bowl of phá lấu in Ho Chi Minh City should cost about **35,000 VND**.",
+     "ms": 2047,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical street-stall bowl of `pha lau` in Ho Chi Minh City should cost about **35,000 VND**.",
+     "ms": 13673,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical street-stall bowl of `pha lau` in Ho Chi Minh City should cost about **30,000 VND**.",
+     "ms": 2210,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical street-stall bowl of **pha lau** in Ho Chi Minh City should cost about **35,000 VND**.",
+     "ms": 2334,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
   }
  }
 }

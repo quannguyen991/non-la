@@ -1163,7 +1163,9 @@ function openTrip() {
     <p class="src">${trip.ngay.length} ${esc(T(trip.ngay.length === 1 ? "day" : "days"))} ·
       ${trip.soMon} ${esc(T(trip.soMon === 1 ? "dish" : "dishes"))} ·
       ${trip.vung.length} ${esc(T(trip.vung.length === 1 ? "area" : "areas"))}${
-      trip.chuyen.length ? ` · ${trip.chuyen.length} ${esc(T("dish stories"))}` : ""}</p>
+      trip.chuyen.length
+        ? ` · ${trip.chuyen.length} ${esc(T(trip.chuyen.length === 1 ? "dish story" : "dish stories"))}`
+        : ""}</p>
     ${wave()}
     ${trip.ngay.slice(0, 3).map((g) => `<div class="row" style="cursor:default">
       <span class="dot" data-l="ok"></span>
