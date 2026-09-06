@@ -42,6 +42,7 @@ import * as Units from "./units.js";
 import * as Predict from "./predict.js";
 import { inferDishes } from "./eaterydish.js";
 import * as Lich from "./lich.js";
+import * as HanhTrinh from "./hanhtrinh.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -1123,6 +1124,73 @@ async function openPostcard() {
   ]);
   if ($("#pcCanvas") !== cv) return;        // người dùng đã đóng thẻ trong lúc chờ
   Postcard.draw(cv, s, { name: localStorage.getItem("nl.name") || "", art });
+}
+
+/* ── trang hành trình ────────────────────────────────────────
+   Xem TRƯỚC rồi mới lưu. Bưu thiếp cho xem trước được vì nó là một tấm
+   ảnh vừa màn hình; trang này dài, nên phần xem trước là mấy dòng đầu
+   cộng con số — đủ để biết mình sắp lưu cái gì.
+
+   Ngôn ngữ chỉ nhận vi hoặc en: chuyện món mới có hai thứ tiếng đó, và
+   một trang nửa Hàn nửa Anh tệ hơn một trang trọn tiếng Anh. */
+function tripHienTai() {
+  return HanhTrinh.dungHanhTrinh(journal.all(), {
+    dishes: S.dishes || [], zoneNames: zoneNames(),
+  });
+}
+
+const tripLang = () => (curLang() === "vi" ? "vi" : "en");
+
+function openTrip() {
+  const trip = tripHienTai();
+  if (trip.rong) {
+    return openSheet(`<h3>${esc(T("Nothing to tell yet"))}</h3>
+      <p class="src">${esc(T("The page is built from prices you have read. Scan one menu and it has something to say."))}</p>
+      <button class="btn sec" data-act="close">Close</button>`);
+  }
+
+  openSheet(`
+    <h3>${esc(T("Your trip, as a page"))}</h3>
+    <p class="src">${trip.ngay.length} ${esc(T(trip.ngay.length === 1 ? "day" : "days"))} ·
+      ${trip.soMon} ${esc(T(trip.soMon === 1 ? "dish" : "dishes"))} ·
+      ${trip.vung.length} ${esc(T(trip.vung.length === 1 ? "area" : "areas"))}${
+      trip.chuyen.length ? ` · ${trip.chuyen.length} ${esc(T("dish stories"))}` : ""}</p>
+    ${wave()}
+    ${trip.ngay.slice(0, 3).map((g) => `<div class="row" style="cursor:default">
+      <span class="dot" data-l="ok"></span>
+      <span><span class="nm">${esc(g.duong.toLocaleDateString(tripLang() === "vi" ? "vi-VN" : "en-GB",
+        { day: "numeric", month: "short" }))}</span><span class="note">${
+        esc(tripLang() === "vi" ? g.amVi : g.amEn)}${g.vung.length ? ` · ${esc(g.vung[0])}` : ""}</span></span>
+      <span class="amt">${g.mon.length}</span>
+    </div>`).join("")}
+    ${trip.ngay.length > 3 ? `<p class="src">${esc(T("and"))} ${trip.ngay.length - 3} ${
+      esc(T("more days on the page"))}</p>` : ""}
+    <button class="btn pri" data-act="tripSave">${I.share}${esc(T("Save the page"))}</button>
+    <p class="seedwarn">${esc(T("Everything on the page comes from your own price checks on this phone. There is no line telling you how much you saved — nobody knows what you would have paid otherwise."))}</p>
+    <button class="btn sec" data-act="close">Close</button>`);
+}
+
+async function saveTrip() {
+  const trip = tripHienTai();
+  const lang = tripLang();
+  const html = HanhTrinh.trangHTML(trip, {
+    ten: localStorage.getItem("nl.name") || "", lang,
+  });
+  const name = HanhTrinh.tenTep(trip, lang);
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+
+  /* Cùng thứ tự với tấm bưu thiếp: bảng chia sẻ trước, tải về sau. Trên
+     điện thoại một tệp rơi vào thư mục Tải về là một tệp phải đi tìm. */
+  const file = new File([blob], name, { type: "text/html" });
+  if (navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: "Nón Lá" }); return; }
+    catch { /* người dùng đóng bảng chia sẻ — rơi xuống nhánh tải về */ }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 30_000);
+  toast(T("Trip page saved"));
 }
 
 /* Lưu ảnh. navigator.share TRƯỚC, tải về sau: trên điện thoại — chỗ app
@@ -3406,6 +3474,18 @@ function renderMe() {
         <small>${st.dishes} dish${st.dishes === 1 ? "" : "es"} and ${st.scans}
           price${st.scans === 1 ? "" : "s"} on one card you can send home</small></span>
     </button>` : ""}
+    ${/* Trang hành trình đứng cạnh bưu thiếp vì cùng một khoảnh khắc —
+         lúc ngồi ở sân bay nhớ lại — nhưng KHÔNG thay nhau. Bưu thiếp
+         là một tấm ảnh để đăng lên mạng: một khổ, vài con số, xong.
+         Trang này có chữ, có ngày âm, có chuyện của từng món đã ăn, và
+         đọc được sau ba năm khi máy chủ của dự án có thể đã không còn.
+         Gộp hai thứ vào một nút là buộc người ta chọn giữa thứ để khoe
+         và thứ để giữ. */""}
+    ${st.scans ? `<button class="pc-card" data-act="tripOpen">
+      <span class="pc-ic" aria-hidden="true">${I.spark}</span>
+      <span><b>${esc(T("Save your trip as a page"))}</b>
+        <small>${esc(T("Day by day, with the lunar date and the story behind each dish you ate. One file, opens anywhere, works offline."))}</small></span>
+    </button>` : ""}
 
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
@@ -4065,6 +4145,8 @@ document.addEventListener("click", async (ev) => {
   if (el("[data-act='surveyApply']")) return applyLocalPrices();
   if (el("[data-act='localDrop']")) return dropLocalPrices();
   if (el("[data-act='pcOpen']")) { closeSheet(); return openPostcard(); }
+  if (el("[data-act='tripOpen']")) { closeSheet(); return openTrip(); }
+  if (el("[data-act='tripSave']")) return saveTrip();
   if (el("[data-act='pcSave']")) return savePostcard();
   if (el("[data-act='taxStart']")) return taxStart(S.taxRows || []);
   if (el("[data-act='taxSwap']")) { S.tax.swapped = !S.tax.swapped; return renderTax(); }

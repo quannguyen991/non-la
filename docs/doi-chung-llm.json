@@ -1110,6 +1110,684 @@
      "raoDon": false
     }
    ]
+  },
+  "gia-co-du-lieu/comtam-q1/claude-haiku-4-5-20251001": {
+   "nhom": "gia-co-du-lieu",
+   "id": "comtam-q1",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm in District 1, Ho Chi Minh City. How much should one plate of com tam cost at a normal place here? Give me a number in VND.",
+   "zone": "hcmc-district1",
+   "dish": "com-tam",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 50000,
+    "p50": 80000,
+    "p75": 90000,
+    "p95": 140000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 5,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 40000,
+    "med": 33750,
+    "cv": 0.095,
+    "ratio": 1.33
+   },
+   "viTriSoVoiDai": "duoi",
+   "luot": [
+    {
+     "text": "A normal plate of com tam (broken rice) at a casual restaurant or com tam stall in District 1, Ho Chi Minh City typically costs between 25,000–40,000 VND, depending on the toppings and protein. A basic plate with a simple topping like grilled pork (com tam suon) runs around 30,000–35,000 VND. Fancier versions or places in more touristy areas might charge up to 50,000 VND, but that's on the higher end for the dish itself—not a specialty restaurant markup.\n\nIf you're eating at a street stall, you're more likely to pay 25,000–30,000 VND. At a sit-down restaurant in District 1, expect 35,000–40,000 VND.",
+     "ms": 3342,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000,
+      50000,
+      25000,
+      30000,
+      35000,
+      40000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal plate of cơm tấm (broken rice) at a casual eatery in District 1, Ho Chi Minh City typically costs around **30,000–50,000 VND**. You might find it cheaper at a very basic street stall (20,000–30,000 VND) or pay a bit more at a nicer establishment (50,000–70,000 VND), but for a standard, no-frills bowl with protein and vegetables, aim for the middle of that range—roughly **40,000 VND**.",
+     "ms": 14040,
+     "so": [
+      30000,
+      50000,
+      20000,
+      30000,
+      50000,
+      70000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of com tam (broken rice) at a casual eatery in District 1, Ho Chi Minh City typically costs around **25,000–35,000 VND**. \n\nThe exact price depends on what's included — a basic plate with just a fried egg and simple toppings might be closer to 25,000 VND, while one with grilled meat, more protein, or multiple sides could reach 35,000–40,000 VND. Nicer or more touristy spots in the district might charge slightly more.",
+     "ms": 3502,
+     "so": [
+      25000,
+      35000,
+      25000,
+      35000,
+      40000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal plate of cơm tấm at a casual eatery in District 1, Ho Chi Minh City typically costs around **25,000–35,000 VND**. \n\nIf it's a particularly simple spot or somewhere slightly off the main streets, you might find it closer to **20,000 VND**. Fancier or more touristy locations could push toward **40,000–50,000 VND**, but that's above the baseline for a standard comtam place.",
+     "ms": 6340,
+     "so": [
+      25000,
+      35000,
+      20000,
+      40000,
+      50000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of cơm tấm (broken rice) at a casual eatery in District 1, Ho Chi Minh City typically costs between 25,000–40,000 VND, depending on the specific spot and what's included. Basic versions with just grilled meat or egg run closer to 25,000–30,000 VND, while plates with richer toppings (like grilled pork chop, shrimp, and extras) reach 35,000–40,000 VND.\n\nIf you're at a restaurant with sit-down service rather than a street stall, you might pay slightly more. District 1 being central and touristy can push prices toward the higher end compared to outer districts, but a straightforward cơm tấm at a local spot should land in that 25,000–40,000 range.",
+     "ms": 4732,
+     "so": [
+      25000,
+      40000,
+      25000,
+      30000,
+      35000,
+      40000,
+      25000,
+      40000
+     ],
+     "daiDien": 32500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal plate of com tam (broken rice) at a casual restaurant or com tam shop in District 1, Ho Chi Minh City typically costs between 25,000–40,000 VND, depending on the protein and toppings. A basic version with just egg or simple protein runs around 25,000–30,000 VND, while one with grilled meat, pâté, or more substantial sides goes toward 35,000–40,000 VND.\n\nIf you're at a slightly nicer establishment or tourist-adjacent area in District 1, it could run higher—up to 50,000+ VND—but at a straightforward com tam stall or humble restaurant, expect the lower end of that range.",
+     "ms": 3073,
+     "so": [
+      25000,
+      40000,
+      25000,
+      30000,
+      35000,
+      40000,
+      50000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal plate of com tam (broken rice) at a casual restaurant or com tam shop in District 1, Ho Chi Minh City typically costs around 25,000–35,000 VND. Most places cluster around 30,000 VND for a standard plate with basic toppings like egg, pork, or grilled meat.\n\nIf you're eating at a slightly nicer spot or in a touristy area of District 1, you might see 35,000–50,000 VND. Street stalls or very casual local places could be closer to 20,000 VND, but 30,000 VND is a solid middle estimate for what you'd pay at a normal place.",
+     "ms": 2900,
+     "so": [
+      25000,
+      35000,
+      30000,
+      35000,
+      50000,
+      20000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of com tam (broken rice) at a casual eatery in District 1, Ho Chi Minh City typically costs around 25,000–35,000 VND. You might find it slightly cheaper at smaller stalls (20,000–25,000 VND) or slightly more at nicer establishments (35,000–45,000 VND), but 30,000 VND is a reasonable middle estimate for an average place.",
+     "ms": 2279,
+     "so": [
+      25000,
+      35000,
+      20000,
+      25000,
+      35000,
+      45000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of com tam (broken rice) at a casual eatery in District 1, Ho Chi Minh City typically costs around **25,000–35,000 VND**. \n\nIf it's a very basic, no-frills spot, you might find it closer to 20,000 VND. Slightly nicer establishments or those in high-foot-traffic areas could push toward 40,000 VND. But 30,000 VND is a solid middle estimate for a straightforward com tam with basic protein and vegetables.",
+     "ms": 2650,
+     "so": [
+      25000,
+      35000,
+      20000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A plate of com tam at a normal place in District 1, Ho Chi Minh City typically costs between 25,000 and 40,000 VND, depending on the specific restaurant and what's included. A straightforward plate with basic toppings and protein runs around 30,000-35,000 VND. Fancier spots or those catering to tourists might charge toward the higher end or beyond, while simpler local eateries could be closer to 25,000 VND.\n\nIf you want a single number: **30,000 VND** is a reasonable middle estimate for a standard plate.",
+     "ms": 2918,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000,
+      25000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "gia-co-du-lieu/miquang-dn/gpt-5.5": {
+   "nhom": "gia-co-du-lieu",
+   "id": "miquang-dn",
+   "model": "gpt-5.5",
+   "hoi": "I'm near the Han River in Da Nang. How much should one bowl of mi Quang cost at a normal place here? Give me a number in VND.",
+   "zone": "danang-hanriver",
+   "dish": "mi-quang",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 45000,
+    "p50": 60000,
+    "p75": 70000,
+    "p95": 100000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 2,
+   "daoDong": {
+    "n": 10,
+    "min": 35000,
+    "max": 50000,
+    "med": 40000,
+    "cv": 0.106,
+    "ratio": 1.43
+   },
+   "viTriSoVoiDai": "duoi",
+   "luot": [
+    {
+     "text": "A normal bowl of mi Quang near the Han River in Da Nang should be around **35,000 VND**.\n\nSmall local spots may be **25,000-40,000 VND**; tourist-facing places can be higher.",
+     "ms": 2504,
+     "so": [
+      35000,
+      25000,
+      40000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of mi Quang near the Han River in Da Nang should be about **40,000 VND**.\n\nAt a simple local place, roughly **30,000-50,000 VND** is normal. If it is a tourist-facing riverside spot, **60,000-80,000 VND** would not be surprising.",
+     "ms": 3368,
+     "so": [
+      40000,
+      30000,
+      50000,
+      60000,
+      80000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of mì Quảng near the Han River in Da Nang should be about **40,000 VND**.",
+     "ms": 2809,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of **mi Quang near the Han River in Da Nang** should cost about **40,000 VND**.\n\nAt a simple local spot, expect roughly **30,000-50,000 VND**. If it is a tourist-facing riverside place, **60,000-80,000 VND** is possible, but I would use **40,000 VND** as the fair baseline.",
+     "ms": 3193,
+     "so": [
+      40000,
+      30000,
+      50000,
+      60000,
+      80000,
+      40000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of mi Quang near the Han River in Da Nang should be about **40,000 VND**.\n\nTypical local range is roughly **30,000-50,000 VND** depending on toppings and whether the place is more tourist-facing.",
+     "ms": 2479,
+     "so": [
+      40000,
+      30000,
+      50000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal bowl of mi Quang near the Han River in Da Nang should cost about **40,000 VND**.\n\nAt a very local spot it may be closer to **30,000-35,000 VND**; in a tourist-facing or nicer casual place, **45,000-60,000 VND** is common.",
+     "ms": 2859,
+     "so": [
+      40000,
+      30000,
+      35000,
+      45000,
+      60000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **40,000 VND** for one bowl of mì Quảng at a normal local place near the Han River in Da Nang.\n\nA typical range is roughly **30,000-50,000 VND**; more touristy or nicer sit-down spots may charge **60,000+ VND**.",
+     "ms": 2661,
+     "so": [
+      40000,
+      30000,
+      50000,
+      60000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **40,000 VND** for one bowl at a normal local place near the Han River in Da Nang.\n\nA reasonable range is roughly **35,000-50,000 VND** depending on toppings and how touristy the spot is.",
+     "ms": 2462,
+     "so": [
+      40000,
+      35000,
+      50000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal bowl of mi Quang near the Han River in Da Nang should be about **35,000 VND**.\n\nAt a simple local place, expect roughly **30,000-45,000 VND**. Tourist-facing spots or places with seafood/special toppings may be higher.",
+     "ms": 2551,
+     "so": [
+      35000,
+      30000,
+      45000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **40,000 VND** for one bowl at a normal local place near the Han River in Da Nang.  \nA typical range is roughly **35,000-50,000 VND**, with tourist-facing spots often higher.",
+     "ms": 2386,
+     "so": [
+      40000,
+      35000,
+      50000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "gia-co-du-lieu/miquang-dn/claude-haiku-4-5-20251001": {
+   "nhom": "gia-co-du-lieu",
+   "id": "miquang-dn",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm near the Han River in Da Nang. How much should one bowl of mi Quang cost at a normal place here? Give me a number in VND.",
+   "zone": "danang-hanriver",
+   "dish": "mi-quang",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 45000,
+    "p50": 60000,
+    "p75": 70000,
+    "p95": 100000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 4,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 52500,
+    "med": 40000,
+    "cv": 0.178,
+    "ratio": 1.75
+   },
+   "viTriSoVoiDai": "duoi",
+   "luot": [
+    {
+     "text": "A normal bowl of mi Quang in Da Nang typically costs around 25,000–40,000 VND, depending on the specific shop and whether it includes extras like shrimp or crab. Most casual street vendors and neighborhood places fall in the 25,000–35,000 VND range. Tourist-oriented spots near the river might charge toward the higher end or beyond.",
+     "ms": 10520,
+     "so": [
+      25000,
+      40000,
+      25000,
+      35000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of mi Quang at a normal local place near the Han River in Da Nang typically costs between 30,000–50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard serving at a casual eatery or street vendor.\n\nPrices vary slightly by exact location and whether it's a tourist-adjacent spot versus a purely local place, but that range covers what you'd expect to pay at an ordinary restaurant rather than a high-end establishment.",
+     "ms": 3412,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of mi Quang at a normal local place near the Han River in Da Nang should cost around **40,000–60,000 VND**. \n\nTourist-adjacent areas might push toward 60,000–80,000 VND, while quieter local spots could be closer to 35,000–45,000 VND. The 40,000–60,000 range is a solid middle estimate for a standard bowl with pork, shrimp, or chicken at a regular eatery.",
+     "ms": 2137,
+     "so": [
+      40000,
+      60000,
+      60000,
+      80000,
+      35000,
+      45000,
+      40000,
+      60000
+     ],
+     "daiDien": 52500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of mi Quang at a normal local place near the Han River in Da Nang typically costs around **30,000–50,000 VND**, with most spots settling in the **35,000–45,000 VND** range.\n\nIf you're eating at a casual street stall or family-run restaurant right by the river, you might find it on the lower end. Tourist-facing spots or slightly more upscale casual restaurants will push toward the higher end. The price can also vary a bit depending on protein choice (shrimp, pork, chicken) and portion size, but that's the realistic ballpark for a standard bowl.",
+     "ms": 42010,
+     "so": [
+      30000,
+      50000,
+      35000,
+      45000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal bowl of mi Quang in Da Nang typically costs around 30,000–50,000 VND. Most casual local spots near the Han River would fall in that range, with 40,000 VND being a reasonable middle estimate for a standard serving.",
+     "ms": 2124,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of mi Quang at a normal local place near the Han River in Da Nang typically costs between 30,000 and 50,000 VND. If you're eating at a simple street stall or casual eatery, you're more likely toward the lower end—around 30,000 to 40,000 VND. A slightly nicer spot might charge 40,000 to 50,000 VND. Tourist-facing restaurants will charge more, sometimes double or triple that.\n\nFor a straightforward answer: **40,000 VND** is a reasonable middle estimate for a standard bowl at a normal place.",
+     "ms": 18265,
+     "so": [
+      30000,
+      50000,
+      30000,
+      40000,
+      40000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of mi Quang at a normal local place near the Han River in Da Nang typically costs between 25,000 and 40,000 VND, with 30,000 VND being a reasonable middle estimate for a standard serving.\n\nIf you're at a casual street stall or small restaurant in a local neighborhood, you'd likely pay closer to 25,000-30,000 VND. A slightly nicer spot or one catering more to tourists might charge 35,000-40,000 VND.",
+     "ms": 3582,
+     "so": [
+      25000,
+      40000,
+      30000,
+      25000,
+      30000,
+      35000,
+      40000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of mi Quang at a normal local place near the Han River in Da Nang typically costs around 40,000–60,000 VND. Most casual eateries and street food stalls in that area charge in that range. You might find slightly cheaper options (30,000–40,000 VND) at smaller, more basic vendors, or pay a bit more (60,000–80,000 VND) at restaurants with better seating or tourist-oriented locations, but the middle estimate of **50,000 VND** is a solid expectation for a standard bowl.",
+     "ms": 3437,
+     "so": [
+      40000,
+      60000,
+      30000,
+      40000,
+      60000,
+      80000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical bowl of mi Quang at a normal local place in Da Nang costs around 30,000–50,000 VND. Most casual eateries and street vendors will charge in that range. If you're eating at a slightly nicer restaurant away from heavy tourist areas, you might pay 40,000–60,000 VND. Tourist-heavy spots near the river can push higher, sometimes 60,000–80,000 VND or more.\n\nI'd estimate 40,000 VND as a solid middle ground for a standard bowl at a regular place.",
+     "ms": 12106,
+     "so": [
+      30000,
+      50000,
+      40000,
+      60000,
+      60000,
+      80000,
+      40000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of mi Quang at a normal local place near the Han River in Da Nang typically costs between 30,000 and 50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard serving.\n\nPrices vary depending on the specific location and whether it's a casual street stall versus a small restaurant, but that range covers what you'd expect to pay at an ordinary, non-touristy establishment in the area.",
+     "ms": 4076,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "gia-co-du-lieu/banhmi-ha/gpt-5.5": {
+   "nhom": "gia-co-du-lieu",
+   "id": "banhmi-ha",
+   "model": "gpt-5.5",
+   "hoi": "I'm in Hoi An Old Town. How much should one banh mi cost here? Give me a number in VND.",
+   "zone": "hoian-oldtown",
+   "dish": "banh-mi",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 30000,
+    "p50": 50000,
+    "p75": 60000,
+    "p95": 70000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 10,
+    "min": 27500,
+    "max": 40000,
+    "med": 27500,
+    "cv": 0.141,
+    "ratio": 1.45
+   },
+   "viTriSoVoiDai": "duoi",
+   "luot": [
+    {
+     "text": "A normal bánh mì in Hoi An Old Town should cost about **30,000 VND**.\n\nTouristy/famous spots may be **35,000-50,000 VND**, but if someone quotes much above that for a basic bánh mì, it is overpriced.",
+     "ms": 4284,
+     "so": [
+      30000,
+      35000,
+      50000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal local `banh mi` in Hoi An Old Town should cost about **25,000 VND**.\n\nTourist-famous spots or larger/special versions can be more like **30,000-45,000 VND**, but **25,000 VND** is a fair baseline number.",
+     "ms": 2819,
+     "so": [
+      25000,
+      30000,
+      45000,
+      25000
+     ],
+     "daiDien": 27500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal local banh mi in Hoi An Old Town should cost about **25,000 VND**.\n\nTourist-famous spots may charge more, often **30,000-50,000 VND**, but **25,000 VND** is the number I’d use as a fair baseline.",
+     "ms": 2972,
+     "so": [
+      25000,
+      30000,
+      50000,
+      25000
+     ],
+     "daiDien": 27500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical local **banh mi in Hoi An Old Town should cost about 25,000 VND**.\n\nTourist-famous spots can be higher, often around **30,000-45,000 VND**, but if you just want the fair street-food benchmark, use **25,000 VND**.",
+     "ms": 2672,
+     "so": [
+      25000,
+      30000,
+      45000,
+      25000
+     ],
+     "daiDien": 27500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical banh mi in Hoi An Old Town should cost about **25,000 VND**.\n\nAt very touristy or famous spots, **30,000-40,000 VND** is still normal, but for a regular street-style one, I’d use **25,000 VND** as the benchmark.",
+     "ms": 2772,
+     "so": [
+      25000,
+      30000,
+      40000,
+      25000
+     ],
+     "daiDien": 27500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A reasonable local price for one banh mi in Hoi An Old Town is about **25,000 VND**.\n\nTourist-heavy spots or famous shops may charge more, often **30,000-45,000 VND**, but **25,000 VND** is the number I’d use as a fair baseline.",
+     "ms": 2819,
+     "so": [
+      25000,
+      30000,
+      45000,
+      25000
+     ],
+     "daiDien": 27500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal banh mi in Hoi An Old Town should cost about **30,000 VND**.\n\nTourist-famous places may be closer to **35,000-45,000 VND**, but if someone quotes much above **50,000 VND** for a basic banh mi, that is high.",
+     "ms": 4106,
+     "so": [
+      30000,
+      35000,
+      45000,
+      50000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal local banh mi in Hoi An Old Town should cost about **25,000 VND**.\n\nTourist-famous spots or larger/special versions may be more like **30,000-50,000 VND**, but **25,000 VND** is the fair baseline number.",
+     "ms": 2855,
+     "so": [
+      25000,
+      30000,
+      50000,
+      25000
+     ],
+     "daiDien": 27500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal local `banh mi` in Hoi An Old Town should cost about **25,000 VND**.\n\nTourist-famous places can be more like **30,000-45,000 VND**, but if you want one fair number to anchor on: **25,000 VND**.",
+     "ms": 2613,
+     "so": [
+      25000,
+      30000,
+      45000,
+      25000
+     ],
+     "daiDien": 27500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal banh mi in Hoi An Old Town should cost about **25,000 VND**.\n\nTourist-famous places may charge more, often **30,000-45,000 VND**, but **25,000 VND** is a fair street-stall baseline.",
+     "ms": 2558,
+     "so": [
+      25000,
+      30000,
+      45000,
+      25000
+     ],
+     "daiDien": 27500,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
   }
  }
 }

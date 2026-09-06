@@ -30,6 +30,7 @@ import { classify, usableFor, rawBand, tidyBand, mergeBand, tidy } from "../tool
 import { amLich as amLichCua, duongLich as duongLichTu, tet as tetAm,
          canChiNam, conGiapEn, soNgayTrongThang as soNgayThangAm } from "./amlich.js";
 import { napLich, ghiChu as ghiChuLich, ngayChay as ngayChayLich } from "./lich.js";
+import { dungHanhTrinh, trangHTML, tenTep as tenTepTrip } from "./hanhtrinh.js";
 import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
          raoDon as raoDonLlm, daoDong as daoDongLlm, soVoiDai as soVoiDaiLlm,
          trungDapAn as trungDapAnLlm } from "../tools/llmparse.mjs";
@@ -1570,6 +1571,60 @@ console.log("\n── chuyện món ──────────────�
     ok("món gắn chặt với một vùng không có giá rải khắp nơi", lech.length === 0,
       JSON.stringify(lech.map((id) => [id, soVung(id)])));
   }
+}
+
+/* ── trang hành trình (hanhtrinh.js) ─────────────────────────
+   Trang này rời khỏi máy và người ta giữ nó lâu, nên hai luật của nó
+   đáng kiểm hơn cả bố cục: mọi con số là dữ liệu của chính người đọc,
+   và tệp phải tự chứa — mở được sau ba năm khi máy chủ dự án có thể
+   đã không còn. */
+console.log("\n── trang hành trình ────────────────────────");
+{
+  const ZN = { "hoian-oldtown": "Hội An · Phố cổ", "hue-citadel": "Huế · Kinh thành" };
+  const ng = (y, m, d, h = 12) => new Date(y, m - 1, d, h).getTime();
+  const nk = [
+    { ts: ng(2026, 9, 24), mode: "menu", id: "cao-lau", label: "Cao lầu", price: 55000, level: "ok", zone: "hoian-oldtown" },
+    { ts: ng(2026, 9, 24, 19), mode: "menu", id: "che-bap", label: "Chè bắp", price: 20000, level: "ok", zone: "hoian-oldtown" },
+    { ts: ng(2026, 9, 24, 20), mode: "cash", level: "ok", zone: "hoian-oldtown" },
+    { ts: ng(2026, 9, 26), mode: "menu", id: "com-hen", label: "Cơm hến", price: 25000, level: "ok", zone: "hue-citadel" },
+  ];
+  const trip = dungHanhTrinh(nk, { dishes, zoneNames: ZN });
+
+  eq("gom theo ngày, không theo lần quét", trip.ngay.length, 2);
+  eq("đếm đủ số lần quét", trip.soQuet, 4);
+  /* Đọc một tờ tiền là một lần dùng app, không phải một món ăn. */
+  eq("bản ghi đếm tiền không thành một món đã ăn", trip.soMon, 3);
+  eq("hai vùng", trip.vung.length, 2);
+  eq("ngày âm của 24/9/2026", trip.ngay[0].amEn, "Lunar 14/8");
+  eq("năm âm ra can chi được", trip.namAm, 2026);
+
+  /* Chuyện món CHỈ của món đã ăn. Kèm cả danh mục vào là biến cuốn nhật
+     ký của một người thành tờ rơi du lịch. */
+  ok("chỉ lấy chuyện của món đã ăn",
+    trip.chuyen.every((d) => ["cao-lau", "che-bap", "com-hen"].includes(d.id)),
+    JSON.stringify(trip.chuyen.map((d) => d.id)));
+
+  eq("nhật ký rỗng thì chuyến rỗng", dungHanhTrinh([], { dishes }).rong, true);
+
+  const html = trangHTML(trip, { ten: "Mai", lang: "en" });
+  /* Tự chứa: không một tham chiếu ra ngoài. Một trang giữ ba năm rồi mở
+     lại mà phông hay stylesheet đã 404 thì nó hỏng đúng lúc người ta
+     muốn đọc nó nhất. */
+  ok("trang không tham chiếu ra ngoài",
+    !/<(?:script|link)\b/i.test(html) && !/https?:\/\//i.test(html),
+    (html.match(/https?:\/\/[^\s"']+/) || [])[0] || "");
+  ok("trang có ngày âm", /Lunar 14\/8/.test(html));
+  ok("trang có tên người đi", /Mai/.test(html));
+  ok("trang có chuyện món đã ăn", /well|giếng/i.test(html));
+  /* Luật gốc: không có con số app không đo được. */
+  ok("trang không có dòng đã tiết kiệm được bao nhiêu",
+    !/\bsaved\b(?!.*nobody)/i.test(html.replace(/There is no line[^<]*/i, "")));
+  eq("trang tiếng Việt dùng chuyện tiếng Việt",
+    /giếng/.test(trangHTML(trip, { lang: "vi" })), true);
+  ok("nhật ký rỗng vẫn ra một trang đọc được",
+    /<\/div>/.test(trangHTML(dungHanhTrinh([], { dishes }), { lang: "en" })));
+  ok("tên tệp có ngày", /^non-la-trip-2026-09-24\.html$/.test(tenTepTrip(trip, "en")),
+    tenTepTrip(trip, "en"));
 }
 
 /* ── đọc câu trả lời của mô hình ngôn ngữ (tools/llmparse.mjs) ─
