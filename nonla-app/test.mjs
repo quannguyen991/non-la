@@ -32,6 +32,8 @@ import { amLich as amLichCua, duongLich as duongLichTu, tet as tetAm,
 import { napLich, ghiChu as ghiChuLich, ngayChay as ngayChayLich,
          chuaSoat as lichChuaSoat } from "./lich.js";
 import { dungHanhTrinh, trangHTML, tenTep as tenTepTrip } from "./hanhtrinh.js";
+import { heSo as ghHeSo, quyVeQuay, daiTuGiaoHang, moTa as ghMoTa,
+         MIN_CAP as GH_MIN_CAP } from "./giaohang.js";
 import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
          raoDon as raoDonLlm, daoDong as daoDongLlm, soVoiDai as soVoiDaiLlm,
          trungDapAn as trungDapAnLlm } from "../tools/llmparse.mjs";
@@ -1690,6 +1692,78 @@ console.log("\n── trang hành trình ─────────────
     /<\/div>/.test(trangHTML(dungHanhTrinh([], { dishes }), { lang: "en" })));
   ok("tên tệp có ngày", /^non-la-trip-2026-09-24\.html$/.test(tenTepTrip(trip, "en")),
     tenTepTrip(trip, "en"));
+}
+
+/* ── giá app giao hàng (giaohang.js) ──────────────────────────
+   Nguồn này với tới được xe đẩy và quán vỉa hè — đúng đầu rẻ mà menu
+   công bố không bao giờ thấy. Nhưng nó đã cộng hoa hồng nền tảng, nên
+   mọi phép thử ở đây canh đúng một chuyện: KHÔNG được để một con số
+   chưa quy đổi, hoặc quy bằng một hệ số không đáng tin, đi ra ngoài. */
+console.log("\n── giá app giao hàng ───────────────────────");
+{
+  const cap = (n, ti) => Array.from({ length: n }, (_, i) => ({
+    quay: 50_000, app: 50_000 * ti[i % ti.length] }));
+
+  /* Chưa đủ cặp thì KHÔNG có hệ số dùng được, dù mấy cặp ấy có đồng ý
+     với nhau đến đâu. Ba cặp đồng ý vẫn có thể là ba lần trùng hợp. */
+  eq("ít hơn ngưỡng thì chưa dùng được",
+    ghHeSo(cap(GH_MIN_CAP - 1, [1.15])).dungDuoc, false);
+  eq("đủ cặp và đồng ý thì dùng được",
+    ghHeSo(cap(GH_MIN_CAP + 3, [1.15, 1.2, 1.1])).dungDuoc, true);
+
+  const tot = ghHeSo(cap(8, [1.15, 1.2, 1.1, 1.18]));
+  ok("hệ số nằm quanh mức đo được", tot.heSo > 1.1 && tot.heSo < 1.25, String(tot.heSo));
+
+  /* Một cặp lệch quẻ — quán đang khuyến mãi, hoặc ghép nhầm cỡ suất —
+     không được kéo cả hệ số đi. Đây là lý do dùng trung vị. */
+  const coLacQue = ghHeSo([...cap(7, [1.15, 1.2, 1.1]), { quay: 50_000, app: 400_000 }]);
+  ok("một cặp lạc quẻ không kéo được hệ số", coLacQue.heSo < 1.3, String(coLacQue.heSo));
+
+  /* Hệ số phi lý thì phải TỪ CHỐI, không phải trả về rồi để người dùng
+     tự nghi. Hệ số 3,0 nghĩa là có cặp so một bát với một phần lớn. */
+  const phiLy = ghHeSo(cap(8, [3.0]));
+  eq("hệ số phi lý bị từ chối", phiLy.dungDuoc, false);
+  ok("và nói ra vì sao", /ngoài dải hợp lý/.test(phiLy.viSao), phiLy.viSao);
+
+  /* Các cặp không đồng ý với nhau thì cũng từ chối, dù trung vị có đẹp. */
+  const tanMac = ghHeSo(cap(9, [0.9, 1.1, 1.6, 0.85, 1.7]));
+  eq("cặp không đồng ý thì từ chối", tanMac.dungDuoc, false);
+  ok("và nói ra vì sao", /không đồng ý/.test(tanMac.viSao), tanMac.viSao);
+
+  /* Hệ số chưa dùng được thì KHÔNG có con số nào đi ra. Thà im lặng còn
+     hơn đưa một con số không có gì đứng sau — cùng luật với ô trống. */
+  eq("hệ số chưa dùng được thì không quy đổi", quyVeQuay(60_000, phiLy), null);
+  eq("hệ số chưa dùng được thì không có dải", daiTuGiaoHang([60_000, 70_000, 80_000], phiLy), null);
+
+  eq("quy về quầy là chia cho hệ số",
+    Math.round(quyVeQuay(57_500, ghHeSo(cap(8, [1.15])))), 50_000);
+
+  const giaApp = [57_500, 63_250, 69_000, 74_750, 80_500, 92_000];
+  const dai = daiTuGiaoHang(giaApp, tot);
+  /* Mọi mốc của dải quy về phải nằm DƯỚI mốc tương ứng của giá app —
+     quy đổi là chia cho một hệ số > 1, nên nếu có mốc nào không thấp đi
+     thì phép chia đã không chạy, hoặc phân vị đang lệch. */
+  {
+    const sx = [...giaApp].sort((a, b) => a - b);
+    const mocApp = { p25: sx[1], p50: sx[2], p75: sx[4], p95: sx[5] };
+    ok("mọi mốc của dải quy về đều thấp hơn giá app tương ứng",
+      ["p25", "p50", "p75", "p95"].every((k) => dai[k] < mocApp[k]),
+      JSON.stringify(dai));
+  }
+  eq("dải quy về luôn mang cờ suy ra", dai.suyRa, true);
+  eq("và mang đúng tên nguồn", dai.nguon, "delivery");
+  /* Cỡ mẫu của HỆ SỐ phải đi kèm, không chỉ cỡ mẫu của dải: 200 dòng app
+     chia cho một hệ số đo trên 3 cặp thì độ tin cậy bị chặn ở con số 3. */
+  eq("dải nói ra cỡ mẫu của chính hệ số", dai.heSoTuSoCap, tot.soCap);
+  ok("câu mô tả nói rõ đây không phải số đo tại quầy",
+    /Not a counter measurement/.test(ghMoTa(dai)), ghMoTa(dai));
+
+  eq("quá ít dòng app thì cũng không có dải", daiTuGiaoHang([60_000], tot), null);
+
+  /* Và nguồn delivery KHÔNG BAO GIỜ được vào dải qua đường pricesrc. */
+  eq("nguồn delivery không vào dải", vaoDai("delivery"), false);
+  ok("delivery không nằm trong danh sách nguồn quan sát",
+    !NGUON_QUAN_SAT.includes("delivery"), JSON.stringify(NGUON_QUAN_SAT));
 }
 
 /* ── đọc câu trả lời của mô hình ngôn ngữ (tools/llmparse.mjs) ─

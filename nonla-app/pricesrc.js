@@ -48,6 +48,9 @@ export const NGUON = {
   SURVEY: "survey",
   /** Đọc ra từ một tờ hoá đơn — thứ đã thực sự trả. */
   BILL: "bill",
+  /** Giá niêm yết trên một ứng dụng giao đồ ăn (ShopeeFood, GrabFood).
+   *  KHÔNG BAO GIỜ vào dải — xem giaohang.js. */
+  DELIVERY: "delivery",
 };
 
 /** Con số này nói về cái gì. */
@@ -97,6 +100,26 @@ export const MO_TA = {
     loai: LOAI.DA_TRA, ben: BEN.BEN_THU_BA, vaoDai: true,
     nhan: "from a bill",
     cau: "Read off a bill — what was actually charged",
+  },
+  /* GIÁ TRÊN ỨNG DỤNG GIAO ĐỒ ĂN — vì sao nó là một bậc riêng
+     Nó không giống `declared`: quán đặt giá ấy nhưng PHẢI bán đúng thế
+     cho mọi đơn thật, nên không nói dối xuống được. Nó cũng không giống
+     `scan`: chưa ai đứng ở quầy nhìn thấy nó, và nó đã cộng sẵn phần hoa
+     hồng nền tảng — một khoản KHÔNG ĐO ĐƯỢC nếu chỉ nhìn màn hình.
+
+     Giá trị của nó nằm ở chỗ khác hẳn: nó là nguồn duy nhất trên mạng
+     với tới được xe đẩy và quán vỉa hè — đúng cái đầu rẻ mà menu công bố
+     không bao giờ nhìn thấy (đo được: 53 ô nạp từ menu, p25 lên 0 lần).
+
+     Nhưng `vaoDai: false`. Một con số đã cộng hoa hồng mà thả vào dải là
+     đẩy cả dải lên, và đó đúng là lỗi vừa phải đi sửa ở menuband.mjs.
+     Đường ra là quy về giá quầy bằng một hệ số ĐO ĐƯỢC — xem giaohang.js
+     — và kết quả quy về ấy đứng ở khối riêng như predict.js, không trộn
+     vào các dòng đã đo. */
+  [NGUON.DELIVERY]: {
+    loai: LOAI.NIEM_YET, ben: BEN.NGUOI_BAN, vaoDai: false,
+    nhan: "delivery app",
+    cau: "Listed on a delivery app — includes the platform's markup",
   },
 };
 
