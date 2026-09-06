@@ -1881,3 +1881,17 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 /* Chấm cam của dòng cảnh báo bẫy đơn vị — cùng vai trò với .wdot của khối
    "vì sao", nên dùng chung kích thước để không phải học hai hệ ký hiệu. */
 .trapdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:#b5651d}
+
+/* ── lịch Việt ────────────────────────────────────────────
+   Dải mảnh, chỉ hiện những hôm có gì đáng nói — ba trăm ngày trong
+   năm nó không tồn tại. Nên nó được phép dùng màu; thứ hiếm mới đáng
+   một màu riêng. Viền trái chứ không phải nền đặc: nền đặc cạnh tấm
+   thẻ phán quyết giá sẽ tranh mắt với chính phán quyết ấy. */
+.lich{border-left:2px solid var(--vien-dam);padding:9px 0 9px 11px;margin:13px 0 4px}
+.lich[data-kind="denlong"]{border-left-color:var(--ho-phach)}
+.lichday{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muc-nhat);margin:0 0 4px}
+.lichline{font-size:13px;line-height:1.55;font-weight:400;color:var(--muc);margin:0}
+.lichin{font-size:11px;color:var(--muc-nhat);white-space:nowrap}
+.lichnote{font-size:10.5px;color:var(--muc-nhat);font-weight:300;line-height:1.5;margin:6px 0 0}
+.lich .fold{margin-top:7px}

@@ -130,6 +130,51 @@ export async function run({ verbose = true } = {}) {
   ck("cảnh báo viền bật ở mức cao", edgeLevel() === "high");
   ck("đọc đúng 2 dòng", $$("#sheetBody .row").length === 2);
 
+  /* ── lịch Việt trên thẻ kết quả ──────────────────────
+     Khối này chỉ đúng vào vài ngày trong tháng, nên nó nhận ngày từ
+     ngoài. Kiểm bằng ngày thật của máy thì hai mươi bảy hôm trong ba
+     mươi hôm phép thử không kiểm được gì cả — và đúng ba hôm nó kiểm
+     được thì không ai đang ngồi chạy nó. */
+  {
+    const co = (d) => {
+      const el = document.createElement("div");
+      el.innerHTML = A.lichHTML(d);
+      return el;
+    };
+    const zCu = A.S.zone;
+
+    /* Luật số một: ngày thường thì KHÔNG có khối nào. Kiểm luật này
+       trước, vì một khối nói chuyện mỗi ngày thì đến hôm mùng một thật
+       cũng bị lướt qua — và không phép thử nào khác bắt được điều đó. */
+    ck("ngày thường không hiện khối lịch", !co(new Date(2026, 8, 6)).querySelector(".lich"));
+
+    /* Mùng một: có khối, có đúng một dòng chính. */
+    const m1 = co(new Date(2026, 8, 11));
+    ck("mùng một hiện khối lịch", !!m1.querySelector(".lich"));
+    ck("khối lịch chỉ có MỘT dòng chính", m1.querySelectorAll(".lichline").length === 1,
+      `có ${m1.querySelectorAll(".lichline").length} dòng`);
+    ck("khối lịch có dòng ngày âm", !!m1.querySelector(".lichday"));
+
+    /* Đêm rằm phố cổ chỉ có ở Hội An. Rò sang vùng khác nghĩa là app
+       nói với khách ở Hà Nội rằng tối nay phố tắt đèn điện. */
+    A.S.zone = "hoian-oldtown";
+    const ha = co(new Date(2026, 8, 24)).textContent;
+    A.S.zone = "hanoi-hoankiem";
+    const hn = co(new Date(2026, 8, 24)).textContent;
+    A.S.zone = zCu;
+    ck("đêm lồng đèn chỉ hiện ở Hội An",
+      /lantern/i.test(ha) && !/lantern/i.test(hn));
+
+    /* Luật số ba: khối lịch KHÔNG được in ra một con số tiền nào. App
+       chưa đo giá ngày lễ; câu duy nhất nó được nói về tiền là dải
+       tham chiếu trên màn hình đo ngoài dịp lễ. */
+    const ngayLe = [[2027, 1, 6], [2026, 8, 25], [2026, 8, 24], [2026, 8, 11]]
+      .map(([y, m, d]) => co(new Date(y, m, d)).textContent).join(" ");
+    ck("khối lịch không in ra con số tiền nào",
+      !/\d[\d.,]*\s*(?:₫|đ\b|VND|dong)/i.test(ngayLe),
+      ngayLe.match(/\d[\d.,]*\s*(?:₫|đ\b|VND|dong)/i)?.[0] || "");
+  }
+
   /* ── dọn trạng thái khi đổi tab ─────────────────────── */
   A.go("eat"); await wait(350);
   ck("đổi tab thì đóng thẻ", !sheetOpen(), "thẻ còn mở đè lên tab mới");

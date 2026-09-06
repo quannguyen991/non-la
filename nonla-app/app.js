@@ -41,6 +41,7 @@ import * as Welcome from "./welcome.js";
 import * as Units from "./units.js";
 import * as Predict from "./predict.js";
 import { inferDishes } from "./eaterydish.js";
+import * as Lich from "./lich.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -802,6 +803,57 @@ const trapLineHTML = anToan(function (traps) {
     </details>`;
 });
 
+/* ── Lịch Việt ───────────────────────────────────────────────
+   Ngày âm lịch là thứ giải thích được những chỗ bảng giá không giải
+   thích nổi: quán phở đóng cửa sáng mùng một, hoa và đồ lễ đắt lên
+   quanh rằm tháng Bảy, phố cổ tắt đèn điện tối 14 âm.
+
+   BA LUẬT CỦA KHỐI NÀY
+
+   1. Ngày thường thì KHÔNG CÓ KHỐI NÀO. Ba trăm ngày trong năm không
+      có gì đáng nói. Một dải hiện ra mỗi lần quét là một dải người ta
+      học cách không nhìn — và đến hôm mùng một thật thì cũng bị lướt
+      qua. Giá trị của nó nằm ở chỗ nó hiếm.
+
+   2. MỘT dòng, không phải một khối cho mỗi ghi chú. Đúng bài học của
+      trapLineHTML: bốn hộp màu chen trên màn hình thì dìm mất chính
+      bảng giá — thứ người dùng đang đứng trước quầy cần đọc.
+
+   3. KHÔNG nói một con số giá nào. App chưa đo giá ngày lễ. Nó biết
+      chắc đúng một điều và chỉ được nói điều đó: dải tham chiếu trên
+      màn hình đo NGOÀI dịp lễ. Suy ra "rằm tháng Bảy hoa đắt gấp
+      rưỡi" là bịa một phép đo bằng kiến thức văn hoá — cùng một lỗi
+      với "so với ~34 quán quanh đây", chỉ khác nguyên liệu. */
+const lichHTML = anToan(function (khiNao = new Date()) {
+  if (!Lich.daNap()) return "";
+  const ghi = Lich.ghiChu(khiNao, S.zone);
+  if (!ghi.length) return "";
+
+  const dau = ghi[0];
+  const con = ghi.slice(1);
+  const ngay = Lich.dongNgay(khiNao);
+
+  /* Dải tham chiếu đo ngoài dịp lễ — nói ra khi và chỉ khi hôm nay là
+     dịp có thể làm lệch giá. Đây là câu duy nhất khối này được phép
+     nói về tiền. */
+  const veGia = ghi.some((g) => g.kind === "giale" || g.kind === "le");
+
+  return `
+    <div class="lich" data-kind="${esc(dau.kind)}">
+      <p class="lichday">${esc(curLang() === "vi" ? ngay.vi : ngay.en)}</p>
+      <p class="lichline">${esc(T(dau.en))}${
+        dau.khi === "sap-toi" && dau.conLai
+          ? ` <span class="lichin">${dau.conLai} ${esc(T(dau.conLai === 1 ? "day away" : "days away"))}</span>`
+          : ""}</p>
+      ${veGia ? `<p class="lichnote">${esc(T("The reference range above was measured outside festival periods."))}</p>` : ""}
+      ${con.length ? `<details class="fold"><summary>${
+        esc(con.length === 1 ? T("1 more note for today") : `${con.length} ${T("more notes for today")}`)
+      }</summary><div class="foldin">${
+        con.map((g) => `<p class="src">${esc(T(g.en))}</p>`).join("")
+      }</div></details>` : ""}
+    </div>`;
+});
+
 /* Dải giá SUY RA cho món vùng này chưa đo. Cố tình để thành một khối riêng,
    không trộn vào các dòng đã đo phía trên: một con số suy ra mà nằm cùng
    hàng với một con số đo được là đúng thứ trust.js sinh ra để chặn. */
@@ -939,6 +991,7 @@ function showMenuResult(rows, conf, traps = null) {
     ${wave()}
     ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">No prices found in that shot. Move closer, hold steady, or enter by hand.</p>`}
     ${trapLineHTML(traps)}
+    ${lichHTML()}
     ${/* Lối vào đếm tiền thối và so hai tấm thực đơn nằm trong khối gập bên
          dưới, không mất đi đâu — phần lớn người dùng quét THỰC ĐƠN rồi gọi
          món rồi trả tiền, nên hai lối đó vẫn phải có mặt ở màn này, chỉ là
@@ -4479,7 +4532,7 @@ async function boot() {
   // eateries.json là lớp "quanh đây có gì" lấy từ OpenStreetMap, KHÔNG phải
   // dữ liệu giá. Thiếu nó thì bản đồ vẫn chạy đủ — nên .catch về rỗng chứ
   // không để Promise.all đánh sập cả lượt khởi động vì một lớp phụ.
-  const [d, p, pl, mp, ea, ax, fm, tr, mr, pv] = await Promise.all([
+  const [d, p, pl, mp, ea, ax, fm, tr, mr, pv, lc] = await Promise.all([
     load("data/dishes.json"), load("data/prices.json"), load("data/places.json"),
     load("data/maps.json"),
     load("data/eateries.json").catch(() => ({ eateries: [] })),
@@ -4498,6 +4551,9 @@ async function boot() {
     // Quán thuộc phân khúc cao cấp. Lớp phụ: thiếu thì tab Nearby vắng một
     // khối, không phải đứng hình.
     load("data/premium.json").catch(() => ({ venues: [] })),
+    // Lịch Việt. Lớp phụ theo đúng nghĩa: thiếu nó thì app im về ngày âm,
+    // và im là hành vi ĐÚNG của khối này ba trăm ngày trong năm.
+    load("data/lich.json").catch(() => null),
   ]);
   S.assets = { icons: new Set(ax.icons || []), photos: new Set(ax.photos || []) };
   S.famous = fm.places || [];
@@ -4515,6 +4571,7 @@ async function boot() {
   S.menuRef = MenuRef.index(mr.items || []);
   S.menuRefAt = mr._lookupAt || "";
   S.premium = pv;
+  Lich.napLich(lc);
   /* Bản ghi quán ăn phải mang `zone`. Bản xuất cũ chỉ có Hội An và không
      có trường đó — nếu ai đó chạy app với tệp cũ thì lớp này sẽ biến mất
      lặng lẽ, nên suy ngược `zone` từ khung của từng vùng thay vì bỏ qua. */
@@ -4651,7 +4708,13 @@ onLang(() => {
 
 window.__nonla = { S, handleText, judgeRows, go, showDish, showPlace, ocr, doScan, Img,
   checkNearby, toggleWatch,
-  canSync, syncData, pullHistory };
+  canSync, syncData, pullHistory,
+  /* Khối lịch nhận NGÀY từ ngoài chứ không tự đọc đồng hồ, nên audit.js
+     kiểm được nó ở ngày mùng một, ngày rằm và đêm 14 âm mà không phải
+     chỉnh giờ máy. Đây cũng là lý do lichHTML() có tham số: một khối chỉ
+     đúng vào đúng ba ngày trong tháng mà chỉ kiểm được vào đúng ba ngày
+     ấy thì trên thực tế là không kiểm được. */
+  lichHTML };
 
 boot().catch((e) => { console.error(e); document.body.innerHTML =
   `<pre style="color:#fff;padding:20px;font:13px monospace">Failed to start: ${esc(e.message)}</pre>`; });
