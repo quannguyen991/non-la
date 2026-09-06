@@ -227,6 +227,8 @@ của cả sản phẩm, nên đáng bóc từng phần.</p>
       <td>Dòng nào tính theo trọng lượng (<code>/100g</code>, <i>/lạng</i>), dòng nào ghi <i>thời giá</i>, và phụ thu chưa gộp vào con số. App <b>không đoán trọng lượng</b> con cá trên bàn — nó chỉ ra dòng đó tính theo cân và đưa phép nhân để bạn hỏi rồi tự tính. <b>Một lạng = 100 gam.</b></td></tr>
   <tr><td><b>Not measured here — estimated from nearby zones</b><br><span style="font-weight:400;font-size:9pt;color:#6C7169">chỉ hiện khi có món chưa đo</span></td>
       <td>Món mà vùng này chưa có số đo nào, nhưng suy được từ các vùng khác. Là một khối <b>tách hẳn</b> khỏi các dòng phía trên — một con số suy ra nằm cùng hàng với một con số đo được là đúng thứ app tồn tại để chặn.</td></tr>
+  <tr><td><b>Dải lịch Việt</b><br><span style="font-weight:400;font-size:9pt;color:#6C7169">chỉ hiện những hôm có gì đáng nói</span></td>
+      <td>Dòng đầu là ngày âm lịch (<i>Lunar 14/8 · Year of the Horse</i>), dưới là một câu duy nhất về hôm nay: mùng một hay ngày rằm thì nhiều quán bán chay; ở Hội An đêm 14 âm thì phố cổ tắt đèn điện. Nếu hôm ấy là mùa lễ, có thêm một dòng nói rõ <b>dải giá tham chiếu bên trên đo ngoài dịp lễ</b> — app không biết giá ngày lễ cao hơn bao nhiêu và không nói điều đó. Còn ghi chú nữa thì gập lại. <b>Ba trăm ngày trong năm dải này không tồn tại.</b></td></tr>
   <tr><td><b>Enter by hand</b></td>
       <td>Luôn có, kể cả khi quét thành công — dùng để thêm một món OCR đọc sót.</td></tr>
   <tr><td><b>Check my change</b></td>
@@ -405,6 +407,15 @@ dành cho người kia.</p>
 
 <!-- ══════════════════ A8 ══════════════════ -->
 <div class="page">
+<h2 style="margin-top:9mm">A7.1 · Hai thứ mới trên tab Eat</h2>
+<table>
+  <tr><th style="width:30%">Phần</th><th>Nói gì</th></tr>
+  <tr><td><b>Dòng ngày chay</b><br><span style="font-weight:400;font-size:9pt;color:#6C7169">hai hôm mỗi tháng âm</span></td>
+      <td>Ngay dưới hàng chọn vùng: <i>“Many places serve vegetarian food today…”</i> App <b>không lọc bỏ</b> món mặn — quán vẫn bán và bạn vẫn có quyền gọi. Nói ra rồi để bạn tự chọn.</td></tr>
+  <tr><td><b>“Why this dish is here”</b><br><span style="font-weight:400;font-size:9pt;color:#6C7169">trên thẻ món, 22 trong 77 món có</span></td>
+      <td>Một đoạn ngắn về chỗ đứng của món: cao lầu chỉ có ở Hội An vì sợi mì làm bằng nước một cái giếng cổ; cơm hến dựng lên từ thứ sông Hương cho. Kết bằng một dòng <b>đếm thật từ bảng giá</b> — <i>“Priced in one of the six zones only.”</i> Món nào không trả lời được câu “vì sao ở đây” thì <b>không có khối này</b>.</td></tr>
+</table>
+
 <h1 class="ch" id="a8"><span class="n">A8</span>Tab Nearby</h1>
 
 <div class="shots two">
@@ -587,6 +598,26 @@ thay phần khung viền.</p>
 
 <!-- ══════════════════ A12 ══════════════════ -->
 <div class="page">
+<h2 style="margin-top:9mm">A11.1 · Trang hành trình</h2>
+<p>Nút <b>“Save your trip as a page”</b> nằm ngay dưới tấm bưu thiếp, và hai thứ này
+<b>không thay nhau</b>. Bưu thiếp là một ảnh để đăng lên mạng: một khổ, vài con số, xong.
+Trang hành trình là thứ để giữ.</p>
+<table>
+  <tr><th style="width:30%">Phần</th><th>Nói gì</th></tr>
+  <tr><td><b>Xem trước</b></td>
+      <td>Số ngày, số món, số vùng, số chuyện món — rồi ba ngày đầu, mỗi ngày một dòng kèm ngày âm.</td></tr>
+  <tr><td><b>Save the page</b></td>
+      <td>Xuất ra <b>một tệp HTML tự chứa</b>: không script, không liên kết ra ngoài, không phông tải về. Mở được trên máy bất kỳ, không cần mạng, và vẫn mở được sau nhiều năm. Trên điện thoại thì bảng chia sẻ hiện ra trước; không có thì tệp rơi vào thư mục Tải về.</td></tr>
+  <tr><td><b>Nội dung trang</b></td>
+      <td>Từng ngày với ngày âm lịch hôm ấy, món đã ăn kèm giá đã trả, rồi phần <i>“Why these dishes belong where you ate them”</i> — chuyện của <b>đúng những món bạn đã ăn</b>, không phải cả danh mục.</td></tr>
+</table>
+<div class="box">
+  <b>Thứ không có trên trang, và sẽ không bao giờ có</b>
+  Không có dòng “bạn đã tiết kiệm được bao nhiêu”. App không biết bạn sẽ trả bao nhiêu
+  nếu không tra giá — và một con số tiết kiệm bịa ra, trên đúng cái trang người ta đem
+  đi khoe, là kiểu nói dối lan xa nhất mà sản phẩm này có thể phạm phải.
+</div>
+
 <h1 class="ch" id="a12"><span class="n">A12</span>Khảo sát giá</h1>
 <p class="lead">Màn hình viết cho một người đang đứng trước quầy: một tay cầm điện thoại,
 mắt liếc bảng giá, người bán đang nhìn. Mười giây một món.</p>
