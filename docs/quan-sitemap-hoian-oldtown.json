@@ -1,0 +1,258 @@
+{
+ "_note": "Tên quán và tên phố đọc từ sitemap công bố của GrabFood. KHÔNG có giá — thực đơn nạp bằng JavaScript và trình duyệt tự động bị chặn (đo 06/09/2026). Dùng để dựng lộ trình đi khảo sát, không dùng để dựng dải giá.",
+ "_dauNhanDang": "Vùng này dùng chung sitemap với vùng khác, nên chỉ nhận quán có dấu nhận dạng trong tên. Tên phố không đủ để phân biệt: tên phố Việt Nam lặp ở mọi thành phố.",
+ "zone": "hoian-oldtown",
+ "layLuc": "2026-09-06",
+ "soTrangQuet": 19224,
+ "soQuanKhopPho": 26,
+ "pho": [
+  {
+   "pho": "hai-bà-trưng",
+   "quan": 6,
+   "mon": [
+    "com-ga-hoi-an",
+    "che"
+   ]
+  },
+  {
+   "pho": "nguyễn-phúc-chu",
+   "quan": 3,
+   "mon": [
+    "pho-bo",
+    "tra-sua"
+   ]
+  },
+  {
+   "pho": "cửa-đại",
+   "quan": 2,
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "pho": "thái-phiên",
+   "quan": 1,
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "pho": "trần-phú",
+   "quan": 1,
+   "mon": [
+    "com-ga-hoi-an"
+   ]
+  },
+  {
+   "pho": "nguyễn-trường-tộ",
+   "quan": 1,
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "pho": "hùng-vương",
+   "quan": 3,
+   "mon": []
+  },
+  {
+   "pho": "phan-châu-trinh",
+   "quan": 3,
+   "mon": []
+  },
+  {
+   "pho": "trần-hưng-đạo",
+   "quan": 2,
+   "mon": []
+  },
+  {
+   "pho": "lý-thường-kiệt",
+   "quan": 2,
+   "mon": []
+  },
+  {
+   "pho": "nguyễn-thái-học",
+   "quan": 1,
+   "mon": []
+  },
+  {
+   "pho": "bạch-đằng",
+   "quan": 1,
+   "mon": []
+  }
+ ],
+ "quan": [
+  {
+   "ten": "sữa dừa nguyên vị bánh mì hội an mô ri 48 thái phiên hội an",
+   "pho": "thái-phiên",
+   "url": "https://food.grab.com/vn/vi/restaurant/sữa-dừa-nguyên-vị-bánh-mì-hội-an-mô-ri-48-thái-phiên-hội-an-delivery/5-C8BJBGCKLTAGGA",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "gà nướng mắm nhĩ phú quý 45 47 hùng vương hội an",
+   "pho": "hùng-vương",
+   "url": "https://food.grab.com/vn/vi/restaurant/gà-nướng-mắm-nhĩ-phú-quý-45-47-hùng-vương-hội-an-delivery/5-C8A1PF3GAPMAT2",
+   "mon": []
+  },
+  {
+   "ten": "tiệm trà sữa và ăn vặt mk mk milktea fast food cửa đại hội an",
+   "pho": "cửa-đại",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-trà-sữa-và-ăn-vặt-mk-mk-milktea-fast-food-cửa-đại-hội-an--delivery/5-C6VDGGLXAZNCVJ",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "cơm gà hội an a bom trần phú",
+   "pho": "trần-phú",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-hội-an-a-bom-trần-phú-delivery/5-C7EYJ3DFAKB2C2",
+   "mon": [
+    "com-ga-hoi-an"
+   ]
+  },
+  {
+   "ten": "highlands coffee 654 hai bà trưng hội an",
+   "pho": "hai-bà-trưng",
+   "url": "https://food.grab.com/vn/vi/restaurant/highlands-coffee-654-hai-bà-trưng-hội-an-delivery/5-C76VLBUKRZLWAT",
+   "mon": []
+  },
+  {
+   "ten": "trà bí đao chia chia hội an hùng vương",
+   "pho": "hùng-vương",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-bí-đao-chia-chia-hội-an-hùng-vương-delivery/5-CYV1PB4JGCA2E2",
+   "mon": []
+  },
+  {
+   "ten": "kfc hai bà trưng hội an",
+   "pho": "hai-bà-trưng",
+   "url": "https://food.grab.com/vn/vi/restaurant/kfc-hai-bà-trưng-hội-an-delivery/5-C3MERT6JCJJHA2",
+   "mon": []
+  },
+  {
+   "ten": "cô hồng quán ăn đường phố hội an 05 nguyễn phúc chu",
+   "pho": "nguyễn-phúc-chu",
+   "url": "https://food.grab.com/vn/vi/restaurant/cô-hồng-quán-ăn-đường-phố-hội-an-05-nguyễn-phúc-chu-delivery/5-C74WT7NEEU2JTN",
+   "mon": [
+    "pho-bo"
+   ]
+  },
+  {
+   "ten": "les artisan indochine hội an đường cửa đại",
+   "pho": "cửa-đại",
+   "url": "https://food.grab.com/vn/vi/restaurant/les-artisan-indochine-hội-an-đường-cửa-đại-delivery/5-C4D3J6EBGUUWCA",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà buôi hội an chicken rice 642 hai bà trưng hai bà trưng 51000",
+   "pho": "hai-bà-trưng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-buôi-hội-an-chicken-rice-642-hai-bà-trưng-hai-bà-trưng-51000-delivery/5-C75CKCEUGPAJTA",
+   "mon": [
+    "com-ga-hoi-an"
+   ]
+  },
+  {
+   "ten": "quán nhậu thành an 573 hai bà trưng phường hội an",
+   "pho": "hai-bà-trưng",
+   "url": "https://food.grab.com/vn/vi/restaurant/quán-nhậu-thành-an-573-hai-bà-trưng-phường-hội-an-delivery/5-C8CUFEJZA7UYTA",
+   "mon": []
+  },
+  {
+   "ten": "lotteria hội an hùng vương",
+   "pho": "hùng-vương",
+   "url": "https://food.grab.com/vn/vi/restaurant/lotteria-hội-an-hùng-vương-delivery/5-C4JZKCCGL66FN2",
+   "mon": []
+  },
+  {
+   "ten": "highlands coffee 69 nguyễn phúc chu hội an",
+   "pho": "nguyễn-phúc-chu",
+   "url": "https://food.grab.com/vn/vi/restaurant/highlands-coffee-69-nguyễn-phúc-chu-hội-an-delivery/5-C4C3LPTKLCBAUA",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì phố cổ hội an nguyễn trường tộ",
+   "pho": "nguyễn-trường-tộ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-phố-cổ-hội-an-nguyễn-trường-tộ-delivery/5-C7EDC7UZT3UBAT",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "mỳ cay 7 cấp độ phan châu trinh hội an",
+   "pho": "phan-châu-trinh",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-cay-7-cấp-độ-phan-châu-trinh-hội-an-delivery/5-C74FCA43SFCDEE",
+   "mon": []
+  },
+  {
+   "ten": "phúc long trần hưng đạo hội an",
+   "pho": "trần-hưng-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/phúc-long-trần-hưng-đạo-hội-an-delivery/5-C76FNLEBGE5WGT",
+   "mon": []
+  },
+  {
+   "ten": "phê la phan châu trinh hội an",
+   "pho": "phan-châu-trinh",
+   "url": "https://food.grab.com/vn/vi/restaurant/phê-la-phan-châu-trinh-hội-an-delivery/5-C4AJL2AWN3KJRN",
+   "mon": []
+  },
+  {
+   "ten": "tiệm chị hai hội an 75 trần hưng đạo",
+   "pho": "trần-hưng-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-chị-hai-hội-an-75-trần-hưng-đạo-delivery/5-C3D2RRNZTLBCTT",
+   "mon": []
+  },
+  {
+   "ten": "trà bí đao chia chia hội an lý thường kiệt",
+   "pho": "lý-thường-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-bí-đao-chia-chia-hội-an-lý-thường-kiệt-delivery/5-CZKCVNKDHAEDAE",
+   "mon": []
+  },
+  {
+   "ten": "maison marou café hội an nguyễn thái học",
+   "pho": "nguyễn-thái-học",
+   "url": "https://food.grab.com/vn/vi/restaurant/maison-marou-café-hội-an-nguyễn-thái-học-delivery/5-C8BWARLJLUWETN",
+   "mon": []
+  },
+  {
+   "ten": "yi he kao nai hội an trà sữa nướng nguyễn phúc chu",
+   "pho": "nguyễn-phúc-chu",
+   "url": "https://food.grab.com/vn/vi/restaurant/yi-he-kao-nai-hội-an-trà-sữa-nướng-nguyễn-phúc-chu-delivery/5-C3J2A7LZTBJVSA",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "lasimi 27 phan châu trinh hội an",
+   "pho": "phan-châu-trinh",
+   "url": "https://food.grab.com/vn/vi/restaurant/lasimi-27-phan-châu-trinh-hội-an-delivery/5-C6XZLXTCTGNXN2",
+   "mon": []
+  },
+  {
+   "ten": "ẩm thực hội an 626 hai bà trưng",
+   "pho": "hai-bà-trưng",
+   "url": "https://food.grab.com/vn/vi/restaurant/ẩm-thực-hội-an-626-hai-bà-trưng-delivery/5-C7CATXNYRN5UNX",
+   "mon": []
+  },
+  {
+   "ten": "chè bà thọ 621 4 hai bà trưng hội an",
+   "pho": "hai-bà-trưng",
+   "url": "https://food.grab.com/vn/vi/restaurant/chè-bà-thọ-621-4-hai-bà-trưng-hội-an-delivery/5-C74YPFTYGCABN2",
+   "mon": [
+    "che"
+   ]
+  },
+  {
+   "ten": "nhà bán ốc lý thường kiệt hội an",
+   "pho": "lý-thường-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-bán-ốc-lý-thường-kiệt-hội-an--delivery/5-C72JAUTFR2BWTT",
+   "mon": []
+  },
+  {
+   "ten": "highlands coffee 62 bạch đằng hội an",
+   "pho": "bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/highlands-coffee-62-bạch-đằng-hội-an-delivery/5-C8EBJ3DBSBJDAT",
+   "mon": []
+  }
+ ]
+}

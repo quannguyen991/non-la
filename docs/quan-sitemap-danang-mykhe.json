@@ -1,0 +1,3023 @@
+{
+ "_note": "Tên quán và tên phố đọc từ sitemap công bố của GrabFood. KHÔNG có giá — thực đơn nạp bằng JavaScript và trình duyệt tự động bị chặn (đo 06/09/2026). Dùng để dựng lộ trình đi khảo sát, không dùng để dựng dải giá.",
+ "_dauNhanDang": "Vùng này dùng chung sitemap với vùng khác, nên chỉ nhận quán có dấu nhận dạng trong tên. Tên phố không đủ để phân biệt: tên phố Việt Nam lặp ở mọi thành phố.",
+ "zone": "danang-mykhe",
+ "layLuc": "2026-09-06",
+ "soTrangQuet": 19224,
+ "soQuanKhopPho": 437,
+ "pho": [
+  {
+   "pho": "nguyễn-công-trứ",
+   "quan": 50,
+   "mon": [
+    "tra-sua",
+    "goi-cuon",
+    "bun-cha-ca",
+    "banh-mi",
+    "nuoc-mia",
+    "sinh-to",
+    "nuoc-ep",
+    "lau"
+   ]
+  },
+  {
+   "pho": "châu-thị-vĩnh-tế",
+   "quan": 81,
+   "mon": [
+    "tra-sua",
+    "banh-mi",
+    "ca-phe-muoi",
+    "sinh-to",
+    "nuoc-ep",
+    "lau"
+   ]
+  },
+  {
+   "pho": "phạm-cự-lượng",
+   "quan": 41,
+   "mon": [
+    "ca-phe-muoi",
+    "tra-sua",
+    "banh-mi",
+    "banh-xeo",
+    "nuoc-mia",
+    "mi-quang"
+   ]
+  },
+  {
+   "pho": "nguyễn-văn-thoại",
+   "quan": 66,
+   "mon": [
+    "tra-sua",
+    "lau",
+    "banh-mi",
+    "mi-quang"
+   ]
+  },
+  {
+   "pho": "phạm-văn-đồng",
+   "quan": 38,
+   "mon": [
+    "banh-xeo",
+    "banh-mi",
+    "nuoc-ep",
+    "tra-sua"
+   ]
+  },
+  {
+   "pho": "lê-quang-đạo",
+   "quan": 13,
+   "mon": [
+    "banh-mi",
+    "lau",
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "pho": "trần-bạch-đằng",
+   "quan": 18,
+   "mon": [
+    "nuoc-ep",
+    "banh-mi",
+    "ca-phe-muoi"
+   ]
+  },
+  {
+   "pho": "tô-hiến-thành",
+   "quan": 11,
+   "mon": [
+    "sinh-to",
+    "nuoc-ep",
+    "banh-mi"
+   ]
+  },
+  {
+   "pho": "chính-hữu",
+   "quan": 7,
+   "mon": [
+    "kem-bo",
+    "sinh-to",
+    "banh-mi"
+   ]
+  },
+  {
+   "pho": "võ-nguyên-giáp",
+   "quan": 14,
+   "mon": [
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "pho": "hà-bổng",
+   "quan": 9,
+   "mon": [
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "pho": "mai-thúc-lân",
+   "quan": 8,
+   "mon": [
+    "mi-quang",
+    "tra-sua"
+   ]
+  },
+  {
+   "pho": "võ-văn-kiệt",
+   "quan": 8,
+   "mon": [
+    "bia-chai",
+    "mi-quang"
+   ]
+  },
+  {
+   "pho": "lê-hữu-trác",
+   "quan": 27,
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "pho": "đặng-vũ-hỷ",
+   "quan": 9,
+   "mon": [
+    "mi-quang"
+   ]
+  },
+  {
+   "pho": "dương-đình-nghệ",
+   "quan": 8,
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "pho": "hoài-thanh",
+   "quan": 5,
+   "mon": [
+    "lau"
+   ]
+  },
+  {
+   "pho": "phan-liêm",
+   "quan": 4,
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "pho": "ung-văn-khiêm",
+   "quan": 3,
+   "mon": [
+    "banh-xeo"
+   ]
+  },
+  {
+   "pho": "phan-tôn",
+   "quan": 3,
+   "mon": [
+    "mi-quang"
+   ]
+  },
+  {
+   "pho": "hoàng-kế-viêm",
+   "quan": 5,
+   "mon": []
+  },
+  {
+   "pho": "hoàng-bích-sơn",
+   "quan": 3,
+   "mon": []
+  },
+  {
+   "pho": "dương-tự-minh",
+   "quan": 2,
+   "mon": []
+  },
+  {
+   "pho": "hà-chương",
+   "quan": 2,
+   "mon": []
+  },
+  {
+   "pho": "nguyễn-hữu-thông",
+   "quan": 1,
+   "mon": []
+  },
+  {
+   "pho": "lý-văn-tố",
+   "quan": 1,
+   "mon": []
+  }
+ ],
+ "quan": [
+  {
+   "ten": "ẩm thực chất bánh canh mực 34 đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/ẩm-thực-chất-bánh-canh-mực-34-đặng-vũ-hỷ-delivery/5-C7EGUBKCA6BFJ6",
+   "mon": []
+  },
+  {
+   "ten": "nazare indian nhà hàng ấn độ 02 võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/nazare-indian-nhà-hàng-ấn-độ-02-võ-nguyên-giáp-delivery/5-C7JBJTVFNGADCA",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa tocotoco 152 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-tocotoco-152-châu-thị-vĩnh-tế-delivery/5-C7LZVTMYV6E3UA",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "b b bakery 192 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/b-b-bakery-192-nguyễn-văn-thoại-delivery/5-C6TUC2D1VKUAVX",
+   "mon": []
+  },
+  {
+   "ten": "bếp nhà tô bánh canh xôi vò cơm nắm nhật dương đình nghệ",
+   "pho": "dương-đình-nghệ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bếp-nhà-tô-bánh-canh-xôi-vò-cơm-nắm-nhật-dương-đình-nghệ-delivery/5-C4N3LFWZJBVDJT",
+   "mon": []
+  },
+  {
+   "ten": "nước ép trái cây coffee thanh hà 10 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/nước-ép-trái-cây-coffee-thanh-hà-10-trần-bạch-đằng-delivery/5-C4AGT4AEE6VTVJ",
+   "mon": [
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "mỹ bò né 10 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỹ-bò-né-10-phạm-văn-đồng-delivery/5-C3MDAFNHHANGL6",
+   "mon": []
+  },
+  {
+   "ten": "ăn vặt sài gòn jun s food châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/ăn-vặt-sài-gòn-jun-s-food-châu-thị-vĩnh-tế--delivery/5-C2VFDB5CABVUSA",
+   "mon": []
+  },
+  {
+   "ten": "cháo dinh dưỡng tâm vang phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cháo-dinh-dưỡng-tâm-vang-phạm-cự-lượng-delivery/5-CZJETVDXLTLCTA",
+   "mon": []
+  },
+  {
+   "ten": "vita bloom kombucha greek yogurt pickled tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/vita-bloom-kombucha-greek-yogurt-pickled-tô-hiến-thành-delivery/5-C76TVFBYNRKCGX",
+   "mon": []
+  },
+  {
+   "ten": "morning coffee châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/morning-coffee-châu-thị-vĩnh-tế-delivery/5-C4EFJ4AUG32AJN",
+   "mon": []
+  },
+  {
+   "ten": "chân gà nướng hai còi 08 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/chân-gà-nướng-hai-còi-08-nguyễn-văn-thoại-delivery/5-CZC1CUDYJVKGMA",
+   "mon": []
+  },
+  {
+   "ten": "mì cay kimchee hàn quốc 7 cấp độ 94 3 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-cay-kimchee-hàn-quốc-7-cấp-độ-94-3-lê-hữu-trác-delivery/5-C4LBKFNBRP6EAT",
+   "mon": []
+  },
+  {
+   "ten": "her coffee phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/her-coffee-phạm-cự-lượng-delivery/5-C7BYLEL1LU6UGT",
+   "mon": []
+  },
+  {
+   "ten": "koi thé nguyễn văn thoại đà nẵng",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/koi-thé-nguyễn-văn-thoại-đà-nẵng-delivery/5-C76VKGCZVLMZGT",
+   "mon": []
+  },
+  {
+   "ten": "highlands coffee nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/highlands-coffee-nguyễn-văn-thoại-delivery/5-CZCXR8NZUAKAAX",
+   "mon": []
+  },
+  {
+   "ten": "tắt bật takeaway cafe lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/tắt-bật-takeaway-cafe-lê-hữu-trác-delivery/5-C3WWUBB3GKBXN6",
+   "mon": []
+  },
+  {
+   "ten": "webe coffee trà trái cây bơ xay 14 nguyễn hữu thông",
+   "pho": "nguyễn-hữu-thông",
+   "url": "https://food.grab.com/vn/vi/restaurant/webe-coffee-trà-trái-cây-bơ-xay-14-nguyễn-hữu-thông-delivery/5-C6MFJXKUPB41JN",
+   "mon": []
+  },
+  {
+   "ten": "trái cây ngâm chấm sốt thái ruốc kho thuỷ huế châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/trái-cây-ngâm-chấm-sốt-thái-ruốc-kho-thuỷ-huế-châu-thị-vĩnh-tế-delivery/5-C8A1LFEXE6NWVX",
+   "mon": []
+  },
+  {
+   "ten": "mì quảng ông tý mai thúc lân",
+   "pho": "mai-thúc-lân",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-quảng-ông-tý-mai-thúc-lân-delivery/5-C74YL2VYWEMDJE",
+   "mon": [
+    "mi-quang"
+   ]
+  },
+  {
+   "ten": "cháo vịt gỏi vịt cháo lòng lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/cháo-vịt-gỏi-vịt-cháo-lòng-lê-hữu-trác-delivery/5-C3AGCLCZSGAFNN",
+   "mon": []
+  },
+  {
+   "ten": "chidori izakaya 123 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/chidori-izakaya-123-châu-thị-vĩnh-tế-delivery/5-C64ATNNHEXVKJ6",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa m 50 tea trà sữa ăn vặt 39 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-m-50-tea-trà-sữa-ăn-vặt-39-nguyễn-công-trứ-delivery/5-C4BWLGMFJ8LBC2",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "higlo coco nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/higlo-coco-nguyễn-công-trứ-delivery/5-C3MERYMVG74YJX",
+   "mon": []
+  },
+  {
+   "ten": "cơm tấm kim ngân châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-tấm-kim-ngân-châu-thị-vĩnh-tế-delivery/5-C3KAVB53AVAWWE",
+   "mon": []
+  },
+  {
+   "ten": "quán chay an tịnh viên kiệt 291 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/quán-chay-an-tịnh-viên-kiệt-291-phạm-văn-đồng-delivery/5-C74XEN5HVKVCAN",
+   "mon": []
+  },
+  {
+   "ten": "à ngon cơm nắm cà phê muối phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/à-ngon-cơm-nắm-cà-phê-muối-phạm-cự-lượng-delivery/5-C4KJLENJKFEZUA",
+   "mon": [
+    "ca-phe-muoi"
+   ]
+  },
+  {
+   "ten": "nướng lưu thị ẩm thực tứ xuyên phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/nướng-lưu-thị-ẩm-thực-tứ-xuyên-phạm-văn-đồng-delivery/5-C73XEJ3FWB3TUE",
+   "mon": []
+  },
+  {
+   "ten": "tiệm ăn vua vịt quay phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-ăn-vua-vịt-quay-phạm-cự-lượng-delivery/VNGFVN000008e7",
+   "mon": []
+  },
+  {
+   "ten": "ăn vặt trà trái cây hoài hí hững châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/ăn-vặt-trà-trái-cây-hoài-hí-hững-châu-thị-vĩnh-tế-delivery/5-C33BCTAKLEUDJT",
+   "mon": []
+  },
+  {
+   "ten": "tiệm cơm nhỏ phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-cơm-nhỏ-phạm-văn-đồng-delivery/5-C8BCN3VAC2TZDE",
+   "mon": []
+  },
+  {
+   "ten": "facaktea 235 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/facaktea-235-phạm-văn-đồng-delivery/5-C7D1WEWFN4NYTX",
+   "mon": []
+  },
+  {
+   "ten": "gà rán five star 73 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/gà-rán-five-star-73-phạm-cự-lượng-delivery/5-C7CGC65CKBEGCE",
+   "mon": []
+  },
+  {
+   "ten": "bongo minitea phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bongo-minitea-phạm-văn-đồng-delivery/5-C3KTJU5CAXV2VT",
+   "mon": []
+  },
+  {
+   "ten": "như ý cháo dinh dưỡng như ý 278 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/như-ý-cháo-dinh-dưỡng-như-ý-278-nguyễn-công-trứ-delivery/5-C8A3GUDDVEVJVJ",
+   "mon": []
+  },
+  {
+   "ten": "katinat 256 võ nguyên giáp đà nẵng",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/katinat-256-võ-nguyên-giáp-đà-nẵng-delivery/5-C73UCRKETETXHA",
+   "mon": []
+  },
+  {
+   "ten": "nhà thuốc pharmacity 124 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-thuốc-pharmacity-124-phạm-cự-lượng-delivery/5-C6KWFEKUMCJHN6",
+   "mon": []
+  },
+  {
+   "ten": "cháo dinh dưỡng cao cấp sao mai 224 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cháo-dinh-dưỡng-cao-cấp-sao-mai-224-nguyễn-công-trứ-delivery/5-C75GCT4ATAEDE2",
+   "mon": []
+  },
+  {
+   "ten": "bundau chat thực phẩm tiện lợi châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bundau-chat-thực-phẩm-tiện-lợi-châu-thị-vĩnh-tế-delivery/5-C6BZKGKKWGCBFE",
+   "mon": []
+  },
+  {
+   "ten": "l kitchen gà rán món hàn 41 tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/l-kitchen-gà-rán-món-hàn-41-tô-hiến-thành-delivery/5-C8C3C6DZNTXZA2",
+   "mon": []
+  },
+  {
+   "ten": "highlands coffee 102 phạm văn đồng huế",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/highlands-coffee-102-phạm-văn-đồng-huế-delivery/5-C4AGRZNHNPEAN2",
+   "mon": []
+  },
+  {
+   "ten": "hương quê quán châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/hương-quê-quán-châu-thị-vĩnh-tế-delivery/5-C2M3LAVTE6WZT6",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì khói 34 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-khói-34-lê-hữu-trác-delivery/5-C2EAEXVKGP3GTJ",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "cơm hến bún hến o gái 311 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-hến-bún-hến-o-gái-311-phạm-văn-đồng-delivery/5-C73HCJDKRAEEVX",
+   "mon": []
+  },
+  {
+   "ten": "tổ cha tổ hợp trà trà sữa châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/tổ-cha-tổ-hợp-trà-trà-sữa-châu-thị-vĩnh-tế-delivery/5-C75KJKAVSBU1V2",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "mì kung fu 225 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-kung-fu-225-nguyễn-văn-thoại-delivery/5-C63BACJUVVJJFA",
+   "mon": []
+  },
+  {
+   "ten": "fresh fruit đà thành lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/fresh-fruit-đà-thành-lê-hữu-trác-delivery/5-C4NZAKCYTTT3NX",
+   "mon": []
+  },
+  {
+   "ten": "gà rán five star 178 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/gà-rán-five-star-178-phạm-cự-lượng-delivery/5-C2VUAPDDAELKAE",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà xối mỡ duyên 131 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-xối-mỡ-duyên-131-nguyễn-công-trứ-delivery/5-C26XRTDDLBUBET",
+   "mon": []
+  },
+  {
+   "ten": "bello pizza 222 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bello-pizza-222-trần-bạch-đằng-delivery/5-C8CKJ4JXAEV3R6",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà ngũ vị châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-ngũ-vị-châu-thị-vĩnh-tế-delivery/5-CZMBAYVACBKJLX",
+   "mon": []
+  },
+  {
+   "ten": "tiệm tàu hũ tươi covang 107 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-tàu-hũ-tươi-covang-107-châu-thị-vĩnh-tế-delivery/5-C7DTJJEUG3KWCA",
+   "mon": []
+  },
+  {
+   "ten": "siêu thị auminimart 61 chính hữu",
+   "pho": "chính-hữu",
+   "url": "https://food.grab.com/vn/vi/restaurant/siêu-thị-auminimart-61-chính-hữu-delivery/5-C7WYUFNULZE3HA",
+   "mon": []
+  },
+  {
+   "ten": "hủ tiếu sài gòn xưa nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/hủ-tiếu-sài-gòn-xưa-nguyễn-công-trứ-delivery/5-C2KBRFUAEE4ZKE",
+   "mon": []
+  },
+  {
+   "ten": "tiệm ăn chợ lớn dương đình nghệ",
+   "pho": "dương-đình-nghệ",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-ăn-chợ-lớn-dương-đình-nghệ-delivery/VNGFVN000009g0",
+   "mon": []
+  },
+  {
+   "ten": "love mì cay kimchee hàn quốc 94 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/love-mì-cay-kimchee-hàn-quốc-94-lê-hữu-trác-delivery/5-C4KARAKXVF2KJ2",
+   "mon": []
+  },
+  {
+   "ten": "cà ri võ văn kiệt",
+   "pho": "võ-văn-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/cà-ri-võ-văn-kiệt-delivery/5-C4KVTUCETBTHGA",
+   "mon": []
+  },
+  {
+   "ten": "coco coffee hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/coco-coffee-hà-bổng-delivery/5-C2WTEVCXBAKKTT",
+   "mon": []
+  },
+  {
+   "ten": "kem dừa cô ba nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/kem-dừa-cô-ba-nguyễn-công-trứ-delivery/5-C4LALVBKVYNFKE",
+   "mon": []
+  },
+  {
+   "ten": "phúc long nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/phúc-long-nguyễn-văn-thoại-delivery/5-C8CVAX3UPF6ARJ",
+   "mon": []
+  },
+  {
+   "ten": "roadhouse american diner lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/roadhouse-american-diner-lê-quang-đạo-delivery/5-CY6DRCDEUEUAJE",
+   "mon": []
+  },
+  {
+   "ten": "fa s healthy drinks food 268 võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/fa-s-healthy-drinks-food-268-võ-nguyên-giáp-delivery/5-C23JAX5VCFAEVA",
+   "mon": []
+  },
+  {
+   "ten": "chị mơ cơm bình dân phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/chị-mơ-cơm-bình-dân-phạm-văn-đồng-delivery/5-C4BVR3BZRUKDCT",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà cơm chiên minh nhật nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-cơm-chiên-minh-nhật-nguyễn-văn-thoại-delivery/5-C7CGE73XE6JAL6",
+   "mon": []
+  },
+  {
+   "ten": "tiệm trà trái cây tươi n92 số 97 tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-trà-trái-cây-tươi-n92-số-97-tô-hiến-thành-delivery/5-C8CGETNJCKLHKA",
+   "mon": []
+  },
+  {
+   "ten": "nhà thuốc pharmacity số 18 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-thuốc-pharmacity-số-18-nguyễn-văn-thoại-delivery/5-C8A2PAAHGXKKGE",
+   "mon": []
+  },
+  {
+   "ten": "cơm tấm lê quang đạo bồ công anh f b",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-tấm-lê-quang-đạo-bồ-công-anh-f-b-delivery/5-CZCKNAL1R7N1DE",
+   "mon": []
+  },
+  {
+   "ten": "mì cay 7 cấp độ chili seoul lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-cay-7-cấp-độ-chili-seoul-lê-hữu-trác-delivery/5-C6BTJXKTGTNZTX",
+   "mon": []
+  },
+  {
+   "ten": "moonmilk market võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/moonmilk-market-võ-nguyên-giáp-delivery/5-C8DWN2WCN23KJ6",
+   "mon": []
+  },
+  {
+   "ten": "adr tiệm trái cây cắt sẵn fresh fruit lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/adr-tiệm-trái-cây-cắt-sẵn-fresh-fruit-lê-hữu-trác-delivery/5-C7UDEK6CCNAEGT",
+   "mon": []
+  },
+  {
+   "ten": "quán ăn gạc măng rê cơm văn phòng đ21 ung văn khiêm",
+   "pho": "ung-văn-khiêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/quán-ăn-gạc-măng-rê-cơm-văn-phòng-đ21-ung-văn-khiêm-delivery/5-C66KGE2ULXMDGE",
+   "mon": []
+  },
+  {
+   "ten": "mỳ quảng phú chiêm 08 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-quảng-phú-chiêm-08-nguyễn-văn-thoại-delivery/5-C6EZA8K1RU23A2",
+   "mon": []
+  },
+  {
+   "ten": "mcdonald’s nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/mcdonald’s-nguyễn-văn-thoại-delivery/5-C7XTRK6VLUNKHA",
+   "mon": []
+  },
+  {
+   "ten": "radio coffee dương tự minh",
+   "pho": "dương-tự-minh",
+   "url": "https://food.grab.com/vn/vi/restaurant/radio-coffee-dương-tự-minh-delivery/5-C2WDHF32EUWKRT",
+   "mon": []
+  },
+  {
+   "ten": "mart sài gòn v hải thực phẩm tươi sạch 149b châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/mart-sài-gòn-v-hải-thực-phẩm-tươi-sạch-149b-châu-thị-vĩnh-tế-delivery/5-C2XTT3JWV6W2TA",
+   "mon": []
+  },
+  {
+   "ten": "bánh xèo quảng ngãi phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-xèo-quảng-ngãi-phạm-văn-đồng-delivery/5-C76TAECXKGJHAJ",
+   "mon": [
+    "banh-xeo"
+   ]
+  },
+  {
+   "ten": "bánh mì bánh bao ba hưng bakery 207 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-bánh-bao-ba-hưng-bakery-207-châu-thị-vĩnh-tế-delivery/5-C8DAAEVCHBDBEE",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "chic kafe hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/chic-kafe-hà-bổng-delivery/5-C62CRYVHVT33GX",
+   "mon": []
+  },
+  {
+   "ten": "auminimart 34 võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/auminimart-34-võ-nguyên-giáp-delivery/5-C72BT4JUJU5HSE",
+   "mon": []
+  },
+  {
+   "ten": "bún đậu mắm tôm chất 2 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-đậu-mắm-tôm-chất-2-châu-thị-vĩnh-tế-delivery/5-C3VKJXTKR6NERT",
+   "mon": []
+  },
+  {
+   "ten": "cửa hàng durex pharmacity 189 nguyễn văn thoại đà nẵng",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/cửa-hàng-durex-pharmacity-189-nguyễn-văn-thoại-đà-nẵng-delivery/5-C6UDVTCESGCCCT",
+   "mon": []
+  },
+  {
+   "ten": "highlands coffee 233 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/highlands-coffee-233-nguyễn-văn-thoại-delivery/5-C76TRXECFAJYWE",
+   "mon": []
+  },
+  {
+   "ten": "duyên cơm gà xối mỡ nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/duyên-cơm-gà-xối-mỡ-nguyễn-văn-thoại-delivery/5-C6NVFFLYTETXBE",
+   "mon": []
+  },
+  {
+   "ten": "happy mart phan tôn",
+   "pho": "phan-tôn",
+   "url": "https://food.grab.com/vn/vi/restaurant/happy-mart-phan-tôn-delivery/5-C6LTRFKJT3LVV2",
+   "mon": []
+  },
+  {
+   "ten": "yen yakiniku sushi sashimi cơm nhật nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/yen-yakiniku-sushi-sashimi-cơm-nhật-nguyễn-văn-thoại-delivery/5-C7LANA3CENAKLN",
+   "mon": []
+  },
+  {
+   "ten": "ông nhị đặc sản nem nướng nha trang đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/ông-nhị-đặc-sản-nem-nướng-nha-trang-đặng-vũ-hỷ-delivery/5-C7EKNNLWAPNJGN",
+   "mon": []
+  },
+  {
+   "ten": "halal mc doner lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/halal-mc-doner-lê-quang-đạo-delivery/5-C6V2PEUYLJDDNT",
+   "mon": []
+  },
+  {
+   "ten": "kem bơ sinh tố take away chính hữu",
+   "pho": "chính-hữu",
+   "url": "https://food.grab.com/vn/vi/restaurant/kem-bơ-sinh-tố-take-away-chính-hữu-delivery/5-CZEUVX4DEECZRX",
+   "mon": [
+    "kem-bo",
+    "sinh-to"
+   ]
+  },
+  {
+   "ten": "sensen banh mi coffee 125 lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/sensen-banh-mi-coffee-125-lê-quang-đạo-delivery/5-C7U3L4JBRCBEJX",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "swancha 106 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/swancha-106-phạm-văn-đồng-delivery/5-C64KKBA1EJJXAT",
+   "mon": []
+  },
+  {
+   "ten": "chị bé bo bún lòng xào nghệ gỏi cuốn và đồ uống nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/chị-bé-bo-bún-lòng-xào-nghệ-gỏi-cuốn-và-đồ-uống-nguyễn-công-trứ-delivery/5-C3MAKFMVAEMHCT",
+   "mon": [
+    "goi-cuon"
+   ]
+  },
+  {
+   "ten": "88 xiên nướng 118 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/88-xiên-nướng-118-trần-bạch-đằng-delivery/5-C76FRAX2GTEFCJ",
+   "mon": []
+  },
+  {
+   "ten": "xà gỗ thép xưởng bia 88 võ văn kiệt",
+   "pho": "võ-văn-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/xà-gỗ-thép-xưởng-bia-88-võ-văn-kiệt-delivery/5-C8CWC4BBJLABRT",
+   "mon": [
+    "bia-chai"
+   ]
+  },
+  {
+   "ten": "zin zin tea lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/zin-zin-tea-lê-hữu-trác-delivery/5-C7UDE3AFA63YEX",
+   "mon": []
+  },
+  {
+   "ten": "anh quân bakery 179 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/anh-quân-bakery-179-châu-thị-vĩnh-tế-delivery/5-C8AJTYNUAE2VGX",
+   "mon": []
+  },
+  {
+   "ten": "h coffee phan tôn",
+   "pho": "phan-tôn",
+   "url": "https://food.grab.com/vn/vi/restaurant/h-coffee-phan-tôn-delivery/VNGFVN00000977",
+   "mon": []
+  },
+  {
+   "ten": "a lộc bún riêu bún chả cá nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/a-lộc-bún-riêu-bún-chả-cá-nguyễn-công-trứ-delivery/5-C74FT2NHN7TCNX",
+   "mon": [
+    "bun-cha-ca"
+   ]
+  },
+  {
+   "ten": "bánh mì cơm tấm littel sài gòn xôi mặn berger chính hữu",
+   "pho": "chính-hữu",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-cơm-tấm-littel-sài-gòn-xôi-mặn-berger-chính-hữu-delivery/5-C75GR8EHA6WEC2",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "yên detox nước ép sinh tố 96 tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/yên-detox-nước-ép-sinh-tố-96-tô-hiến-thành-delivery/5-C6LGHFKURAVZEX",
+   "mon": [
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "1999 nước ép sinh tố trái cây cắt sẵn ăn vặt võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/1999-nước-ép-sinh-tố-trái-cây-cắt-sẵn-ăn-vặt-võ-nguyên-giáp-delivery/5-C3A2E6VCEX2JV2",
+   "mon": [
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "izakaya yoiyoi 265 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/izakaya-yoiyoi-265-nguyễn-công-trứ-delivery/5-C8BCRZLDGGNGNA",
+   "mon": []
+  },
+  {
+   "ten": "ẩm thực gánh bún đậu mắm tôm châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/ẩm-thực-gánh-bún-đậu-mắm-tôm-châu-thị-vĩnh-tế-delivery/5-CYWHVU6UA2KUTA",
+   "mon": []
+  },
+  {
+   "ten": "tiệm nhà ximi phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-nhà-ximi-phạm-văn-đồng-delivery/5-C7JJENTZKF3VGN",
+   "mon": []
+  },
+  {
+   "ten": "xôi chiên anh mập châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/xôi-chiên-anh-mập-châu-thị-vĩnh-tế-delivery/5-C2EWHFM1VKLUVN",
+   "mon": []
+  },
+  {
+   "ten": "tiệm trà rio 134 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-trà-rio-134-phạm-văn-đồng-delivery/5-C8CFVY5URE2ZJX",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà 52 bình đăk lăk châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-52-bình-đăk-lăk-châu-thị-vĩnh-tế-delivery/5-C2NYBCKEN74YUE",
+   "mon": []
+  },
+  {
+   "ten": "ba anh bakery banh mi burger nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/ba-anh-bakery-banh-mi-burger-nguyễn-công-trứ-delivery/5-C3KFBA43CRN1G6",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "bếp cô thảo nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bếp-cô-thảo-nguyễn-công-trứ-delivery/5-C2UGDAMBRP4ZN2",
+   "mon": []
+  },
+  {
+   "ten": "vegetarian nam hương kitchen chay nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/vegetarian-nam-hương-kitchen-chay-nguyễn-văn-thoại-delivery/5-C7AHCX2YTATKEA",
+   "mon": []
+  },
+  {
+   "ten": "trứng ngon đà nẵng 134 dương đình nghệ",
+   "pho": "dương-đình-nghệ",
+   "url": "https://food.grab.com/vn/vi/restaurant/trứng-ngon-đà-nẵng-134-dương-đình-nghệ-delivery/5-C3VDSGM3JJCTTE",
+   "mon": []
+  },
+  {
+   "ten": "mrp bingsu tea nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/mrp-bingsu-tea-nguyễn-văn-thoại-delivery/5-C2UZLTMXNUWZN6",
+   "mon": []
+  },
+  {
+   "ten": "phê coffee the garden open 24 7 01 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/phê-coffee-the-garden-open-24-7-01-trần-bạch-đằng-delivery/5-C4MEACMCRTNUA2",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì trường tiền o tho cơ sở 2 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-trường-tiền-o-tho-cơ-sở-2-phạm-văn-đồng-delivery/5-C62EA7LWJLBHUA",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "chip chip food chân gà sốt thái 117 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/chip-chip-food-chân-gà-sốt-thái-117-châu-thị-vĩnh-tế-delivery/5-C73XRYAJC36EC6",
+   "mon": []
+  },
+  {
+   "ten": "phở trang nam định chính hữu",
+   "pho": "chính-hữu",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-trang-nam-định-chính-hữu-delivery/5-C7CXR72CA7KUEX",
+   "mon": []
+  },
+  {
+   "ten": "bánh canh cua 69 45 phan liêm cơ sở 1",
+   "pho": "phan-liêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-canh-cua-69-45-phan-liêm-cơ-sở-1-delivery/5-C6XFLVBJJJJXLE",
+   "mon": []
+  },
+  {
+   "ten": "biu steak 맛있는 소고기 30 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/biu-steak-맛있는-소고기-30-trần-bạch-đằng-delivery/5-C63GA7NYGN5EJ2",
+   "mon": []
+  },
+  {
+   "ten": "cà phê trà sữa bandb phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cà-phê-trà-sữa-bandb-phạm-cự-lượng-delivery/5-C3EVLA43MBADC6",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "seven days coffee võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/seven-days-coffee-võ-nguyên-giáp-delivery/5-C66KUECTE7E3RA",
+   "mon": []
+  },
+  {
+   "ten": "cửa hàng durex pharmacity 181 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cửa-hàng-durex-pharmacity-181-nguyễn-công-trứ-delivery/5-C7M3G4KJKFTZJT",
+   "mon": []
+  },
+  {
+   "ten": "cửa hàng coca cola thu thủy mart hoài thanh",
+   "pho": "hoài-thanh",
+   "url": "https://food.grab.com/vn/vi/restaurant/cửa-hàng-coca-cola-thu-thủy-mart-hoài-thanh-delivery/5-C62XRCBTE8BEAT",
+   "mon": []
+  },
+  {
+   "ten": "cơm sườn 139 chính hữu",
+   "pho": "chính-hữu",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-sườn-139-chính-hữu-delivery/5-C34XA8MWSFCXE2",
+   "mon": []
+  },
+  {
+   "ten": "yo chân gà 186 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/yo-chân-gà-186-châu-thị-vĩnh-tế-delivery/5-C7UYETDKKGNEEA",
+   "mon": []
+  },
+  {
+   "ten": "yuka onigiri shop cơm nắm nhật bản nguyễn văn thoại shop online",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/yuka-onigiri-shop-cơm-nắm-nhật-bản-nguyễn-văn-thoại-shop-online-delivery/5-CY2ZGLK1JY21TX",
+   "mon": []
+  },
+  {
+   "ten": "th true mart nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/th-true-mart-nguyễn-văn-thoại-delivery/5-C25AAK5KRK4XKA",
+   "mon": []
+  },
+  {
+   "ten": "king coffee take away 203 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/king-coffee-take-away-203-nguyễn-văn-thoại-delivery/5-C2XHR4CBLU2HPE",
+   "mon": []
+  },
+  {
+   "ten": "the cups coffee nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/the-cups-coffee-nguyễn-văn-thoại-delivery/5-CYM1G4MDTFETHA",
+   "mon": []
+  },
+  {
+   "ten": "phở cường hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-cường-hà-bổng-delivery/5-CZJBJ4BVV3XKAX",
+   "mon": []
+  },
+  {
+   "ten": "chu cha trà sữa full topping trà sữa thái trà trái cây tươi châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/chu-cha-trà-sữa-full-topping-trà-sữa-thái-trà-trái-cây-tươi-châu-thị-vĩnh-tế-delivery/5-C75CPBM3R4D2DA",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "trà sữa xingfu cha phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-xingfu-cha-phạm-cự-lượng-delivery/5-C3NKTU5TCTWJJ6",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "vân bún chả hà nội cs2 06 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/vân-bún-chả-hà-nội-cs2-06-phạm-văn-đồng-delivery/5-C8DHA7MZC6VCGE",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa mỳ cay ăn vặt pocpoc châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-mỳ-cay-ăn-vặt-pocpoc-châu-thị-vĩnh-tế-delivery/5-C3UJA35VLFCWRN",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "tiệm nước nhà phê trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-nước-nhà-phê-trần-bạch-đằng-delivery/5-C7V1V4CBEFMGCN",
+   "mon": []
+  },
+  {
+   "ten": "anh quân bakery 79b châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/anh-quân-bakery-79b-châu-thị-vĩnh-tế-delivery/5-C8AJTY3EVVBEKE",
+   "mon": []
+  },
+  {
+   "ten": "cay cùng bạn thân lẩu cay tê trung quốc 107 lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/cay-cùng-bạn-thân-lẩu-cay-tê-trung-quốc-107-lê-quang-đạo-delivery/5-C753DBD1AU6XME",
+   "mon": [
+    "lau"
+   ]
+  },
+  {
+   "ten": "siêu thị ngon mart lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/siêu-thị-ngon-mart-lê-quang-đạo-delivery/5-C32JE7M1JVNTA6",
+   "mon": []
+  },
+  {
+   "ten": "siêu thị auminimart 97 hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/siêu-thị-auminimart-97-hà-bổng-delivery/5-C7JXJ6TZCTNJE2",
+   "mon": []
+  },
+  {
+   "ten": "trinh sài gòn cơm tấm sườn cây nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/trinh-sài-gòn-cơm-tấm-sườn-cây-nguyễn-văn-thoại-delivery/5-CZDWSCL2RFJCKA",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì gà tố nga 164 tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-gà-tố-nga-164-tô-hiến-thành-delivery/5-C732EGNJRB42GE",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "bánh canh cá lóc sịa 270 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-canh-cá-lóc-sịa-270-phạm-văn-đồng-delivery/5-C7VBGPMHL4ECSA",
+   "mon": []
+  },
+  {
+   "ten": "phở thìn 13 lò đúc cn nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-thìn-13-lò-đúc-cn-nguyễn-văn-thoại-delivery/5-C3U2DFUDLEEZCA",
+   "mon": []
+  },
+  {
+   "ten": "bún chả quạt cháo lòng xương má hàm châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-chả-quạt-cháo-lòng-xương-má-hàm-châu-thị-vĩnh-tế-delivery/5-C4JEE6TVL7WKDA",
+   "mon": []
+  },
+  {
+   "ten": "truyền thái y tàu hủ singapore cà phê muối châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/truyền-thái-y-tàu-hủ-singapore-cà-phê-muối-châu-thị-vĩnh-tế-delivery/5-C3MDDFVXECDEE2",
+   "mon": [
+    "ca-phe-muoi"
+   ]
+  },
+  {
+   "ten": "pizza hut nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/pizza-hut-nguyễn-văn-thoại-delivery/5-CZCGT63HEAUVLT",
+   "mon": []
+  },
+  {
+   "ten": "cơm tấm bụi châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-tấm-bụi-châu-thị-vĩnh-tế-delivery/5-C8C3CZDKC4LYG2",
+   "mon": []
+  },
+  {
+   "ten": "cà phê trà sữa hi4 120 mai thúc lân",
+   "pho": "mai-thúc-lân",
+   "url": "https://food.grab.com/vn/vi/restaurant/cà-phê-trà-sữa-hi4-120-mai-thúc-lân-delivery/5-C7ADPCAKL8BUEE",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "tiệm cò 9 võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-cò-9-võ-nguyên-giáp-delivery/5-C73ZJUKEA3MWR6",
+   "mon": []
+  },
+  {
+   "ten": "ăn vặt cá mập con 1 lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/ăn-vặt-cá-mập-con-1-lê-quang-đạo-delivery/5-C3EGDEMVAJXGGA",
+   "mon": []
+  },
+  {
+   "ten": "nước ép sinh tố trái cây tô 02 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/nước-ép-sinh-tố-trái-cây-tô-02-châu-thị-vĩnh-tế-delivery/5-C7JJLPB1JYDHNE",
+   "mon": [
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "moonmilk market lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/moonmilk-market-lê-quang-đạo-delivery/5-C7XYN6A3N231RN",
+   "mon": []
+  },
+  {
+   "ten": "bánh mỳ nướng muối ớt tiến đạt nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mỳ-nướng-muối-ớt-tiến-đạt-nguyễn-công-trứ-delivery/5-C76HRZDULLCZEA",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "heo quay vịt quay tần chef 70 mai thúc lân",
+   "pho": "mai-thúc-lân",
+   "url": "https://food.grab.com/vn/vi/restaurant/heo-quay-vịt-quay-tần-chef-70-mai-thúc-lân-delivery/5-C3BBLAJVT4EVHE",
+   "mon": []
+  },
+  {
+   "ten": "tàu hũ seaweed phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tàu-hũ-seaweed-phạm-cự-lượng-delivery/5-C3MFMANWA25DV6",
+   "mon": []
+  },
+  {
+   "ten": "tây hồ quán cơ sở 2 175 chính hữu",
+   "pho": "chính-hữu",
+   "url": "https://food.grab.com/vn/vi/restaurant/tây-hồ-quán-cơ-sở-2-175-chính-hữu-delivery/5-C7DUWAKXTFWEWE",
+   "mon": []
+  },
+  {
+   "ten": "mỳ quảng bé liên phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-quảng-bé-liên-phạm-cự-lượng-delivery/5-C3WHUGKTARLGT2",
+   "mon": []
+  },
+  {
+   "ten": "mẹt bún đậu mắm tôm phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/mẹt-bún-đậu-mắm-tôm-phạm-văn-đồng-delivery/5-C6JHGE5XLBNVFA",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà xé 147 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-xé-147-nguyễn-công-trứ-delivery/5-C7KFL2CXTE5YUA",
+   "mon": []
+  },
+  {
+   "ten": "tổ yến chưng sẵn cát tường mai thúc lân",
+   "pho": "mai-thúc-lân",
+   "url": "https://food.grab.com/vn/vi/restaurant/tổ-yến-chưng-sẵn-cát-tường-mai-thúc-lân-delivery/5-C63CNYBUFFTWAE",
+   "mon": []
+  },
+  {
+   "ten": "ăn vặt kim đồng võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/ăn-vặt-kim-đồng-võ-nguyên-giáp-delivery/5-C26TLBCVC8BTSE",
+   "mon": []
+  },
+  {
+   "ten": "út kombucha tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/út-kombucha-tô-hiến-thành-delivery/5-C4D1RBAHV3JKAX",
+   "mon": []
+  },
+  {
+   "ten": "bún đậu tràng an mai thúc lân",
+   "pho": "mai-thúc-lân",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-đậu-tràng-an-mai-thúc-lân-delivery/5-C6JCWGACR8E2AN",
+   "mon": []
+  },
+  {
+   "ten": "cháo dinh dưỡng cao cấp for kids 205 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cháo-dinh-dưỡng-cao-cấp-for-kids-205-phạm-văn-đồng-delivery/5-C6VGT6MAA34XR6",
+   "mon": []
+  },
+  {
+   "ten": "gopi mart nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/gopi-mart-nguyễn-văn-thoại-delivery/5-C7VXEENAVA3XET",
+   "mon": []
+  },
+  {
+   "ten": "house of cha châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/house-of-cha-châu-thị-vĩnh-tế-delivery/5-CYXGA2V2T8BER6",
+   "mon": []
+  },
+  {
+   "ten": "vinamilk giấc mơ sữa việt đà nẵng nguyễn công trứ vt20131",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/vinamilk-giấc-mơ-sữa-việt-đà-nẵng-nguyễn-công-trứ-vt20131-delivery/5-C4AVA8EATN3CGJ",
+   "mon": []
+  },
+  {
+   "ten": "mì trộn indomie cá viên chiên mắm bếp gạo lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-trộn-indomie-cá-viên-chiên-mắm-bếp-gạo-lê-hữu-trác-delivery/5-C8DDJNE1GVECAX",
+   "mon": []
+  },
+  {
+   "ten": "mì cay sasin châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-cay-sasin-châu-thị-vĩnh-tế-delivery/VNGFVN000009rc",
+   "mon": []
+  },
+  {
+   "ten": "súp cua bánh cuốn xôi nguyệt phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/súp-cua-bánh-cuốn-xôi-nguyệt-phạm-cự-lượng-delivery/5-C7AZVPM3C2JWBA",
+   "mon": []
+  },
+  {
+   "ten": "tiệm ăn chợ lớn nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-ăn-chợ-lớn-nguyễn-văn-thoại-delivery/5-CZA3WBDHRGJVVJ",
+   "mon": []
+  },
+  {
+   "ten": "fa s mart nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/fa-s-mart-nguyễn-văn-thoại-delivery/5-C2W1EYWEJUD2G6",
+   "mon": []
+  },
+  {
+   "ten": "chè bưởi phương nam châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/chè-bưởi-phương-nam-châu-thị-vĩnh-tế-delivery/5-CZCYLK42JA23SA",
+   "mon": []
+  },
+  {
+   "ten": "bánh bao thọ phát 149 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-bao-thọ-phát-149-nguyễn-công-trứ-delivery/5-C7EDG241MBX2JT",
+   "mon": []
+  },
+  {
+   "ten": "ramen sushi dương đình nghệ",
+   "pho": "dương-đình-nghệ",
+   "url": "https://food.grab.com/vn/vi/restaurant/ramen-sushi-dương-đình-nghệ-delivery/5-C7VBEXTBLJJDBA",
+   "mon": []
+  },
+  {
+   "ten": "golo burger pizza hoàng kế viêm",
+   "pho": "hoàng-kế-viêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/golo-burger-pizza-hoàng-kế-viêm-delivery/5-C4MZDCADRRL1VT",
+   "mon": []
+  },
+  {
+   "ten": "cấp tiến dương đình nghệ mart",
+   "pho": "dương-đình-nghệ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cấp-tiến-dương-đình-nghệ-mart-delivery/5-C2X2AUU2VTB2PA",
+   "mon": []
+  },
+  {
+   "ten": "bánh mỳ khói châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mỳ-khói-châu-thị-vĩnh-tế-delivery/5-C35TG7UHRX2CCE",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "phở hà nội xưa nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-hà-nội-xưa-nguyễn-công-trứ-delivery/5-C3CTVEMAEJ4CTA",
+   "mon": []
+  },
+  {
+   "ten": "cửa hàng tiện lợi nina mart nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/cửa-hàng-tiện-lợi-nina-mart-nguyễn-văn-thoại-delivery/5-C7D3VAWJV3WFET",
+   "mon": []
+  },
+  {
+   "ten": "mixue 212 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/mixue-212-phạm-cự-lượng-delivery/5-C6J3LXK1FF5AAJ",
+   "mon": []
+  },
+  {
+   "ten": "phụ kiện 24h phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/phụ-kiện-24h-phạm-văn-đồng-delivery/5-C7LAEFLGE3VZNA",
+   "mon": []
+  },
+  {
+   "ten": "trung nguyên legend 157 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/trung-nguyên-legend-157-nguyễn-văn-thoại-delivery/5-C8CWATW3L6CJLE",
+   "mon": []
+  },
+  {
+   "ten": "mì quảng 45 phan tôn",
+   "pho": "phan-tôn",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-quảng-45-phan-tôn-delivery/5-C3KKGJUUA4JZGX",
+   "mon": [
+    "mi-quang"
+   ]
+  },
+  {
+   "ten": "thu thủy mart hoài thanh",
+   "pho": "hoài-thanh",
+   "url": "https://food.grab.com/vn/vi/restaurant/thu-thủy-mart-hoài-thanh-delivery/5-C25GT7LCAJNWN2",
+   "mon": []
+  },
+  {
+   "ten": "bé tý bún bò mì quảng bún mắm đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bé-tý-bún-bò-mì-quảng-bún-mắm-đặng-vũ-hỷ-delivery/5-C64GAXVKAFCHEJ",
+   "mon": [
+    "mi-quang"
+   ]
+  },
+  {
+   "ten": "katinat 120 nguyễn văn thoại đà nẵng",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/katinat-120-nguyễn-văn-thoại-đà-nẵng-delivery/5-C7CXTZJ1CBDYKE",
+   "mon": []
+  },
+  {
+   "ten": "cơm sinh viên cơm trưa tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-sinh-viên-cơm-trưa-tô-hiến-thành-delivery/5-C7ADTT6JEXKJFE",
+   "mon": []
+  },
+  {
+   "ten": "giấy cafe 304 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/giấy-cafe-304-phạm-cự-lượng-delivery/5-C75EJFXTT2VCA6",
+   "mon": []
+  },
+  {
+   "ten": "montana cafe võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/montana-cafe-võ-nguyên-giáp-delivery/5-C8AALJWZEKBKG6",
+   "mon": []
+  },
+  {
+   "ten": "dê tư nghĩa dê núi ninh bình 15 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/dê-tư-nghĩa-dê-núi-ninh-bình-15-châu-thị-vĩnh-tế-delivery/5-C66ZNT4YTT6VJT",
+   "mon": []
+  },
+  {
+   "ten": "the holiday beach club dining võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/the-holiday-beach-club-dining-võ-nguyên-giáp-delivery/5-C8CUKET1TFMDEJ",
+   "mon": []
+  },
+  {
+   "ten": "ali cafe và trà sữa 132 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/ali-cafe-và-trà-sữa-132-phạm-cự-lượng-delivery/5-C3WBUA5XUFNFCE",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "korea bbq restaurant nhà hàng hàn quốc trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/korea-bbq-restaurant-nhà-hàng-hàn-quốc-trần-bạch-đằng-delivery/5-C8CAVTXEVBBDNE",
+   "mon": []
+  },
+  {
+   "ten": "phở thìn hà nội 102 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-thìn-hà-nội-102-nguyễn-văn-thoại-delivery/5-C7VUEUT1JRA1N2",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì cà phê a b phan liêm",
+   "pho": "phan-liêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-cà-phê-a-b-phan-liêm-delivery/5-C6CHSEKTN743E2",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "cửa hàng tiện lợi nina mart võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/cửa-hàng-tiện-lợi-nina-mart-võ-nguyên-giáp-delivery/5-C76FLPVYT3UGNN",
+   "mon": []
+  },
+  {
+   "ten": "xôi xưa xôi xéo xôi mặn 31 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/xôi-xưa-xôi-xéo-xôi-mặn-31-châu-thị-vĩnh-tế-delivery/5-C64TGAAYVTXVPA",
+   "mon": []
+  },
+  {
+   "ten": "tý cà phơ đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/tý-cà-phơ-đặng-vũ-hỷ-delivery/5-C4DGFETXGNM1CE",
+   "mon": []
+  },
+  {
+   "ten": "đồng tiến bakery 102 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/đồng-tiến-bakery-102-châu-thị-vĩnh-tế-delivery/5-C6N3TJCWNXXEPE",
+   "mon": []
+  },
+  {
+   "ten": "phở hà nội nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-hà-nội-nguyễn-văn-thoại-delivery/5-C2WEGNU2N66KGX",
+   "mon": []
+  },
+  {
+   "ten": "phở bụp nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-bụp-nguyễn-văn-thoại-delivery/5-C4B1TK6ZVPBXJT",
+   "mon": []
+  },
+  {
+   "ten": "quán ni gà vịt luộc và quay 120 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/quán-ni-gà-vịt-luộc-và-quay-120-phạm-văn-đồng-delivery/5-C7J2PE43NNLGGT",
+   "mon": []
+  },
+  {
+   "ten": "paris sushi châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/paris-sushi-châu-thị-vĩnh-tế-delivery/5-CZJVG6VALBNXCA",
+   "mon": []
+  },
+  {
+   "ten": "anima pizza napoli lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/anima-pizza-napoli-lê-hữu-trác-delivery/5-C75DGGBKJ4NTAX",
+   "mon": []
+  },
+  {
+   "ten": "mỳ quảng quê châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-quảng-quê-châu-thị-vĩnh-tế-delivery/5-C6BCVA3KLNMXCE",
+   "mon": []
+  },
+  {
+   "ten": "mart sài gòn v hải thực phẩm tươi sạch 149 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/mart-sài-gòn-v-hải-thực-phẩm-tươi-sạch-149-châu-thị-vĩnh-tế-delivery/5-C2XTT3KBPA5HGJ",
+   "mon": []
+  },
+  {
+   "ten": "mì xíu dimsum lâm ký nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-xíu-dimsum-lâm-ký-nguyễn-văn-thoại-delivery/5-C3NJAZNKV7M2LN",
+   "mon": []
+  },
+  {
+   "ten": "hủ tiếu trâm anh 87 đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/hủ-tiếu-trâm-anh-87-đặng-vũ-hỷ-delivery/5-C7N2GBLXCNUKCT",
+   "mon": []
+  },
+  {
+   "ten": "mẹ gao trái cây cắt sẵn võ văn kiệt",
+   "pho": "võ-văn-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/mẹ-gao-trái-cây-cắt-sẵn-võ-văn-kiệt-delivery/5-C8ADN7VYL6LXJN",
+   "mon": []
+  },
+  {
+   "ten": "coffee banh mi minh 117 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/coffee-banh-mi-minh-117-lê-hữu-trác-delivery/5-C76ZVZEFLP4WGT",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "huế ngon bánh mì thịt rim 209 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/huế-ngon-bánh-mì-thịt-rim-209-châu-thị-vĩnh-tế-delivery/5-C8AGLJLFWB42N6",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "đồng tiến bakery 68 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/đồng-tiến-bakery-68-lê-hữu-trác-delivery/5-C6T3SGNBGBDYME",
+   "mon": []
+  },
+  {
+   "ten": "tiệm xôi mực quốc dân hoàng bích sơn",
+   "pho": "hoàng-bích-sơn",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-xôi-mực-quốc-dân-hoàng-bích-sơn-delivery/5-C7BULLAXCTWEVE",
+   "mon": []
+  },
+  {
+   "ten": "au cafe’ cafe muối châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/au-cafe’-cafe-muối-châu-thị-vĩnh-tế-delivery/5-C7CHVNUAEU2AT2",
+   "mon": []
+  },
+  {
+   "ten": "bánh kem sinh nhật bánh ngọt ba hưng bakery 47 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-kem-sinh-nhật-bánh-ngọt-ba-hưng-bakery-47-nguyễn-văn-thoại-delivery/5-C6MCTZKUVPUXSA",
+   "mon": []
+  },
+  {
+   "ten": "trà bí đao mood fresh 141 tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-bí-đao-mood-fresh-141-tô-hiến-thành-delivery/5-C4CTA4BYN3XXNX",
+   "mon": []
+  },
+  {
+   "ten": "sữa nước ép cô nguyệt châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/sữa-nước-ép-cô-nguyệt-châu-thị-vĩnh-tế-delivery/5-C6KAKB3TR6LJLE",
+   "mon": [
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "chân gà sốt thái nhà đinh chi nhánh 2 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/chân-gà-sốt-thái-nhà-đinh-chi-nhánh-2-nguyễn-công-trứ-delivery/5-C7CGCNTVRK5AC6",
+   "mon": []
+  },
+  {
+   "ten": "nutifood ngôi nhà dinh dưỡng nguyễn văn thoại qdng1007",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/nutifood-ngôi-nhà-dinh-dưỡng-nguyễn-văn-thoại-qdng1007-delivery/5-C8BBEXJJT8JHVX",
+   "mon": []
+  },
+  {
+   "ten": "ther tea nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/ther-tea-nguyễn-văn-thoại-delivery/5-C7KGPEUDNBN3EE",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa ông trùm 86 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-ông-trùm-86-nguyễn-văn-thoại-delivery/5-CZCYN3JYVBEYL2",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "hi grind protein smoothies trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/hi-grind-protein-smoothies-trần-bạch-đằng-delivery/5-C76GR3KHPE4FE2",
+   "mon": []
+  },
+  {
+   "ten": "bò né 3 ngon 176 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bò-né-3-ngon-176-phạm-cự-lượng-delivery/5-C4JZLKMDFAMGRX",
+   "mon": []
+  },
+  {
+   "ten": "gaviscon strepsils pharmacity 124 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/gaviscon-strepsils-pharmacity-124-phạm-cự-lượng-delivery/5-C74JPB3JBCCXFE",
+   "mon": []
+  },
+  {
+   "ten": "tiệm rau má pennywort 131 mai thúc lân",
+   "pho": "mai-thúc-lân",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-rau-má-pennywort-131-mai-thúc-lân-delivery/5-C7EZGXTWGBNWPA",
+   "mon": []
+  },
+  {
+   "ten": "phở như ý bún chả hà nội 3 lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-như-ý-bún-chả-hà-nội-3-lê-quang-đạo-delivery/5-C6CZMB3TC7C3C6",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì đậu hũ bạn hiền lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-đậu-hũ-bạn-hiền-lê-hữu-trác-delivery/5-C3JZKABGR7UXG6",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "cơm ngon 32 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-ngon-32-châu-thị-vĩnh-tế-delivery/5-CZEFTVLTKFCYTN",
+   "mon": []
+  },
+  {
+   "ten": "nước ép cà phê ms nhung 136 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/nước-ép-cà-phê-ms-nhung-136-phạm-văn-đồng-delivery/5-C8AWCZCVSA5XN6",
+   "mon": [
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "phở mạnh cường trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-mạnh-cường-trần-bạch-đằng-delivery/5-C2JEGTDHAA6YWE",
+   "mon": []
+  },
+  {
+   "ten": "rêu coffee dương đình nghệ",
+   "pho": "dương-đình-nghệ",
+   "url": "https://food.grab.com/vn/vi/restaurant/rêu-coffee-dương-đình-nghệ-delivery/5-CZD3VJAXKA4WGE",
+   "mon": []
+  },
+  {
+   "ten": "bobo food pizza pasta lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/bobo-food-pizza-pasta-lê-quang-đạo-delivery/5-C8ADBBKKJ3UKUA",
+   "mon": []
+  },
+  {
+   "ten": "nem chua rán phố cổ hà nội phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/nem-chua-rán-phố-cổ-hà-nội-phạm-cự-lượng-delivery/5-C3DWLCBYCZMDCT",
+   "mon": []
+  },
+  {
+   "ten": "khoai lang lắc gà rán mr thịnh nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/khoai-lang-lắc-gà-rán-mr-thịnh-nguyễn-công-trứ-delivery/5-C6EVBA3KLUXYN2",
+   "mon": []
+  },
+  {
+   "ten": "bánh khoai mỡ 86 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-khoai-mỡ-86-phạm-văn-đồng-delivery/5-C8EEE4LAPF4KBE",
+   "mon": []
+  },
+  {
+   "ten": "nhất vịt quay châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhất-vịt-quay-châu-thị-vĩnh-tế-delivery/5-C3UWC4CWHBBVRT",
+   "mon": []
+  },
+  {
+   "ten": "phở anh 46 mai thúc lân",
+   "pho": "mai-thúc-lân",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-anh-46-mai-thúc-lân-delivery/5-C7MWT63VCPJJGN",
+   "mon": []
+  },
+  {
+   "ten": "nghi coffee tea 229 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/nghi-coffee-tea-229-phạm-văn-đồng-delivery/5-C7V3JUJHLLMXE2",
+   "mon": []
+  },
+  {
+   "ten": "max milk tea 34 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/max-milk-tea-34-nguyễn-công-trứ-delivery/5-C3EHVGMBCAD3JX",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "cơm thái lẩu thái ẩm thực thailan thai market restaurant 183 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-thái-lẩu-thái-ẩm-thực-thailan-thai-market-restaurant-183-nguyễn-văn-thoại-delivery/VNGFVN00000990",
+   "mon": [
+    "lau"
+   ]
+  },
+  {
+   "ten": "ngọc ký mì bò đài loan taiwanese beef noodles ung văn khiêm",
+   "pho": "ung-văn-khiêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/ngọc-ký-mì-bò-đài-loan-taiwanese-beef-noodles-ung-văn-khiêm-delivery/5-C7VFMF6WTA3UVJ",
+   "mon": []
+  },
+  {
+   "ten": "bếp nhà soka nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bếp-nhà-soka-nguyễn-công-trứ-delivery/5-C24FLXUHTVCBUE",
+   "mon": []
+  },
+  {
+   "ten": "cháo vịt gỏi vịt 146 hoàng bích sơn",
+   "pho": "hoàng-bích-sơn",
+   "url": "https://food.grab.com/vn/vi/restaurant/cháo-vịt-gỏi-vịt-146-hoàng-bích-sơn-delivery/5-C3AGRXXGBAUFTA",
+   "mon": []
+  },
+  {
+   "ten": "bikini bottom express mai thúc lân",
+   "pho": "mai-thúc-lân",
+   "url": "https://food.grab.com/vn/vi/restaurant/bikini-bottom-express-mai-thúc-lân-delivery/5-C6CXVYKUCCNFR6",
+   "mon": []
+  },
+  {
+   "ten": "chất cơm tấm cơm gà lá dứa phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/chất-cơm-tấm-cơm-gà-lá-dứa-phạm-văn-đồng-delivery/5-C76VLUCWVN4UVT",
+   "mon": []
+  },
+  {
+   "ten": "shop rau củ đà lạt hà chương",
+   "pho": "hà-chương",
+   "url": "https://food.grab.com/vn/vi/restaurant/shop-rau-củ-đà-lạt-hà-chương-delivery/5-C2XJE6VDFAUAEN",
+   "mon": []
+  },
+  {
+   "ten": "ốp la 70 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/ốp-la-70-nguyễn-công-trứ-delivery/5-C8A2N6KCVT4EMA",
+   "mon": []
+  },
+  {
+   "ten": "sumi tea trà sữa và trà trái cây 196 5 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/sumi-tea-trà-sữa-và-trà-trái-cây-196-5-nguyễn-công-trứ-delivery/5-C7KFREAHC2MXAT",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "auminimart 9 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/auminimart-9-phạm-văn-đồng-delivery/5-C7UUCVKHJBJJN6",
+   "mon": []
+  },
+  {
+   "ten": "kaido sushi 248 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/kaido-sushi-248-phạm-cự-lượng-delivery/5-C8CBBEDEEEXGUA",
+   "mon": []
+  },
+  {
+   "ten": "cơm tấm sài gòn thu tâm 210 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-tấm-sài-gòn-thu-tâm-210-nguyễn-công-trứ-delivery/5-C7BTJ7WACZDDEA",
+   "mon": []
+  },
+  {
+   "ten": "gà rán hàn quốc an chicken châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/gà-rán-hàn-quốc-an-chicken-châu-thị-vĩnh-tế-delivery/5-C6EAWFKTEJ4CAN",
+   "mon": []
+  },
+  {
+   "ten": "đồng tiến bakery 147 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/đồng-tiến-bakery-147-nguyễn-công-trứ-delivery/5-C6T3TPNXCFK1AJ",
+   "mon": []
+  },
+  {
+   "ten": "bé chuu trái cây sốt thái sứa chân gà châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bé-chuu-trái-cây-sốt-thái-sứa-chân-gà-châu-thị-vĩnh-tế-delivery/5-C7WTAF21RTEDPE",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì bánh bao ba hưng bakery 47 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-bánh-bao-ba-hưng-bakery-47-nguyễn-văn-thoại-delivery/5-C73HVJLAPA3KTE",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "phở long hói nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-long-hói-nguyễn-văn-thoại-delivery/5-C7UYGVBBRTKEG6",
+   "mon": []
+  },
+  {
+   "ten": "nhà thuốc pharmacity 159 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-thuốc-pharmacity-159-châu-thị-vĩnh-tế-delivery/5-C6KWKBW3R2XUCE",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa hong cha phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-hong-cha-phạm-cự-lượng-delivery/VNGFVN000009m4",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "davi tea trà ô long đậm vị 12 33 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/davi-tea-trà-ô-long-đậm-vị-12-33-nguyễn-công-trứ-delivery/5-C6U2DFL2MF4YJE",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa gạo 28 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-gạo-28-châu-thị-vĩnh-tế-delivery/5-C4EDNE6VET3DTE",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "bún đậu tràng an châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-đậu-tràng-an-châu-thị-vĩnh-tế-delivery/5-C2EVFB21RRDATJ",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì bánh ngọt bánh kem tân vinh bakery 144 châu thị vĩnh tế đà nẵng",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-bánh-ngọt-bánh-kem-tân-vinh-bakery-144-châu-thị-vĩnh-tế-đà-nẵng-delivery/5-C8DYJEXBJULDJE",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "cơm gà gia vĩnh nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-gia-vĩnh-nguyễn-văn-thoại-delivery/5-C3DZRJ4XN7NVAJ",
+   "mon": []
+  },
+  {
+   "ten": "ba anh banh mi burger nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/ba-anh-banh-mi-burger-nguyễn-văn-thoại-delivery/5-C8BYERMAET2HVJ",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "fancha tea nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/fancha-tea-nguyễn-văn-thoại-delivery/5-CZEHN7LYGA2AL2",
+   "mon": []
+  },
+  {
+   "ten": "indian restaurant desi dera indian food g15 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/indian-restaurant-desi-dera-indian-food-g15-phạm-văn-đồng-delivery/5-C6MDLT4UVGKZNT",
+   "mon": []
+  },
+  {
+   "ten": "paris levain trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/paris-levain-trần-bạch-đằng-delivery/5-C7UYHBAYSGDERE",
+   "mon": []
+  },
+  {
+   "ten": "phá lấu bò mẹ cún châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/phá-lấu-bò-mẹ-cún-châu-thị-vĩnh-tế-delivery/5-C762NE4YNNW2FE",
+   "mon": [
+    "lau"
+   ]
+  },
+  {
+   "ten": "anh quân bakery 170 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/anh-quân-bakery-170-phạm-cự-lượng-delivery/5-C6MCTZKUUAA3JE",
+   "mon": []
+  },
+  {
+   "ten": "siêu thị auminimart 45 hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/siêu-thị-auminimart-45-hà-bổng-delivery/5-C7JXJ6TZCK2UE2",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì đệ nhất phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-đệ-nhất-phạm-cự-lượng-delivery/5-C7VDAFVAV241EA",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "nước mía cô câm 196 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/nước-mía-cô-câm-196-nguyễn-công-trứ-delivery/5-C3UKVA5EPF2HVN",
+   "mon": [
+    "nuoc-mia"
+   ]
+  },
+  {
+   "ten": "trái cây tô sinh tố nước ép mẹ hà nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/trái-cây-tô-sinh-tố-nước-ép-mẹ-hà-nguyễn-công-trứ-delivery/5-C4NVJ2BWL7JCL2",
+   "mon": [
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "quán huế 34 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/quán-huế-34-lê-hữu-trác-delivery/5-C6V3JEMUAPDJN6",
+   "mon": []
+  },
+  {
+   "ten": "sashimi cá hồi cá trích món nhật toàn farm lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/sashimi-cá-hồi-cá-trích-món-nhật-toàn-farm-lê-hữu-trác-delivery/5-C7JCFEUYEB4VEJ",
+   "mon": []
+  },
+  {
+   "ten": "phở hòa 2 phan liêm",
+   "pho": "phan-liêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-hòa-2-phan-liêm-delivery/5-C62XE3BZCEUUN2",
+   "mon": []
+  },
+  {
+   "ten": "lala burger 135 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/lala-burger-135-phạm-cự-lượng-delivery/5-C7VCC26JAXNYNE",
+   "mon": []
+  },
+  {
+   "ten": "kfc đường nguyễn văn thoại đà nẵng",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/kfc-đường-nguyễn-văn-thoại-đà-nẵng-delivery/5-CYMAPEVWWAEAEA",
+   "mon": []
+  },
+  {
+   "ten": "bún bò huế o thanh 20 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-bò-huế-o-thanh-20-phạm-văn-đồng-delivery/5-C7ECGE61RPVHNA",
+   "mon": []
+  },
+  {
+   "ten": "gaviscon strepsils pharmacity 159 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/gaviscon-strepsils-pharmacity-159-châu-thị-vĩnh-tế-delivery/5-C74JNUDBGK62CA",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì ép hb trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-ép-hb-trần-bạch-đằng-delivery/5-CYUUNAWETNLHAN",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "cơm gà xối mỡ duyên châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-xối-mỡ-duyên-châu-thị-vĩnh-tế-delivery/5-CYVKWCEUJ3ACCN",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa m 50 tea nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-m-50-tea-nguyễn-công-trứ-delivery/5-C261FFWHJ7TTL2",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "bánh mì việt nam nước ép healthy đồ ăn nhẹ bami joy 75 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-việt-nam-nước-ép-healthy-đồ-ăn-nhẹ-bami-joy-75-trần-bạch-đằng-delivery/5-C7WEL8NZV3NDAX",
+   "mon": [
+    "banh-mi",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "cơm ba chị em đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-ba-chị-em-đặng-vũ-hỷ-delivery/5-CZCTKCBGG8CXV2",
+   "mon": []
+  },
+  {
+   "ten": "bún bò bà tuyết nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-bò-bà-tuyết-nguyễn-công-trứ-delivery/5-C7EJPFMFCU6UUE",
+   "mon": []
+  },
+  {
+   "ten": "mì quảng bà mua nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-quảng-bà-mua-nguyễn-văn-thoại-delivery/VNGFVN000008h7",
+   "mon": [
+    "mi-quang"
+   ]
+  },
+  {
+   "ten": "chân gà bún đậu trà sữa boss đen phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/chân-gà-bún-đậu-trà-sữa-boss-đen-phạm-văn-đồng-delivery/5-C4AGTCAJLZMWMA",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "bún bò huế 17 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-bò-huế-17-châu-thị-vĩnh-tế-delivery/5-CZJEVUUDCRDXJ2",
+   "mon": []
+  },
+  {
+   "ten": "cửa hàng yến sào khánh hoà 36 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cửa-hàng-yến-sào-khánh-hoà-36-nguyễn-công-trứ-delivery/5-C32YVNNXEFKKRT",
+   "mon": []
+  },
+  {
+   "ten": "cơm huế như nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-huế-như-nguyễn-văn-thoại-delivery/5-C4AKE8MGAFVTVN",
+   "mon": []
+  },
+  {
+   "ten": "coffee hương quảng 41 lý văn tố",
+   "pho": "lý-văn-tố",
+   "url": "https://food.grab.com/vn/vi/restaurant/coffee-hương-quảng-41-lý-văn-tố-delivery/5-C6EZGNKTKBU3LJ",
+   "mon": []
+  },
+  {
+   "ten": "cá nục nướng người miền trung cn châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cá-nục-nướng-người-miền-trung-cn-châu-thị-vĩnh-tế-delivery/5-C3JTLA6DLPTVDE",
+   "mon": []
+  },
+  {
+   "ten": "mì cay 7 cấp độ seoul spicy 7 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-cay-7-cấp-độ-seoul-spicy-7-lê-hữu-trác-delivery/5-C6BAEBBWLAJDSA",
+   "mon": []
+  },
+  {
+   "ten": "yy store lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/yy-store-lê-hữu-trác-delivery/5-C7EVRXTHR6WHMA",
+   "mon": []
+  },
+  {
+   "ten": "crepe bánh kếp 06 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/crepe-bánh-kếp-06-châu-thị-vĩnh-tế-delivery/5-C6EEBEKTSB6XCA",
+   "mon": []
+  },
+  {
+   "ten": "mỳ quảng hà 10 hoàng kế viêm",
+   "pho": "hoàng-kế-viêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-quảng-hà-10-hoàng-kế-viêm-delivery/5-C6JHMB3TNXTHCJ",
+   "mon": []
+  },
+  {
+   "ten": "anh quân bakery 267 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/anh-quân-bakery-267-nguyễn-công-trứ-delivery/5-C8AJTYUUBE3ZJE",
+   "mon": []
+  },
+  {
+   "ten": "chu cha trà sữa full topping trà sữa thái trà trái cây tươi phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/chu-cha-trà-sữa-full-topping-trà-sữa-thái-trà-trái-cây-tươi-phạm-cự-lượng-delivery/5-C75CPBMGJNEWKE",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "quán ngon trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/quán-ngon-trần-bạch-đằng-delivery/5-CYN1EP3KPEWDEA",
+   "mon": []
+  },
+  {
+   "ten": "amber coffee and fruit 커피 과일 đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/amber-coffee-and-fruit-커피-과일-đặng-vũ-hỷ-delivery/5-C74FVYEUL6XGRJ",
+   "mon": []
+  },
+  {
+   "ten": "taco ngon hoàng kế viêm",
+   "pho": "hoàng-kế-viêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/taco-ngon-hoàng-kế-viêm-delivery/5-CZDJLZCDCGMWKE",
+   "mon": []
+  },
+  {
+   "ten": "mì cay 7 cấp độ trà sữa ăn vặt ngon phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-cay-7-cấp-độ-trà-sữa-ăn-vặt-ngon-phạm-cự-lượng-delivery/5-C64DHCAJG75YHA",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "ăn vặt bích thủy 39a hoài thanh",
+   "pho": "hoài-thanh",
+   "url": "https://food.grab.com/vn/vi/restaurant/ăn-vặt-bích-thủy-39a-hoài-thanh-delivery/5-C6K2JXKYGFVJGN",
+   "mon": []
+  },
+  {
+   "ten": "shuyi nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/shuyi-nguyễn-văn-thoại-delivery/5-C6MDPB3TNFUCCX",
+   "mon": []
+  },
+  {
+   "ten": "cà phê muối lotus 200 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cà-phê-muối-lotus-200-trần-bạch-đằng-delivery/5-C6MTHA3TSCLVWA",
+   "mon": [
+    "ca-phe-muoi"
+   ]
+  },
+  {
+   "ten": "bánh bèo chén bánh lọc bún mắm tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-bèo-chén-bánh-lọc-bún-mắm-tô-hiến-thành-delivery/5-C4KUWENHVPVCUE",
+   "mon": []
+  },
+  {
+   "ten": "mơ cà phê trà 41 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/mơ-cà-phê-trà-41-châu-thị-vĩnh-tế-delivery/5-C8CGAE2AUEKZGA",
+   "mon": []
+  },
+  {
+   "ten": "socomart 305 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/socomart-305-nguyễn-văn-thoại-delivery/5-C7JCE4CZG6TAAN",
+   "mon": []
+  },
+  {
+   "ten": "chè sữa chua như vân nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/chè-sữa-chua-như-vân-nguyễn-công-trứ-delivery/5-C8DUVUKUTBKCVA",
+   "mon": []
+  },
+  {
+   "ten": "highlands coffee 180 võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/highlands-coffee-180-võ-nguyên-giáp-delivery/5-C7XDAKECRALTTX",
+   "mon": []
+  },
+  {
+   "ten": "mixue châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/mixue-châu-thị-vĩnh-tế-delivery/5-C4EDTZNHUFCHJ6",
+   "mon": []
+  },
+  {
+   "ten": "gozi hotdog hoàng kế viêm",
+   "pho": "hoàng-kế-viêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/gozi-hotdog-hoàng-kế-viêm-delivery/5-C7KTDA5CV3XGEN",
+   "mon": []
+  },
+  {
+   "ten": "o thuỳ bún bò huế lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/o-thuỳ-bún-bò-huế-lê-hữu-trác-delivery/5-C7UWJ7CYGY5DEJ",
+   "mon": []
+  },
+  {
+   "ten": "vinamilk giấc mơ sữa việt đà nẵng phạm cự lượng ht20211",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/vinamilk-giấc-mơ-sữa-việt-đà-nẵng-phạm-cự-lượng-ht20211-delivery/5-C4AVA8EARRJVEN",
+   "mon": []
+  },
+  {
+   "ten": "siêu thị auminimart 127 hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/siêu-thị-auminimart-127-hà-bổng-delivery/5-C7LANA3GE6J2A2",
+   "mon": []
+  },
+  {
+   "ten": "cội nguồn coffee phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cội-nguồn-coffee-phạm-văn-đồng-delivery/5-C76VJJLVRJUXNA",
+   "mon": []
+  },
+  {
+   "ten": "hồng bánh xèo 318 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/hồng-bánh-xèo-318-phạm-cự-lượng-delivery/5-C3BER7W2RFKYN6",
+   "mon": [
+    "banh-xeo"
+   ]
+  },
+  {
+   "ten": "gaviscon strepsils pharmacity 189 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/gaviscon-strepsils-pharmacity-189-nguyễn-văn-thoại-delivery/5-C74JPCJEJUDEJJ",
+   "mon": []
+  },
+  {
+   "ten": "bánh canh bé huế châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-canh-bé-huế-châu-thị-vĩnh-tế-delivery/5-C8CYLRCXRLMWTN",
+   "mon": []
+  },
+  {
+   "ten": "nem nướng by béo 48 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/nem-nướng-by-béo-48-châu-thị-vĩnh-tế-delivery/5-C8CZNYWUNAWXDA",
+   "mon": []
+  },
+  {
+   "ten": "tiệm nhà su su nước ép ăn vặt 303 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-nhà-su-su-nước-ép-ăn-vặt-303-phạm-văn-đồng-delivery/5-C8CFENEBJGJTGE",
+   "mon": [
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "ánh vịt quay 274 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/ánh-vịt-quay-274-phạm-văn-đồng-delivery/5-C8B1NACJWBNJAT",
+   "mon": []
+  },
+  {
+   "ten": "mì quảng bà mua võ văn kiệt",
+   "pho": "võ-văn-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-quảng-bà-mua-võ-văn-kiệt-delivery/VNGFVN000008if",
+   "mon": [
+    "mi-quang"
+   ]
+  },
+  {
+   "ten": "bếp an healthy food drink danang 72 59 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/bếp-an-healthy-food-drink-danang-72-59-nguyễn-văn-thoại-delivery/5-C75KDFJWGLKUL6",
+   "mon": []
+  },
+  {
+   "ten": "buffet nướng lẩu trung hoa lục thiện môn 233 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/buffet-nướng-lẩu-trung-hoa-lục-thiện-môn-233-nguyễn-văn-thoại-delivery/5-C74HCBTKJ7AJSE",
+   "mon": [
+    "lau"
+   ]
+  },
+  {
+   "ten": "bếp nhà levain phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bếp-nhà-levain-phạm-cự-lượng-delivery/5-C6KAE6KTRN2HC6",
+   "mon": []
+  },
+  {
+   "ten": "anh quân bakery 71 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/anh-quân-bakery-71-nguyễn-văn-thoại-delivery/5-C8BXTFVYRCAZN2",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà sài gòn v hải châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-sài-gòn-v-hải-châu-thị-vĩnh-tế-delivery/5-C2D3JXDARPC3PE",
+   "mon": []
+  },
+  {
+   "ten": "nhà thuốc pharmacity 181 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-thuốc-pharmacity-181-nguyễn-công-trứ-delivery/5-C6KWKBXATA4GJ2",
+   "mon": []
+  },
+  {
+   "ten": "gaviscon strepsils pharmacity 181 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/gaviscon-strepsils-pharmacity-181-nguyễn-công-trứ-delivery/5-C74JNUBHNTBJJT",
+   "mon": []
+  },
+  {
+   "ten": "cơm 41 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-41-nguyễn-công-trứ-delivery/5-C3MYFABKMB4FGA",
+   "mon": []
+  },
+  {
+   "ten": "nước ép ly ly 134 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/nước-ép-ly-ly-134-phạm-văn-đồng-delivery/5-C74YLEAGJ6KGE2",
+   "mon": [
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "trà hoa quả nhiệt đới chính hữu",
+   "pho": "chính-hữu",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-hoa-quả-nhiệt-đới-chính-hữu-delivery/5-C72DDENJHFCTRN",
+   "mon": []
+  },
+  {
+   "ten": "hai còi chân gà nướng cánh gà nướng 58 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/hai-còi-chân-gà-nướng-cánh-gà-nướng-58-nguyễn-văn-thoại-delivery/5-CZC1GFC2HEDZKE",
+   "mon": []
+  },
+  {
+   "ten": "bánh cuốn bình định 256 nguyễn công trứ sơn trà",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-cuốn-bình-định-256-nguyễn-công-trứ-sơn-trà-delivery/5-C8DDJ33GSFKULE",
+   "mon": []
+  },
+  {
+   "ten": "bò né 3 ngon 73 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bò-né-3-ngon-73-phạm-cự-lượng-delivery/5-C7N1E6VEJ3DFTJ",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa umacha nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-umacha-nguyễn-văn-thoại-delivery/5-C2DYVYEZVYAATN",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "bếp gourmet phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bếp-gourmet-phạm-cự-lượng-delivery/5-C7CGE73XGGN1J6",
+   "mon": []
+  },
+  {
+   "ten": "chicky licky gà rán hàn quốc 242 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/chicky-licky-gà-rán-hàn-quốc-242-phạm-cự-lượng-delivery/5-C6BYTRKURT5GGE",
+   "mon": []
+  },
+  {
+   "ten": "anisha kafe trà sữa cà phê kombucha dương đình nghệ",
+   "pho": "dương-đình-nghệ",
+   "url": "https://food.grab.com/vn/vi/restaurant/anisha-kafe-trà-sữa-cà-phê-kombucha-dương-đình-nghệ-delivery/5-C8BFE3TJA752DE",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "nhà thuốc fpt long châu 65 nguyễn văn thoại p an hải",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-thuốc-fpt-long-châu-65-nguyễn-văn-thoại-p-an-hải-delivery/5-C8DYJB3CA7TXLE",
+   "mon": []
+  },
+  {
+   "ten": "kebab torki phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/kebab-torki-phạm-cự-lượng-delivery/VNGFVN000008ob",
+   "mon": []
+  },
+  {
+   "ten": "xôi trang 39 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/xôi-trang-39-châu-thị-vĩnh-tế-delivery/5-C6BCVK3UJPVELA",
+   "mon": []
+  },
+  {
+   "ten": "mì cay gangwon 53 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/mì-cay-gangwon-53-phạm-cự-lượng-delivery/5-C62WV7UTPEUCN2",
+   "mon": []
+  },
+  {
+   "ten": "cô tôn nữ đặc sản huế 05 dương tự minh",
+   "pho": "dương-tự-minh",
+   "url": "https://food.grab.com/vn/vi/restaurant/cô-tôn-nữ-đặc-sản-huế-05-dương-tự-minh-delivery/5-C3UWDETFVJMFV6",
+   "mon": []
+  },
+  {
+   "ten": "tiệm mì trộn haomi 224 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-mì-trộn-haomi-224-châu-thị-vĩnh-tế-delivery/5-C36HCXMTHAMFC6",
+   "mon": []
+  },
+  {
+   "ten": "graffiti new york pizza lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/graffiti-new-york-pizza-lê-quang-đạo-delivery/5-C8AHHBNZJFU1E6",
+   "mon": []
+  },
+  {
+   "ten": "bún đậu mắm tôm minh ý 32 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-đậu-mắm-tôm-minh-ý-32-lê-hữu-trác-delivery/5-C3EBUA6DL6MHHE",
+   "mon": []
+  },
+  {
+   "ten": "triangle kebab nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/triangle-kebab-nguyễn-công-trứ-delivery/5-CZCZJ7CCGAXHVT",
+   "mon": []
+  },
+  {
+   "ten": "an mộc nhiên vegan trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/an-mộc-nhiên-vegan-trần-bạch-đằng-delivery/5-C7N2CKKDVXCUE2",
+   "mon": []
+  },
+  {
+   "ten": "mỳ quảng liên minh phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-quảng-liên-minh-phạm-cự-lượng-delivery/5-C73WAREDGF2UBE",
+   "mon": []
+  },
+  {
+   "ten": "xôi xéo hà nội châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/xôi-xéo-hà-nội-châu-thị-vĩnh-tế-delivery/5-C7MXN243UFMZNJ",
+   "mon": []
+  },
+  {
+   "ten": "hủ tiếu ngã tư võ nguyên giáp",
+   "pho": "võ-nguyên-giáp",
+   "url": "https://food.grab.com/vn/vi/restaurant/hủ-tiếu-ngã-tư-võ-nguyên-giáp-delivery/5-C8CWUFUEGYTADE",
+   "mon": []
+  },
+  {
+   "ten": "bình yên là nhà trà sữa trà trái cây cafe muối 66 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bình-yên-là-nhà-trà-sữa-trà-trái-cây-cafe-muối-66-châu-thị-vĩnh-tế-delivery/5-C7LZA8BCFAAFNT",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "cơm gà xối mỡ lâm ký nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-xối-mỡ-lâm-ký-nguyễn-văn-thoại-delivery/5-C34WCNXJL7CGAJ",
+   "mon": []
+  },
+  {
+   "ten": "nhà thuốc an khang 74 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-thuốc-an-khang-74-nguyễn-văn-thoại-delivery/5-C761TKU3C7VTEA",
+   "mon": []
+  },
+  {
+   "ten": "tasting gà rán hamburger châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/tasting-gà-rán-hamburger-châu-thị-vĩnh-tế-delivery/5-C8AFJFKBCE3EHE",
+   "mon": []
+  },
+  {
+   "ten": "quán cô hồng đặc sản đà nẵng 103 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/quán-cô-hồng-đặc-sản-đà-nẵng-103-nguyễn-văn-thoại-delivery/5-C3K3ALCHGKMJTJ",
+   "mon": []
+  },
+  {
+   "ten": "fa s healthy drinks food 139 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/fa-s-healthy-drinks-food-139-nguyễn-văn-thoại-delivery/5-C23JAXXEN8NVRN",
+   "mon": []
+  },
+  {
+   "ten": "blue tiny breakfast brunch lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/blue-tiny-breakfast-brunch-lê-hữu-trác-delivery/5-C76ALTDDGJUUVJ",
+   "mon": []
+  },
+  {
+   "ten": "kpub võ văn kiệt",
+   "pho": "võ-văn-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/kpub-võ-văn-kiệt-delivery/5-CZD1BEDKJ2LATN",
+   "mon": []
+  },
+  {
+   "ten": "chị bé bo bánh mỳ thịt nướng cà phê 56 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/chị-bé-bo-bánh-mỳ-thịt-nướng-cà-phê-56-nguyễn-công-trứ-delivery/5-C7BYTVKAMAX3AJ",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "nước ép phú trọng châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/nước-ép-phú-trọng-châu-thị-vĩnh-tế-delivery/5-C7TEV76ZA36BJA",
+   "mon": [
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "lươn xứ nghệ dì mai châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/lươn-xứ-nghệ-dì-mai-châu-thị-vĩnh-tế-delivery/5-CYVVMEXAJN61VX",
+   "mon": []
+  },
+  {
+   "ten": "cafe tea nước mía 302 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cafe-tea-nước-mía-302-phạm-cự-lượng-delivery/5-C75ER8JHWGJAT2",
+   "mon": [
+    "nuoc-mia"
+   ]
+  },
+  {
+   "ten": "bánh mì xíu 51 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-xíu-51-trần-bạch-đằng-delivery/5-C3NYVGNGKGN1CA",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "bún mì quảng dung phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-mì-quảng-dung-phạm-cự-lượng-delivery/5-C3J1JXMCTRD2NN",
+   "mon": [
+    "mi-quang"
+   ]
+  },
+  {
+   "ten": "thương cháo bò 136 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/thương-cháo-bò-136-phạm-văn-đồng-delivery/5-C7BVETCET8ECGT",
+   "mon": []
+  },
+  {
+   "ten": "yaour tý _ trái cây tươi lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/yaour-tý-_-trái-cây-tươi-lê-hữu-trác-delivery/5-C7AVMEUZCX2BME",
+   "mon": []
+  },
+  {
+   "ten": "bánh canh cá nục nhi 83 đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-canh-cá-nục-nhi-83-đặng-vũ-hỷ-delivery/5-C8BXAJ4YNP6UTA",
+   "mon": []
+  },
+  {
+   "ten": "cửa hàng durex pharmacity 159 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cửa-hàng-durex-pharmacity-159-châu-thị-vĩnh-tế-delivery/5-C7M3E3EDTRD1LE",
+   "mon": []
+  },
+  {
+   "ten": "cô tiên sinh tố nước ép hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cô-tiên-sinh-tố-nước-ép-hà-bổng-delivery/5-C7BTT63XJKJYEN",
+   "mon": [
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "bà chua mart nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bà-chua-mart-nguyễn-công-trứ-delivery/5-C23YVRLVE26KGT",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà phương ký hoàng kế viêm",
+   "pho": "hoàng-kế-viêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-phương-ký-hoàng-kế-viêm-delivery/5-C2DXCXXDL8LEEX",
+   "mon": []
+  },
+  {
+   "ten": "hẻm huế bánh lọc trần tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/hẻm-huế-bánh-lọc-trần-tô-hiến-thành-delivery/5-C25KJGLYDAEXL6",
+   "mon": []
+  },
+  {
+   "ten": "tiệm nhà phương võ văn kiệt",
+   "pho": "võ-văn-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-nhà-phương-võ-văn-kiệt-delivery/5-C76CGENETPAGVE",
+   "mon": []
+  },
+  {
+   "ten": "toàn farm fillet cá hồi cá trích tươi trong ngày lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/toàn-farm-fillet-cá-hồi-cá-trích-tươi-trong-ngày-lê-hữu-trác-delivery/5-C76ANUNECEUFN2",
+   "mon": []
+  },
+  {
+   "ten": "lapin bakery coffee võ văn kiệt",
+   "pho": "võ-văn-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/lapin-bakery-coffee-võ-văn-kiệt-delivery/5-C7KVL8CTLCAKJ2",
+   "mon": []
+  },
+  {
+   "ten": "xiên nướng phú yên nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/xiên-nướng-phú-yên-nguyễn-công-trứ-delivery/5-C7AETXV2A3VYNX",
+   "mon": []
+  },
+  {
+   "ten": "tiệm trà trái cây mẹ bắp 213 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-trà-trái-cây-mẹ-bắp-213-nguyễn-công-trứ-delivery/5-C4DHG6TDCTJ3J2",
+   "mon": []
+  },
+  {
+   "ten": "tiệm trà 8x mì cay ăn vặt trà trái cây trà sữa cafe phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-trà-8x-mì-cay-ăn-vặt-trà-trái-cây-trà-sữa-cafe-phạm-văn-đồng-delivery/5-C7JXEUWHNXLTCT",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "bánh mì cô phượng trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-cô-phượng-trần-bạch-đằng-delivery/5-C352FBEULBECUE",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "bò né 3 ngon nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bò-né-3-ngon-nguyễn-công-trứ-delivery/5-CZDHRLMYC3TKUE",
+   "mon": []
+  },
+  {
+   "ten": "vịt quay lá mắc mật lạng sơn nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/vịt-quay-lá-mắc-mật-lạng-sơn-nguyễn-công-trứ-delivery/5-CZJANKJUPGCWJX",
+   "mon": []
+  },
+  {
+   "ten": "cơm gà gia khang 02 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-gà-gia-khang-02-châu-thị-vĩnh-tế-delivery/5-C8AKC4LANBUCAT",
+   "mon": []
+  },
+  {
+   "ten": "anh quân bakery 210 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/anh-quân-bakery-210-nguyễn-công-trứ-delivery/5-C73BL73VABXBV2",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì chả cá má hải châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-chả-cá-má-hải-châu-thị-vĩnh-tế-delivery/5-CZJFSEUBPGCJV2",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "a hải cơm phần phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/a-hải-cơm-phần-phạm-văn-đồng-delivery/5-C76XJTKYTFD3KA",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa gia hỷ châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-gia-hỷ-châu-thị-vĩnh-tế-delivery/5-C7XKPBBGEGCBKA",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "phương food gà ủ muối hoa tiêu nhà làm nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/phương-food-gà-ủ-muối-hoa-tiêu-nhà-làm-nguyễn-văn-thoại-delivery/5-C3T3E6TKEN6WLT",
+   "mon": []
+  },
+  {
+   "ten": "bánh ướt bà sửu cơ sở 2 44 trần bạch đằng",
+   "pho": "trần-bạch-đằng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-ướt-bà-sửu-cơ-sở-2-44-trần-bạch-đằng-delivery/5-C8D2E8M1LBN3BA",
+   "mon": []
+  },
+  {
+   "ten": "xôi vỹ dạ xôi xéo xôi mặn 3 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/xôi-vỹ-dạ-xôi-xéo-xôi-mặn-3-phạm-văn-đồng-delivery/5-C73XCNU2TNEZNJ",
+   "mon": []
+  },
+  {
+   "ten": "coffee 1989 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/coffee-1989-châu-thị-vĩnh-tế-delivery/5-C8ATLTU1GEKYAT",
+   "mon": []
+  },
+  {
+   "ten": "bún tươi ngã 5 nguyễn công trứ chị thương",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-tươi-ngã-5-nguyễn-công-trứ-chị-thương-delivery/5-C4L1AVDBV3M2AN",
+   "mon": []
+  },
+  {
+   "ten": "cửa hàng durex pharmacity 124 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/cửa-hàng-durex-pharmacity-124-phạm-cự-lượng-delivery/5-C7M3E3EDUBWHVN",
+   "mon": []
+  },
+  {
+   "ten": "bánh tráng su béo 252 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-tráng-su-béo-252-phạm-cự-lượng-delivery/5-C7U1G24XMATHAE",
+   "mon": []
+  },
+  {
+   "ten": "cà phê bánh mì coffee smoothie protein shake 155 lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/cà-phê-bánh-mì-coffee-smoothie-protein-shake-155-lê-quang-đạo-delivery/5-C6L3G4MHGK4WT2",
+   "mon": [
+    "banh-mi",
+    "sinh-to"
+   ]
+  },
+  {
+   "ten": "korean food 170 dương đình nghệ",
+   "pho": "dương-đình-nghệ",
+   "url": "https://food.grab.com/vn/vi/restaurant/korean-food-170-dương-đình-nghệ-delivery/5-C6THMGAAAZJJV6",
+   "mon": []
+  },
+  {
+   "ten": "rau má pha 83 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/rau-má-pha-83-châu-thị-vĩnh-tế-delivery/5-C3CTCGLZEN2TCN",
+   "mon": []
+  },
+  {
+   "ten": "bánh chuối chiên bà thủy 209 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-chuối-chiên-bà-thủy-209-châu-thị-vĩnh-tế-delivery/5-C63UBB6HAKJHJA",
+   "mon": []
+  },
+  {
+   "ten": "hai còi chân gà nướng cánh gà nướng 91 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/hai-còi-chân-gà-nướng-cánh-gà-nướng-91-nguyễn-văn-thoại-delivery/5-CYM3UFXHT2EDPA",
+   "mon": []
+  },
+  {
+   "ten": "bello pizza 105 hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/bello-pizza-105-hà-bổng-delivery/5-C74FTEUGJFXUA2",
+   "mon": []
+  },
+  {
+   "ten": "chè lièn 41 hoài thanh street",
+   "pho": "hoài-thanh",
+   "url": "https://food.grab.com/vn/vi/restaurant/chè-lièn-41-hoài-thanh-street-delivery/5-C72KLXN2GP4DLX",
+   "mon": []
+  },
+  {
+   "ten": "góc phố coffee 02 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/góc-phố-coffee-02-phạm-cự-lượng-delivery/5-C6EURJ4DVJKXLT",
+   "mon": []
+  },
+  {
+   "ten": "mỳ cay 3t 15 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-cay-3t-15-châu-thị-vĩnh-tế-delivery/5-C75JFGBZG6MZTX",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa gia hỷ châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-gia-hỷ-châu-thị-vĩnh-tế-delivery/5-C762RKWDVEJTLE",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "43 town street food nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/43-town-street-food-nguyễn-văn-thoại-delivery/5-C7MTKB5GPAEVCT",
+   "mon": []
+  },
+  {
+   "ten": "nhà tui bbq nướng lẩu nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-tui-bbq-nướng-lẩu-nguyễn-công-trứ-delivery/5-C6JTBA3TA7LYWE",
+   "mon": [
+    "lau"
+   ]
+  },
+  {
+   "ten": "nhà thuốc pharmacity 189 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/nhà-thuốc-pharmacity-189-nguyễn-văn-thoại-delivery/5-C6KWFEKULCBTRT",
+   "mon": []
+  },
+  {
+   "ten": "phở hoà phan liêm",
+   "pho": "phan-liêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/phở-hoà-phan-liêm-delivery/5-C7BDMF2HPCBKT6",
+   "mon": []
+  },
+  {
+   "ten": "king dish phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/king-dish-phạm-cự-lượng-delivery/5-C3MYGRMZNJK1FA",
+   "mon": []
+  },
+  {
+   "ten": "bún đậu mắm tôm hà nội châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bún-đậu-mắm-tôm-hà-nội-châu-thị-vĩnh-tế-delivery/5-C4M1R73JNA41G6",
+   "mon": []
+  },
+  {
+   "ten": "tiệm cafe trà matcha adina phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/tiệm-cafe-trà-matcha-adina-phạm-văn-đồng-delivery/5-C7T3EUTEARACA6",
+   "mon": []
+  },
+  {
+   "ten": "bánh mì bánh bao ba hưng bakery 207 châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-mì-bánh-bao-ba-hưng-bakery-207-châu-thị-vĩnh-tế-delivery/5-C3NEMAATNEAJV6",
+   "mon": [
+    "banh-mi"
+   ]
+  },
+  {
+   "ten": "hẻm huế cơm hến tô hiến thành",
+   "pho": "tô-hiến-thành",
+   "url": "https://food.grab.com/vn/vi/restaurant/hẻm-huế-cơm-hến-tô-hiến-thành-delivery/5-C24ESFLFHELFME",
+   "mon": []
+  },
+  {
+   "ten": "cơm tấm lộc 59 nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-tấm-lộc-59-nguyễn-công-trứ-delivery/5-C7TAFEXKHB3HV2",
+   "mon": []
+  },
+  {
+   "ten": "trái cây tươi sạch 15 hà chương",
+   "pho": "hà-chương",
+   "url": "https://food.grab.com/vn/vi/restaurant/trái-cây-tươi-sạch-15-hà-chương-delivery/5-C22ASAU3EGNJSE",
+   "mon": []
+  },
+  {
+   "ten": "anh quân bakery 79 lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/anh-quân-bakery-79-lê-hữu-trác-delivery/5-C73BL74XRPCYRX",
+   "mon": []
+  },
+  {
+   "ten": "lẩu mỳ xào ăn vặt 133 hoài thanh",
+   "pho": "hoài-thanh",
+   "url": "https://food.grab.com/vn/vi/restaurant/lẩu-mỳ-xào-ăn-vặt-133-hoài-thanh-delivery/5-C36WEPMEEEJFAJ",
+   "mon": [
+    "lau"
+   ]
+  },
+  {
+   "ten": "siêu thị auminimart 23 võ văn kiệt",
+   "pho": "võ-văn-kiệt",
+   "url": "https://food.grab.com/vn/vi/restaurant/siêu-thị-auminimart-23-võ-văn-kiệt-delivery/5-C7JWRXWZVRNYLA",
+   "mon": []
+  },
+  {
+   "ten": "nắng cà phê nước ép 211 phạm văn đồng",
+   "pho": "phạm-văn-đồng",
+   "url": "https://food.grab.com/vn/vi/restaurant/nắng-cà-phê-nước-ép-211-phạm-văn-đồng-delivery/5-C8ADUEUGJ2XFCT",
+   "mon": [
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "trà chanh lucky 163 phạm cự lượng",
+   "pho": "phạm-cự-lượng",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-chanh-lucky-163-phạm-cự-lượng-delivery/5-C7DFANT2GBWYL6",
+   "mon": []
+  },
+  {
+   "ten": "mỳ cay 7 cấp độ kseoull lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-cay-7-cấp-độ-kseoull-lê-hữu-trác-delivery/5-C64ECCDJAZCBE2",
+   "mon": []
+  },
+  {
+   "ten": "cơm thố thiên phúc 89 nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-thố-thiên-phúc-89-nguyễn-văn-thoại-delivery/5-C6EVRYKTEU6AVA",
+   "mon": []
+  },
+  {
+   "ten": "tonkin bún chả nguyễn công trứ",
+   "pho": "nguyễn-công-trứ",
+   "url": "https://food.grab.com/vn/vi/restaurant/tonkin-bún-chả-nguyễn-công-trứ-delivery/5-C2THCXX3LYEBRE",
+   "mon": []
+  },
+  {
+   "ten": "cơm tấm minh luân châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/cơm-tấm-minh-luân-châu-thị-vĩnh-tế-delivery/5-C8CJRBV1CUEGAX",
+   "mon": []
+  },
+  {
+   "ten": "bánh xèo miền tây bún thịt nướng ung văn khiêm",
+   "pho": "ung-văn-khiêm",
+   "url": "https://food.grab.com/vn/vi/restaurant/bánh-xèo-miền-tây-bún-thịt-nướng-ung-văn-khiêm-delivery/5-C75YL3LDRPKYG2",
+   "mon": [
+    "banh-xeo"
+   ]
+  },
+  {
+   "ten": "ốc điện phương nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/ốc-điện-phương-nguyễn-văn-thoại-delivery/5-C7DHEJ6FSATULE",
+   "mon": []
+  },
+  {
+   "ten": "the pizza company nguyễn văn thoại",
+   "pho": "nguyễn-văn-thoại",
+   "url": "https://food.grab.com/vn/vi/restaurant/the-pizza-company-nguyễn-văn-thoại-delivery/5-CYUHGJ4GJEBBN2",
+   "mon": []
+  },
+  {
+   "ten": "quán min lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/quán-min-lê-hữu-trác-delivery/5-C6XZTFMGJZBKRE",
+   "mon": []
+  },
+  {
+   "ten": "trà sữa bingxue châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/trà-sữa-bingxue-châu-thị-vĩnh-tế-delivery/5-C76BJXN3FFDXJE",
+   "mon": [
+    "tra-sua"
+   ]
+  },
+  {
+   "ten": "túc tắc tea châu thị vĩnh tế",
+   "pho": "châu-thị-vĩnh-tế",
+   "url": "https://food.grab.com/vn/vi/restaurant/túc-tắc-tea-châu-thị-vĩnh-tế-delivery/5-C6M1NXD2EBJAEA",
+   "mon": []
+  },
+  {
+   "ten": "ken coffee juice smoothie 33 lê quang đạo",
+   "pho": "lê-quang-đạo",
+   "url": "https://food.grab.com/vn/vi/restaurant/ken-coffee-juice-smoothie-33-lê-quang-đạo-delivery/5-C762NBKXTVMJE6",
+   "mon": [
+    "sinh-to",
+    "nuoc-ep"
+   ]
+  },
+  {
+   "ten": "mỳ lan châu 62 hà bổng",
+   "pho": "hà-bổng",
+   "url": "https://food.grab.com/vn/vi/restaurant/mỳ-lan-châu-62-hà-bổng-delivery/5-C761RF3XNAAYVJ",
+   "mon": []
+  },
+  {
+   "ten": "like coffee hoàng bích sơn",
+   "pho": "hoàng-bích-sơn",
+   "url": "https://food.grab.com/vn/vi/restaurant/like-coffee-hoàng-bích-sơn-delivery/5-C4EVJRNXVAKGCT",
+   "mon": []
+  },
+  {
+   "ten": "dì liên nem nướng nha trang bún thịt nướng đặng vũ hỷ",
+   "pho": "đặng-vũ-hỷ",
+   "url": "https://food.grab.com/vn/vi/restaurant/dì-liên-nem-nướng-nha-trang-bún-thịt-nướng-đặng-vũ-hỷ-delivery/5-C7JGTK5DC2JKLA",
+   "mon": []
+  },
+  {
+   "ten": "love mì cay kimchee hàn quốc lê hữu trác",
+   "pho": "lê-hữu-trác",
+   "url": "https://food.grab.com/vn/vi/restaurant/love-mì-cay-kimchee-hàn-quốc-lê-hữu-trác-delivery/5-C4L3LT6ZE7B2PE",
+   "mon": []
+  }
+ ]
+}

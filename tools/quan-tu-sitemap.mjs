@@ -40,11 +40,52 @@ const flag = (n, d) => { const i = argv.indexOf(n); return i >= 0 && argv[i + 1]
 const ZONE = flag("--zone", "hanoi-hoankiem");
 const RA = flag("--ra", join(GOC, "docs", `quan-sitemap-${ZONE}.json`));
 
-const THANH_PHO = { "hanoi-hoankiem": "hanoi", "hoian-oldtown": "hoi-an",
-  "danang-hanriver": "da-nang", "danang-mykhe": "da-nang", "hue-citadel": "hue",
+/* Sitemap GrabFood chỉ công bố 23 tỉnh thành, và tên vùng ở đó KHÔNG
+   trùng tên vùng của Nón Lá. Đo ngày 07/09/2026:
+
+     · `hoi-an` KHÔNG có — nhưng Hội An nằm trong vùng giao hàng `da-nang`
+       (233 quán có "hội an" trong tên, 57 quán "cao lầu"). Cách Đà Nẵng
+       30km nên Grab gộp chung, và điều đó có lợi cho ta.
+     · `hue` KHÔNG có, và cũng không nằm trong vùng nào khác — Huế cách Đà
+       Nẵng 100km. Chữ "huế" xuất hiện 462 lần trong sitemap Đà Nẵng
+       nhưng gần như toàn bộ là tên MÓN "bún bò Huế", không phải địa danh.
+       Đừng lấy con số ấy làm bằng chứng là Huế có mặt.
+
+   Vùng nào không có thì tệp này nói ra và dừng, chứ không đi cào một
+   thành phố khác rồi gắn nhãn Huế lên. */
+const THANH_PHO = { "hanoi-hoankiem": "hanoi", "hoian-oldtown": "da-nang",
+  "danang-hanriver": "da-nang", "danang-mykhe": "da-nang",
   "hcmc-district1": "ho-chi-minh" };
+/* ── VÀ ĐÂY LÀ CHỖ KHỚP THEO TÊN PHỐ GÃY ─────────────────────
+   Tên phố Việt Nam lặp ở MỌI thành phố. Hùng Vương, Bà Triệu, Trần Phú,
+   Hoàng Diệu — Hội An có, Đà Nẵng cũng có. Trong cùng một thành phố thì
+   một tên phố là một con phố; qua thành phố khác thì không còn đúng.
+
+   Hội An và Đà Nẵng dùng CHUNG một sitemap `da-nang` (Grab gộp vùng giao
+   hàng). Lần chạy đầu ngày 07/09/2026 vì thế cho ra 949 "quán Hội An" mà
+   chỉ 26 quán (2%) thật sự nhắc tới Hội An — phần còn lại là quán Đà
+   Nẵng bị dán nhãn sai. Riêng phố Trần Phú trùng khít 81 quán ở cả hai
+   vùng: cùng một danh sách, hai cái tên.
+
+   Đã thử lọc bằng "phố nào chỉ Hội An mới có" và cách ấy CŨNG SAI: danh
+   sách phố lấy từ OSM là một mẫu, không phải sổ địa chính, nên Trần Cao
+   Vân trông như của riêng Hội An chỉ vì mẫu Đà Nẵng không có nó.
+
+   Nên vùng nào dùng chung sitemap với vùng khác thì phải có DẤU NHẬN
+   DẠNG trong chính tên quán. Không có dấu thì không nhận — thà 26 dòng
+   đúng còn hơn 949 dòng nói sai về chỗ nó nằm. */
+const DAU = {
+  "hoian-oldtown": { phai: /h[oộ]i\s*an/i },
+  "danang-hanriver": { cam: /h[oộ]i\s*an/i },
+  "danang-mykhe": { cam: /h[oộ]i\s*an/i },
+};
+
 const tp = THANH_PHO[ZONE];
-if (!tp) { console.error(`Chưa biết thành phố của vùng ${ZONE}`); process.exit(1); }
+if (!tp) {
+  console.error(`GrabFood không công bố sitemap cho vùng ${ZONE}.`);
+  console.error(`Có: ${Object.keys(THANH_PHO).join(", ")}`);
+  process.exit(3);
+}
 
 const H = { "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
   + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36" };
@@ -120,6 +161,9 @@ for (const u of url) {
   /* Tên phố nằm ở CUỐI tên quán trong tiếng Việt: "Cơm sườn 27 Hàn
      Thuyên", "Chị Cúc Bún Trộn Nam Bộ Bạch Đằng". Chỉ soi phần đuôi thì
      bỏ được phần lớn dương tính giả do một chữ trùng nằm ở giữa tên. */
+  const dau = DAU[ZONE];
+  if (dau?.phai && !dau.phai.test(ten)) continue;
+  if (dau?.cam && dau.cam.test(ten)) continue;
   const duoi = s.slice(-28);
   const khop = pho.find((p) => duoi.includes(p));
   if (!khop) continue;
@@ -142,6 +186,10 @@ const doc = {
   _note: "Tên quán và tên phố đọc từ sitemap công bố của GrabFood. KHÔNG có giá — "
        + "thực đơn nạp bằng JavaScript và trình duyệt tự động bị chặn (đo 06/09/2026). "
        + "Dùng để dựng lộ trình đi khảo sát, không dùng để dựng dải giá.",
+  _dauNhanDang: DAU[ZONE]
+    ? "Vùng này dùng chung sitemap với vùng khác, nên chỉ nhận quán có dấu nhận dạng "
+      + "trong tên. Tên phố không đủ để phân biệt: tên phố Việt Nam lặp ở mọi thành phố."
+    : null,
   zone: ZONE,
   layLuc: new Date().toISOString().slice(0, 10),
   soTrangQuet: url.length,
