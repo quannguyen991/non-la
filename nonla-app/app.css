@@ -1904,3 +1904,7 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .story{font-size:14px;line-height:1.72;font-weight:300;color:var(--muc);margin:2px 0 0}
 .storylink{font-size:11.5px;line-height:1.55;color:var(--muc-nhat);font-weight:400;
   margin:9px 0 0;padding-left:9px;border-left:2px solid var(--vien-in)}
+
+/* Ngày chay ở tab Eat — hai hôm mỗi tháng âm, nên được phép chiếm một dòng. */
+.chayline{font-size:12.5px;line-height:1.55;color:var(--muc-nhat);font-weight:400;
+  margin:11px 0 2px;padding-left:10px;border-left:2px solid var(--ngoc,#1F8A70)}

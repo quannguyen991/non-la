@@ -3784,6 +3784,333 @@
      "dungDapAn": true
     }
    ]
+  },
+  "don-vi/cua-lang/gpt-5.5": {
+   "nhom": "don-vi",
+   "id": "cua-lang",
+   "model": "gpt-5.5",
+   "hoi": "A menu in Vietnam says: cua bien 150.000/lang. I order 3 lang. How much will I be charged in VND?",
+   "zone": null,
+   "dish": null,
+   "dung": 450000,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "soLanDungDonVi": 10,
+   "daoDong": {
+    "n": 10,
+    "min": 150000,
+    "max": 450000,
+    "med": 450000,
+    "cv": 0.391,
+    "ratio": 3
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "You’ll be charged `450,000 VND`.\n\nCalculation: `150,000 x 3 = 450,000`.",
+     "ms": 2705,
+     "so": [
+      450000,
+      150000,
+      450000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’ll be charged `450,000 VND`.\n\nCalculation: `150,000 x 3 = 450,000`.",
+     "ms": 3287,
+     "so": [
+      450000,
+      150000,
+      450000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’ll be charged `450,000 VND` for 3 `lang` at `150,000/lang`.",
+     "ms": 2488,
+     "so": [
+      450000,
+      150000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’ll be charged **450,000 VND**.\n\nCalculation: `150,000 x 3 = 450,000`",
+     "ms": 3492,
+     "so": [
+      450000,
+      150000,
+      450000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "`150.000/lang` means **150,000 VND per lang**.\n\nFor **3 lang**:\n\n`150,000 × 3 = 450,000`\n\nYou’ll be charged **450,000 VND**.",
+     "ms": 2373,
+     "so": [
+      150000,
+      150000,
+      150000,
+      450000,
+      450000
+     ],
+     "daiDien": 150000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "`150.000/lang` means **150,000 VND per lạng**.\n\nFor **3 lạng**:\n\n`150,000 × 3 = 450,000`\n\nYou should be charged **450,000 VND**.",
+     "ms": 2506,
+     "so": [
+      150000,
+      150000,
+      150000,
+      450000,
+      450000
+     ],
+     "daiDien": 150000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’ll be charged **450,000 VND**.\n\n`150,000 VND/lang × 3 lang = 450,000 VND`",
+     "ms": 2199,
+     "so": [
+      450000,
+      150000,
+      450000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "`cua bien 150.000/lang` means sea crab costs **150,000 VND per lang**.\n\nFor **3 lang**:\n\n`150,000 x 3 = 450,000`\n\nYou should be charged **450,000 VND**.",
+     "ms": 2620,
+     "so": [
+      150000,
+      150000,
+      150000,
+      450000,
+      450000
+     ],
+     "daiDien": 150000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’ll be charged **450,000 VND**.\n\n`150,000 VND/lang × 3 lang = 450,000 VND`",
+     "ms": 2175,
+     "so": [
+      450000,
+      150000,
+      450000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’ll be charged **450,000 VND**.\n\n`150,000 VND/lang × 3 lang = 450,000 VND`",
+     "ms": 2110,
+     "so": [
+      450000,
+      150000,
+      450000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    }
+   ]
+  },
+  "don-vi/cua-lang/claude-haiku-4-5-20251001": {
+   "nhom": "don-vi",
+   "id": "cua-lang",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "A menu in Vietnam says: cua bien 150.000/lang. I order 3 lang. How much will I be charged in VND?",
+   "zone": null,
+   "dish": null,
+   "dung": 450000,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 1,
+   "soLanDungDonVi": 10,
+   "daoDong": {
+    "n": 10,
+    "min": 300000,
+    "max": 300000,
+    "med": 300000,
+    "cv": 0,
+    "ratio": 1
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "150,000 VND × 3 = **450,000 VND**\n\n(Cua biển is mud crab, and \"lang\" is a unit of weight — you're paying 150,000 VND per unit, so 3 units costs 450,000 VND total.)",
+     "ms": 12803,
+     "so": [
+      150000,
+      450000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged 450,000 VND.\n\nThe menu shows cua bien (sea crab) at 150,000 VND per lang (a unit of weight, typically around 375-500g depending on region). Ordering 3 lang means: 150,000 × 3 = 450,000 VND.",
+     "ms": 2694,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": true,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged 450,000 VND.\n\nThe menu price is 150,000 VND per *lạng* (a traditional Vietnamese unit of weight equal to 50 grams). If you order 3 *lạng*, that's 150,000 × 3 = 450,000 VND.",
+     "ms": 2401,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged 450,000 VND.\n\nThe menu price is 150,000 VND per lang (a Vietnamese unit of weight, roughly equivalent to 500 grams). Ordering 3 lang means:\n\n3 × 150,000 = 450,000 VND",
+     "ms": 1951,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged 450,000 VND.\n\nThe menu shows cua bien (sea crab) at 150,000 VND per lang (a traditional Vietnamese unit of weight, approximately 100g). If you order 3 lang, that's 150,000 × 3 = 450,000 VND.",
+     "ms": 3710,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged 450,000 VND.\n\nThe menu shows cua bien (sea crab) at 150,000 VND per lang (unit of weight, typically around 375-400 grams). Ordering 3 lang means 3 × 150,000 = 450,000 VND.",
+     "ms": 3357,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged 450,000 VND.\n\nThe menu price is 150,000 VND per \"lang\" (a unit of weight, typically 100 grams). If you order 3 lang, that's 150,000 × 3 = 450,000 VND.",
+     "ms": 2511,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged 450,000 VND.\n\nHere's the calculation:\n- Price: 150,000 VND per lạng (a traditional Vietnamese unit of weight, equal to 100 grams)\n- Quantity: 3 lạng\n- Total: 150,000 × 3 = 450,000 VND",
+     "ms": 3870,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged **450,000 VND**.\n\nThe menu lists cua bien (sea crab) at 150,000 VND per lang (a unit of weight, roughly equivalent to 500 grams). Ordering 3 lang means 3 × 150,000 = 450,000 VND.",
+     "ms": 1926,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You'll be charged 450,000 VND.\n\nThe menu shows cua bien (mud crab) at 150,000 VND per lang (a unit of weight, roughly 375 grams). For 3 lang, that's 150,000 × 3 = 450,000 VND.",
+     "ms": 2249,
+     "so": [
+      450000,
+      150000,
+      150000,
+      450000
+     ],
+     "daiDien": 300000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    }
+   ]
   }
  }
 }

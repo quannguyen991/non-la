@@ -855,6 +855,15 @@ const lichHTML = anToan(function (khiNao = new Date()) {
     </div>`;
 });
 
+/* Một dòng cho tab Eat vào ngày mùng một và ngày rằm. Tách khỏi lichHTML
+   vì hai chỗ nói hai việc: dải trên thẻ kết quả giải thích một CÁI GIÁ
+   trước mặt, còn dòng này giúp chọn món — và ở tab Eat thì phần lớn ghi
+   chú lịch (đêm lồng đèn, mùa lễ) không liên quan. */
+const chayLineHTML = anToan(function (khiNao = new Date()) {
+  if (!Lich.daNap() || !Lich.ngayChay(khiNao)) return "";
+  return `<p class="chayline">${esc(T("Many places serve vegetarian food today — it is the first day or the full moon of the lunar month."))}</p>`;
+});
+
 /* Dải giá SUY RA cho món vùng này chưa đo. Cố tình để thành một khối riêng,
    không trộn vào các dòng đã đo phía trên: một con số suy ra mà nằm cùng
    hàng với một con số đo được là đúng thứ trust.js sinh ra để chặn. */
@@ -1699,6 +1708,13 @@ function renderEat(filter = "") {
           màn Ăn gì không hề nói ra là có vùng nào khác — người dùng phải mò vào
           tận tab Tôi mới đổi được, và kết luận là "app chỉ có Hội An". */""}
     ${zoneRowHTML()}
+
+    ${/* Ngày chay: MỘT dòng, và chỉ hai hôm mỗi tháng âm.
+          Đây là chỗ nó có ích nhất — người dùng đang duyệt danh sách món để
+          quyết định ăn gì, chứ không phải đang đứng trước một cái giá. Không
+          lọc bỏ món mặn: quán vẫn bán, và khách vẫn có quyền gọi. Nói ra rồi
+          để người ta tự chọn là đúng nếp của cả sản phẩm này. */""}
+    ${chayLineHTML()}
 
     ${f ? `
     <section class="eat-hero">
@@ -4843,7 +4859,7 @@ window.__nonla = { S, handleText, judgeRows, go, showDish, showPlace, ocr, doSca
      chỉnh giờ máy. Đây cũng là lý do lichHTML() có tham số: một khối chỉ
      đúng vào đúng ba ngày trong tháng mà chỉ kiểm được vào đúng ba ngày
      ấy thì trên thực tế là không kiểm được. */
-  lichHTML };
+  lichHTML, chayLineHTML };
 
 boot().catch((e) => { console.error(e); document.body.innerHTML =
   `<pre style="color:#fff;padding:20px;font:13px monospace">Failed to start: ${esc(e.message)}</pre>`; });
