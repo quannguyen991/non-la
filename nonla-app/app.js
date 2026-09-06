@@ -1700,6 +1700,52 @@ function renderEat(filter = "") {
       charges. Scan a menu to check a real one.</p>`;
 }
 
+/* ── Vì sao món này ở đây ─────────────────────────────────────
+   Khối văn hoá duy nhất trong app, và nó phải kiếm được chỗ đứng của
+   mình chứ không được ngồi nhờ.
+
+   Cách nó kiếm chỗ: nó GIẢI THÍCH BẢNG GIÁ. Cao lầu chỉ có ở Hội An vì
+   sợi mì làm bằng nước một cái giếng trong phố — nên ô cao lầu × Hoàn
+   Kiếm trong prices.json trống, và trống là đúng chứ không phải thiếu
+   dữ liệu. Không có dòng cuối nối sang bảng giá thì đây chỉ là một đoạn
+   giới thiệu du lịch, và app này không cần thêm một đoạn như thế.
+
+   HAI MƯƠI HAI MÓN, KHÔNG PHẢI BẢY MƯƠI BẢY.
+   Chỉ những món trả lời được thật câu "vì sao ở đây" mới có chuyện.
+   Món còn lại KHÔNG có khối — im lặng, đúng một luật với ô trống trong
+   bảng giá. Viết cho đủ bảy mươi bảy nghĩa là năm mươi lăm đoạn văn
+   không nói gì, và người đọc học được rằng khối này không đáng đọc.
+
+   Chữ trong story không đi qua T(): đây là văn xuôi biên soạn tay, chưa
+   có bản Hàn / Trung / Nhật. Rơi về bản tiếng Anh thì phải NÓI RA là
+   chưa dịch — thay ngôn ngữ trong im lặng là để người ta tưởng mình
+   đang đọc bản tiếng của mình. */
+const storyHTML = anToan(function (d) {
+  const s = d?.story;
+  if (!s) return "";
+
+  const lang = curLang();
+  const chu = lang === "vi" ? (s.vi || s.en) : s.en;
+  const chuaDich = lang !== "vi" && lang !== "en" && !s[lang];
+
+  /* Đếm THẬT từ bảng giá, không viết tay. Một dòng nói "món này chỉ có ở
+     một vùng" mà bảng giá lại có nó ở bốn vùng là app tự mâu thuẫn với
+     chính mình trên cùng một màn hình. */
+  const coGia = Object.entries(S.prices || {}).filter(([, z]) => z.items?.[d.id]);
+  const tong = Object.keys(S.prices || {}).length;
+  const neo = coGia.length === 1
+    ? T("Priced in one of the six zones only.")
+    : coGia.length && coGia.length < tong
+      ? `${coGia.length} ${T("of the six zones have a measured range for it.")}`
+      : "";
+
+  return `
+    <h2 class="sect">${esc(T("Why this dish is here"))}</h2>
+    <p class="story">${esc(chu)}</p>
+    ${neo ? `<p class="storylink">${esc(neo)}</p>` : ""}
+    ${chuaDich ? `<p class="src">${esc(T("This note has not been translated yet — shown in English."))}</p>` : ""}`;
+});
+
 function showDish(id) {
   const d = dishById(id); if (!d) return;
   History.add("place", { id: d.id, label: d.vi, of: "dish", zone: S.zone }).then(scheduleSync);
@@ -1716,6 +1762,7 @@ function showDish(id) {
     ${st ? `<div class="card"><p class="kicker">Local price</p>
         <p style="font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:3px">${fmtVND(st.p25)} – ${money(st.p75)}</p>
         <p class="src">Typical range in ${esc(zone().name)} · ${esc(zone().updated)}</p></div>` : ""}
+    ${storyHTML(d)}
     ${whyHTML(id)}
     ${whereToEat(id)}
     ${sayBlock(d.say, d.ph)}

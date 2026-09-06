@@ -1526,6 +1526,52 @@ console.log("\n── lịch Việt ──────────────�
   }
 }
 
+/* ── chuyện món (trường story trong dishes.json) ──────────────
+   Kiểm DỮ LIỆU chứ không kiểm mã. Khối này là văn xuôi biên soạn tay,
+   nên lỗi của nó không phải lỗi cú pháp — nó là một đoạn văn nói sai
+   về một món, hoặc một đoạn văn mâu thuẫn với chính bảng giá nằm ngay
+   phía trên nó trên cùng một màn hình. */
+console.log("\n── chuyện món ──────────────────────────────");
+{
+  const coChuyen = dishes.filter((d) => d.story);
+  ok(`${coChuyen.length} món có chuyện`, coChuyen.length >= 20, `${coChuyen.length} món`);
+
+  /* Không viết cho cả 77 món là CỐ Ý. Nếu một hôm nào đó gần đủ 77 thì
+     nhiều khả năng có người đang lấp chữ cho đầy, và khối này mất đúng
+     thứ làm nó đáng đọc. */
+  ok("không lấp chữ cho đủ 77 món", coChuyen.length <= 40,
+    `${coChuyen.length}/${dishes.length} — đừng viết cho món không có câu trả lời thật`);
+
+  ok("mọi chuyện món đều có đủ bốn trường",
+    coChuyen.every((d) => d.story.en && d.story.vi && d.story.why && d.story.src),
+    JSON.stringify(coChuyen.find((d) =>
+      !(d.story.en && d.story.vi && d.story.why && d.story.src))?.id || null));
+
+  ok("chuyện món không quá dài để đọc ở quầy",
+    coChuyen.every((d) => d.story.en.length <= 520),
+    JSON.stringify(coChuyen.filter((d) => d.story.en.length > 520).map((d) => d.id)));
+
+  /* Chuyện món KHÔNG được in ra một con số tiền. Dải giá đo được nằm
+     ngay phía trên nó trên cùng tấm thẻ; một con số trong đoạn văn sẽ
+     đọc ra như thể nó cùng hạng bằng chứng với dải kia. */
+  ok("chuyện món không in ra con số tiền nào",
+    coChuyen.every((d) => !/\d[\d.,]*\s*(?:₫|đ\b|VND|dong|đồng)/i.test(`${d.story.en} ${d.story.vi}`)),
+    JSON.stringify(coChuyen.find((d) =>
+      /\d[\d.,]*\s*(?:₫|đ\b|VND|dong|đồng)/i.test(`${d.story.en} ${d.story.vi}`))?.id || null));
+
+  /* Chuyện món phải khớp với BẢNG GIÁ. Một đoạn văn nói món này chỉ có
+     ở một nơi, trong khi bảng giá có nó ở cả sáu vùng, là app tự mâu
+     thuẫn — và giao diện đếm số vùng từ chính bảng giá, nên hai câu
+     trái nhau sẽ nằm cạnh nhau trên một màn hình. */
+  {
+    const soVung = (id) => Object.values(prices).filter((z) => z.items?.[id]).length;
+    const chiMotNoi = ["cao-lau", "com-hen", "goi-ca-nam-o", "che-bap"];
+    const lech = chiMotNoi.filter((id) => soVung(id) > 2);
+    ok("món gắn chặt với một vùng không có giá rải khắp nơi", lech.length === 0,
+      JSON.stringify(lech.map((id) => [id, soVung(id)])));
+  }
+}
+
 /* ── đọc câu trả lời của mô hình ngôn ngữ (tools/llmparse.mjs) ─
    Bộ đo đối chứng gọi mạng và tốn tiền, nhưng chỗ dễ sai nhất của nó
    không dính gì tới mạng: rút con số tiền Việt ra khỏi một đoạn văn

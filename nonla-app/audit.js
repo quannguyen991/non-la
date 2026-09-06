@@ -175,6 +175,32 @@ export async function run({ verbose = true } = {}) {
       ngayLe.match(/\d[\d.,]*\s*(?:₫|đ\b|VND|dong)/i)?.[0] || "");
   }
 
+  /* ── chuyện món trên thẻ món ─────────────────────────
+     Khối văn hoá duy nhất trong app. Nó chỉ có chỗ đứng nếu nó giải
+     thích được bảng giá, nên phép kiểm quan trọng nhất ở đây không
+     phải "khối có hiện không" mà là "khối có nói ngược với bảng giá
+     nằm ngay trên nó không". */
+  {
+    const cu = A.S.zone;
+    A.S.zone = "hoian-oldtown";
+    A.showDish("cao-lau"); await wait(300);
+    ck("món có chuyện thì hiện khối", !!$("#sheetBody .story"));
+    ck("khối chuyện có dòng nối sang bảng giá", !!$("#sheetBody .storylink"));
+
+    /* Dòng nối đếm thật từ S.prices. So lại ở đây để bắt trường hợp
+       đoạn văn và con số nói hai điều khác nhau trên cùng màn hình. */
+    const soVung = Object.values(A.S.prices).filter((z) => z.items?.["cao-lau"]).length;
+    ck("dòng nối khớp với số vùng thật có giá",
+      soVung !== 1 || /one of the six|một/i.test($("#sheetBody .storylink").textContent),
+      `${soVung} vùng · "${$("#sheetBody .storylink")?.textContent}"`);
+
+    A.S.zone = "hanoi-hoankiem";
+    A.showDish("pho-bo"); await wait(300);
+    ck("món chưa có chuyện thì KHÔNG hiện khối rỗng", !$("#sheetBody .story"));
+    A.S.zone = cu;
+    click("[data-act='close']"); await wait(220);
+  }
+
   /* ── dọn trạng thái khi đổi tab ─────────────────────── */
   A.go("eat"); await wait(350);
   ck("đổi tab thì đóng thẻ", !sheetOpen(), "thẻ còn mở đè lên tab mới");

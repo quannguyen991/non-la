@@ -1895,3 +1895,12 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .lichin{font-size:11px;color:var(--muc-nhat);white-space:nowrap}
 .lichnote{font-size:10.5px;color:var(--muc-nhat);font-weight:300;line-height:1.5;margin:6px 0 0}
 .lich .fold{margin-top:7px}
+
+/* ── chuyện món ───────────────────────────────────────────
+   Đọc chậm hơn phần còn lại của thẻ, nên cỡ chữ nhỉnh hơn một chút và
+   dòng thưa hơn. Không có nền, không có viền: đây là văn xuôi, và bỏ
+   một đoạn văn vào hộp là bảo người đọc rằng nó ngang hàng với một
+   con số — trong khi cả tấm thẻ này được dựng để phân biệt hai thứ. */
+.story{font-size:14px;line-height:1.72;font-weight:300;color:var(--muc);margin:2px 0 0}
+.storylink{font-size:11.5px;line-height:1.55;color:var(--muc-nhat);font-weight:400;
+  margin:9px 0 0;padding-left:9px;border-left:2px solid var(--vien-in)}

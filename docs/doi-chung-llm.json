@@ -1,22 +1,23 @@
 {
  "_note": "Sinh bằng tools/doi-chung-llm.mjs. Đừng sửa tay — chạy lại lệnh đó.",
  "_gioiHan": "Đo các model qua proxy tương thích OpenAI, KHÔNG phải app ChatGPT/Gemini của người dùng cuối. Gemini không có mặt trong phép đo này vì máy chạy đo không có khoá Google.",
- "doLuc": "2026-09-06T08:59:41.613Z",
+ "doLuc": "2026-09-06T09:09:23.938Z",
  "cua": "https://codex.hungnguyen.codes/v1",
- "luot": 1,
+ "luot": 10,
  "models": [
-  "gpt-5.5"
+  "gpt-5.5",
+  "claude-haiku-4-5-20251001"
  ],
  "loi": [
   {
    "khoa": "gia-co-du-lieu/pho-hk/gpt-5.5",
-   "lan": 0,
+   "lan": 1,
    "loi": "HTTP 502 {\"error\":{\"message\":\"openai_error\",\"type\":\"bad_response_status_code\",\"param\":\"\",\"code\":\"bad_response_status_code\"}}"
   },
   {
-   "khoa": "gia-co-du-lieu/caolau-ha/gpt-5.5",
-   "lan": 0,
-   "loi": "The operation was aborted due to timeout"
+   "khoa": "gia-co-du-lieu/pho-hk/gpt-5.5",
+   "lan": 2,
+   "loi": "HTTP 502 {\"error\":{\"message\":\"openai_error\",\"type\":\"bad_response_status_code\",\"param\":\"\",\"code\":\"bad_response_status_code\"}}"
   }
  ],
  "cau": {
@@ -35,19 +36,287 @@
     "p95": 140000,
     "seed": true
    },
-   "soLuot": 0,
+   "soLuot": 8,
+   "soLuotHong": 2,
    "soLanTuChoi": 0,
-   "soLanRaoDon": 0,
+   "soLanRaoDon": 2,
    "daoDong": {
-    "n": 0,
-    "min": null,
-    "max": null,
-    "med": null,
-    "cv": null,
-    "ratio": null
+    "n": 8,
+    "min": 40000,
+    "max": 50000,
+    "med": 50000,
+    "cv": 0.068,
+    "ratio": 1.25
    },
-   "viTriSoVoiDai": null,
-   "luot": []
+   "viTriSoVoiDai": "trong",
+   "luot": [
+    {
+     "text": "40,000 VND.",
+     "ms": 56538,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around 50,000 VND for one bowl at a normal street stall in Hoan Kiem.",
+     "ms": 76914,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **50,000 VND** for one bowl of **pho bo** at a normal street stall in Hoan Kiem.",
+     "ms": 53623,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal street-stall bowl of **pho bo in Hoan Kiem, Hanoi** should be about **50,000 VND**.\n\nYou may see cheaper around **40,000 VND** in very local spots, but in Hoan Kiem tourist-heavy areas **50,000-60,000 VND** is common.",
+     "ms": 3649,
+     "so": [
+      50000,
+      40000,
+      50000,
+      60000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **50,000 VND**.",
+     "ms": 1787,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal street-stall bowl of **pho bo in Hoan Kiem** should be about **50,000 VND**.\n\nYou might see roughly **40,000-70,000 VND** depending on how central/touristy the exact spot is, but **50,000 VND** is a fair baseline.",
+     "ms": 3032,
+     "so": [
+      50000,
+      40000,
+      70000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal street-stall bowl of **pho bo in Hoan Kiem, Hanoi** should cost about **50,000 VND**.\n\nYou may see a typical range around **40,000-60,000 VND**, with central/tourist-heavy spots sometimes higher.",
+     "ms": 2538,
+     "so": [
+      50000,
+      40000,
+      60000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal street-stall bowl of **pho bo in Hoan Kiem, Hanoi** should be around **50,000 VND**.\n\nTypical range: **40,000-60,000 VND** depending on portion size and how touristy the exact street is.",
+     "ms": 4283,
+     "so": [
+      50000,
+      40000,
+      60000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "gia-co-du-lieu/pho-hk/claude-haiku-4-5-20251001": {
+   "nhom": "gia-co-du-lieu",
+   "id": "pho-hk",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm standing on a street in Hoan Kiem, Hanoi. How much should one bowl of pho bo cost at a normal street stall here? Give me a number in VND.",
+   "zone": "hanoi-hoankiem",
+   "dish": "pho-bo",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 50000,
+    "p50": 100000,
+    "p75": 110000,
+    "p95": 140000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 6,
+   "daoDong": {
+    "n": 10,
+    "min": 37500,
+    "max": 52500,
+    "med": 50000,
+    "cv": 0.098,
+    "ratio": 1.4
+   },
+   "viTriSoVoiDai": "trong",
+   "luot": [
+    {
+     "text": "At a normal street stall in Hoàn Kiếm, Hanoi, a bowl of phở bò should cost around 40,000-60,000 VND. Most casual stalls cluster in the 45,000-55,000 VND range for a standard bowl. Prices vary slightly by specific location and time of day, but that's the typical range you'd encounter.",
+     "ms": 6192,
+     "so": [
+      40000,
+      60000,
+      45000,
+      55000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "At a normal street stall in Hoan Kiem, Hanoi, a bowl of pho bo typically costs around **40,000–60,000 VND**. \n\nIf it's a basic stall with minimal seating, you might find it closer to 35,000–45,000 VND. If it's slightly more established or in a higher-traffic tourist area within Hoan Kiem, it could reach 60,000–80,000 VND. The 40,000–60,000 range is the most common for a standard bowl.",
+     "ms": 3089,
+     "so": [
+      40000,
+      60000,
+      35000,
+      45000,
+      60000,
+      80000,
+      40000,
+      60000
+     ],
+     "daiDien": 52500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of pho bo at a street stall in Hoan Kiem would typically cost around 40,000–60,000 VND, with most landing in the 45,000–55,000 VND range. Premium locations or stalls with high foot traffic might push toward 60,000–70,000 VND, while simpler spots could be as low as 35,000–40,000 VND.\n\nI'd estimate **50,000 VND** as a representative figure for a solid bowl in that area.",
+     "ms": 2593,
+     "so": [
+      40000,
+      60000,
+      45000,
+      55000,
+      60000,
+      70000,
+      35000,
+      40000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "At a normal street stall in Hoan Kiem, Hanoi, a bowl of pho bo typically costs around 40,000–60,000 VND. Most stalls in that central tourist area charge on the higher end of the local range, so expect closer to 50,000–60,000 VND rather than what you'd pay in outer districts. If you find something significantly cheaper (under 30,000), it's likely a very basic spot or you've wandered into a less touristy neighborhood.",
+     "ms": 3509,
+     "so": [
+      40000,
+      60000,
+      50000,
+      60000,
+      30000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "At a typical street stall in Hoàn Kiếm, Hanoi, a bowl of pho bo should cost around **40,000–60,000 VND**. \n\nMost casual stalls in that central district charge in this range. You might find slightly cheaper options at 30,000–40,000 VND if you venture into less touristy areas, but in Hoàn Kiếm itself, expect to pay toward the higher end of that spectrum, especially if it's a well-regarded spot. Tourist-facing places can push it to 80,000+ VND, so if a stall quotes that much, you're overpaying.",
+     "ms": 3765,
+     "so": [
+      40000,
+      60000,
+      30000,
+      40000,
+      80000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "At a typical street stall in Hoan Kiem, a bowl of pho bo costs around 40,000–60,000 VND. Most stalls in that central Hanoi area charge in that range. You might find some slightly cheaper (35,000 VND) or pricier (70,000+ VND) depending on the specific spot and current conditions, but 50,000 VND is a reasonable middle estimate for a standard bowl.",
+     "ms": 65675,
+     "so": [
+      40000,
+      60000,
+      35000,
+      70000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "At a normal street stall in Hoan Kiem, a bowl of pho bo typically costs around **30,000–50,000 VND**. \n\nIn the Hoan Kiem area specifically, which is central Hanoi and relatively touristy compared to outer districts, you'd be on the higher end of that range—closer to 40,000–50,000 VND. If you find a smaller, less-trafficked stall away from the main tourist zones near the lake, you might get it for 30,000–35,000 VND.\n\nThe price varies based on portion size, meat quality, and whether the stall attracts tourists or mainly locals. Expect to pay a bit more than you would in outer districts, but it's still very affordable.",
+     "ms": 3920,
+     "so": [
+      30000,
+      50000,
+      40000,
+      50000,
+      30000,
+      35000
+     ],
+     "daiDien": 37500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of pho bo at a normal street stall in Hoan Kiem, Hanoi typically costs between 40,000 and 60,000 VND. Most stalls in that area charge around 50,000 VND for a standard bowl. Prices vary slightly depending on the specific location, time of day, and whether you're getting the basic version or one with extra meat or premium cuts, but 50,000 VND is a solid middle estimate for that neighborhood.",
+     "ms": 4530,
+     "so": [
+      40000,
+      60000,
+      50000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "At a typical street stall in Hoàn Kiếm, Hanoi, a bowl of pho bò should cost around **40,000–60,000 VND** as of 2024. Most casual stalls in that central district charge in this range for a standard bowl. You might find some slightly cheaper options at 35,000 VND or premium versions at 70,000+ VND depending on the specific stall and portion size, but 40,000–60,000 is the normal range for a decent bowl of pho bò.",
+     "ms": 5605,
+     "so": [
+      40000,
+      60000,
+      35000,
+      70000,
+      40000,
+      60000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "At a normal street stall in Hoàn Kiếm, Hanoi, a bowl of phở bò typically costs around 40,000–60,000 VND. A reasonable middle estimate would be **50,000 VND**.\n\nThis can vary depending on the exact location, the stall's reputation, portion size, and whether it's peak tourist season, but that's the ballpark for a standard bowl at a casual local vendor in that central Hanoi district.",
+     "ms": 11499,
+     "so": [
+      40000,
+      60000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
   },
   "gia-co-du-lieu/caolau-ha/gpt-5.5": {
    "nhom": "gia-co-du-lieu",
@@ -64,19 +333,783 @@
     "p95": 160000,
     "seed": true
    },
-   "soLuot": 0,
+   "soLuot": 10,
+   "soLuotHong": 0,
    "soLanTuChoi": 0,
    "soLanRaoDon": 0,
    "daoDong": {
-    "n": 0,
-    "min": null,
-    "max": null,
-    "med": null,
-    "cv": null,
-    "ratio": null
+    "n": 10,
+    "min": 40000,
+    "max": 50000,
+    "med": 40000,
+    "cv": 0.103,
+    "ratio": 1.25
    },
-   "viTriSoVoiDai": null,
-   "luot": []
+   "viTriSoVoiDai": "duoi",
+   "luot": [
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town should cost about **40,000 VND**.",
+     "ms": 3542,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town should be about **40,000 VND**.\n\nAt a very local/simple place you might see **30,000-40,000 VND**; in a more tourist-facing Old Town spot, **50,000-70,000 VND** is common.",
+     "ms": 4238,
+     "so": [
+      40000,
+      30000,
+      40000,
+      50000,
+      70000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town should be about **40,000 VND**.",
+     "ms": 2150,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About **40,000 VND** for one bowl at a normal local place in Hoi An Old Town.\n\nYou may see touristy spots charging **50,000-80,000 VND**, but **40,000 VND** is a reasonable baseline price.",
+     "ms": 2572,
+     "so": [
+      40000,
+      50000,
+      80000,
+      40000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town should be about **40,000 VND**.\n\nAt a simple local place, expect roughly **35,000-50,000 VND**. In a more touristy restaurant in the old town, **60,000-90,000 VND** is common.",
+     "ms": 2853,
+     "so": [
+      40000,
+      35000,
+      50000,
+      60000,
+      90000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town should cost about **40,000 VND**.\n\nAt a very local/simple place it may be closer to **30,000-35,000 VND**; in tourist-heavy restaurants, **50,000-70,000 VND** is common.",
+     "ms": 2880,
+     "so": [
+      40000,
+      30000,
+      35000,
+      50000,
+      70000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town should cost about **50,000 VND**.\n\nAt a very local/simple place it may be closer to **35,000-45,000 VND**; in tourist-heavy spots around the Old Town, **50,000-70,000 VND** is common.",
+     "ms": 3275,
+     "so": [
+      50000,
+      35000,
+      45000,
+      50000,
+      70000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About **40,000 VND** for one bowl at a normal local place in Hoi An Old Town.  \nTouristy spots may be more like **50,000-70,000 VND**.",
+     "ms": 2696,
+     "so": [
+      40000,
+      50000,
+      70000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of **cao lau in Hoi An Old Town** should be about **40,000 VND**.\n\nAt very local/simple spots you might see **30,000-40,000 VND**; touristy Old Town restaurants can be **50,000-70,000 VND**.",
+     "ms": 3214,
+     "so": [
+      40000,
+      30000,
+      40000,
+      50000,
+      70000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town should cost about **40,000 VND**.\n\nAt a simple local place you might see **30,000-50,000 VND**; more touristy restaurants can be higher.",
+     "ms": 2847,
+     "so": [
+      40000,
+      30000,
+      50000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "gia-co-du-lieu/caolau-ha/claude-haiku-4-5-20251001": {
+   "nhom": "gia-co-du-lieu",
+   "id": "caolau-ha",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm in Hoi An Old Town. How much should one bowl of cao lau cost at a normal place here? Give me a number in VND.",
+   "zone": "hoian-oldtown",
+   "dish": "cao-lau",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 60000,
+    "p50": 70000,
+    "p75": 90000,
+    "p95": 160000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 10,
+    "min": 40000,
+    "max": 60000,
+    "med": 46250,
+    "cv": 0.154,
+    "ratio": 1.5
+   },
+   "viTriSoVoiDai": "duoi",
+   "luot": [
+    {
+     "text": "A bowl of cao lau at a normal local place in Hoi An Old Town typically costs around 40,000–60,000 VND. Most casual eateries and street stalls in the tourist-heavy old town charge in that range, with 50,000 VND being a common middle ground.\n\nIf you're eating at a slightly nicer restaurant rather than a basic stall, you might pay 70,000–100,000 VND. Avoid the most touristy spots right on the main streets, where prices can climb higher.",
+     "ms": 2462,
+     "so": [
+      40000,
+      60000,
+      50000,
+      70000,
+      100000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical bowl of cao lau at a normal local restaurant in Hoi An Old Town runs around 40,000–50,000 VND. Some places in the heart of the tourist area might charge 60,000–80,000 VND, while smaller family-run spots or stalls could go as low as 30,000–40,000 VND. I'd aim for the 40,000–50,000 range as a fair middle estimate for a decent bowl at a regular place.",
+     "ms": 5404,
+     "so": [
+      40000,
+      50000,
+      60000,
+      80000,
+      30000,
+      40000,
+      40000,
+      50000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lau at a normal local restaurant in Hoi An Old Town typically costs around 30,000–50,000 VND. Most places fall in the 40,000 VND range for a standard serving.\n\nIf you're eating at a touristy spot right on the main pedestrian street, you might pay 50,000–70,000 VND. Local warungs and smaller shops away from the main drag will be closer to 30,000–40,000 VND.",
+     "ms": 5374,
+     "so": [
+      30000,
+      50000,
+      40000,
+      50000,
+      70000,
+      30000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town typically costs between 40,000–60,000 VND. Most local vendors and casual restaurants charge around 50,000 VND for a standard serving.\n\nIf you're eating at a tourist-oriented place in the heart of the Old Town, expect to pay toward the higher end or slightly above. Local spots away from the main pedestrian streets will be closer to 40,000 VND.",
+     "ms": 3843,
+     "so": [
+      40000,
+      60000,
+      50000,
+      40000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal bowl of cao lau in Hoi An Old Town typically costs around **40,000–60,000 VND**. \n\nTourist-facing restaurants in the main areas might charge up to 80,000–100,000 VND, while local spots or street vendors could be slightly less. The 40,000–60,000 range is what you'd expect at a straightforward local restaurant.",
+     "ms": 4308,
+     "so": [
+      40000,
+      60000,
+      80000,
+      100000,
+      40000,
+      60000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lầu at a normal local place in Hoi An typically costs between 30,000–50,000 VND. Most establishments serving it to locals charge around 40,000 VND for a standard bowl.\n\nIf you're eating at a touristy spot in the Old Town itself, expect to pay more—often 60,000–100,000 VND or higher. But for an authentic local price at a regular eatery, 40,000 VND is a solid reference point.",
+     "ms": 13989,
+     "so": [
+      30000,
+      50000,
+      40000,
+      60000,
+      100000,
+      40000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lau at a normal, non-touristy place in Hoi An Old Town typically costs around 40,000-60,000 VND. Most local vendors and small restaurants charge in that range. You might find it slightly cheaper (30,000-40,000 VND) at a very simple stall, or pay more (70,000-100,000+ VND) at tourist-oriented establishments, but the mid-range for an ordinary bowl is roughly 50,000 VND.",
+     "ms": 3118,
+     "so": [
+      40000,
+      60000,
+      30000,
+      40000,
+      70000,
+      100000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical bowl of cao lau at a normal local restaurant in Hoi An Old Town costs around 30,000–50,000 VND. Most places fall in the 35,000–45,000 VND range for a standard serving.\n\nIf you're eating at a place clearly catering to tourists in the main pedestrian zones, it could be slightly higher (50,000–60,000 VND), but that's the going rate at ordinary eateries where locals eat.",
+     "ms": 2997,
+     "so": [
+      30000,
+      50000,
+      35000,
+      45000,
+      50000,
+      60000
+     ],
+     "daiDien": 47500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lau at a normal, non-touristy place in Hoi An Old Town typically costs around 40,000–60,000 VND. Most local vendors and small restaurants charge in that range. If you're at a slightly nicer spot or somewhere more touristy, it might run 60,000–80,000 VND, but 40,000–60,000 is the standard local price.",
+     "ms": 2598,
+     "so": [
+      40000,
+      60000,
+      60000,
+      80000,
+      40000,
+      60000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lau at a normal restaurant or street stall in Hoi An Old Town typically costs around 30,000–50,000 VND. Most places will be in the 40,000 VND range for a standard serving.\n\nIf you're eating at a tourist-focused establishment right in the heart of the Old Town, it might run 50,000–60,000 VND or slightly higher. Street vendors or less touristy spots may charge 30,000–35,000 VND.",
+     "ms": 3675,
+     "so": [
+      30000,
+      50000,
+      40000,
+      50000,
+      60000,
+      30000,
+      35000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "gia-co-du-lieu/bunbo-hue/gpt-5.5": {
+   "nhom": "gia-co-du-lieu",
+   "id": "bunbo-hue",
+   "model": "gpt-5.5",
+   "hoi": "I'm near the Citadel in Hue. How much should one bowl of bun bo Hue cost at a normal street stall here? Give me a number in VND.",
+   "zone": "hue-citadel",
+   "dish": "bun-bo-hue",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 35000,
+    "p50": 50000,
+    "p75": 70000,
+    "p95": 90000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 35000,
+    "med": 35000,
+    "cv": 0.043,
+    "ratio": 1.17
+   },
+   "viTriSoVoiDai": "trong",
+   "luot": [
+    {
+     "text": "A normal street stall near the Citadel in Hue should be about **35,000 VND** for one bowl of `bun bo Hue`.",
+     "ms": 4011,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `30,000 VND` for one bowl at a normal street stall near the Citadel.",
+     "ms": 3881,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one bowl at a normal street stall near the Citadel.",
+     "ms": 4123,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one bowl at a normal street stall near the Citadel.",
+     "ms": 3521,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one bowl at a normal street stall near the Citadel.",
+     "ms": 3912,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one normal bowl at a street stall near the Citadel.",
+     "ms": 3154,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `35,000 VND` for one normal bowl at a street stall near the Citadel.",
+     "ms": 2981,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **35,000 VND** for one bowl at a normal street stall near the Citadel.",
+     "ms": 3484,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `35,000 VND` for one bowl at a normal street stall near the Citadel.",
+     "ms": 3606,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "35,000 VND is a normal price for one bowl at a street stall near the Citadel.",
+     "ms": 4155,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "gia-co-du-lieu/bunbo-hue/claude-haiku-4-5-20251001": {
+   "nhom": "gia-co-du-lieu",
+   "id": "bunbo-hue",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm near the Citadel in Hue. How much should one bowl of bun bo Hue cost at a normal street stall here? Give me a number in VND.",
+   "zone": "hue-citadel",
+   "dish": "bun-bo-hue",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 35000,
+    "p50": 50000,
+    "p75": 70000,
+    "p95": 90000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 7,
+   "daoDong": {
+    "n": 10,
+    "min": 35000,
+    "max": 50000,
+    "med": 40000,
+    "cv": 0.125,
+    "ratio": 1.43
+   },
+   "viTriSoVoiDai": "trong",
+   "luot": [
+    {
+     "text": "At a normal street stall near the Citadel in Hue, a bowl of bun bo Hue typically costs around 40,000–60,000 VND. Most vendors in that area charge in the 50,000 VND range for a standard serving.\n\nIf you're eating at a particularly popular or well-located stall near major tourist spots, you might see prices toward the higher end or slightly above. Smaller, more local stalls away from the main tourist areas could be closer to 35,000–45,000 VND.",
+     "ms": 2896,
+     "so": [
+      40000,
+      60000,
+      50000,
+      35000,
+      45000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal street stall bowl of bun bo Hue near the Citadel in Hue typically costs around **30,000–50,000 VND**, with most stalls charging in the **35,000–45,000 VND** range.\n\nIf you're at a particularly popular or well-positioned stall, it might lean toward the higher end. A very basic stall might be closer to 30,000 VND. Tourist-adjacent areas could push slightly higher, but this is the standard local price for a proper portion in Hue itself.",
+     "ms": 3223,
+     "so": [
+      30000,
+      50000,
+      35000,
+      45000,
+      30000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of bun bo Hue at a normal street stall near the Citadel in Hue typically costs around 30,000–50,000 VND, with 40,000 VND being a reasonable middle estimate for 2024.\n\nPrices vary based on the specific stall's reputation, portion size, and meat quality, but this range covers most casual vendors in the area. Stalls with better-known reputations or in higher-traffic tourist zones might charge toward the upper end or slightly above, while smaller local spots may be closer to 30,000 VND.",
+     "ms": 3905,
+     "so": [
+      30000,
+      50000,
+      40000,
+      30000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical bowl of bun bo Hue at a normal street stall near the Citadel in Hue should cost around **30,000–50,000 VND**. Most stalls in that area fall in the 35,000–45,000 VND range for a standard, generous portion.\n\nIf it's a particularly popular or well-established spot, you might see 50,000–60,000 VND. Tourist-oriented places could charge more, but at actual street stalls frequented by locals, you're looking at the lower end of that range.",
+     "ms": 3411,
+     "so": [
+      30000,
+      50000,
+      35000,
+      45000,
+      50000,
+      60000
+     ],
+     "daiDien": 47500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of bun bo Hue at a normal street stall near the Citadel in Hue typically costs between 40,000 and 60,000 VND, with 50,000 VND being a reasonable middle estimate for a standard portion.\n\nPrices can vary slightly depending on the specific stall, whether it's peak tourist season, and if you're ordering from a more established vendor versus a smaller cart, but that range covers what you'd expect to pay for a quality bowl in that area.",
+     "ms": 2461,
+     "so": [
+      40000,
+      60000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bun bo Hue at a normal street stall near the Citadel in Hue typically costs between 30,000 and 50,000 VND, with 40,000 VND being a reasonable mid-range estimate for a standard portion.\n\nPrices can vary slightly depending on the specific stall, quality of ingredients, and whether it's peak tourist season, but that range covers what you'd expect to pay at an established local vendor in that area.",
+     "ms": 3723,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bun bo Hue at a normal street stall near the Citadel in Hue typically costs between 30,000–50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard portion.\n\nPrices vary by stall quality and exact location—busier tourist-adjacent spots may charge toward the higher end, while quieter local stalls might be closer to 30,000 VND. If the stall is particularly well-known or in a premium location, you might see 60,000 VND or slightly more.",
+     "ms": 3281,
+     "so": [
+      30000,
+      50000,
+      40000,
+      30000,
+      60000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bun bo Hue at a typical street stall near the Citadel in Hue should cost around **40,000–60,000 VND**, with 50,000 VND being a fair middle estimate for a standard portion.\n\nPrices vary by vendor and exact location—stalls right at major tourist spots may charge toward the higher end, while those a block or two away tend toward the lower end. Quality and portion size also factor in.",
+     "ms": 3600,
+     "so": [
+      40000,
+      60000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical bowl of bun bo Hue at a street stall near the Citadel in Hue should cost around 30,000–50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard portion.\n\nPrices vary by stall quality and exact location, but this range reflects what you'd expect to pay at an ordinary, non-touristy street vendor in that area. Stalls closer to major tourist spots may charge slightly more, while those in quieter neighborhoods might be a bit cheaper.",
+     "ms": 5309,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal street stall bowl of bun bo Hue near the Citadel in Hue typically costs around 30,000–50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard portion in 2024.\n\nPrices vary based on the specific stall's reputation, portion size, and meat quality, but that range covers what you'd expect to pay at a casual, non-touristy spot in the area.",
+     "ms": 4964,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "gia-co-du-lieu/comtam-q1/gpt-5.5": {
+   "nhom": "gia-co-du-lieu",
+   "id": "comtam-q1",
+   "model": "gpt-5.5",
+   "hoi": "I'm in District 1, Ho Chi Minh City. How much should one plate of com tam cost at a normal place here? Give me a number in VND.",
+   "zone": "hcmc-district1",
+   "dish": "com-tam",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 50000,
+    "p50": 80000,
+    "p75": 90000,
+    "p95": 140000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 1,
+   "daoDong": {
+    "n": 10,
+    "min": 45000,
+    "max": 62500,
+    "med": 57500,
+    "cv": 0.106,
+    "ratio": 1.39
+   },
+   "viTriSoVoiDai": "trong",
+   "luot": [
+    {
+     "text": "A normal plate of cơm tấm in District 1 should cost about **55,000 VND**.\n\nAt a simple local place, expect roughly **45,000-70,000 VND** depending on toppings. If it is a polished/tourist-facing spot, **80,000+ VND** is common.",
+     "ms": 3756,
+     "so": [
+      55000,
+      45000,
+      70000,
+      80000
+     ],
+     "daiDien": 62500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A normal plate of com tam in District 1, Ho Chi Minh City should cost about **55,000 VND**.\n\nAt very local spots it may be closer to **40,000-50,000 VND**, while cleaner or more central casual places often land around **60,000-80,000 VND**.",
+     "ms": 2832,
+     "so": [
+      55000,
+      40000,
+      50000,
+      60000,
+      80000
+     ],
+     "daiDien": 55000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of **com tam in District 1** should be around **60,000 VND**.\n\nAt a simple local spot it may be closer to **45,000-55,000 VND**, while a cleaner sit-down place in District 1 can easily be **65,000-80,000 VND**.",
+     "ms": 3094,
+     "so": [
+      60000,
+      45000,
+      55000,
+      65000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of com tam in District 1 should be about **60,000 VND**.\n\nAt a basic local spot you might see **45,000-70,000 VND**; in more touristy or nicer places it can be higher.",
+     "ms": 2518,
+     "so": [
+      60000,
+      45000,
+      70000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **45,000 VND** for one plate of cơm tấm at a normal local place in District 1.\n\nYou may see cheaper basic plates around **35,000-40,000 VND**, while places aimed at office workers or tourists can be **55,000-70,000 VND**.",
+     "ms": 3294,
+     "so": [
+      45000,
+      35000,
+      40000,
+      55000,
+      70000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of com tam in District 1 should cost about **55,000 VND**.",
+     "ms": 2240,
+     "so": [
+      55000
+     ],
+     "daiDien": 55000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of **com tam in District 1, Ho Chi Minh City** should cost about **60,000 VND**.",
+     "ms": 2525,
+     "so": [
+      60000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of com tam in District 1, Ho Chi Minh City should cost about **45,000 VND**.\n\nAt a very local/simple spot it might be closer to **35,000-40,000 VND**, while a cleaner sit-down or tourist-facing place in District 1 can easily be **55,000-70,000 VND**.",
+     "ms": 4019,
+     "so": [
+      45000,
+      35000,
+      40000,
+      55000,
+      70000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of `com tam` in District 1 should cost about **50,000 VND**.\n\nAt a basic local spot it may be closer to **40,000-55,000 VND**; in a more tourist-facing or nicer casual place, **60,000-80,000 VND** is common.",
+     "ms": 3390,
+     "so": [
+      50000,
+      40000,
+      55000,
+      60000,
+      80000
+     ],
+     "daiDien": 55000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A normal plate of cơm tấm in District 1 should be about **50,000 VND**.\n\nAt a simple local spot you might see **40,000-60,000 VND**; in a more tourist-facing or nicer casual place, **70,000-90,000 VND** is common.",
+     "ms": 3114,
+     "so": [
+      50000,
+      40000,
+      60000,
+      70000,
+      90000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
   }
  }
 }
