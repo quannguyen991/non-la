@@ -2565,6 +2565,737 @@
      "raoDon": false
     }
    ]
+  },
+  "gia-khong-du-lieu/buncha-mk/gpt-5.5": {
+   "nhom": "gia-khong-du-lieu",
+   "id": "buncha-mk",
+   "model": "gpt-5.5",
+   "hoi": "I'm at My Khe beach in Da Nang. How much should one serving of bun cha cost here? Give me a number in VND.",
+   "zone": "danang-mykhe",
+   "dish": "bun-cha",
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 1,
+   "daoDong": {
+    "n": 10,
+    "min": 40000,
+    "max": 60000,
+    "med": 46250,
+    "cv": 0.117,
+    "ratio": 1.5
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "About `40,000 VND` for one serving.  \n\nAt a beach-area spot near My Khe, `35,000-50,000 VND` is a normal range depending on the shop and portion size.",
+     "ms": 3482,
+     "so": [
+      40000,
+      35000,
+      50000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "About **45,000 VND** for one serving.",
+     "ms": 4235,
+     "so": [
+      45000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical serving of `bún chả` around My Khe beach in Da Nang should be about `50,000 VND`. In a more touristy spot, `60,000–80,000 VND` is still plausible.",
+     "ms": 3435,
+     "so": [
+      50000,
+      60000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `45,000 VND` for one serving of `bún chả` near My Khe. In a casual local place, `35,000-60,000 VND` is a normal range.",
+     "ms": 3622,
+     "so": [
+      45000,
+      35000,
+      60000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND` for one serving.",
+     "ms": 4380,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About 50,000 VND for one serving.",
+     "ms": 3693,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `50,000 VND` for one serving is a reasonable target near My Khe. If it’s a basic local shop, `35,000-45,000 VND` is still fair; if it’s a tourist-facing place, `60,000 VND` or a bit more can happen.",
+     "ms": 5461,
+     "so": [
+      50000,
+      35000,
+      45000,
+      60000
+     ],
+     "daiDien": 47500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `45,000 VND` for one serving near My Khe.",
+     "ms": 3802,
+     "so": [
+      45000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `50,000 VND` for one serving.",
+     "ms": 4038,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `50,000 VND` for one serving near My Khe.",
+     "ms": 3674,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "gia-khong-du-lieu/buncha-mk/claude-haiku-4-5-20251001": {
+   "nhom": "gia-khong-du-lieu",
+   "id": "buncha-mk",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm at My Khe beach in Da Nang. How much should one serving of bun cha cost here? Give me a number in VND.",
+   "zone": "danang-mykhe",
+   "dish": "bun-cha",
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 7,
+   "daoDong": {
+    "n": 10,
+    "min": 50000,
+    "max": 115000,
+    "med": 76250,
+    "cv": 0.248,
+    "ratio": 2.3
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "Bun chả prices at tourist beaches like My Khe in Da Nang typically range from 40,000 to 80,000 VND per serving, depending on the vendor and exact location.\n\nIf you're eating at a beachfront restaurant or tourist-oriented stand, expect the higher end of that range—around 60,000–80,000 VND. Local food stalls slightly away from the main beach area usually charge 40,000–50,000 VND.\n\nA reasonable middle estimate for a standard serving at My Khe would be **50,000–60,000 VND**.",
+     "ms": 2603,
+     "so": [
+      40000,
+      80000,
+      60000,
+      80000,
+      40000,
+      50000,
+      50000,
+      60000
+     ],
+     "daiDien": 55000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Bun chả prices at beachside locations in Da Nang tend to run higher than inland. For a single serving at a casual restaurant or food stall near My Khe Beach, you'd typically expect to pay **60,000–100,000 VND**, with most landing around **70,000–80,000 VND**.\n\nBeachfront venues charge more than neighborhood spots. If you're at a dedicated restaurant with table service rather than a street stall, it could reach **120,000 VND** or beyond. Direct street vendors might be slightly cheaper, closer to **50,000–60,000 VND**, but My Khe's tourist proximity pushes prices upward.\n\nA reasonable midpoint estimate: **75,000 VND**.",
+     "ms": 4059,
+     "so": [
+      60000,
+      100000,
+      70000,
+      80000,
+      120000,
+      50000,
+      60000,
+      75000
+     ],
+     "daiDien": 72500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Bun chả isn't typically a dish you'd find at a beach in Da Nang — it's a Hanoi specialty. At the beach, you'd more likely encounter grilled seafood, bánh mì, or other coastal Vietnamese dishes.\n\nThat said, if you did find bun chả at a tourist-area restaurant near My Khe beach, a single serving would likely run 80,000–150,000 VND depending on the restaurant's positioning. Tourist spots charge more than local eateries.\n\nIf you're looking for actual local food recommendations at My Khe, I'd be happy to help with that instead.",
+     "ms": 2866,
+     "so": [
+      80000,
+      150000
+     ],
+     "daiDien": 115000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "At My Khe beach in Da Nang, a typical serving of bun cha should cost around **40,000–60,000 VND** for a standard restaurant or food stall.\n\nIf you're eating at a casual beachside vendor or food stall, you might find it toward the lower end or even slightly less. At a more established restaurant with a view, it could push toward the higher end or beyond. Tourist-oriented spots directly on the beach may charge a premium—potentially 70,000–100,000 VND or more.\n\nFor the best value, look for local spots slightly back from the immediate beachfront.",
+     "ms": 2984,
+     "so": [
+      40000,
+      60000,
+      70000,
+      100000
+     ],
+     "daiDien": 65000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical serving of bun chả at a casual restaurant or street vendor in Da Nang should cost around 40,000–60,000 VND, with 50,000 VND being a reasonable mid-range estimate. Prices can vary based on the specific location (beachfront venues charge more), the quality of ingredients, and whether it's a tourist-oriented spot versus a local establishment. At My Khe beach specifically, if you're eating at a beachfront restaurant, you might see prices toward the higher end or even exceeding this range.",
+     "ms": 7429,
+     "so": [
+      40000,
+      60000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical serving of bun cha at My Khe beach in Da Nang should cost around **60,000–120,000 VND**, depending on the vendor and location.\n\nBeachfront vendors and restaurants charge more than inland spots. A casual beach stall might offer it at the lower end (60,000–80,000 VND), while a sit-down restaurant with a beachfront view could ask 100,000–120,000 VND or more.\n\nIf you're looking for the best value, head slightly inland from the beach proper—you'll find better prices at local eateries while staying close by.",
+     "ms": 2957,
+     "so": [
+      60000,
+      120000,
+      60000,
+      80000,
+      100000,
+      120000
+     ],
+     "daiDien": 90000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical serving of bun cha at My Khe beach in Da Nang would cost around **80,000–120,000 VND**, depending on the specific restaurant or street vendor.\n\nBeach areas tend to be pricier than inland neighborhoods. Casual beachfront vendors or casual restaurants charge in that range, while higher-end establishments right on the beach could push toward 150,000 VND or more. If you're eating at a small local shop back from the immediate beachfront, you might find it closer to 60,000–80,000 VND.\n\nI'd suggest checking a few spots to compare before ordering—prices vary noticeably even within the same area.",
+     "ms": 3077,
+     "so": [
+      80000,
+      120000,
+      150000,
+      60000,
+      80000
+     ],
+     "daiDien": 80000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical serving of bun chả at My Khe beach in Da Nang should cost around **80,000–150,000 VND**, depending on the specific restaurant or vendor.\n\nTourist-facing establishments right on the beach tend toward the higher end of that range, while smaller local spots or vendors a block back from the waterfront usually charge closer to 80,000–100,000 VND. Premium restaurants with beachfront seating can go higher, sometimes exceeding 150,000 VND.\n\nIf you're looking for a reasonable midpoint estimate, **100,000–120,000 VND** is a solid benchmark for a full serving with decent quality.",
+     "ms": 3245,
+     "so": [
+      80000,
+      150000,
+      80000,
+      100000,
+      150000,
+      100000,
+      120000
+     ],
+     "daiDien": 100000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Bun chả isn't typically a Da Nang specialty—it's a Hanoi dish. You're more likely to find it at tourist-oriented restaurants or chains rather than authentic local spots in My Khe.\n\nAt a casual beachside restaurant in Da Nang, a serving of bun chả would typically run **60,000–100,000 VND**. Tourist-focused places near My Khe beach could charge **120,000–150,000 VND** or more.\n\nIf you want authentic bun chả, you'd be better served heading to a local com tam or pho joint away from the beach, where you might find it for **50,000–70,000 VND**. Da Nang's strength is fresh seafood and banh mi, so those would be better local options at the beach.",
+     "ms": 7373,
+     "so": [
+      60000,
+      100000,
+      120000,
+      150000,
+      50000,
+      70000
+     ],
+     "daiDien": 85000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Bun cha isn't a typical dish in Da Nang—it's a Hanoi specialty. You're unlikely to find authentic bun cha at My Khe beach or elsewhere in Da Nang.\n\nIf a restaurant there does offer it (perhaps catering to tourists familiar with the dish), you'd likely pay a markup. A single serving would probably run 80,000–150,000 VND depending on the venue and whether it's a tourist-oriented spot.\n\nIn Hanoi itself, where bun cha is standard street food, a serving costs 30,000–50,000 VND at local stalls. Da Nang pricing would be higher, especially beachside.",
+     "ms": 3223,
+     "so": [
+      80000,
+      150000,
+      30000,
+      50000
+     ],
+     "daiDien": 65000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "gia-khong-du-lieu/goica-hue/gpt-5.5": {
+   "nhom": "gia-khong-du-lieu",
+   "id": "goica-hue",
+   "model": "gpt-5.5",
+   "hoi": "I'm near the Citadel in Hue. How much should one serving of goi ca Nam O cost here? Give me a number in VND.",
+   "zone": "hue-citadel",
+   "dish": "goi-ca-nam-o",
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 1,
+   "daoDong": {
+    "n": 10,
+    "min": 50000,
+    "max": 100000,
+    "med": 70000,
+    "cv": 0.226,
+    "ratio": 2
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "A fair price near the Citadel in Hue is about **50,000 VND** for one serving.",
+     "ms": 7878,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `100,000 VND` per serving.",
+     "ms": 4946,
+     "so": [
+      100000
+     ],
+     "daiDien": 100000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "`80,000 VND` for one serving is a reasonable target near the Citadel in Hue.",
+     "ms": 4474,
+     "so": [
+      80000
+     ],
+     "daiDien": 80000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A fair price is about **70,000 VND** for one serving.\n\nNear the Citadel, I’d expect roughly **60,000 to 90,000 VND**, depending on the restaurant and portion size.",
+     "ms": 5533,
+     "so": [
+      70000,
+      60000,
+      90000
+     ],
+     "daiDien": 70000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "About 50,000 VND for one serving near the Citadel.",
+     "ms": 4943,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A fair price for one serving of `gỏi cá Nam Ô` near the Citadel in Hue is about **70,000 VND**.",
+     "ms": 6046,
+     "so": [
+      70000
+     ],
+     "daiDien": 70000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `80,000 VND` for one serving near the Citadel is a reasonable expectation.",
+     "ms": 5285,
+     "so": [
+      80000
+     ],
+     "daiDien": 80000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `70,000 VND` for one serving near the Citadel.",
+     "ms": 5712,
+     "so": [
+      70000
+     ],
+     "daiDien": 70000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `50,000 VND` for one serving is a reasonable target near the Citadel.",
+     "ms": 5366,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **60,000 VND** for one serving.",
+     "ms": 6065,
+     "so": [
+      60000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "gia-khong-du-lieu/goica-hue/claude-haiku-4-5-20251001": {
+   "nhom": "gia-khong-du-lieu",
+   "id": "goica-hue",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm near the Citadel in Hue. How much should one serving of goi ca Nam O cost here? Give me a number in VND.",
+   "zone": "hue-citadel",
+   "dish": "goi-ca-nam-o",
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 9,
+   "daoDong": {
+    "n": 10,
+    "min": 55000,
+    "max": 115000,
+    "med": 90000,
+    "cv": 0.229,
+    "ratio": 2.09
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "I don't have reliable information about current menu prices at specific restaurants near the Citadel in Hue. Gỏi cá Nam Ộ (a fish salad specialty from Nam Ộ village) pricing varies significantly by vendor, restaurant quality level, and how recently prices have been updated.\n\nFor a realistic local estimate: a serving at a casual food stall would typically be around 50,000–80,000 VND, while a restaurant near the Citadel catering to tourists might charge 100,000–150,000 VND or more.\n\nYour best bet is to ask vendors directly or check recent reviews on Google Maps for restaurants in that area, which will show current prices and photos of the dish.",
+     "ms": 3470,
+     "so": [
+      50000,
+      80000,
+      100000,
+      150000
+     ],
+     "daiDien": 90000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have reliable access to current pricing for specific dishes at specific locations, especially for a local specialty like gỏi cá Nam Ơ in Hue. Prices vary by restaurant, season, and market conditions, and they change over time.\n\nFor an accurate current price, I'd recommend:\n- Checking Google Maps or TripAdvisor reviews for restaurants near the Citadel that serve this dish — reviewers often mention prices\n- Asking your hotel or a local guide\n- Visiting a nearby restaurant and asking directly\n\nThat said, gỏi cá Nam Ơ is a local specialty in Hue, typically reasonably priced as a street food or casual restaurant dish. You could expect something in the range of 50,000–150,000 VND depending on the venue, but I can't give you a precise figure without current local knowledge.",
+     "ms": 6091,
+     "so": [
+      50000,
+      150000
+     ],
+     "daiDien": 100000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have reliable information about current street-food pricing in specific Vietnamese locations. Gỏi cá Nam Ô (a fish salad specialty from Huế) prices fluctuate based on the vendor, exact location, tourist density, and current conditions.\n\nThat said, from what I know about Huế street food markets: a typical serving of gỏi cá Nam Ô from a standard vendor would likely run between 40,000–80,000 VND, with touristy spots or established restaurants charging more (up to 150,000+ VND). Local markets near the Citadel tend to be on the lower end of that range.\n\nYour best move is to ask locals or check a few vendors nearby—prices vary enough that a direct number would be more misleading than useful.",
+     "ms": 3702,
+     "so": [
+      40000,
+      80000,
+      150000
+     ],
+     "daiDien": 80000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have reliable access to current pricing for specific dishes at particular locations. Food prices fluctuate based on the restaurant, season, tourist demand, and local economic conditions.\n\nThat said, gỏi cá Nam Ô (a fresh fish salad specialty from the Nam Ô fishing village near Hue) typically costs between 80,000–150,000 VND per serving at casual to mid-range restaurants in Hue, depending on the quality and location. Tourist-oriented spots near the Citadel tend toward the higher end of that range.\n\nFor the most accurate current price, I'd ask your hotel, check recent Google reviews for nearby restaurants, or simply ask vendors directly—haggling is common in Hue's food scene, especially for casual dining.",
+     "ms": 3149,
+     "so": [
+      80000,
+      150000
+     ],
+     "daiDien": 115000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have reliable access to current pricing for specific dishes at specific locations. Street food and restaurant prices in Hue fluctuate based on the vendor, exact location, ingredients, and current conditions.\n\nThat said, gỏi cá Nam Ô (a local fish salad specialty from Nam Ô village near Hue) typically runs around **40,000–80,000 VND** for a serving at casual eateries and street stalls in Hue, with tourist-facing restaurants charging more. If you're near the Citadel, you're in a higher-traffic area, so expect prices on the higher end of that range or slightly above.\n\nYour best move is to ask a local vendor or check a few stalls—prices vary noticeably, and haggling is common at street food spots.",
+     "ms": 3419,
+     "so": [
+      40000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have reliable information about current street food prices in Hue, including goi ca Nam O (fermented fish salad), which fluctuates seasonally and by vendor. Price ranges vary significantly depending on where you eat—casual street stalls versus restaurants—and have likely shifted since my training data.\n\nYour best bet is to ask locals or check recent travel blogs and forums focused on Hue. If you're near the Citadel, vendors in that tourist area may charge more than those in residential neighborhoods.\n\nThat said, fermented fish salads at casual venues in Vietnam typically run anywhere from 30,000–80,000 VND for a standard serving, but I can't give you a reliable current number for this specific dish in this specific location.",
+     "ms": 3347,
+     "so": [
+      30000,
+      80000
+     ],
+     "daiDien": 55000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have reliable information about current prices for gỏi cá Nam Ô (a Huế specialty fish salad) in that specific location. Prices vary significantly based on the exact vendor, whether it's a street stall or restaurant, current market conditions, and seasonal factors.\n\nThat said, from what I know about street food pricing in Huế, a typical serving of gỏi cá Nam Ô from a casual vendor would generally range around **50,000–80,000 VND**, with restaurant versions running higher (100,000–150,000+ VND). Near a tourist area like the Citadel, prices might skew toward the upper end of that range or beyond.\n\nYour best bet is to ask locals or check a few nearby vendors to see what they're charging—prices can vary noticeably even within the same neighborhood.",
+     "ms": 3488,
+     "so": [
+      50000,
+      80000,
+      100000,
+      150000
+     ],
+     "daiDien": 90000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have reliable information about current menu prices for gỏi cá Nam Ô in Hue. While this is a regional specialty dish from the Nam Ô area near Hue, restaurant and street food prices fluctuate based on the vendor, location, season, and current economic conditions.\n\nFrom general knowledge about Vietnamese street food pricing in Hue, a typical serving of gỏi cá (fish salad) at a casual eatery or street vendor would likely fall in the range of 40,000–80,000 VND, but this is an estimate rather than a precise current figure.\n\nFor the most accurate price, I'd recommend:\n- Asking locals or your hotel staff\n- Checking recent reviews on Google Maps or TripAdvisor for Nam Ô restaurants\n- Visiting a few stalls near the Citadel to compare",
+     "ms": 3604,
+     "so": [
+      40000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "I don't have reliable access to current, specific pricing for dishes at particular locations in Hue. Food prices vary by restaurant, season, and change over time, and I can't give you an accurate figure for a specific venue without recent local data.\n\nFor a current price, I'd suggest:\n- Asking your hotel or a local guide\n- Checking recent reviews on Google Maps or TripAdvisor for restaurants near the Citadel\n- Asking at a nearby restaurant directly\n\nThat said, gỏi cá Nam Ô (a local Hue fish salad) is typically a modest dish at casual eateries—generally in the range of 50,000–150,000 VND depending on the restaurant's tier—but I can't pin down a reliable number for your exact location and time without current information.",
+     "ms": 3289,
+     "so": [
+      50000,
+      150000
+     ],
+     "daiDien": 100000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have reliable information about current menu prices for gỏi cá Nam Ô (a local Hue fish salad specialty) at specific locations near the Citadel. Prices vary significantly by vendor, season, and whether you're eating at a casual street stall versus a restaurant, and my knowledge has limits on real-time pricing data.\n\nFor an accurate price, I'd recommend:\n- Asking at your accommodation or a local guide\n- Checking recent reviews on Google Maps or TripAdvisor for restaurants in that area\n- Asking vendors directly when you see the dish\n\nGenerally, casual street food in Hue tends to be quite affordable (often 50,000–150,000 VND for a full dish), but that's a broad range and won't tell you the specific current price for this particular specialty.",
+     "ms": 3310,
+     "so": [
+      50000,
+      150000
+     ],
+     "daiDien": 100000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "don-vi/ca-100g/gpt-5.5": {
+   "nhom": "don-vi",
+   "id": "ca-100g",
+   "model": "gpt-5.5",
+   "hoi": "A seafood menu in Vietnam says: ca song 100.000/100g. I want a fish that weighs 800 grams. How much will I be charged in VND?",
+   "zone": null,
+   "dish": null,
+   "dung": 800000,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "soLanDungDonVi": 10,
+   "daoDong": {
+    "n": 10,
+    "min": 450000,
+    "max": 800000,
+    "med": 450000,
+    "cv": 0.291,
+    "ratio": 1.78
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "You’d be charged `800,000 VND`.\n\n`100,000 VND per 100g` times `8` for `800g` = `800,000 VND`.",
+     "ms": 3021,
+     "so": [
+      800000,
+      100000,
+      800000
+     ],
+     "daiDien": 800000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’ll be charged `800,000 VND`.\n\nCalculation: `100,000 VND per 100g × 8 = 800,000 VND` for `800g`.",
+     "ms": 2884,
+     "so": [
+      800000,
+      100000,
+      800000
+     ],
+     "daiDien": 800000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’d be charged **800,000 VND**.\n\nCalculation: `100,000 VND / 100 g = 1,000 VND per g`, so `800 g x 1,000 = 800,000 VND`.",
+     "ms": 3442,
+     "so": [
+      800000,
+      100000,
+      1000,
+      800000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’ll be charged `800,000 VND`.\n\n`100,000 VND / 100g` means `800g` is 8 times that amount:\n`8 x 100,000 = 800,000 VND`.",
+     "ms": 4448,
+     "so": [
+      800000,
+      100000,
+      100000,
+      800000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "`100,000 VND / 100 g` means `1,000 VND / g`.\n\nFor `800 g`, the charge is:\n\n`800 x 1,000 = 800,000 VND`\n\nSo you’ll be charged `800,000 VND`.",
+     "ms": 3585,
+     "so": [
+      100000,
+      1000,
+      800000,
+      800000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’d be charged **800,000 VND**.\n\nCalculation: `100,000 VND / 100 g = 1,000 VND per gram`, so `800 g x 1,000 = 800,000 VND`.",
+     "ms": 3078,
+     "so": [
+      800000,
+      100000,
+      1000,
+      800000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You would be charged **800,000 VND**.\n\nCalculation: `100,000 VND per 100g × 8 = 800,000 VND` for `800g`.",
+     "ms": 3334,
+     "so": [
+      800000,
+      100000,
+      800000
+     ],
+     "daiDien": 800000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "`100.000 VND / 100g` means `1.000 VND / g`.\n\nFor `800 g`, the charge is:\n\n`800 x 1.000 = 800.000 VND`\n\nSo you would be charged **800,000 VND**.",
+     "ms": 4213,
+     "so": [
+      100000,
+      1000,
+      800000,
+      800000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’d be charged **800,000 VND**.\n\nCalculation: `100,000 VND / 100g = 1,000 VND per gram`, so `800g x 1,000 = 800,000 VND`.",
+     "ms": 3432,
+     "so": [
+      800000,
+      100000,
+      1000,
+      800000
+     ],
+     "daiDien": 450000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    },
+    {
+     "text": "You’d be charged `800,000 VND`.\n\nCalculation: `100,000 VND / 100g × 800g = 800,000 VND`.",
+     "ms": 3546,
+     "so": [
+      800000,
+      100000,
+      800000
+     ],
+     "daiDien": 800000,
+     "tuChoi": false,
+     "raoDon": false,
+     "dungDapAn": true
+    }
+   ]
   }
  }
 }
