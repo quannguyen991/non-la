@@ -42,8 +42,18 @@ function cachBaoNhieuNgay(d, moc) {
 
 /** Ghi chú cho ngày `d` tại vùng `zoneId`.
  *  Trả về mảng đã xếp theo `weight` giảm dần — giao diện lấy phần tử
- *  đầu làm dòng hiện ra, phần còn lại nằm trong khối gập. */
-export function ghiChu(d, zoneId = null, tz = TZ_VN) {
+ *  đầu làm dòng hiện ra, phần còn lại nằm trong khối gập.
+ *
+ *  MẶC ĐỊNH BỎ MỌI MỤC CÒN CỜ `verify`.
+ *  Cờ ấy nghĩa là "chưa có người có chuyên môn xác nhận", và một mục
+ *  chưa xác nhận thì là VIỆC CẦN LÀM, không phải nội dung. Để nó lọt ra
+ *  màn hình là đúng thứ luật số 14 trong đặc tả sinh ra để chặn: nội
+ *  dung văn hoá không được để mô hình ngôn ngữ tự sinh, và lễ hội địa
+ *  phương là chỗ dễ sai nhất.
+ *
+ *  `keCaChuaSoat: true` chỉ dùng cho phép thử và cho công cụ đi soát —
+ *  không dùng ở giao diện. */
+export function ghiChu(d, zoneId = null, { tz = TZ_VN, keCaChuaSoat = false } = {}) {
   if (!BANG) return [];
   const al = amLich(d, tz);
   const ra = [];
@@ -101,8 +111,16 @@ export function ghiChu(d, zoneId = null, tz = TZ_VN) {
     ra.push({ ...m, khi: "hom-nay" });
   }
 
-  return ra.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+  return ra
+    .filter((m) => keCaChuaSoat || !m.verify)
+    .sort((a, b) => (b.weight || 0) - (a.weight || 0));
 }
+
+/** Những mục còn chờ xác nhận, cho công cụ đi soát và cho phép thử đếm
+ *  việc còn nợ. Không dùng ở giao diện. */
+export const chuaSoat = () => [
+  ...(BANG?.thangAm || []), ...(BANG?.leCoDinh || []), ...(BANG?.leVung || []),
+].filter((m) => m.verify);
 
 /** Ngày dương của lần TỚI mốc âm lịch này rơi vào, tính từ `d`.
  *
@@ -144,12 +162,12 @@ export function ngayChay(d, tz = TZ_VN) {
  *  Quét tiến từng ngày thay vì tính ngược từ bảng: bảng có ba loại mục
  *  với ba luật khác nhau, và tính ngược nghĩa là viết lại cả ba luật ấy
  *  lần thứ hai — hai bản của cùng một luật thì sớm muộn cũng lệch nhau. */
-export function sapToi(d, zoneId = null, soNgay = 45, tz = TZ_VN) {
+export function sapToi(d, zoneId = null, soNgay = 45, { tz = TZ_VN, keCaChuaSoat = false } = {}) {
   const ra = [];
   const daCo = new Set();
   for (let i = 0; i <= soNgay; i++) {
     const ng = new Date(d.getFullYear(), d.getMonth(), d.getDate() + i);
-    for (const g of ghiChu(ng, zoneId, tz)) {
+    for (const g of ghiChu(ng, zoneId, { tz, keCaChuaSoat })) {
       if (g.khi !== "hom-nay" || daCo.has(g.id)) continue;
       daCo.add(g.id);
       ra.push({ ...g, ngayDuong: ng, cach: i });

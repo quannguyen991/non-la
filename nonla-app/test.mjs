@@ -29,7 +29,8 @@ import { index as refIndex, lookup as refLookup, bandOf as refBand } from "./men
 import { classify, usableFor, rawBand, tidyBand, mergeBand, tidy } from "../tools/menuband.mjs";
 import { amLich as amLichCua, duongLich as duongLichTu, tet as tetAm,
          canChiNam, conGiapEn, soNgayTrongThang as soNgayThangAm } from "./amlich.js";
-import { napLich, ghiChu as ghiChuLich, ngayChay as ngayChayLich } from "./lich.js";
+import { napLich, ghiChu as ghiChuLich, ngayChay as ngayChayLich,
+         chuaSoat as lichChuaSoat } from "./lich.js";
 import { dungHanhTrinh, trangHTML, tenTep as tenTepTrip } from "./hanhtrinh.js";
 import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
          raoDon as raoDonLlm, daoDong as daoDongLlm, soVoiDai as soVoiDaiLlm,
@@ -1524,6 +1525,28 @@ console.log("\n── lịch Việt ──────────────�
     const canSoat = moiMuc.filter((m) => m.verify);
     ok(`${canSoat.length} mục lịch còn chờ người có chuyên môn xác nhận`, true,
       canSoat.map((m) => m.id).join(", "));
+    eq("chuaSoat() liệt kê đúng danh sách còn nợ",
+      lichChuaSoat().map((m) => m.id).sort(), canSoat.map((m) => m.id).sort());
+
+    /* Và mục còn nợ KHÔNG được lọt ra giao diện. Một lễ hội chưa ai xác
+       nhận mà hiện lên màn hình của khách là app khẳng định một điều về
+       văn hoá địa phương mà chính nó chưa kiểm — cùng loại lỗi với việc
+       in ra một con số chưa đo. */
+    {
+      const hienRa = [];
+      for (let i = 0; i < 400; i++) {
+        const d = new Date(2026, 0, 1 + i);
+        for (const z of Object.keys(prices)) {
+          for (const g of ghiChuLich(d, z)) if (g.verify) hienRa.push(`${g.id}@${z}`);
+        }
+      }
+      eq("mục chưa xác nhận không lọt ra giao diện suốt 400 ngày", hienRa.length, 0);
+      /* Nhưng phải lấy ra được khi CỐ Ý xin — nếu không thì cờ verify
+         chỉ là một cách xoá nội dung, và không ai đi soát được nữa. */
+      const coCo = ghiChuLich(new Date(2026, 8, 25), "hoian-oldtown", { keCaChuaSoat: true });
+      ok("xin thì vẫn lấy được mục chưa xác nhận để đi soát",
+        coCo.some((g) => g.verify), JSON.stringify(coCo.map((g) => g.id)));
+    }
   }
 }
 
