@@ -107,6 +107,25 @@ export function usableFor(row, unit) {
   const c = classify(row);
   if (c.tier === "premium") return false;
   if (c.shared && !SHARED_UNITS.has(unit)) return false;
+
+  /* BẬC NHÀ HÀNG CŨNG PHẢI CHẶN, ĐỐI XỨNG VỚI LUẬT TRÊN.
+     classify() vẫn luôn tính ra ba bậc, nhưng bản đầu chỉ dùng tới
+     "premium" rồi vứt "restaurant" đi — nên "Bánh xèo Hội An phần nhà
+     hàng" 140–290k nằm chung dải với bánh xèo vỉa hè 20–50k. Đo được
+     ngày 06/09/2026: 29 trong 130 dòng đang dựng dải là bậc nhà hàng,
+     và riêng một dòng ấy đẩy p95 bánh xèo Hội An từ 110k lên 250k —
+     tức là một đĩa bánh xèo 240.000₫ thôi bị gọi là "vượt hẳn".
+
+     Đây đúng là luật "không trộn phân khúc", chỉ là nó mới được viết
+     một nửa: hỏng im lặng, và mọi phép thử số học vẫn xanh.
+
+     Ngoại lệ dùng lại chính SHARED_UNITS, không dựng tập thứ hai. Hai
+     tập ấy trùng nhau không phải tình cờ: món bán theo nồi, theo mẹt,
+     theo người — lẩu, chả cá, bún đậu, bánh bèo — vốn CHỈ có ở quán
+     ngồi bàn. Với chúng thì dòng nhà hàng là đúng dân số cần đo, không
+     phải nhiễu. Hai tập rời nhau mà phải giữ đồng bộ tay là cái bẫy
+     bảo trì; ngày nào chúng thật sự rẽ đôi thì tách, không phải bây giờ. */
+  if (c.tier === "restaurant" && !SHARED_UNITS.has(unit)) return false;
   return true;
 }
 

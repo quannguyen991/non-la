@@ -1192,6 +1192,27 @@ console.log("\n── menuband: dựng dải từ khoảng giá ─────�
   ok("đầu đắt của dải cũ cũng không bị bỏ mất",
     mergeBand({ ...prev, p95: 300_000 }, [{ low: 50_000, high: 120_000 }]).p95 >= 300_000);
 
+  /* KHÔNG TRỘN PHÂN KHÚC — luật này trước đây mới được viết một nửa.
+     classify() vẫn luôn tính ra ba bậc, nhưng usableFor() chỉ chặn
+     "premium" rồi vứt "restaurant" đi. Hậu quả đo được ngày 06/09/2026:
+     "Bánh xèo Hội An phần nhà hàng" 140–290k nằm chung dải với bánh xèo
+     vỉa hè 20–50k, đẩy p95 từ 110k lên 250k — và một đĩa bánh xèo
+     240.000₫ ở Hội An thôi bị gọi là "vượt hẳn". Hỏng im lặng: mọi phép
+     thử số học vẫn xanh. */
+  {
+    const nhaHang = { name: "Bánh xèo Hội An phần nhà hàng", group: "Món Hội An",
+                      venue: "Morning Glory", note: null, low: 140_000, high: 290_000 };
+    eq("dòng bậc nhà hàng bị nhận đúng bậc", classify(nhaHang).tier, "restaurant");
+    eq("món bán theo phần thì KHÔNG nhận dòng nhà hàng",
+      usableFor(nhaHang, "each"), false);
+    eq("món bán theo tô cũng không", usableFor(nhaHang, "per bowl"), false);
+    /* Nhưng lẩu, chả cá, bún đậu, bánh bèo vốn chỉ có ở quán ngồi bàn —
+       với chúng thì dòng nhà hàng là đúng dân số cần đo, không phải nhiễu. */
+    eq("món bán theo nồi thì vẫn nhận", usableFor(nhaHang, "per pot"), true);
+    eq("món bán theo mẹt thì vẫn nhận", usableFor(nhaHang, "per tray"), true);
+    eq("món bán theo người thì vẫn nhận", usableFor(nhaHang, "per person"), true);
+  }
+
   const fresh = mergeBand(null, [{ low: 40_000, high: 80_000 }]);
   ok("ô chưa có gì thì lấy nguyên số tra được", fresh.p50 > 0 && fresh.p25 <= fresh.p50);
 }
@@ -1398,6 +1419,15 @@ console.log("\n── nạp lại bộ giá: chạy lại không trôi số ─�
      thì lần chạy sau lại lấy nó làm base và vòng trôi số quay lại. */
   ok("dải gốc không mang theo cờ sourced",
     coBase.every(([, it]) => !it.base.sourced && !it.base.base));
+
+  /* Và không ô nào được nống p95 vượt quá dải gốc quá xa. Một ô đã nạp
+     mà trần cao gấp đôi số viết tay ban đầu là dấu hiệu có dòng của một
+     phân khúc khác lọt vào — đúng ca bánh xèo Hội An. */
+  {
+    const nong = sourced.filter(([, it]) => it.base && it.p95 > it.base.p95 * 1.8);
+    ok("không ô nào có trần cao gấp 1,8 lần dải gốc", nong.length === 0,
+      JSON.stringify(nong.map(([id, it]) => [id, it.base.p95, it.p95])));
+  }
 }
 
 /* ── âm lịch (amlich.js) ──────────────────────────────────────

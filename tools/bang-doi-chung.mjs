@@ -30,8 +30,26 @@ const BAT = "<!-- BANG-DOI-CHUNG:BAT";
 const KET = "<!-- BANG-DOI-CHUNG:KET -->";
 
 const j = JSON.parse(readFileSync(NGUON, "utf8"));
-const cau = Object.values(j.cau || {});
-if (!cau.length) { console.error("Tệp kết quả rỗng."); process.exit(1); }
+const cauTho = Object.values(j.cau || {});
+if (!cauTho.length) { console.error("Tệp kết quả rỗng."); process.exit(1); }
+
+/* ĐỌC LẠI DẢI TỪ prices.json, KHÔNG DÙNG ẢNH CHỤP TRONG TỆP KẾT QUẢ.
+   Câu trả lời của model là thứ đã đo xong và không đổi nữa. Dải của Nón
+   Lá thì đổi mỗi lần nạp dữ liệu mới — và ngày 06/09/2026 nó đổi thật:
+   sửa luật phân khúc kéo p95 cao lầu Hội An từ 160k về 120k.
+
+   Giữ ảnh chụp cũ thì hồ sơ so câu trả lời của model với một dải KHÔNG
+   CÒN TỒN TẠI trong app, và không có gì báo lên. Đọc lại mỗi lần sinh
+   bảng thì chương này luôn nói về đúng cái app đang chạy. */
+const prices0 = JSON.parse(readFileSync(join(GOC, "nonla-app/data/prices.json"), "utf8")).zones;
+const viTri = (gt, d) => (gt == null || !d ? null
+  : gt < d.p25 ? "duoi" : gt > d.p95 ? "tren" : "trong");
+const cau = cauTho.map((c) => {
+  const it = c.zone && c.dish ? prices0[c.zone]?.items?.[c.dish] : null;
+  if (!it) return c;
+  const dai = { p25: it.p25, p50: it.p50, p75: it.p75, p95: it.p95, seed: !!it.seed };
+  return { ...c, daiNonLa: dai, viTriSoVoiDai: viTri(c.daoDong?.med, dai) };
+});
 
 const models = [...new Set(cau.map((c) => c.model))];
 const nhom = (n, m) => cau.filter((c) => c.nhom === n && (!m || c.model === m));
