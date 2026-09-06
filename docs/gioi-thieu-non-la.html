@@ -892,8 +892,159 @@ lời nằm riêng ở <code>tools/llmparse.mjs</code> và có phép thử trong
 — đó là chỗ dễ sai nhất và nó không cần mạng để kiểm.</p>
 
 <!-- BANG-DOI-CHUNG:BAT — sinh bằng `node tools/bang-doi-chung.mjs --ghi`, ĐỪNG sửa tay -->
-<p class="lead">Chưa có số. Chạy <code>node tools/doi-chung-llm.mjs</code> rồi
-<code>node tools/bang-doi-chung.mjs --ghi</code>.</p>
+
+<h2>Kết quả · món × vùng Nón Lá có dải giá</h2>
+<table>
+  <tr><th style="width:20%">Câu hỏi</th><th>Model</th><th>Trung vị 10 lượt</th>
+      <th>Thấp nhất – cao nhất</th><th>Lệch</th><th>Dải Nón Lá (p25–p95)</th><th>Rơi vào</th></tr>
+  <tr><td><code>banhmi-ha</code></td><td>claude-haiku-4-5</td>
+      <td><b>32.500₫</b></td><td>30.000₫ – 50.000₫</td>
+      <td>1.67×</td>
+      <td>30.000₫ – 70.000₫</td>
+      <td>trong dải</td></tr>
+  <tr><td><code>banhmi-ha</code></td><td>gpt-5.5</td>
+      <td><b>27.500₫</b></td><td>27.500₫ – 40.000₫</td>
+      <td>1.45×</td>
+      <td>30.000₫ – 70.000₫</td>
+      <td><b>dưới dải</b></td></tr>
+  <tr><td><code>bunbo-hue</code></td><td>claude-haiku-4-5</td>
+      <td><b>40.000₫</b></td><td>35.000₫ – 50.000₫</td>
+      <td>1.43×</td>
+      <td>35.000₫ – 90.000₫</td>
+      <td>trong dải</td></tr>
+  <tr><td><code>bunbo-hue</code></td><td>gpt-5.5</td>
+      <td><b>35.000₫</b></td><td>30.000₫ – 35.000₫</td>
+      <td>1.17×</td>
+      <td>35.000₫ – 90.000₫</td>
+      <td>trong dải</td></tr>
+  <tr><td><code>caolau-ha</code></td><td>claude-haiku-4-5</td>
+      <td><b>46.250₫</b></td><td>40.000₫ – 60.000₫</td>
+      <td>1.5×</td>
+      <td>60.000₫ – 160.000₫</td>
+      <td><b>dưới dải</b></td></tr>
+  <tr><td><code>caolau-ha</code></td><td>gpt-5.5</td>
+      <td><b>40.000₫</b></td><td>40.000₫ – 50.000₫</td>
+      <td>1.25×</td>
+      <td>60.000₫ – 160.000₫</td>
+      <td><b>dưới dải</b></td></tr>
+  <tr><td><code>comtam-q1</code></td><td>claude-haiku-4-5</td>
+      <td><b>33.750₫</b></td><td>30.000₫ – 40.000₫</td>
+      <td>1.33×</td>
+      <td>50.000₫ – 140.000₫</td>
+      <td><b>dưới dải</b></td></tr>
+  <tr><td><code>comtam-q1</code></td><td>gpt-5.5</td>
+      <td><b>57.500₫</b></td><td>45.000₫ – 62.500₫</td>
+      <td>1.39×</td>
+      <td>50.000₫ – 140.000₫</td>
+      <td>trong dải</td></tr>
+  <tr><td><code>miquang-dn</code></td><td>claude-haiku-4-5</td>
+      <td><b>40.000₫</b></td><td>30.000₫ – 52.500₫</td>
+      <td>1.75×</td>
+      <td>45.000₫ – 100.000₫</td>
+      <td><b>dưới dải</b></td></tr>
+  <tr><td><code>miquang-dn</code></td><td>gpt-5.5</td>
+      <td><b>40.000₫</b></td><td>35.000₫ – 50.000₫</td>
+      <td>1.43×</td>
+      <td>45.000₫ – 100.000₫</td>
+      <td><b>dưới dải</b></td></tr>
+  <tr><td><code>pho-hk</code></td><td>claude-haiku-4-5</td>
+      <td><b>50.000₫</b></td><td>37.500₫ – 52.500₫</td>
+      <td>1.4×</td>
+      <td>50.000₫ – 140.000₫</td>
+      <td>trong dải</td></tr>
+  <tr><td><code>pho-hk</code></td><td>gpt-5.5</td>
+      <td><b>50.000₫</b></td><td>40.000₫ – 50.000₫</td>
+      <td>1.25×</td>
+      <td>50.000₫ – 140.000₫</td>
+      <td>trong dải</td></tr>
+</table>
+
+<h2>Bốn thước đo</h2>
+<table>
+  <tr><th style="width:34%"></th><th>gpt-5.5</th><th>claude-haiku-4-5</th></tr>
+  <tr><td><b>Độ dao động giữa 10 lượt</b></td><td>1.17× – 1.45×</td><td>1.33× – 1.75×</td></tr>
+  <tr><td><b>Trung vị rơi <i>dưới</i> p25 của Nón Lá</b></td><td><b>3/6</b> câu</td><td><b>3/6</b> câu</td></tr>
+  <tr><td><b>Trung vị rơi <i>trên</i> p95</b></td><td>0/6 câu</td><td>0/6 câu</td></tr>
+  <tr><td><b>Chịu nói “không biết” khi Nón Lá cũng không có dữ liệu</b></td><td><b>0/39</b> lượt</td><td><b>0/40</b> lượt</td></tr>
+  <tr><td><b>Đọc đúng đơn vị <i>lạng</i> / <code>100g</code></b></td><td>30/30 lượt</td><td>23/30 lượt</td></tr>
+  <tr><td><b>Trả lời được món <i>ngoài</i> 77 món &nbsp;<span style="font-weight:400">← chỗ Nón Lá thua</span></b></td><td><b>50/50</b> lượt</td><td><b>50/50</b> lượt</td></tr>
+  <tr><td><b>Câu rào đón (“giá có thể thay đổi”)</b></td><td>11/97 lượt</td><td>55/100 lượt</td></tr>
+</table>
+
+<h2>Đọc kết quả</h2>
+
+<p><b>① Chúng không loạn — và đó không phải điều đáng mừng cho chúng.</b>
+Độ dao động giữa mười lượt chỉ 1.17×–1.75×,
+tức là các model khá nhất quán <i>với chính mình</i>. Giả thuyết ban đầu của chúng tôi —
+hỏi mười lần ra mười con số vung vãi — đã <b>sai</b>, và chúng tôi ghi lại đúng như thế.</p>
+
+<p><b>② Nhưng chúng lệch một chiều.</b> 6/12 lượt đo có trung vị
+nằm <b>dưới</b> mốc p25 của khu vực, và 0/12 lượt nằm trên p95.
+Sai lệch không ngẫu nhiên: nó <b>nghiêng hẳn về phía rẻ</b>.</p>
+
+<div class="box terra">
+  <b>Vì sao chiều lệch ấy nguy hiểm hơn cả sự thiếu chính xác</b>
+  Ô lệch mạnh nhất trong lần chạy này: <code>caolau-ha</code> —
+  gpt-5.5 trả lời quanh <b>40.000₫</b>, trong khi dải
+  dựng từ thực đơn công bố của chính khu vực ấy là 60.000₫ – 160.000₫.
+  Một khách được bảo “món này khoảng 40.000₫” rồi nhìn thấy
+  70.000₫ trên tấm thực đơn sẽ kết luận mình <b>đang bị chặt chém</b> — trong khi
+  70.000₫ đúng là <i>trung vị</i> của khu vực ấy, tức là cái giá bình thường nhất
+  có thể có.
+  <br><br>
+  Nghĩa là một con số lấy từ mô hình ngôn ngữ không chỉ thiếu chính xác: nó đẩy khách tới
+  chỗ <b>nghi oan một người bán trung thực</b>. Đó đúng là điều nguyên tắc gốc của dự án
+  này sinh ra để tránh.
+</div>
+
+<p><b>③ Không lần nào chúng chịu nói “tôi không biết”.</b> 79/79
+lượt hỏi về món <i>không</i> thuộc khu vực đó vẫn nhận được một con số. Hỏi giá cao lầu ở
+Hoàn Kiếm — nơi gần như không quán nào bán — model đưa ra một mức giá tự tin thay vì nói
+rằng đó không phải món của Hà Nội. Ô trống trong bảng của Nón Lá hiện ra một dấu gạch;
+ô trống trong tri thức của model hiện ra một con số.</p>
+
+<p><b>④ Bẫy đơn vị: 53/60 lượt đọc đúng — và đây lại là chỗ giả thuyết
+của chúng tôi sai lần thứ hai.</b> Đưa thẳng bài toán ra (“cá song 100.000/100g, con 800
+gam”) thì các model tính đúng gần như mọi lượt. Phép nhân không phải chỗ chúng yếu.</p>
+
+<div class="box jade">
+  <b>Chỗ yếu nằm trước phép nhân một bước</b>
+  Người khách <b>không hỏi câu đó</b>. Họ không biết là có gì để hỏi. Trên tấm thực đơn,
+  “Cá song 100.000” và “Cá song 100.000/100g” trông gần như nhau, và cái đuôi
+  <code>/100g</code> chỉ đổi nghĩa nếu người đọc biết <i>lạng</i> là gì. Một mô hình
+  ngôn ngữ trả lời rất giỏi câu được hỏi; nó không gõ vào vai ai để báo rằng có một câu
+  cần hỏi.
+  <br><br>
+  Đó đúng là việc của <code>units.js</code>: không tính hộ, không đoán trọng lượng con
+  cá — chỉ <b>chỉ ra dòng nào tính theo cân</b> và đưa phép nhân để khách tự hỏi người
+  bán rồi tự tính. Giá trị nằm ở chỗ <i>phát hiện</i>, không nằm ở chỗ <i>tính</i>.
+</div>
+
+<p><b>⑤ Và đây là chỗ Nón Lá thua.</b> 100/100 lượt hỏi về món
+<i>ngoài</i> 77 món trong danh mục đều được trả lời hữu ích — bánh căn, bún ốc, phá lấu,
+chả rươi. Nón Lá trả về một dấu gạch. Một mô hình ngôn ngữ phủ rộng hơn hẳn, và bất kỳ
+bảng so sánh nào không ghi dòng này ra là một bảng không đáng tin.</p>
+
+
+
+<div class="box jade">
+  <b>Kết luận đúng, chứ không phải kết luận thắng</b>
+  Mô hình ngôn ngữ trả lời <i>rộng</i> hơn Nón Lá rất nhiều, và trả lời khá ổn định. Thứ
+  nó không làm được là <b>đo</b>: không nguồn, không ngày, không cỡ mẫu, không có ai đứng
+  ở phố Hàng Bạc tháng này để kiểm lại, và không im lặng được khi không biết. Nón Lá hẹp
+  hơn hẳn — 77 món, sáu khu phố — nhưng trong đúng cái hẹp ấy, mỗi con số có một nguồn để
+  chỉ tay vào và một ngày tháng để đối chiếu.
+  <br><br>
+  Cộng thêm ba việc không mô hình nào làm được vì lý do cấu trúc chứ không phải vì chưa
+  làm: <b>chạy khi tắt mạng</b>, <b>đưa màn hình cho người bán đọc</b>, và <b>dày lên mỗi
+  ngày</b> nhờ người đi khảo sát.
+</div>
+
+<p class="src" style="margin-top:6mm">Đo ngày 2026-09-06 ·
+gpt-5.5 · claude-haiku-4-5 qua <code>https://codex.hungnguyen.codes/v1</code> ·
+10 lượt mỗi câu · 36 lượt đo · dữ liệu thô ở
+<code>docs/doi-chung-llm.json</code> · chạy lại bằng
+<code>node tools/doi-chung-llm.mjs</code></p>
 <!-- BANG-DOI-CHUNG:KET -->
 </div>
 

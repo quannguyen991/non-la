@@ -5251,6 +5251,294 @@
      "raoDon": true
     }
    ]
+  },
+  "ngoai-danh-muc/cha-ruoi/gpt-5.5": {
+   "nhom": "ngoai-danh-muc",
+   "id": "cha-ruoi",
+   "model": "gpt-5.5",
+   "hoi": "How much should one serving of cha ruoi cost in Hanoi, Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 40000,
+    "med": 30000,
+    "cv": 0.134,
+    "ratio": 1.33
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "About 40,000 VND per serving.",
+     "ms": 5362,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `30,000 VND` for one serving in Hanoi.",
+     "ms": 3653,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND` for one serving in Hanoi.",
+     "ms": 4178,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `40,000 VND` per serving in Hanoi.",
+     "ms": 3302,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About **30,000 VND** for one serving in Hanoi.",
+     "ms": 4710,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `30,000 VND` for one serving in Hanoi.",
+     "ms": 3807,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one serving in Hanoi.",
+     "ms": 3698,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `30,000 VND` for one serving in Hanoi.",
+     "ms": 2450,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `30,000 VND` for one serving in Hanoi.",
+     "ms": 2645,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `30,000 VND` for one serving in Hanoi.",
+     "ms": 4034,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "ngoai-danh-muc/cha-ruoi/claude-haiku-4-5-20251001": {
+   "nhom": "ngoai-danh-muc",
+   "id": "cha-ruoi",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "How much should one serving of cha ruoi cost in Hanoi, Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 7,
+   "daoDong": {
+    "n": 10,
+    "min": 25000,
+    "max": 60000,
+    "med": 32500,
+    "cv": 0.262,
+    "ratio": 2.4
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "Cha ruoi (shrimp paste cake) typically costs between 30,000 to 50,000 VND per serving in Hanoi, depending on the vendor and location. Street stalls and casual eateries tend toward the lower end (30,000–40,000 VND), while restaurants in tourist areas or upscale establishments charge 40,000–50,000 VND or more.\n\nA reasonable mid-range estimate is **40,000 VND** per serving.",
+     "ms": 8210,
+     "so": [
+      30000,
+      50000,
+      30000,
+      40000,
+      40000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Cha rối (shrimp cake) typically costs between 15,000–25,000 VND per serving at casual eateries and street vendors in Hanoi. A mid-range estimate would be around 20,000 VND for a single serving.\n\nPrices vary by location and vendor—touristy areas and restaurants will charge more, while local vendors in markets or neighborhoods may charge less. High-end restaurants could charge 30,000–40,000 VND or more per serving.",
+     "ms": 3373,
+     "so": [
+      15000,
+      25000,
+      20000,
+      30000,
+      40000
+     ],
+     "daiDien": 25000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical serving of cha ruoi (shrimp cake) at a street food stall or casual restaurant in Hanoi currently costs around 20,000–40,000 VND, depending on the vendor, location, and portion size. Mid-range restaurants might charge 50,000–80,000 VND.\n\nIf you're looking for a single reference number: **30,000 VND** is a reasonable average for a standard serving at a street vendor.",
+     "ms": 4107,
+     "so": [
+      20000,
+      40000,
+      50000,
+      80000,
+      30000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Cha ruoi (shrimp paste on sugarcane) typically costs between 20,000–40,000 VND per serving at casual eateries and street food stalls in Hanoi. Mid-range restaurants charge toward the higher end of that range, while street vendors are usually on the lower end.\n\nA reasonable estimate for a single serving is around **30,000 VND**.",
+     "ms": 3209,
+     "so": [
+      20000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Cha ruoi (shrimp paste spring rolls) typically costs between 20,000–50,000 VND per serving in Hanoi, depending on the restaurant or vendor. A casual street stall might charge around 20,000–30,000 VND, while a mid-range restaurant would be closer to 40,000–50,000 VND. Tourist-heavy areas tend to be on the higher end.",
+     "ms": 2184,
+     "so": [
+      20000,
+      50000,
+      20000,
+      30000,
+      40000,
+      50000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Cha ruoi (shrimp paste on sugar cane) in Hanoi typically costs between 20,000–40,000 VND per serving at casual eateries and street food stalls. A reasonable estimate for a single serving is around **30,000 VND**.\n\nPrices vary by location and vendor quality—tourist areas and sit-down restaurants may charge toward the higher end, while street vendors in local neighborhoods tend toward the lower end.",
+     "ms": 2868,
+     "so": [
+      20000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Cha ruoi (shrimp paste on sugar cane) in Hanoi typically costs between 20,000–40,000 VND per serving at casual street stalls and casual restaurants. Budget-friendly spots lean toward the lower end, while more established vendors or tourist areas charge closer to the higher end.\n\nA reasonable estimate for one serving is around **30,000 VND**.",
+     "ms": 2682,
+     "so": [
+      20000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical serving of cha ruoi (shrimp paste on sugar cane) in Hanoi costs around **40,000–80,000 VND**, depending on the vendor and location.\n\nStreet food stalls and casual eateries in local neighborhoods charge closer to 40,000–50,000 VND per serving. Tourist-oriented restaurants or those in central areas charge 60,000–80,000 VND or more. Premium establishments can exceed this range.\n\nIf you're looking for a baseline mid-range price, **60,000 VND** is a reasonable estimate for a single serving at a decent restaurant.",
+     "ms": 3680,
+     "so": [
+      40000,
+      80000,
+      40000,
+      50000,
+      60000,
+      80000,
+      60000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Cha ruoi (shrimp paste cakes) typically cost between 20,000–40,000 VND per serving in Hanoi, depending on the vendor and location. Street food stalls in busy areas tend toward the lower end, while restaurants in touristy zones or nicer establishments charge more. A reasonable estimate for a standard serving is around 30,000 VND.",
+     "ms": 2824,
+     "so": [
+      20000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical serving of cha ruoi (shrimp paste on sugar cane) from a street vendor or casual restaurant in Hanoi costs around 20,000–40,000 VND, with most falling in the 25,000–35,000 VND range. At slightly nicer establishments, you might pay 40,000–60,000 VND.\n\nIf you're buying from a market or street cart, expect the lower end. For a restaurant meal with rice and sides, it would be more.",
+     "ms": 4552,
+     "so": [
+      20000,
+      40000,
+      25000,
+      35000,
+      40000,
+      60000
+     ],
+     "daiDien": 37500,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
   }
  }
 }
