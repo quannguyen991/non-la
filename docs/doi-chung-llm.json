@@ -5084,6 +5084,173 @@
      "raoDon": false
     }
    ]
+  },
+  "ngoai-danh-muc/banh-canh-cua/claude-haiku-4-5-20251001": {
+   "nhom": "ngoai-danh-muc",
+   "id": "banh-canh-cua",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "How much should one bowl of banh canh cua cost at a street stall in Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 10,
+   "daoDong": {
+    "n": 10,
+    "min": 37500,
+    "max": 45000,
+    "med": 40000,
+    "cv": 0.046,
+    "ratio": 1.2
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "A typical bowl of banh canh cua at a street stall in Vietnam costs around 30,000–50,000 VND, with 40,000 VND being a reasonable middle estimate for most cities.\n\nPrices vary by location: in Ho Chi Minh City or Hanoi, you might pay toward the higher end, while in smaller cities or less touristy areas, you'd find bowls closer to 30,000 VND. Premium stalls or those in high-traffic areas can charge 60,000 VND or more.",
+     "ms": 15044,
+     "so": [
+      30000,
+      50000,
+      40000,
+      30000,
+      60000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of banh canh cua at a street stall in Vietnam typically costs between 30,000 and 50,000 VND, with 40,000 VND being a reasonable middle estimate for most cities like Hanoi or Ho Chi Minh City.\n\nPrices vary by location—tourist areas and city centers run higher, while smaller towns and less touristy neighborhoods are cheaper. The quality and portion size of the crab also affects the price.",
+     "ms": 2683,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of banh canh cua (crab banh canh) at a street stall in Vietnam typically costs between 30,000 and 60,000 VND, depending on the city and neighborhood. In Hanoi and Ho Chi Minh City, you'd generally pay around 40,000–50,000 VND for a decent bowl. In smaller cities or less touristy areas, it might be closer to 30,000–40,000 VND. Premium stalls or those in tourist zones could charge 60,000 VND or more.\n\nIf I had to give you a single representative number: **45,000 VND** is a reasonable middle estimate for a good-quality bowl at a typical street stall.",
+     "ms": 3944,
+     "so": [
+      30000,
+      60000,
+      40000,
+      50000,
+      30000,
+      40000,
+      60000,
+      45000
+     ],
+     "daiDien": 42500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of banh canh cua (crab banh canh) at a typical street stall in Vietnam costs around **30,000–50,000 VND**, with most vendors charging in the **35,000–45,000 VND** range.\n\nPrices vary by location and vendor reputation. In major tourist areas like Hanoi or Ho Chi Minh City, you might pay slightly more, while smaller cities and rural areas tend to be cheaper. A particularly popular or well-known stall might charge toward the higher end, especially if they use quality crab meat and homemade broth.",
+     "ms": 4547,
+     "so": [
+      30000,
+      50000,
+      35000,
+      45000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bánh canh cua (crab bánh canh) at a typical street stall in Vietnam costs around **30,000–50,000 VND**, with **40,000 VND** being a reasonable middle estimate for most cities.\n\nPrices vary by location: tourist areas and Hanoi/Ho Chi Minh City tend toward the higher end, while smaller cities or rural areas are cheaper. A particularly generous or well-known stall might charge up to 60,000 VND.",
+     "ms": 2870,
+     "so": [
+      30000,
+      50000,
+      40000,
+      60000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of banh canh cua (crab banh canh) at a street stall in Vietnam typically costs between 30,000 and 60,000 VND, depending on the location and quality. In Hanoi or Ho Chi Minh City, expect closer to 40,000-60,000 VND. In smaller cities or rural areas, you might find it for 25,000-40,000 VND. A reasonable middle estimate would be around 45,000 VND for a typical street stall serving in a major city.",
+     "ms": 2248,
+     "so": [
+      30000,
+      60000,
+      40000,
+      60000,
+      25000,
+      40000,
+      45000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical bowl of bánh canh cua (crab bánh canh) at a street stall in Vietnam runs between 30,000–50,000 VND, depending on the city and stall quality. In major tourist areas like Hanoi or Ho Chi Minh City, you might pay toward the higher end or beyond. In smaller cities or less touristy neighborhoods, it's more likely to be in the 30,000–40,000 VND range.\n\nIf I had to pick a single number for an average street stall: **40,000 VND**.",
+     "ms": 6793,
+     "so": [
+      30000,
+      50000,
+      30000,
+      40000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of banh canh cua (crab banh canh) at a street stall in Vietnam typically costs between 30,000 and 50,000 VND, depending on the city and neighborhood. In Hanoi or Ho Chi Minh City, you'd generally pay around 40,000-50,000 VND. In smaller cities or less touristy areas, it might be closer to 30,000-35,000 VND.\n\nA reasonable middle estimate is **40,000 VND**.",
+     "ms": 2148,
+     "so": [
+      30000,
+      50000,
+      40000,
+      50000,
+      30000,
+      35000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of bánh canh cua (crab bánh canh) at a street stall in Vietnam typically costs between 25,000–50,000 VND, depending on the location and quality. In major cities like Hanoi or Ho Chi Minh City, you'd pay toward the higher end of that range, while in smaller towns or less touristy areas it would be cheaper. A reasonable middle estimate is around 35,000–40,000 VND.",
+     "ms": 2282,
+     "so": [
+      25000,
+      50000,
+      35000,
+      40000
+     ],
+     "daiDien": 37500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of banh canh cua (crab banh canh) at a street stall in Vietnam typically costs between 30,000 and 50,000 VND, depending on the city and stall quality. In major tourist areas like Hanoi or Ho Chi Minh City, you might pay toward the higher end or slightly more. In smaller cities or less touristy neighborhoods, you'd likely be closer to 30,000–40,000 VND.\n\nA reasonable middle estimate is **40,000 VND**.",
+     "ms": 2578,
+     "so": [
+      30000,
+      50000,
+      30000,
+      40000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
   }
  }
 }
