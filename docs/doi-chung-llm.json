@@ -1788,6 +1788,477 @@
      "raoDon": false
     }
    ]
+  },
+  "gia-co-du-lieu/banhmi-ha/claude-haiku-4-5-20251001": {
+   "nhom": "gia-co-du-lieu",
+   "id": "banhmi-ha",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm in Hoi An Old Town. How much should one banh mi cost here? Give me a number in VND.",
+   "zone": "hoian-oldtown",
+   "dish": "banh-mi",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 30000,
+    "p50": 50000,
+    "p75": 60000,
+    "p95": 70000,
+    "seed": true
+   },
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 9,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 50000,
+    "med": 32500,
+    "cv": 0.173,
+    "ratio": 1.67
+   },
+   "viTriSoVoiDai": "trong",
+   "luot": [
+    {
+     "text": "A banh mi in Hoi An Old Town typically costs between 25,000–40,000 VND, depending on the vendor and ingredients. Tourist-facing shops charge toward the higher end, while local spots run closer to 25,000–30,000 VND. A reasonable mid-range estimate would be around 30,000–35,000 VND.",
+     "ms": 2221,
+     "so": [
+      25000,
+      40000,
+      25000,
+      30000,
+      30000,
+      35000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "In Hoi An Old Town, a banh mi typically costs between 25,000–40,000 VND, depending on the vendor and fillings. A basic banh mi (with pâté, cold cuts, and vegetables) runs around 25,000–30,000 VND. Premium versions with extra protein or at more touristy spots can reach 35,000–40,000 VND.\n\nIf you're looking for a single number: **30,000 VND** is a fair expectation for a standard banh mi in the Old Town area.",
+     "ms": 2412,
+     "so": [
+      25000,
+      40000,
+      25000,
+      30000,
+      35000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A banh mi in Hoi An Old Town typically costs between 25,000–40,000 VND, depending on the vendor and fillings. Tourist-heavy spots near the central market or main walking streets tend toward the higher end, while smaller local vendors charge less. A solid estimate for a quality banh mi would be around 30,000–35,000 VND.",
+     "ms": 5940,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000
+     ],
+     "daiDien": 32500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "In Hoi An Old Town, a banh mi typically costs around 30,000–50,000 VND at casual street stalls and local shops. Tourist-oriented vendors in the central area may charge up to 60,000–80,000 VND.\n\nFor a baseline, expect **40,000 VND** as a reasonable middle estimate for a standard banh mi in the Old Town area.",
+     "ms": 83162,
+     "so": [
+      30000,
+      50000,
+      60000,
+      80000,
+      40000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A banh mi in Hoi An Old Town typically costs between 25,000–40,000 VND, depending on the vendor and ingredients. Tourist-facing spots tend toward the higher end, while local stalls are closer to 25,000–30,000 VND.\n\nA reasonable middle estimate: **30,000 VND**.",
+     "ms": 2522,
+     "so": [
+      25000,
+      40000,
+      25000,
+      30000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "In Hoi An Old Town, a banh mi typically costs between 25,000–40,000 VND, with most vendors charging around 30,000–35,000 VND for a standard one.\n\nPrices vary by location and vendor. Stalls in the main tourist areas charge toward the higher end, while smaller shops on side streets may be cheaper. Premium versions with extra meat or specialty fillings can reach 40,000–50,000 VND.",
+     "ms": 14484,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000,
+      40000,
+      50000
+     ],
+     "daiDien": 37500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A banh mi in Hoi An Old Town typically costs between 25,000–40,000 VND, depending on the vendor and fillings. Tourist-oriented spots near the main walking streets tend toward the higher end, while local stalls are cheaper. A reasonable mid-range estimate is around 30,000 VND.",
+     "ms": 2018,
+     "so": [
+      25000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "In Hoi An Old Town, a banh mi typically costs around **25,000–40,000 VND** depending on the vendor and fillings. Tourist-oriented spots in the heart of the old town tend toward the higher end, while local vendors a block or two away charge less. A basic banh mi with pâté and cold cuts runs closer to 25,000 VND, while premium versions with more meat or special preparations go up to 40,000 VND or slightly beyond.",
+     "ms": 2367,
+     "so": [
+      25000,
+      40000,
+      25000,
+      40000
+     ],
+     "daiDien": 32500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "In Hoi An Old Town, a standard banh mi typically costs between 25,000–40,000 VND, depending on the vendor and fillings. Tourist-oriented spots in the main areas may charge toward the higher end or more, while smaller local vendors charge less.\n\nA reasonable estimate to expect: **30,000–35,000 VND** for a typical banh mi in the Old Town area.",
+     "ms": 2477,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000
+     ],
+     "daiDien": 32500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A good banh mi in Hoi An Old Town typically costs between 25,000–40,000 VND, depending on the vendor and ingredients. Tourist-focused spots near the main attractions charge toward the higher end, while local vendors away from the center are cheaper. \n\nFor a quality banh mi with good meat and fresh ingredients, expect around 30,000–35,000 VND as a reasonable middle ground.",
+     "ms": 2509,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000
+     ],
+     "daiDien": 32500,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "gia-khong-du-lieu/caolau-hk/gpt-5.5": {
+   "nhom": "gia-khong-du-lieu",
+   "id": "caolau-hk",
+   "model": "gpt-5.5",
+   "hoi": "I'm in Hoan Kiem, Hanoi. How much should one bowl of cao lau cost here? Give me a number in VND.",
+   "zone": "hanoi-hoankiem",
+   "dish": "cao-lau",
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 4,
+   "daoDong": {
+    "n": 10,
+    "min": 60000,
+    "max": 80000,
+    "med": 70000,
+    "cv": 0.096,
+    "ratio": 1.33
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "About **70,000 VND** for one bowl of cao lau in Hoan Kiem.\n\nIf it’s a simple local spot, closer to **50,000-60,000 VND**; if it’s in a tourist-facing restaurant near the lake/Old Quarter, **70,000-90,000 VND** is normal.",
+     "ms": 4082,
+     "so": [
+      70000,
+      50000,
+      60000,
+      70000,
+      90000
+     ],
+     "daiDien": 70000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About **80,000 VND** for one bowl of cao lau in Hoan Kiem, Hanoi.\n\nCheaper local spots may be closer to 50,000-60,000 VND, while tourist-focused places can run 90,000-120,000 VND.",
+     "ms": 3661,
+     "so": [
+      80000,
+      50000,
+      60000,
+      90000,
+      120000
+     ],
+     "daiDien": 80000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A fair price for one bowl of `cao lau` in Hoan Kiem, Hanoi is about **60,000 VND**.\n\nYou might see it anywhere from **45,000-80,000 VND** depending on whether it is a local shop or a tourist-facing restaurant.",
+     "ms": 2589,
+     "so": [
+      60000,
+      45000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of cao lau in Hoan Kiem, Hanoi should cost about **70,000 VND**.\n\nReasonable range: **60,000-90,000 VND**, with tourist-heavy spots sometimes higher.",
+     "ms": 2390,
+     "so": [
+      70000,
+      60000,
+      90000
+     ],
+     "daiDien": 70000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **70,000 VND** for one bowl of cao lau in Hoan Kiem.\n\nA local/simple spot might be closer to **50,000-60,000 VND**; a tourist-facing restaurant around the Old Quarter can reasonably be **70,000-90,000 VND**.",
+     "ms": 3997,
+     "so": [
+      70000,
+      50000,
+      60000,
+      70000,
+      90000
+     ],
+     "daiDien": 70000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "70,000 VND",
+     "ms": 2870,
+     "so": [
+      70000
+     ],
+     "daiDien": 70000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **60,000 VND** for one bowl of cao lau in Hoan Kiem, Hanoi.",
+     "ms": 1932,
+     "so": [
+      60000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A fair price for one bowl of **cao lau in Hoan Kiem, Hanoi** is about **60,000 VND**.\n\nYou may see it around **50,000-80,000 VND** depending on whether it’s a simple local spot or a tourist-facing restaurant.",
+     "ms": 2840,
+     "so": [
+      60000,
+      50000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A reasonable price for one bowl of cao lau in Hoan Kiem, Hanoi is about **70,000 VND**.\n\nYou may see it roughly in the **50,000-90,000 VND** range depending on whether it is a casual local spot or a more tourist-facing restaurant.",
+     "ms": 4133,
+     "so": [
+      70000,
+      50000,
+      90000
+     ],
+     "daiDien": 70000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A fair price for one bowl of cao lau in Hoan Kiem, Hanoi is about **60,000 VND**.\n\nYou may see it around **50,000-80,000 VND** depending on whether it is a street-side spot, casual restaurant, or tourist-heavy Old Quarter place.",
+     "ms": 5200,
+     "so": [
+      60000,
+      50000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "gia-khong-du-lieu/caolau-hk/claude-haiku-4-5-20251001": {
+   "nhom": "gia-khong-du-lieu",
+   "id": "caolau-hk",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm in Hoan Kiem, Hanoi. How much should one bowl of cao lau cost here? Give me a number in VND.",
+   "zone": "hanoi-hoankiem",
+   "dish": "cao-lau",
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 4,
+   "daoDong": {
+    "n": 10,
+    "min": 40000,
+    "max": 65000,
+    "med": 50000,
+    "cv": 0.149,
+    "ratio": 1.63
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "A bowl of cao lau in Hoàn Kiếm, Hanoi typically costs between 40,000–80,000 VND, depending on the venue. Tourist-oriented restaurants near the Old Quarter charge toward the higher end, while local spots run cheaper. A reasonable middle estimate is around **50,000–60,000 VND** for a standard bowl.\n\nIf you're eating at a casual street stall or local restaurant, expect closer to 40,000 VND. At a nicer establishment catering to tourists, you might pay 70,000–80,000 VND or more.",
+     "ms": 42531,
+     "so": [
+      40000,
+      80000,
+      50000,
+      60000,
+      40000,
+      70000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of cao lau in Hoan Kiem should cost around 40,000–60,000 VND at a typical restaurant or food stall. Tourist-facing establishments near the Old Quarter might charge toward the higher end or beyond, while local spots would be closer to 40,000 VND.",
+     "ms": 2610,
+     "so": [
+      40000,
+      60000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical bowl of cao lau in Hoan Kiem should cost around **40,000–60,000 VND**, with 50,000 VND being a reasonable middle estimate for a standard serving at a casual restaurant or street vendor in that area.\n\nPrices can vary based on the specific location and establishment — tourist-facing spots may charge toward the higher end or beyond, while local vendors might be closer to 40,000 VND.",
+     "ms": 2414,
+     "so": [
+      40000,
+      60000,
+      50000,
+      40000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of cao lau in Hoan Kiem, Hanoi typically costs between 40,000–60,000 VND at casual local eateries. Mid-range restaurants or those in more touristy areas of Hoan Kiem might charge 60,000–80,000 VND or slightly higher.\n\nIf you want a single number: **50,000 VND** is a reasonable expectation for a standard bowl at a typical pho/noodle shop in that district.",
+     "ms": 4974,
+     "so": [
+      40000,
+      60000,
+      60000,
+      80000,
+      50000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lầu in Hoàn Kiếm, Hanoi typically costs between 30,000–50,000 VND at casual local eateries. Tourist-oriented restaurants in the Old Quarter may charge 50,000–80,000 VND or more.\n\nIf you're looking for a single representative number: **40,000 VND** is a reasonable mid-range estimate for a decent bowl at a local spot.",
+     "ms": 2245,
+     "so": [
+      30000,
+      50000,
+      50000,
+      80000,
+      40000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Cao lau in Hoan Kiem should cost around **40,000–60,000 VND** per bowl at a typical local restaurant or street vendor.\n\nIf you're at a more upscale or tourist-oriented establishment in the area, it could run **70,000–100,000 VND**. Street stalls and smaller vendors tend toward the lower end of that range, while sit-down restaurants charge more.",
+     "ms": 3778,
+     "so": [
+      40000,
+      60000,
+      70000,
+      100000
+     ],
+     "daiDien": 65000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lau in Hoàn Kiếm, Hanoi typically costs between 30,000–50,000 VND, with most vendors charging around 40,000 VND. Tourist-oriented spots near the Old Quarter might charge slightly more, up to 60,000 VND, while local eateries tend toward the lower end of that range.",
+     "ms": 11419,
+     "so": [
+      30000,
+      50000,
+      40000,
+      60000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lau in Hoan Kiem, Hanoi typically costs between 40,000–60,000 VND. For a standard serving at a casual restaurant or street stall in the tourist area, expect to pay around **50,000 VND**. Upscale restaurants may charge more, while smaller local vendors might charge slightly less.",
+     "ms": 2319,
+     "so": [
+      40000,
+      60000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cao lau in Hoan Kiem, Hanoi typically costs between 40,000 and 80,000 VND, depending on the vendor and location. Tourist-facing restaurants in the Old Quarter charge toward the higher end, while local spots are cheaper.\n\nA reasonable mid-range estimate: **50,000 VND**.",
+     "ms": 37011,
+     "so": [
+      40000,
+      80000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "I don't have real-time pricing data for Hanoi's street food markets right now. Cao lau prices in Hoan Kiem can vary significantly depending on whether you're eating at a tourist-focused spot versus a local vendor, and prices shift over time.\n\nThat said, based on typical pricing in central Hanoi tourist areas like Hoan Kiem, you'd generally expect to pay somewhere between 40,000-80,000 VND for a bowl, with tourist restaurants on the higher end and local vendors on the lower end.\n\nFor the most accurate current price, I'd recommend checking with locals nearby or asking at a few stalls—you'll get a better sense of what's fair right now than I can provide from here.",
+     "ms": 5313,
+     "so": [
+      40000,
+      80000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
   }
  }
 }
