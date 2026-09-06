@@ -1,7 +1,11 @@
 # Nón Lá
 
-Trợ lý camera cho khách quốc tế tại Việt Nam. Chĩa máy vào thực đơn, hoá đơn hoặc xấp tiền —
-app đọc, đối chiếu với giá phổ biến của khu vực, và nói cho bạn biết nó có bình thường không.
+Thước đo giá đường phố Việt Nam. Đo bằng chân, đọc bằng camera, chạy khi tắt mạng.
+
+Cái lõi không phải camera mà là **bảng giá theo từng món × từng khu phố** — thứ chưa
+ai dựng — cùng hai cái máy quanh nó: một máy để **đọc** bảng giá ấy khi bạn đang đứng
+trước tấm thực đơn, và một máy để **dựng** ra nó khi có người đi bộ dọc con phố và gõ
+giá thật (chế độ khảo sát, mười giây một món).
 
 PWA thuần, không build step. **Ảnh quét không rời khỏi máy** — OCR chạy trên
 thiết bị. Ảnh bạn **chủ động đăng** lên Community thì có, và toạ độ GPS trong

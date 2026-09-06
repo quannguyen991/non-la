@@ -156,20 +156,25 @@ ${(() => {
 </div>`;
 })()}
 
-<p><b>③ Không lần nào chúng chịu nói “tôi không biết”.</b> ${luotKhongDl - imLang}/${luotKhongDl}
+${luotKhongDl ? `<p><b>③ Không lần nào chúng chịu nói “tôi không biết”.</b> ${luotKhongDl - imLang}/${luotKhongDl}
 lượt hỏi về món <i>không</i> thuộc khu vực đó vẫn nhận được một con số. Hỏi giá cao lầu ở
 Hoàn Kiếm — nơi gần như không quán nào bán — model đưa ra một mức giá tự tin thay vì nói
 rằng đó không phải món của Hà Nội. Ô trống trong bảng của Nón Lá hiện ra một dấu gạch;
-ô trống trong tri thức của model hiện ra một con số.</p>
+ô trống trong tri thức của model hiện ra một con số.</p>` : ""}
 
-<p><b>④ Bẫy đơn vị: ${dungDv}/${luotDv} lượt đọc đúng.</b> Đây là nhóm sai lệch lớn nhất
+${luotDv ? `<p><b>④ Bẫy đơn vị: ${dungDv}/${luotDv} lượt đọc đúng.</b> Đây là nhóm sai lệch lớn nhất
 về tiền tuyệt đối trong thực tế — một con cá 800 gam trên thực đơn ghi
-<code>100.000/100g</code>.</p>
+<code>100.000/100g</code>.</p>` : ""}
 
-<p><b>⑤ Và đây là chỗ Nón Lá thua.</b> ${traLoiNgoai}/${luotNgoai} lượt hỏi về món
+${luotNgoai ? `<p><b>⑤ Và đây là chỗ Nón Lá thua.</b> ${traLoiNgoai}/${luotNgoai} lượt hỏi về món
 <i>ngoài</i> 77 món trong danh mục đều được trả lời hữu ích — bánh căn, bún ốc, phá lấu,
 chả rươi. Nón Lá trả về một dấu gạch. Một mô hình ngôn ngữ phủ rộng hơn hẳn, và bất kỳ
-bảng so sánh nào không ghi dòng này ra là một bảng không đáng tin.</p>
+bảng so sánh nào không ghi dòng này ra là một bảng không đáng tin.</p>` : ""}
+
+${(luotKhongDl && luotDv && luotNgoai) ? "" : `<div class="box terra"><b>Phép đo chưa chạy xong</b>
+Ba nhóm câu cuối chưa có đủ số liệu ở lần chạy này, nên phần đọc kết quả còn thiếu mục.
+Chạy <code>node tools/doi-chung-llm.mjs --tiep</code> để chạy nốt, rồi
+<code>node tools/bang-doi-chung.mjs --ghi</code>.</div>`}
 
 <div class="box jade">
   <b>Kết luận đúng, chứ không phải kết luận thắng</b>

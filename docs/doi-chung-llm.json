@@ -18,6 +18,11 @@
    "khoa": "gia-co-du-lieu/pho-hk/gpt-5.5",
    "lan": 2,
    "loi": "HTTP 502 {\"error\":{\"message\":\"openai_error\",\"type\":\"bad_response_status_code\",\"param\":\"\",\"code\":\"bad_response_status_code\"}}"
+  },
+  {
+   "khoa": "gia-khong-du-lieu/comhen-q1/gpt-5.5",
+   "lan": 4,
+   "loi": "The operation was aborted due to timeout"
   }
  ],
  "cau": {
@@ -2257,6 +2262,307 @@
      "daiDien": 60000,
      "tuChoi": false,
      "raoDon": true
+    }
+   ]
+  },
+  "gia-khong-du-lieu/comhen-q1/gpt-5.5": {
+   "nhom": "gia-khong-du-lieu",
+   "id": "comhen-q1",
+   "model": "gpt-5.5",
+   "hoi": "I'm in District 1, Ho Chi Minh City. How much should one bowl of com hen cost here? Give me a number in VND.",
+   "zone": "hcmc-district1",
+   "dish": "com-hen",
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 9,
+   "soLuotHong": 1,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 9,
+    "min": 35000,
+    "max": 60000,
+    "med": 47500,
+    "cv": 0.129,
+    "ratio": 1.71
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "About `45,000 VND` for one bowl in District 1.",
+     "ms": 4815,
+     "so": [
+      45000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `40,000 VND` for one bowl in District 1. A normal range is roughly `35,000-55,000 VND`; above `60,000 VND` starts to look overpriced for a basic serving.",
+     "ms": 4630,
+     "so": [
+      40000,
+      35000,
+      55000,
+      60000
+     ],
+     "daiDien": 47500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A fair price for one bowl of `cơm hến` in District 1 is about **35,000 VND**.\n\nAt a casual local spot, **30,000 to 45,000 VND** is a normal range.",
+     "ms": 34799,
+     "so": [
+      35000,
+      30000,
+      45000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About **45,000 VND** for a normal bowl in District 1.",
+     "ms": 112302,
+     "so": [
+      45000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical bowl of `com hen` in District 1, Ho Chi Minh City should cost about **50,000 VND**.\n\nAt a very local/simple place it might be closer to **35,000-45,000 VND**; in District 1 at a cleaner sit-down or tourist-facing spot, **50,000-70,000 VND** is normal.",
+     "ms": 56327,
+     "so": [
+      50000,
+      35000,
+      45000,
+      50000,
+      70000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **50,000 VND** for one bowl of `com hen` in District 1.\n\nYou might find cheaper local spots closer to **35,000-45,000 VND**, but in District 1, **50,000 VND** is a reasonable expected price.",
+     "ms": 2691,
+     "so": [
+      50000,
+      35000,
+      45000,
+      50000
+     ],
+     "daiDien": 47500,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A reasonable price in District 1 for one bowl of **cơm hến** is about **50,000 VND**.\n\nStreet/local spot: closer to **35,000-45,000 VND**.  \nClean sit-down or touristy District 1 place: **50,000-70,000 VND**.",
+     "ms": 4156,
+     "so": [
+      50000,
+      35000,
+      45000,
+      50000,
+      70000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A reasonable price for one bowl of **com hen** in District 1, Ho Chi Minh City is about **60,000 VND**.",
+     "ms": 2837,
+     "so": [
+      60000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A reasonable price for one bowl of `com hen` in District 1, Ho Chi Minh City is **50,000 VND**.",
+     "ms": 2327,
+     "so": [
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "gia-khong-du-lieu/comhen-q1/claude-haiku-4-5-20251001": {
+   "nhom": "gia-khong-du-lieu",
+   "id": "comhen-q1",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "I'm in District 1, Ho Chi Minh City. How much should one bowl of com hen cost here? Give me a number in VND.",
+   "zone": "hcmc-district1",
+   "dish": "com-hen",
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 4,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 60000,
+    "med": 33750,
+    "cv": 0.271,
+    "ratio": 2
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "A bowl of cơm hến (clam rice) in District 1, Ho Chi Minh City typically costs around **40,000–60,000 VND**, with most places charging closer to **50,000 VND**.\n\nDistrict 1 is the central business and tourist area, so prices are higher than in outer districts. You'll find it cheaper (30,000–40,000 VND) in areas like District 3 or 4, but in District 1's restaurants and food stalls, expect to pay in that 40,000–60,000 range.",
+     "ms": 2551,
+     "so": [
+      40000,
+      60000,
+      50000,
+      30000,
+      40000,
+      40000,
+      60000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cơm hến (clam rice) in District 1, Ho Chi Minh City typically costs between 25,000–40,000 VND, depending on the vendor and exact portion size. Most established spots charge around 30,000–35,000 VND for a standard bowl.\n\nIf you're eating at a sit-down restaurant rather than a street stall, expect the higher end of that range or slightly above.",
+     "ms": 3579,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000
+     ],
+     "daiDien": 32500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Com hen (chicken rice) in District 1, Ho Chi Minh City typically costs between 25,000–40,000 VND per bowl at casual eateries and street food stalls. A reasonable mid-range estimate would be around **30,000–35,000 VND**.\n\nAt more upscale restaurants in District 1, you might pay 50,000+ VND, but for authentic local com hen at a pho shop or casual vendor, expect to pay closer to the 25,000–35,000 range.",
+     "ms": 2503,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000,
+      50000,
+      25000,
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cơm hến (clam rice) in District 1, Ho Chi Minh City typically costs around **40,000–60,000 VND** at casual eateries and street food stalls. At more upscale restaurants or tourist-heavy areas in the district, you might pay **70,000–100,000 VND** or more.\n\nFor the best value, look for small local shops or market stalls rather than restaurants catering to tourists—you'll find bowls closer to the 40,000–50,000 VND range there.",
+     "ms": 3335,
+     "so": [
+      40000,
+      60000,
+      70000,
+      100000,
+      40000,
+      50000
+     ],
+     "daiDien": 55000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cơm hến (clam rice) in District 1, Ho Chi Minh City typically costs between 25,000–40,000 VND, depending on the vendor and quality. Tourist-facing establishments and restaurants in central areas lean toward the higher end, while smaller local stalls are usually closer to 25,000–30,000 VND.\n\nIf you're eating at a casual eatery or street vendor in District 1, expect around **30,000–35,000 VND** as a reasonable middle estimate.",
+     "ms": 3433,
+     "so": [
+      25000,
+      40000,
+      25000,
+      30000,
+      30000,
+      35000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "Com hen (a local specialty of clams with rice) in District 1, Ho Chi Minh City typically costs around 40,000–60,000 VND per bowl at casual eateries and food stalls. At more upscale restaurants, you might pay 80,000–100,000 VND or more.\n\nIf you're looking for a reasonable mid-range estimate, **50,000 VND** is a solid baseline for a standard bowl in that area.",
+     "ms": 2476,
+     "so": [
+      40000,
+      60000,
+      80000,
+      100000,
+      50000
+     ],
+     "daiDien": 60000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of cơm hến (clam rice) in District 1, Ho Chi Minh City typically costs between 25,000 and 40,000 VND, depending on the specific stall or restaurant and portion size.\n\nIf you're looking at a casual street vendor or small eatery, expect around 25,000–30,000 VND. Slightly nicer establishments or tourist-adjacent spots in District 1 might charge 35,000–40,000 VND.\n\nA reasonable middle estimate would be **30,000 VND** for a standard bowl.",
+     "ms": 4877,
+     "so": [
+      25000,
+      40000,
+      25000,
+      30000,
+      35000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of cơm hến (clam rice) in District 1, Ho Chi Minh City typically costs between 25,000 and 40,000 VND, depending on the vendor and portion size. A standard bowl at a mid-range spot usually runs around **30,000 VND**.\n\nStreet vendors and smaller eateries tend toward the lower end, while restaurants in more touristy areas or with larger portions charge more.",
+     "ms": 5985,
+     "so": [
+      25000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical bowl of cơm hến in District 1, Ho Chi Minh City costs around **30,000–50,000 VND**. \n\nIn touristy areas of District 1, prices lean toward the higher end of that range or beyond. If you find it at a local eatery or street vendor, you're more likely to pay closer to 30,000–40,000 VND. Fancier establishments or those catering to tourists can charge 50,000 VND or more.",
+     "ms": 2867,
+     "so": [
+      30000,
+      50000,
+      30000,
+      40000,
+      50000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Com hen (broken rice with clams) in District 1, Ho Chi Minh City typically costs between 25,000–40,000 VND per bowl at casual eateries and street food stalls. \n\nA reasonable midpoint estimate is **30,000 VND**, though you might find it slightly cheaper at smaller local spots (around 25,000 VND) or pay a bit more at nicer establishments catering to tourists (up to 40,000 VND).",
+     "ms": 3996,
+     "so": [
+      25000,
+      40000,
+      30000,
+      25000,
+      40000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
     }
    ]
   }

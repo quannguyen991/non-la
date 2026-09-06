@@ -25,7 +25,7 @@
     <div class="fact"><b>6</b><i>VÙNG ĐÃ CÓ DỮ LIỆU</i></div>
     <div class="fact"><b>77</b><i>MÓN CÓ TRI THỨC</i></div>
     <div class="fact"><b>2.481</b><i>QUÁN TỪ OSM</i></div>
-    <div class="fact"><b>739</b><i>PHÉP THỬ, XANH HẾT</i></div>
+    <div class="fact"><b>580</b><i>PHÉP THỬ LÕI, XANH HẾT</i></div>
   </div>
   <div class="foot"><span>Giới thiệu dự án &amp; danh mục tính năng</span><span>nonla-app.vercel.app</span></div>
 </section>
@@ -1289,21 +1289,35 @@ song với dải giá tham chiếu, không thay nó.</p>
 ba kiểm chính dữ liệu.</p>
 
 <div class="stat-row">
-  <div class="stat"><b>420</b><i>PHÉP THỬ LÕI · <code>node test.mjs</code></i></div>
-  <div class="stat"><b>249</b><i>PHÉP THỬ TƯƠNG TÁC · <code>audit.js</code></i></div>
-  <div class="stat"><b>0</b><i>PHÉP THỬ TRƯỢT</i></div>
+  <div class="stat"><b>580</b><i>PHÉP THỬ LÕI · <code>node test.mjs</code></i></div>
+  <div class="stat"><b>325</b><i>ĐIỂM KIỂM TƯƠNG TÁC · <code>audit.js</code></i></div>
+  <div class="stat"><b>0</b><i>PHÉP THỬ LÕI TRƯỢT</i></div>
   <div class="stat"><b>92%</b><i>ĐỘ TIN CẬY OCR TIẾNG VIỆT</i></div>
 </div>
 
 <h2>Tầng 1 — lõi logic, chạy trong Node</h2>
-<p>420 phép thử phủ: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá, đọc
+<p>580 phép thử phủ: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá, đọc
 mệnh giá tiền, phát hiện nhầm bậc số 0, toàn bộ phép chiếu / khoảng cách / khung nhìn của
 bản đồ, lõi thuần lớp cộng đồng, cách dựng liên kết ra ngoài, bẫy đơn vị, mô hình suy giá,
-phép suy món từ tên quán, và ranh giới giữa giá niêm yết với giá đo được.</p>
+phép suy món từ tên quán, ranh giới giữa giá niêm yết với giá đo được, <b>lõi âm lịch</b>,
+<b>tra cứu lịch Việt</b>, <b>trang hành trình</b>, và <b>bộ đọc câu trả lời của mô hình
+ngôn ngữ</b>. Chạy ngày 06/09/2026: <b>580 xanh, 0 trượt</b>.</p>
+
+<p>Ba nhóm mới đáng nói vì chúng neo vào những ca mà một lỗi sẽ đi qua im lặng:</p>
+<ul>
+  <li><b>Âm lịch</b> — ngày Tết mười một năm liền, cộng hai ca lệch múi giờ: Tết Mậu Thân
+    1968 và năm 2030, hai năm Việt Nam và Trung Quốc ăn Tết khác ngày. Cộng một vòng khứ
+    hồi dương → âm → dương trên 1.830 ngày liên tiếp.</li>
+  <li><b>Lịch Việt</b> — kiểm cả luật <i>ngày thường thì im</i>. Một phép thử chỉ kiểm
+    những hôm có ghi chú sẽ để lọt đúng cách hỏng tệ nhất: một khối nói chuyện mỗi ngày.</li>
+  <li><b>Trang hành trình</b> — kiểm rằng tệp xuất ra <i>không tham chiếu ra ngoài</i>
+    (không script, không link, không phông tải về) và <i>không có dòng “bạn đã tiết kiệm
+    được bao nhiêu”</i>.</li>
+</ul>
 
 <h2>Tầng 2 — đường tương tác, chạy trong trình duyệt</h2>
-<p>Bộ <code>audit.js</code> — <b>249 phép kiểm, xanh hết</b> ở lần chạy ngày 04/09/2026 —
-kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi
+<p>Bộ <code>audit.js</code> — <b>325 điểm kiểm</b>, xanh hết ở lần chạy đầy đủ gần nhất
+ngày 04/09/2026 — kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi
 tab có dọn sạch trạng thái cũ không. Tầng này tồn tại vì hai lỗi từng lọt qua tầng một —
 lõi logic đúng hoàn toàn mà người dùng vẫn không bấm được:</p>
 <ul>
@@ -1314,6 +1328,19 @@ lõi logic đúng hoàn toàn mà người dùng vẫn không bấm được:</p
 <p>Cộng ba luật riêng: mọi liên kết mạng xã hội phải là liên kết <i>tìm kiếm</i>; màn mở
 đầu phải phủ trên thanh nav và luôn có lối đi tiếp không cần tài khoản; bấm <i>Post</i>
 trong chế độ sổ tay phải thực sự ghi thêm một bài xuống máy.</p>
+
+<div class="box terra">
+  <b>Còn nợ ở tầng này, và nói ra thay vì để yên</b>
+  Đợt 06/09 thêm bảy điểm kiểm tương tác cho lớp văn hoá — khối lịch có im đúng vào ngày
+  thường không, đêm lồng đèn có rò sang vùng khác không, khối chuyện món có nói ngược với
+  bảng giá nằm ngay trên nó không. <b>Bảy điểm ấy chưa được chạy hết một lượt đầy đủ.</b>
+  Không phải vì chúng hỏng: <code>audit.js</code> có khoảng bảy trăm lần chờ ngắn nối
+  nhau, và trình duyệt bóp <code>setTimeout</code> khi tab không hiển thị, nên một lượt
+  chạy trong khung xem ẩn kéo dài hàng giờ. Muốn có số xanh cho tầng này thì phải mở
+  <code>index.html</code> trong một cửa sổ trình duyệt <i>đang hiện</i> rồi gọi:
+  <br><br>
+  <code>import('./audit.js').then(m =&gt; m.run())</code>
+</div>
 
 <h2>Tầng 3 — kiểm chính dữ liệu</h2>
 <p>Đây là tầng ít gặp nhất và có lẽ đáng nói nhất: phép thử đọc <code>data/*.json</code> và
