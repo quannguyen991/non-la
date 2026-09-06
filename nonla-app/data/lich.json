@@ -1,127 +1,188 @@
 {
   "_note": "Lịch Việt — những ngày âm lịch làm đổi cách một con số nên được đọc. Tra bằng lich.js, ngày âm tính bằng amlich.js ở UTC+7.",
-
   "_luat": [
     "Mỗi mục phải có trường src. Không có nguồn thì không vào tệp này.",
     "Mục nào chưa được người có chuyên môn xác nhận thì mang cờ verify: true. Phép thử ĐẾM số mục ấy và in ra, nhưng không làm trượt — một việc còn nợ không phải một lỗi, và làm trượt phép thử vì nó thì người ta sẽ xoá cờ cho xanh bảng.",
     "Không mục nào được nói một con số giá. App chưa đo giá ngày lễ. Ghi chú được phép nói dải giá tham chiếu đo NGOÀI dịp lễ — đó là điều app biết chắc.",
-    "Chữ en là khoá i18n (xem i18n.js: khoá chính là chuỗi tiếng Anh đầy đủ)."
+    "Chữ en là khoá i18n (xem i18n.js: khoá chính là chuỗi tiếng Anh đầy đủ).",
+    "Trường `nhan` là NHÃN NGẮN cho danh sách 'sắp tới'; `en` là CÂU ĐẦY ĐỦ cho dải hôm nay. Hai ngữ cảnh khác nhau: câu 'Today is the first day…' đọc sai hoàn toàn khi đứng cạnh một ngày còn năm hôm nữa."
   ],
-
   "thangAm": [
     {
       "id": "mung-mot",
-      "ngay": [1],
+      "ngay": [
+        1
+      ],
       "kind": "chay",
       "weight": 4,
       "en": "Today is the first day of the lunar month. Many people eat vegetarian, so some meat stalls open late or stay shut.",
-      "src": "Tập tục ăn chay ngày mùng một và ngày rằm, phổ biến khắp ba miền."
+      "src": "Tập tục ăn chay ngày mùng một và ngày rằm, phổ biến khắp ba miền.",
+      "nhan": "First day of the lunar month — many eat vegetarian"
     },
     {
       "id": "ram",
-      "ngay": [15],
+      "ngay": [
+        15
+      ],
       "kind": "chay",
       "weight": 4,
       "en": "Today is the lunar full moon. Many people eat vegetarian, so some meat stalls open late or stay shut.",
-      "src": "Tập tục ăn chay ngày mùng một và ngày rằm, phổ biến khắp ba miền."
+      "src": "Tập tục ăn chay ngày mùng một và ngày rằm, phổ biến khắp ba miền.",
+      "nhan": "Lunar full moon — many eat vegetarian"
     },
     {
       "id": "hoian-den-long",
-      "ngay": [14],
-      "zones": ["hoian-oldtown"],
+      "ngay": [
+        14
+      ],
+      "zones": [
+        "hoian-oldtown"
+      ],
       "kind": "denlong",
       "weight": 8,
       "en": "Tonight is Hoi An's lantern night. The old town switches off its electric lights and hangs silk lanterns instead.",
-      "src": "Đêm phố cổ Hội An, tổ chức vào ngày 14 âm lịch hằng tháng từ năm 1998."
+      "src": "Đêm phố cổ Hội An, tổ chức vào ngày 14 âm lịch hằng tháng từ năm 1998.",
+      "nhan": "Lantern night in Hoi An old town"
     }
   ],
-
   "leCoDinh": [
     {
       "id": "tet",
-      "thang": 1, "ngay": 1, "truoc": 10, "sau": 5,
-      "kind": "le", "weight": 10,
+      "thang": 1,
+      "ngay": 1,
+      "truoc": 10,
+      "sau": 5,
+      "kind": "le",
+      "weight": 10,
       "en": "Tet, the lunar new year. Most street stalls close for several days and many reopen with holiday pricing.",
       "enTruoc": "Tet is coming. Stalls start closing in the days before, and the ones that stay open get busy.",
-      "src": "Tết Nguyên đán, mùng một tháng Giêng âm lịch."
+      "src": "Tết Nguyên đán, mùng một tháng Giêng âm lịch.",
+      "nhan": "Tet — the lunar new year"
     },
     {
       "id": "ram-thang-gieng",
-      "thang": 1, "ngay": 15,
-      "kind": "le", "weight": 7,
+      "thang": 1,
+      "ngay": 15,
+      "kind": "le",
+      "weight": 7,
       "en": "Ram thang Gieng, the first full moon of the year and the biggest offering day after Tet. Vegetarian food, flowers and fruit are in heavy demand.",
-      "src": "Rằm tháng Giêng (Tết Nguyên tiêu), 15 tháng Giêng âm lịch."
+      "src": "Rằm tháng Giêng (Tết Nguyên tiêu), 15 tháng Giêng âm lịch.",
+      "nhan": "Ram thang Gieng — first full moon of the year"
     },
     {
       "id": "han-thuc",
-      "thang": 3, "ngay": 3,
-      "kind": "le", "weight": 5,
+      "thang": 3,
+      "ngay": 3,
+      "kind": "le",
+      "weight": 5,
       "en": "Tet Han Thuc. Households make banh troi and banh chay — small glutinous rice balls you will see stacked on street stalls today.",
-      "src": "Tết Hàn thực, mùng 3 tháng 3 âm lịch."
+      "src": "Tết Hàn thực, mùng 3 tháng 3 âm lịch.",
+      "nhan": "Tet Han Thuc — banh troi, banh chay"
     },
     {
       "id": "gio-to",
-      "thang": 3, "ngay": 10,
-      "kind": "le", "weight": 6,
+      "thang": 3,
+      "ngay": 10,
+      "kind": "le",
+      "weight": 6,
       "en": "Hung Kings Commemoration Day, a public holiday. Expect crowds and some stalls closed.",
-      "src": "Giỗ Tổ Hùng Vương, mùng 10 tháng 3 âm lịch — ngày nghỉ lễ theo Bộ luật Lao động."
+      "src": "Giỗ Tổ Hùng Vương, mùng 10 tháng 3 âm lịch — ngày nghỉ lễ theo Bộ luật Lao động.",
+      "nhan": "Hung Kings Commemoration Day — public holiday"
     },
     {
       "id": "doan-ngo",
-      "thang": 5, "ngay": 5,
-      "kind": "le", "weight": 5,
+      "thang": 5,
+      "ngay": 5,
+      "kind": "le",
+      "weight": 5,
       "en": "Tet Doan Ngo, the midyear festival. Look for com ruou and fresh fruit sold from morning stalls.",
-      "src": "Tết Đoan Ngọ, mùng 5 tháng 5 âm lịch."
+      "src": "Tết Đoan Ngọ, mùng 5 tháng 5 âm lịch.",
+      "nhan": "Tet Doan Ngo — the midyear festival"
     },
     {
       "id": "vu-lan",
-      "thang": 7, "ngay": 15, "truoc": 14,
-      "kind": "giale", "weight": 8,
+      "thang": 7,
+      "ngay": 15,
+      "truoc": 14,
+      "kind": "giale",
+      "weight": 8,
       "en": "Vu Lan and the seventh lunar month, the biggest offering season of the year. Flowers, fruit and votive goods are in heavy demand all month.",
       "enTruoc": "The seventh lunar month has begun — the biggest offering season of the year. Flowers, fruit and votive goods are in heavy demand.",
-      "src": "Rằm tháng Bảy (Vu Lan báo hiếu / xá tội vong nhân), 15 tháng 7 âm lịch."
+      "src": "Rằm tháng Bảy (Vu Lan báo hiếu / xá tội vong nhân), 15 tháng 7 âm lịch.",
+      "nhan": "Vu Lan — the seventh lunar month offering season"
     },
     {
       "id": "trung-thu",
-      "thang": 8, "ngay": 15, "truoc": 7,
-      "kind": "le", "weight": 8,
+      "thang": 8,
+      "ngay": 15,
+      "truoc": 7,
+      "kind": "le",
+      "weight": 8,
       "en": "Tet Trung Thu, the mid-autumn festival. Lanterns, lion dances and mooncakes everywhere, and the streets stay busy late.",
       "enTruoc": "Mid-autumn festival is coming. Mooncake stalls and lantern sellers are already out.",
-      "src": "Tết Trung Thu, 15 tháng 8 âm lịch."
+      "src": "Tết Trung Thu, 15 tháng 8 âm lịch.",
+      "nhan": "Tet Trung Thu — the mid-autumn festival"
     },
     {
       "id": "ong-tao",
-      "thang": 12, "ngay": 23,
-      "kind": "le", "weight": 6,
+      "thang": 12,
+      "ngay": 23,
+      "kind": "le",
+      "weight": 6,
       "en": "Ong Cong Ong Tao day, a week before Tet. Households release live carp into rivers and lakes, and the countdown to the holiday closures starts here.",
-      "src": "Tết Ông Công Ông Táo, 23 tháng Chạp âm lịch."
+      "src": "Tết Ông Công Ông Táo, 23 tháng Chạp âm lịch.",
+      "nhan": "Ong Cong Ong Tao — a week before Tet"
     },
     {
       "id": "tat-nien",
-      "thang": 12, "ngay": 29, "keoDaiToiCuoiThang": true,
-      "kind": "le", "weight": 9,
+      "thang": 12,
+      "ngay": 29,
+      "keoDaiToiCuoiThang": true,
+      "kind": "le",
+      "weight": 9,
       "en": "The last days of the lunar year. Many stalls have already shut for Tet; the ones still open are winding down.",
-      "src": "Tất niên, những ngày cuối tháng Chạp."
+      "src": "Tất niên, những ngày cuối tháng Chạp.",
+      "nhan": "Last days of the lunar year"
     }
   ],
-
   "leVung": [
     {
       "id": "cau-ngu",
-      "zones": ["danang-mykhe", "danang-hanriver"],
-      "amThang": [1, 2, 3],
-      "kind": "le", "weight": 6, "verify": true,
+      "zones": [
+        "danang-mykhe",
+        "danang-hanriver"
+      ],
+      "amThang": [
+        1,
+        2,
+        3
+      ],
+      "kind": "le",
+      "weight": 6,
+      "verify": true,
       "en": "Cau Ngu season, the whale-worship festival of the coastal fishing villages. Dates are set village by village in the first three lunar months.",
-      "src": "Lễ hội Cầu Ngư của làng chài ven biển Đà Nẵng. CẦN XÁC NHẬN ngày cụ thể của từng làng trước khi hiện lên giao diện."
+      "src": "Lễ hội Cầu Ngư của làng chài ven biển Đà Nẵng. CẦN XÁC NHẬN ngày cụ thể của từng làng trước khi hiện lên giao diện.",
+      "nhan": "Cau Ngu season in the fishing villages"
     },
     {
       "id": "hoi-an-trung-thu",
-      "zones": ["hoian-oldtown"],
-      "amThang": [8],
-      "amNgay": [14, 15, 16],
-      "kind": "le", "weight": 8, "verify": true,
+      "zones": [
+        "hoian-oldtown"
+      ],
+      "amThang": [
+        8
+      ],
+      "amNgay": [
+        14,
+        15,
+        16
+      ],
+      "kind": "le",
+      "weight": 8,
+      "verify": true,
       "en": "Mid-autumn in Hoi An, the biggest lantern nights of the year in the old town.",
-      "src": "Trung Thu tại Hội An. CẦN XÁC NHẬN chương trình của thành phố năm hiện tại."
+      "src": "Trung Thu tại Hội An. CẦN XÁC NHẬN chương trình của thành phố năm hiện tại.",
+      "nhan": "Mid-autumn lantern nights in Hoi An"
     }
   ]
 }

@@ -864,6 +864,38 @@ const chayLineHTML = anToan(function (khiNao = new Date()) {
   return `<p class="chayline">${esc(T("Many places serve vegetarian food today — it is the first day or the full moon of the lunar month."))}</p>`;
 });
 
+/* Khối "sắp tới" trong tab You. Khác hẳn dải trên thẻ kết quả: dải kia
+   nói về HÔM NAY và chỉ hiện khi hôm nay đáng nói; khối này nói về sáu
+   tuần tới và dùng để LÊN KẾ HOẠCH — khách ở Hội An muốn biết đêm rằm
+   phố cổ rơi vào hôm nào để còn ở lại thêm một ngày.
+
+   Cắt ở sáu tuần vì đó là quãng dài nhất còn đổi được vé. Xa hơn thì
+   danh sách dài ra mà không ai làm gì với nó. */
+const lichSapToiHTML = anToan(function (khiNao = new Date()) {
+  if (!Lich.daNap()) return "";
+  const moc = Lich.sapToi(khiNao, S.zone, 45).slice(0, 5);
+  if (!moc.length) return "";
+
+  const vi = curLang() === "vi";
+  const ngayDoc = (d) => d.toLocaleDateString(vi ? "vi-VN" : "en-GB",
+    { day: "numeric", month: "short" });
+
+  return `
+    <div class="sect-row">
+      <span class="spark" aria-hidden="true">${I.spark}</span>
+      <h2>${esc(T("Coming up"))}</h2>
+      <span class="rule" aria-hidden="true"></span>
+    </div>
+    <p class="src" style="margin:-4px 0 8px">${esc(T("Lunar dates for the next six weeks, in this area."))}</p>
+    <div class="lich-list">
+      ${moc.map((g) => `<div class="lich-row">
+        <span class="lich-when">${esc(ngayDoc(g.ngayDuong))}<i>${
+          g.cach === 0 ? esc(T("today")) : `+${g.cach}${esc(T("d"))}`}</i></span>
+        <span class="lich-what">${esc(T(g.nhan || g.en))}</span>
+      </div>`).join("")}
+    </div>`;
+});
+
 /* Dải giá SUY RA cho món vùng này chưa đo. Cố tình để thành một khối riêng,
    không trộn vào các dòng đã đo phía trên: một con số suy ra mà nằm cùng
    hàng với một con số đo được là đúng thứ trust.js sinh ra để chặn. */
@@ -3473,6 +3505,8 @@ function renderMe() {
     </div>
     <p class="you-note">${I.spark}<span>${record}</span></p>
 
+    ${lichSapToiHTML()}
+
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
       <h2>Achievements</h2>
@@ -4861,7 +4895,7 @@ window.__nonla = { S, handleText, judgeRows, go, showDish, showPlace, ocr, doSca
      chỉnh giờ máy. Đây cũng là lý do lichHTML() có tham số: một khối chỉ
      đúng vào đúng ba ngày trong tháng mà chỉ kiểm được vào đúng ba ngày
      ấy thì trên thực tế là không kiểm được. */
-  lichHTML, chayLineHTML };
+  lichHTML, chayLineHTML, lichSapToiHTML };
 
 boot().catch((e) => { console.error(e); document.body.innerHTML =
   `<pre style="color:#fff;padding:20px;font:13px monospace">Failed to start: ${esc(e.message)}</pre>`; });

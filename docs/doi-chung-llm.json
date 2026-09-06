@@ -4794,6 +4794,296 @@
      "raoDon": false
     }
    ]
+  },
+  "ngoai-danh-muc/pha-lau/claude-haiku-4-5-20251001": {
+   "nhom": "ngoai-danh-muc",
+   "id": "pha-lau",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "How much should one bowl of pha lau cost at a street stall in Ho Chi Minh City, Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 8,
+   "daoDong": {
+    "n": 10,
+    "min": 37500,
+    "max": 55000,
+    "med": 50000,
+    "cv": 0.104,
+    "ratio": 1.47
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "A bowl of phở lâu (hot pot phở) at a street stall in Ho Chi Minh City typically costs around 40,000–60,000 VND, with most stalls pricing it closer to 50,000 VND. Some busier tourist-adjacent areas may charge slightly more, while smaller local stalls in residential neighborhoods might be on the lower end.",
+     "ms": 3449,
+     "so": [
+      40000,
+      60000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A typical bowl of phở at a street stall in Ho Chi Minh City runs around 40,000–60,000 VND, with 50,000 VND being a reasonable middle estimate for a standard bowl. Prices vary by location and stall reputation—tourist areas may charge more, while local neighborhoods offer better value. Specialty versions or premium stalls might go higher.",
+     "ms": 2407,
+     "so": [
+      40000,
+      60000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of phở lâu (hot pot phở) at a street stall in Ho Chi Minh City typically costs between 40,000 and 80,000 VND, depending on the stall's location, quality, and what proteins are included. Central areas and tourist zones tend toward the higher end, while local neighborhoods run cheaper.\n\nA reasonable mid-range estimate is around 50,000–60,000 VND for a standard bowl with beef.",
+     "ms": 8803,
+     "so": [
+      40000,
+      80000,
+      50000,
+      60000
+     ],
+     "daiDien": 55000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of phở lâu (hot pot phở) at a street stall in Ho Chi Minh City typically costs between 40,000–80,000 VND, depending on the stall's location, quality, and protein additions. Central tourist areas run toward the higher end, while local neighborhoods stay closer to 40,000–50,000 VND.\n\nIf you're looking for a single figure, 50,000–60,000 VND is a reasonable middle estimate for a standard bowl at an average stall.",
+     "ms": 3867,
+     "so": [
+      40000,
+      80000,
+      40000,
+      50000,
+      50000,
+      60000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of phở at a street stall in Ho Chi Minh City typically costs between 35,000 and 50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard bowl in 2024.\n\nPrices vary by location and stall quality—busier tourist areas or better-known vendors may charge toward the higher end, while smaller stalls in residential neighborhoods tend to be closer to 35,000 VND.",
+     "ms": 6505,
+     "so": [
+      35000,
+      50000,
+      40000,
+      35000
+     ],
+     "daiDien": 37500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical bowl of phở at a street stall in Ho Chi Minh City runs around 40,000–60,000 VND, depending on the stall's location and reputation. Central areas and tourist zones tend toward the higher end, while local neighborhoods are closer to 40,000. Premium stalls or those with notably good broth might charge up to 80,000 VND.",
+     "ms": 4544,
+     "so": [
+      40000,
+      60000,
+      40000,
+      80000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical bowl of phở at a street stall in Ho Chi Minh City costs around **30,000–50,000 VND**, with most falling in the **35,000–45,000 VND** range. Budget stalls might go as low as 25,000 VND, while slightly more upscale ones could reach 60,000 VND or more.\n\nThe price depends on the stall's location, portion size, and meat quality. Stalls in touristy areas charge more than those in local neighborhoods.",
+     "ms": 3345,
+     "so": [
+      30000,
+      50000,
+      35000,
+      45000,
+      25000,
+      60000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A typical bowl of phở at a street stall in Ho Chi Minh City costs around 40,000–60,000 VND. Budget stalls might charge 30,000–40,000 VND, while slightly more upscale ones could be 60,000–80,000 VND. The most common price you'd encounter is around 50,000 VND.",
+     "ms": 1898,
+     "so": [
+      40000,
+      60000,
+      30000,
+      40000,
+      60000,
+      80000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A bowl of phở at a street stall in Ho Chi Minh City typically costs between 40,000 and 80,000 VND, depending on the stall's location and quality. In central tourist areas, you might pay toward the higher end; in local neighborhoods, closer to 40,000-50,000 VND is more common. A reasonable middle estimate would be around 50,000-60,000 VND for a standard bowl.",
+     "ms": 3714,
+     "so": [
+      40000,
+      80000,
+      40000,
+      50000,
+      50000,
+      60000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A bowl of phở lâu (hot pot phở) at a street stall in Ho Chi Minh City typically costs between 40,000–80,000 VND, depending on the stall's location, quality, and whether it includes premium ingredients like beef or seafood.\n\nA basic bowl with standard broth and noodles runs closer to 40,000–50,000 VND. Mid-range stalls with better quality ingredients or slightly fancier presentations charge 60,000–80,000 VND. Tourist-heavy areas or nicer establishments push toward the higher end or beyond.\n\nIf you're looking for a single typical price point: **50,000 VND** is a reasonable middle estimate for a decent bowl at an average street stall.",
+     "ms": 2904,
+     "so": [
+      40000,
+      80000,
+      40000,
+      50000,
+      60000,
+      80000,
+      50000
+     ],
+     "daiDien": 50000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "ngoai-danh-muc/banh-canh-cua/gpt-5.5": {
+   "nhom": "ngoai-danh-muc",
+   "id": "banh-canh-cua",
+   "model": "gpt-5.5",
+   "hoi": "How much should one bowl of banh canh cua cost at a street stall in Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 10,
+    "min": 35000,
+    "max": 40000,
+    "med": 40000,
+    "cv": 0.064,
+    "ratio": 1.14
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "About 40,000 VND.",
+     "ms": 3348,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `35,000 VND` for one bowl at a street stall.",
+     "ms": 3836,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one bowl at a street stall.",
+     "ms": 3159,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND`.",
+     "ms": 3082,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND` for one bowl at a street stall.",
+     "ms": 4744,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND` for one bowl at a street stall.",
+     "ms": 3116,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "A reasonable street-stall price is about `35,000 VND` for one bowl.",
+     "ms": 2086,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND` for one bowl at a street stall.",
+     "ms": 3910,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About 35,000 VND.",
+     "ms": 3287,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND` for one bowl at a typical street stall in Vietnam.",
+     "ms": 2090,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
   }
  }
 }

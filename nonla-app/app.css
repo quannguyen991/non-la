@@ -1908,3 +1908,12 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 /* Ngày chay ở tab Eat — hai hôm mỗi tháng âm, nên được phép chiếm một dòng. */
 .chayline{font-size:12.5px;line-height:1.55;color:var(--muc-nhat);font-weight:400;
   margin:11px 0 2px;padding-left:10px;border-left:2px solid var(--ngoc,#1F8A70)}
+
+/* Khối "sắp tới" ở tab You — lịch âm sáu tuần tới. */
+.lich-list{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px}
+.lich-row{display:flex;gap:12px;align-items:baseline;padding:8px 0;
+  border-bottom:1px solid rgba(29,42,36,.08)}
+.lich-when{flex:0 0 78px;font-size:12.5px;font-weight:600;color:var(--muc);
+  display:flex;flex-direction:column;line-height:1.25}
+.lich-when i{font-style:normal;font-size:10px;font-weight:400;color:var(--muc-nhat)}
+.lich-what{font-size:12.5px;line-height:1.5;font-weight:300;color:var(--muc-nhat)}

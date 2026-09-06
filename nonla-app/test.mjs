@@ -1511,6 +1511,18 @@ console.log("\n── lịch Việt ──────────────�
   ok("mọi mục lịch đều có nguồn", moiMuc.every((m) => m.src && m.src.length > 8),
     JSON.stringify(moiMuc.find((m) => !m.src)?.id || null));
   ok("mọi mục lịch đều có chữ tiếng Anh", moiMuc.every((m) => m.en && m.en.length > 12));
+  /* Nhãn ngắn cho danh sách "sắp tới". Câu đầy đủ viết cho HÔM NAY —
+     "Today is the first day of the lunar month" đọc sai hoàn toàn khi
+     nó đứng cạnh một ngày còn năm hôm nữa. */
+  ok("mọi mục lịch đều có nhãn ngắn cho danh sách sắp tới",
+    moiMuc.every((m) => m.nhan && m.nhan.length > 8),
+    JSON.stringify(moiMuc.find((m) => !m.nhan)?.id || null));
+  ok("nhãn ngắn không mở đầu bằng chữ Today",
+    moiMuc.every((m) => !/^\s*(today|tonight)/i.test(m.nhan || "")),
+    JSON.stringify(moiMuc.find((m) => /^\s*(today|tonight)/i.test(m.nhan || ""))?.id || null));
+  ok("nhãn ngắn đủ ngắn cho một dòng danh sách",
+    moiMuc.every((m) => (m.nhan || "").length <= 62),
+    JSON.stringify(moiMuc.filter((m) => (m.nhan || "").length > 62).map((m) => m.id)));
   /* Không mục nào được nói một con số giá — app chưa đo giá ngày lễ. */
   ok("không mục lịch nào in ra một con số tiền",
     moiMuc.every((m) => !/\d[\d.,]*\s*(?:₫|đ\b|VND|dong)/i.test(`${m.en} ${m.enTruoc || ""}`)));
