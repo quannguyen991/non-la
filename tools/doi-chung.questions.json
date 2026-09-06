@@ -1,0 +1,61 @@
+{
+  "_note": "Bộ câu hỏi đối chứng với mô hình ngôn ngữ. Mỗi câu hỏi chạy nhiều lượt, hội thoại mới mỗi lượt, không mồi vai system — đúng cách một khách du lịch mở app lên và gõ một câu. Sửa tệp này thì chạy lại tools/doi-chung-llm.mjs, đừng sửa tay bảng kết quả.",
+  "_datCau": "Câu hỏi viết bằng tiếng Anh vì đó là thứ tiếng khách quốc tế thật sự gõ vào. Không câu nào mồi model rằng có một khoảng giá 'đúng' — hỏi thẳng như người không biết gì.",
+
+  "nhom": {
+    "gia-co-du-lieu": {
+      "mo_ta": "Món × vùng mà Nón Lá CÓ dải giá đo được. Đo độ dao động giữa các lượt và khoảng lệch so với dải.",
+      "cau": [
+        { "id": "pho-hk", "dish": "pho-bo", "zone": "hanoi-hoankiem",
+          "hoi": "I'm standing on a street in Hoan Kiem, Hanoi. How much should one bowl of pho bo cost at a normal street stall here? Give me a number in VND." },
+        { "id": "caolau-ha", "dish": "cao-lau", "zone": "hoian-oldtown",
+          "hoi": "I'm in Hoi An Old Town. How much should one bowl of cao lau cost at a normal place here? Give me a number in VND." },
+        { "id": "bunbo-hue", "dish": "bun-bo-hue", "zone": "hue-citadel",
+          "hoi": "I'm near the Citadel in Hue. How much should one bowl of bun bo Hue cost at a normal street stall here? Give me a number in VND." },
+        { "id": "comtam-q1", "dish": "com-tam", "zone": "hcmc-district1",
+          "hoi": "I'm in District 1, Ho Chi Minh City. How much should one plate of com tam cost at a normal place here? Give me a number in VND." },
+        { "id": "miquang-dn", "dish": "mi-quang", "zone": "danang-hanriver",
+          "hoi": "I'm near the Han River in Da Nang. How much should one bowl of mi Quang cost at a normal place here? Give me a number in VND." },
+        { "id": "banhmi-ha", "dish": "banh-mi", "zone": "hoian-oldtown",
+          "hoi": "I'm in Hoi An Old Town. How much should one banh mi cost here? Give me a number in VND." }
+      ]
+    },
+
+    "gia-khong-du-lieu": {
+      "mo_ta": "Món × vùng mà Nón Lá CŨNG KHÔNG có dải giá — món đó không thuộc vùng đó. Nón Lá trả về gạch ngang. Câu hỏi là model có im được không.",
+      "cau": [
+        { "id": "caolau-hk", "dish": "cao-lau", "zone": "hanoi-hoankiem",
+          "hoi": "I'm in Hoan Kiem, Hanoi. How much should one bowl of cao lau cost here? Give me a number in VND." },
+        { "id": "comhen-q1", "dish": "com-hen", "zone": "hcmc-district1",
+          "hoi": "I'm in District 1, Ho Chi Minh City. How much should one bowl of com hen cost here? Give me a number in VND." },
+        { "id": "buncha-mk", "dish": "bun-cha", "zone": "danang-mykhe",
+          "hoi": "I'm at My Khe beach in Da Nang. How much should one serving of bun cha cost here? Give me a number in VND." },
+        { "id": "goica-hue", "dish": "goi-ca-nam-o", "zone": "hue-citadel",
+          "hoi": "I'm near the Citadel in Hue. How much should one serving of goi ca Nam O cost here? Give me a number in VND." }
+      ]
+    },
+
+    "don-vi": {
+      "mo_ta": "Bẫy đơn vị — nhóm sai lệch lớn nhất về tiền tuyệt đối. Chấm đúng/sai nhị phân: đáp án đúng có xuất hiện trong câu trả lời không.",
+      "cau": [
+        { "id": "ca-100g", "dung": 800000,
+          "hoi": "A seafood menu in Vietnam says: ca song 100.000/100g. I want a fish that weighs 800 grams. How much will I be charged in VND?" },
+        { "id": "tom-lang", "dung": 1200000,
+          "hoi": "A seafood menu in Vietnam says: tom 120.000/lang. I want 1 kilogram of prawns. How much will I be charged in VND?" },
+        { "id": "cua-lang", "dung": 450000,
+          "hoi": "A menu in Vietnam says: cua bien 150.000/lang. I order 3 lang. How much will I be charged in VND?" }
+      ]
+    },
+
+    "ngoai-danh-muc": {
+      "mo_ta": "Món KHÔNG nằm trong 77 món của Nón Lá. Ở đây Nón Lá trả về gạch ngang còn model trả lời được — đo để ghi vào hồ sơ đúng chỗ mình thua.",
+      "cau": [
+        { "id": "banh-can", "hoi": "How much should one plate of banh can cost at a street stall in Nha Trang, Vietnam? Give me a number in VND." },
+        { "id": "bun-oc", "hoi": "How much should one bowl of bun oc cost at a street stall in Hanoi, Vietnam? Give me a number in VND." },
+        { "id": "pha-lau", "hoi": "How much should one bowl of pha lau cost at a street stall in Ho Chi Minh City, Vietnam? Give me a number in VND." },
+        { "id": "banh-canh-cua", "hoi": "How much should one bowl of banh canh cua cost at a street stall in Vietnam? Give me a number in VND." },
+        { "id": "cha-ruoi", "hoi": "How much should one serving of cha ruoi cost in Hanoi, Vietnam? Give me a number in VND." }
+      ]
+    }
+  }
+}

@@ -27,6 +27,12 @@ import { NGUON, NGUON_QUAN_SAT, MIN_MAU, MIN_DOI_CHIEU, vaoDai, laDoDuoc,
          loc, bachPhanVi, dungDai, phatHienTron, soSanhKhaiVaDo } from "./pricesrc.js";
 import { index as refIndex, lookup as refLookup, bandOf as refBand } from "./menuref.js";
 import { classify, usableFor, rawBand, tidyBand, mergeBand, tidy } from "../tools/menuband.mjs";
+import { amLich as amLichCua, duongLich as duongLichTu, tet as tetAm,
+         canChiNam, conGiapEn, soNgayTrongThang as soNgayThangAm } from "./amlich.js";
+import { napLich, ghiChu as ghiChuLich, ngayChay as ngayChayLich } from "./lich.js";
+import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
+         raoDon as raoDonLlm, daoDong as daoDongLlm, soVoiDai as soVoiDaiLlm,
+         trungDapAn as trungDapAnLlm } from "../tools/llmparse.mjs";
 import { bandFloor, forZone } from "./premium.js";
 import { readFileSync } from "fs";
 
@@ -1390,6 +1396,178 @@ console.log("\n── nạp lại bộ giá: chạy lại không trôi số ─�
      thì lần chạy sau lại lấy nó làm base và vòng trôi số quay lại. */
   ok("dải gốc không mang theo cờ sourced",
     coBase.every(([, it]) => !it.base.sourced && !it.base.base));
+}
+
+/* ── âm lịch (amlich.js) ──────────────────────────────────────
+   Neo vào ngày Tết mười một năm liền. Một thuật toán thiên văn sai
+   lệch nửa ngày vẫn ra đúng phần lớn các ngày trong năm — chỉ những
+   ngày điểm sóc rơi sát nửa đêm mới lộ ra. Tết là ngày dễ tra lại
+   nhất và cũng là ngày sai thì tai hại nhất. */
+console.log("\n── âm lịch ─────────────────────────────────");
+{
+  const TET = { 2020: "25/1", 2021: "12/2", 2022: "1/2", 2023: "22/1", 2024: "10/2",
+                2025: "29/1", 2026: "17/2", 2027: "6/2", 2028: "26/1", 2029: "13/2",
+                2030: "2/2" };
+  for (const [nam, want] of Object.entries(TET)) {
+    const d = tetAm(Number(nam));
+    eq(`Tết ${nam}`, `${d.getDate()}/${d.getMonth() + 1}`, want);
+  }
+
+  /* Ca lệch múi giờ — lý do cả tệp amlich.js tồn tại thay vì gọi một
+     thư viện âm lịch bất kỳ. Cùng thuật toán, đổi mỗi tz, ra hai ngày
+     Tết khác nhau. Nếu hai dòng này bao giờ bằng nhau thì tham số tz
+     đã bị nối tắt ở đâu đó và app đang chạy lịch Trung Quốc. */
+  const t1968vn = tetAm(1968, 7), t1968tq = tetAm(1968, 8);
+  eq("Tết Mậu Thân 1968 · giờ Việt Nam", `${t1968vn.getDate()}/${t1968vn.getMonth() + 1}`, "29/1");
+  eq("Tết Mậu Thân 1968 · giờ Bắc Kinh", `${t1968tq.getDate()}/${t1968tq.getMonth() + 1}`, "30/1");
+  const t2030vn = tetAm(2030, 7), t2030tq = tetAm(2030, 8);
+  ok("2030 hai nước ăn Tết lệch nhau một ngày",
+    t2030vn.getDate() === 2 && t2030tq.getDate() === 3,
+    `${t2030vn.getDate()}/2 vs ${t2030tq.getDate()}/2`);
+
+  eq("can chi 2026", canChiNam(2026), "Bính Ngọ");
+  eq("can chi 2024", canChiNam(2024), "Giáp Thìn");
+  /* Chi thứ tư ở Việt Nam là Mèo, ở Trung Quốc là Thỏ. */
+  eq("2023 là năm Mèo, không phải Thỏ", conGiapEn(2023), "Cat");
+
+  /* Khứ hồi trên năm năm liên tiếp. Bắt được cả lỗi lệch một ngày lẫn
+     lỗi đánh số tháng sau tháng nhuận. */
+  {
+    let lech = 0;
+    for (let i = 0; i < 1830; i++) {
+      const d = new Date(2024, 0, 1 + i);
+      const ve = duongLichTu(amLichCua(d));
+      if (!ve || ve.getTime() !== d.getTime()) lech++;
+    }
+    eq("dương → âm → dương khứ hồi 1830 ngày", lech, 0);
+  }
+
+  /* Tháng âm chỉ có 29 hoặc 30 ngày. Giao diện nào cho chọn ngày 31
+     âm lịch là cho chọn một ngày không tồn tại. */
+  {
+    let la = 0;
+    for (let th = 1; th <= 12; th++) {
+      const n = soNgayThangAm({ thang: th, nam: 2026 });
+      if (n !== 29 && n !== 30) la++;
+    }
+    eq("mọi tháng âm 2026 dài 29 hoặc 30 ngày", la, 0);
+  }
+
+  /* Xin một tháng nhuận không tồn tại phải trả null, không trả một
+     ngày gần đúng. 2026 không nhuận tháng 4. */
+  eq("tháng nhuận không có thật → null",
+    duongLichTu({ ngay: 5, thang: 4, nam: 2026, nhuan: true }), null);
+}
+
+/* ── lịch Việt (lich.js) ──────────────────────────────────────
+   Luật số một của khối này là NGÀY THƯỜNG THÌ IM. Một phép thử chỉ
+   kiểm những ngày có ghi chú sẽ để lọt đúng cách hỏng tệ nhất: một
+   khối nói chuyện mỗi ngày, và đến hôm mùng một thật thì không ai
+   còn đọc nó nữa. */
+console.log("\n── lịch Việt ───────────────────────────────");
+{
+  const lichData = JSON.parse(readFileSync("./data/lich.json", "utf8"));
+  ok("nạp được bảng lịch", napLich(lichData));
+
+  const ids = (d, z) => ghiChuLich(d, z).map((x) => x.id);
+
+  eq("ngày thường thì im", ids(new Date(2026, 8, 6), "hoian-oldtown"), []);
+  eq("mùng một tháng 8 âm", ids(new Date(2026, 8, 11), "hanoi-hoankiem"), ["mung-mot"]);
+  ok("rằm có ghi chú ăn chay", ids(new Date(2026, 8, 25), "hanoi-hoankiem").includes("ram"));
+
+  /* Đêm rằm phố cổ chỉ có ở Hội An. Một ghi chú theo vùng mà rò sang
+     vùng khác là app nói với khách ở Hà Nội rằng tối nay phố tắt đèn. */
+  ok("đêm lồng đèn 14 âm chỉ hiện ở Hội An",
+    ids(new Date(2026, 8, 24), "hoian-oldtown").includes("hoian-den-long") &&
+    !ids(new Date(2026, 8, 24), "hanoi-hoankiem").includes("hoian-den-long"));
+
+  /* Tin của HÔM NAY phải đứng trên tin BÁO TRƯỚC. Ngày mùng một mà
+     dòng đầu là "Trung Thu sắp tới" thì app bỏ qua việc đang xảy ra
+     trước mặt để nói về việc chưa xảy ra. */
+  {
+    const g = ghiChuLich(new Date(2027, 1, 6), "hanoi-hoankiem"); /* mùng một Tết */
+    eq("ngày Tết: tin hôm nay đứng đầu", g[0].id, "tet");
+    eq("ngày Tết: tin hôm nay không phải tin báo trước", g[0].khi, "hom-nay");
+  }
+
+  /* Đứng ở 28 tháng Chạp phải thấy Tết còn hai ngày — chứ không phải
+     im lặng vì mốc mùng một của năm âm đang chạy đã trôi qua. */
+  {
+    const g = ghiChuLich(new Date(2027, 1, 4), "hanoi-hoankiem").find((x) => x.id === "tet");
+    ok("28 tháng Chạp báo Tết còn 2 ngày", g && g.conLai === 2, JSON.stringify(g || null));
+  }
+
+  /* Tất niên phải bắt được ngày cuối tháng Chạp dù tháng ấy thiếu. */
+  ok("29 tháng Chạp (tháng thiếu) vẫn là tất niên",
+    ids(new Date(2027, 1, 5), "hanoi-hoankiem").includes("tat-nien"));
+
+  eq("mùng một là ngày chay", ngayChayLich(new Date(2026, 8, 11)), true);
+  eq("ngày thường không phải ngày chay", ngayChayLich(new Date(2026, 8, 6)), false);
+
+  /* Kiểm chính DỮ LIỆU, không kiểm mã. */
+  const moiMuc = [...(lichData.thangAm || []), ...(lichData.leCoDinh || []), ...(lichData.leVung || [])];
+  ok("mọi mục lịch đều có nguồn", moiMuc.every((m) => m.src && m.src.length > 8),
+    JSON.stringify(moiMuc.find((m) => !m.src)?.id || null));
+  ok("mọi mục lịch đều có chữ tiếng Anh", moiMuc.every((m) => m.en && m.en.length > 12));
+  /* Không mục nào được nói một con số giá — app chưa đo giá ngày lễ. */
+  ok("không mục lịch nào in ra một con số tiền",
+    moiMuc.every((m) => !/\d[\d.,]*\s*(?:₫|đ\b|VND|dong)/i.test(`${m.en} ${m.enTruoc || ""}`)));
+  {
+    const vung = lichData.leVung || [];
+    ok("mọi lễ theo vùng đều trỏ vào vùng có thật",
+      vung.every((m) => (m.zones || []).every((z) => prices[z])),
+      JSON.stringify(vung.flatMap((m) => (m.zones || []).filter((z) => !prices[z]))));
+    /* Đếm việc còn nợ và IN RA, nhưng không làm trượt: làm trượt phép
+       thử vì một việc chưa làm xong thì người ta sẽ xoá cờ cho xanh
+       bảng, và mất luôn danh sách việc cần xác nhận. */
+    const canSoat = moiMuc.filter((m) => m.verify);
+    ok(`${canSoat.length} mục lịch còn chờ người có chuyên môn xác nhận`, true,
+      canSoat.map((m) => m.id).join(", "));
+  }
+}
+
+/* ── đọc câu trả lời của mô hình ngôn ngữ (tools/llmparse.mjs) ─
+   Bộ đo đối chứng gọi mạng và tốn tiền, nhưng chỗ dễ sai nhất của nó
+   không dính gì tới mạng: rút con số tiền Việt ra khỏi một đoạn văn
+   tiếng Anh có lẫn đô la, gam và dấu chấm phân nhóm. Rút sai là cả
+   bảng số trong hồ sơ sai theo mà không có gì báo lên. */
+console.log("\n── đọc câu trả lời của mô hình ─────────────");
+{
+  eq("40.000 kiểu Việt", docSoLlm("40.000"), 40000);
+  eq("40,000 kiểu Anh", docSoLlm("40,000"), 40000);
+  eq("1.60 là số thập phân", docSoLlm("1.60"), 1.6);
+  eq("1.234.567", docSoLlm("1.234.567"), 1234567);
+
+  eq("khoảng giá có nhãn ở cuối",
+    tienVietLlm("around 40,000-60,000 VND at a street stall"), [40000, 60000]);
+  eq("hậu tố k", tienVietLlm("Expect 45k to 70k VND."), [45000, 70000]);
+  eq("đồng", tienVietLlm("Roughly 100.000 đồng per bowl."), [100000]);
+  eq("bỏ đô la", tienVietLlm("about $1.60–$2.40"), []);
+  eq("bỏ đô la viết chữ", tienVietLlm("Around USD 2 per bowl."), []);
+  eq("bỏ số năm", tienVietLlm("In 2024 prices rose."), []);
+  eq("số trần đủ lớn vẫn là tiền", tienVietLlm("it was about 35000"), [35000]);
+  /* Gam KHÔNG được thành tiền: "100.000/100g" mà đọc 100g thành
+     100.000₫ là bịa ra một cái giá không có trên tấm thực đơn. */
+  eq("gam không phải tiền", tienVietLlm("ca song 100.000/100g"), [100000]);
+
+  eq("không có số nào = từ chối trả lời",
+    tuChoiLlm("I do not have real-time pricing data for that."), true);
+  eq("có số thì không tính là từ chối",
+    tuChoiLlm("Prices vary, but roughly 50,000 VND."), false);
+  eq("rào đón đo riêng, không lẫn với từ chối",
+    raoDonLlm("Prices vary by location, roughly 50,000 VND."), true);
+
+  eq("độ dao động", daoDongLlm([40000, 50000, 60000, 120000]).ratio, 3);
+  eq("trung vị không bị số lạc kéo đi", daoDongLlm([40000, 50000, 60000, 120000]).med, 55000);
+  eq("không có số nào thì không có độ dao động", daoDongLlm([]).ratio, null);
+
+  const dai = { p25: 50000, p50: 100000, p75: 110000, p95: 140000 };
+  eq("dưới dải", soVoiDaiLlm(30000, dai), "duoi");
+  eq("trong dải", soVoiDaiLlm(90000, dai), "trong");
+  eq("trên dải", soVoiDaiLlm(200000, dai), "tren");
+
+  eq("chấm đúng câu bẫy đơn vị", trungDapAnLlm("that comes to 800,000 VND", 800000), true);
+  eq("chấm sai câu bẫy đơn vị", trungDapAnLlm("that comes to 100,000 VND", 800000), false);
 }
 
 console.log("\n════════════════════════════════════════════");

@@ -1,0 +1,82 @@
+{
+ "_note": "Sinh bằng tools/doi-chung-llm.mjs. Đừng sửa tay — chạy lại lệnh đó.",
+ "_gioiHan": "Đo các model qua proxy tương thích OpenAI, KHÔNG phải app ChatGPT/Gemini của người dùng cuối. Gemini không có mặt trong phép đo này vì máy chạy đo không có khoá Google.",
+ "doLuc": "2026-09-06T08:59:41.613Z",
+ "cua": "https://codex.hungnguyen.codes/v1",
+ "luot": 1,
+ "models": [
+  "gpt-5.5"
+ ],
+ "loi": [
+  {
+   "khoa": "gia-co-du-lieu/pho-hk/gpt-5.5",
+   "lan": 0,
+   "loi": "HTTP 502 {\"error\":{\"message\":\"openai_error\",\"type\":\"bad_response_status_code\",\"param\":\"\",\"code\":\"bad_response_status_code\"}}"
+  },
+  {
+   "khoa": "gia-co-du-lieu/caolau-ha/gpt-5.5",
+   "lan": 0,
+   "loi": "The operation was aborted due to timeout"
+  }
+ ],
+ "cau": {
+  "gia-co-du-lieu/pho-hk/gpt-5.5": {
+   "nhom": "gia-co-du-lieu",
+   "id": "pho-hk",
+   "model": "gpt-5.5",
+   "hoi": "I'm standing on a street in Hoan Kiem, Hanoi. How much should one bowl of pho bo cost at a normal street stall here? Give me a number in VND.",
+   "zone": "hanoi-hoankiem",
+   "dish": "pho-bo",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 50000,
+    "p50": 100000,
+    "p75": 110000,
+    "p95": 140000,
+    "seed": true
+   },
+   "soLuot": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 0,
+    "min": null,
+    "max": null,
+    "med": null,
+    "cv": null,
+    "ratio": null
+   },
+   "viTriSoVoiDai": null,
+   "luot": []
+  },
+  "gia-co-du-lieu/caolau-ha/gpt-5.5": {
+   "nhom": "gia-co-du-lieu",
+   "id": "caolau-ha",
+   "model": "gpt-5.5",
+   "hoi": "I'm in Hoi An Old Town. How much should one bowl of cao lau cost at a normal place here? Give me a number in VND.",
+   "zone": "hoian-oldtown",
+   "dish": "cao-lau",
+   "dung": null,
+   "daiNonLa": {
+    "p25": 60000,
+    "p50": 70000,
+    "p75": 90000,
+    "p95": 160000,
+    "seed": true
+   },
+   "soLuot": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 0,
+    "min": null,
+    "max": null,
+    "med": null,
+    "cv": null,
+    "ratio": null
+   },
+   "viTriSoVoiDai": null,
+   "luot": []
+  }
+ }
+}
