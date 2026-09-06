@@ -162,9 +162,22 @@ Hoàn Kiếm — nơi gần như không quán nào bán — model đưa ra một
 rằng đó không phải món của Hà Nội. Ô trống trong bảng của Nón Lá hiện ra một dấu gạch;
 ô trống trong tri thức của model hiện ra một con số.</p>` : ""}
 
-${luotDv ? `<p><b>④ Bẫy đơn vị: ${dungDv}/${luotDv} lượt đọc đúng.</b> Đây là nhóm sai lệch lớn nhất
-về tiền tuyệt đối trong thực tế — một con cá 800 gam trên thực đơn ghi
-<code>100.000/100g</code>.</p>` : ""}
+${luotDv ? `<p><b>④ Bẫy đơn vị: ${dungDv}/${luotDv} lượt đọc đúng — và đây lại là chỗ giả thuyết
+của chúng tôi sai lần thứ hai.</b> Đưa thẳng bài toán ra (“cá song 100.000/100g, con 800
+gam”) thì các model tính đúng gần như mọi lượt. Phép nhân không phải chỗ chúng yếu.</p>
+
+<div class="box jade">
+  <b>Chỗ yếu nằm trước phép nhân một bước</b>
+  Người khách <b>không hỏi câu đó</b>. Họ không biết là có gì để hỏi. Trên tấm thực đơn,
+  “Cá song 100.000” và “Cá song 100.000/100g” trông gần như nhau, và cái đuôi
+  <code>/100g</code> chỉ đổi nghĩa nếu người đọc biết <i>lạng</i> là gì. Một mô hình
+  ngôn ngữ trả lời rất giỏi câu được hỏi; nó không gõ vào vai ai để báo rằng có một câu
+  cần hỏi.
+  <br><br>
+  Đó đúng là việc của <code>units.js</code>: không tính hộ, không đoán trọng lượng con
+  cá — chỉ <b>chỉ ra dòng nào tính theo cân</b> và đưa phép nhân để khách tự hỏi người
+  bán rồi tự tính. Giá trị nằm ở chỗ <i>phát hiện</i>, không nằm ở chỗ <i>tính</i>.
+</div>` : ""}
 
 ${luotNgoai ? `<p><b>⑤ Và đây là chỗ Nón Lá thua.</b> ${traLoiNgoai}/${luotNgoai} lượt hỏi về món
 <i>ngoài</i> 77 món trong danh mục đều được trả lời hữu ích — bánh căn, bún ốc, phá lấu,

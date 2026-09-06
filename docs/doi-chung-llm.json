@@ -4111,6 +4111,404 @@
      "dungDapAn": true
     }
    ]
+  },
+  "ngoai-danh-muc/banh-can/gpt-5.5": {
+   "nhom": "ngoai-danh-muc",
+   "id": "banh-can",
+   "model": "gpt-5.5",
+   "hoi": "How much should one plate of banh can cost at a street stall in Nha Trang, Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 10,
+    "min": 15000,
+    "max": 40000,
+    "med": 27500,
+    "cv": 0.237,
+    "ratio": 2.67
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "About `15,000 VND` for one plate at a street stall in Nha Trang.",
+     "ms": 2782,
+     "so": [
+      15000
+     ],
+     "daiDien": 15000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **30,000 VND** for one plate at a street stall in Nha Trang.",
+     "ms": 3908,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "30,000 VND",
+     "ms": 3803,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `25,000 VND` per plate at a street stall in Nha Trang.",
+     "ms": 3343,
+     "so": [
+      25000
+     ],
+     "daiDien": 25000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `25,000 VND` for one plate at a street stall in Nha Trang.",
+     "ms": 4307,
+     "so": [
+      25000
+     ],
+     "daiDien": 25000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `30,000 VND` for one plate at a street stall in Nha Trang.",
+     "ms": 6667,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around **25,000 VND** for one plate at a street stall in Nha Trang.",
+     "ms": 3227,
+     "so": [
+      25000
+     ],
+     "daiDien": 25000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `20,000 VND` for one plate at a street stall in Nha Trang.",
+     "ms": 3639,
+     "so": [
+      20000
+     ],
+     "daiDien": 20000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `30,000 VND` for one plate at a street stall in Nha Trang.",
+     "ms": 3202,
+     "so": [
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `40,000 VND` for one plate at a street stall in Nha Trang.",
+     "ms": 3245,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
+  },
+  "ngoai-danh-muc/banh-can/claude-haiku-4-5-20251001": {
+   "nhom": "ngoai-danh-muc",
+   "id": "banh-can",
+   "model": "claude-haiku-4-5-20251001",
+   "hoi": "How much should one plate of banh can cost at a street stall in Nha Trang, Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 10,
+   "daoDong": {
+    "n": 10,
+    "min": 30000,
+    "max": 45000,
+    "med": 40000,
+    "cv": 0.106,
+    "ratio": 1.5
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs between 30,000–50,000 VND, with most vendors charging around 40,000 VND. Price varies based on the vendor, location within the city, and toppings (meat, seafood, or vegetables).",
+     "ms": 2430,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs between 30,000–50,000 VND, with 40,000 VND being a reasonable middle estimate for a standard portion.\n\nPrices vary depending on the stall's location (tourist areas charge more), the protein added (shrimp or crab costs more than pork), and current inflation, but this range covers what you'd expect to pay at an average local stall.",
+     "ms": 2853,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs between 25,000–40,000 VND, with 30,000 VND being a common price point. The exact cost depends on the stall, portion size, and toppings (shrimp, pork, crab, etc.).",
+     "ms": 5228,
+     "so": [
+      25000,
+      40000,
+      30000
+     ],
+     "daiDien": 30000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs around 30,000–50,000 VND, with 40,000 VND being a common price point. Prices can vary depending on the stall's location, ingredients, and portion size, but this range reflects what you'd expect to pay at a casual street vendor rather than a restaurant.",
+     "ms": 2408,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs between 25,000–40,000 VND, with most vendors charging around 30,000–35,000 VND. Prices vary by stall, portion size, and toppings, but that range is standard for casual street food in the area.",
+     "ms": 1890,
+     "so": [
+      25000,
+      40000,
+      30000,
+      35000
+     ],
+     "daiDien": 32500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs around 30,000–50,000 VND, with 40,000 VND being a common price point. Prices vary depending on the stall, portions, and toppings (shrimp, pork, crab), but this range is standard for casual street food in the area.",
+     "ms": 2183,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs between 30,000 and 50,000 VND, with 40,000 VND being a common middle price point.\n\nThe exact price depends on the stall's location, portion size, and what protein or toppings are included (chicken, shrimp, pork, or just vegetarian). Stalls in tourist-heavy areas may charge toward the higher end, while those in local neighborhoods tend to be cheaper.",
+     "ms": 2245,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs around **30,000–50,000 VND**, with 40,000 VND being a reasonable middle estimate.\n\nBánh canh is a thick Vietnamese tapioca noodle soup, often filled with shrimp, crab, or pork. Street stall prices vary based on the protein choice and portion size—a basic version might be toward the lower end, while one loaded with seafood could push toward or beyond 50,000 VND.",
+     "ms": 3717,
+     "so": [
+      30000,
+      50000,
+      40000,
+      50000
+     ],
+     "daiDien": 45000,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs around **30,000–50,000 VND**, with most stalls pricing it at **35,000–40,000 VND**.\n\nThe exact price depends on the stall's location, ingredients, and portion size. Stalls in more touristy areas or near the beach might charge slightly more, while those in local neighborhoods tend to be on the lower end of that range.",
+     "ms": 2291,
+     "so": [
+      30000,
+      50000,
+      35000,
+      40000
+     ],
+     "daiDien": 37500,
+     "tuChoi": false,
+     "raoDon": true
+    },
+    {
+     "text": "A plate of bánh canh at a street stall in Nha Trang typically costs around 30,000–50,000 VND, with most stalls charging closer to 40,000 VND. Prices can vary depending on the specific stall, ingredients (shrimp, crab, or pork), and portion size, but that range is standard for the city.",
+     "ms": 2001,
+     "so": [
+      30000,
+      50000,
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": true
+    }
+   ]
+  },
+  "ngoai-danh-muc/bun-oc/gpt-5.5": {
+   "nhom": "ngoai-danh-muc",
+   "id": "bun-oc",
+   "model": "gpt-5.5",
+   "hoi": "How much should one bowl of bun oc cost at a street stall in Hanoi, Vietnam? Give me a number in VND.",
+   "zone": null,
+   "dish": null,
+   "dung": null,
+   "daiNonLa": null,
+   "soLuot": 10,
+   "soLuotHong": 0,
+   "soLanTuChoi": 0,
+   "soLanRaoDon": 0,
+   "daoDong": {
+    "n": 10,
+    "min": 35000,
+    "max": 40000,
+    "med": 35000,
+    "cv": 0.063,
+    "ratio": 1.14
+   },
+   "viTriSoVoiDai": null,
+   "luot": [
+    {
+     "text": "About **35,000 VND** for one bowl at a street stall in Hanoi.",
+     "ms": 3753,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "40,000 VND",
+     "ms": 3102,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one bowl at a typical Hanoi street stall.",
+     "ms": 3027,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND` for one bowl at a street stall in Hanoi.",
+     "ms": 3684,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one bowl at a street stall in Hanoi.",
+     "ms": 3655,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "Around `35,000 VND` for one bowl at a street stall in Hanoi.",
+     "ms": 2901,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "35,000 VND is a reasonable street-stall price for one bowl of `bún ốc` in Hanoi.",
+     "ms": 4175,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one bowl at a street stall in Hanoi.",
+     "ms": 3619,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `40,000 VND` for one bowl at a typical street stall in Hanoi.",
+     "ms": 2567,
+     "so": [
+      40000
+     ],
+     "daiDien": 40000,
+     "tuChoi": false,
+     "raoDon": false
+    },
+    {
+     "text": "About `35,000 VND` for one bowl at a street stall in Hanoi.",
+     "ms": 4249,
+     "so": [
+      35000
+     ],
+     "daiDien": 35000,
+     "tuChoi": false,
+     "raoDon": false
+    }
+   ]
   }
  }
 }
