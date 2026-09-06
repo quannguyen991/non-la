@@ -470,7 +470,7 @@ export async function syncData({ quiet: silent = true } = {}) {
       /* Đánh dấu SAU khi máy chủ đã nhận. Đánh dấu trước rồi gửi hỏng là
          mất hẳn — bản ghi vẫn nằm đó nhưng không lần đẩy nào tìm tới nó
          nữa, và không ai biết. */
-      await History.markSynced(rows.map((r) => r.id));
+      await History.markSynced(rows.map((r) => r.rid));
       S.sync.sent = rows.length;
     } else {
       S.sync.sent = 0;

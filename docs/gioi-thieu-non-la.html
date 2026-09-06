@@ -1441,8 +1441,8 @@ ba kiểm chính dữ liệu.</p>
 
 <div class="stat-row">
   <div class="stat"><b>583</b><i>PHÉP THỬ LÕI · <code>node test.mjs</code></i></div>
-  <div class="stat"><b>325</b><i>ĐIỂM KIỂM TƯƠNG TÁC · <code>audit.js</code></i></div>
-  <div class="stat"><b>0</b><i>PHÉP THỬ LÕI TRƯỢT</i></div>
+  <div class="stat"><b>249</b><i>ĐIỂM KIỂM TƯƠNG TÁC · <code>audit.js</code></i></div>
+  <div class="stat"><b>0</b><i>PHÉP THỬ TRƯỢT</i></div>
   <div class="stat"><b>92%</b><i>ĐỘ TIN CẬY OCR TIẾNG VIỆT</i></div>
 </div>
 
@@ -1467,8 +1467,8 @@ ngôn ngữ</b>. Chạy ngày 06/09/2026: <b>583 xanh, 0 trượt</b>.</p>
 </ul>
 
 <h2>Tầng 2 — đường tương tác, chạy trong trình duyệt</h2>
-<p>Bộ <code>audit.js</code> — <b>325 điểm kiểm</b>, xanh hết ở lần chạy đầy đủ gần nhất
-ngày 04/09/2026 — kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi
+<p>Bộ <code>audit.js</code> — <b>249 điểm kiểm, xanh hết</b> ở lần chạy ngày 06/09/2026,
+khổ 375×812, hết 55 giây — kiểm mọi nút có bấm được không, thẻ có mở đúng chỗ không, đổi
 tab có dọn sạch trạng thái cũ không. Tầng này tồn tại vì hai lỗi từng lọt qua tầng một —
 lõi logic đúng hoàn toàn mà người dùng vẫn không bấm được:</p>
 <ul>
@@ -1481,16 +1481,31 @@ lõi logic đúng hoàn toàn mà người dùng vẫn không bấm được:</p
 trong chế độ sổ tay phải thực sự ghi thêm một bài xuống máy.</p>
 
 <div class="box terra">
-  <b>Còn nợ ở tầng này, và nói ra thay vì để yên</b>
-  Đợt 06/09 thêm bảy điểm kiểm tương tác cho lớp văn hoá — khối lịch có im đúng vào ngày
-  thường không, đêm lồng đèn có rò sang vùng khác không, khối chuyện món có nói ngược với
-  bảng giá nằm ngay trên nó không. <b>Bảy điểm ấy chưa được chạy hết một lượt đầy đủ.</b>
-  Không phải vì chúng hỏng: <code>audit.js</code> có khoảng bảy trăm lần chờ ngắn nối
-  nhau, và trình duyệt bóp <code>setTimeout</code> khi tab không hiển thị, nên một lượt
-  chạy trong khung xem ẩn kéo dài hàng giờ. Muốn có số xanh cho tầng này thì phải mở
-  <code>index.html</code> trong một cửa sổ trình duyệt <i>đang hiện</i> rồi gọi:
+  <b>Lần chạy này bắt được một lỗi mất dữ liệu, và nó im lặng hoàn toàn</b>
+  Kho nhật ký (<code>history.js</code>) dựng bằng <code>keyPath: "id"</code>. Nhưng bản ghi
+  một lượt quét cũng mang trường <code>id</code> — và ở đó <code>id</code> nghĩa là
+  <b>mã món</b>. Hai khái niệm khác nhau đi chung một tên.
   <br><br>
-  <code>import('./audit.js').then(m =&gt; m.run())</code>
+  Hậu quả: quét cao lầu <b>lần thứ hai</b> là một khoá trùng, IndexedDB từ chối ghi, và
+  lớp bọc <code>quiet()</code> nuốt trọn lỗi ấy. Không ngoại lệ, không cảnh báo. Đo được:
+  ghi hai lần cùng một mã món thì số bản ghi đứng yên 19 → 19 → 19. Nhật ký giữ mãi giá của
+  <i>lần đầu</i> ăn món đó; bưu thiếp đếm mọi món đúng một lần; và <b>số lượt quét không
+  bao giờ vượt nổi số món khác nhau</b> — dấu vân tay của lỗi này nằm ngay trên tab You,
+  suốt thời gian qua, mà không ai đọc ra.
+  <br><br>
+  Đã sửa ở bản 2 của kho: khoá bản ghi tách hẳn thành <code>rid</code> tự tăng, còn
+  <code>id</code> trả về đúng nghĩa mã món. Bước chuyển dữ liệu đọc hết bản cũ ra rồi mới
+  xoá kho — đã chạy thật trên một kho 19 bản ghi, không mất bản nào. Ba điểm kiểm mới canh
+  đúng đường ấy, chạy chính lối mà app đi.
+</div>
+
+<div class="box">
+  <b>Vì sao lỗi này lọt qua được cả hai tầng trước đó</b>
+  Tầng một chạy trong Node, không có IndexedDB, nên không chạm tới. Tầng hai <i>có</i> một
+  điểm kiểm đúng chỗ — “ghi được một hoạt động” — nhưng nó ghi một bản ghi mang mã món
+  <b>cố định</b>, nên lần chạy đầu tiên trên một máy sạch thì xanh, và mọi lần sau đỏ vì
+  một lý do trông như lỗi của chính phép thử. Một phép thử không lặp lại được là một phép
+  thử người ta học cách bỏ qua.
 </div>
 
 <h2>Tầng 3 — kiểm chính dữ liệu</h2>
@@ -1512,10 +1527,11 @@ dạng một dấu gạch.</p>
 <table>
   <tr><th>Hạng mục</th><th>Kết quả</th></tr>
   <tr><td>Chuỗi pixel → OCR → khớp → phán quyết</td><td>Đúng, kể cả khi OCR đọc nát <code>Cao lầu</code> thành <code>Caolâ`u</code></td></tr>
-  <tr><td>Chạy khi tắt hẳn server</td><td>Boot được, OCR được, phán quyết được</td></tr>
+  <tr><td>Chạy khi tắt hẳn server</td><td>Boot được, OCR được, phán quyết được. Đo lại 06/09/2026 với máy chủ <b>tắt hẳn</b> (shell không nối được cổng): app khởi động, đọc 2 dòng thực đơn, ra phán quyết đúng vùng.</td></tr>
   <tr><td>Bản đồ chi tiết khi tắt server</td><td>Mở được, kéo/phóng/lọc được, chạm ghim ra thẻ</td></tr>
   <tr><td>Đăng bài khi tắt mạng</td><td>Bài vào hàng chờ IndexedDB, gửi lại được khi có sóng</td></tr>
-  <tr><td>Service worker</td><td>53 tệp trong danh sách cài đặt, cộng dữ liệu huấn luyện OCR nạp theo nhu cầu</td></tr>
+  <tr><td>Lớp văn hoá khi tắt server</td><td>Dải lịch Việt ra đúng đêm 14 âm ở Hội An; khối chuyện món và dòng đếm vùng ra đủ; khối “Coming up” dựng được bốn mốc; <b>trang hành trình sinh ra trọn 6.925 ký tự</b>, không một tham chiếu ra ngoài. Toàn bộ khi không có máy chủ nào.</td></tr>
+  <tr><td>Service worker</td><td>62 tệp trong danh sách cài đặt — đối chiếu lại với cache thật ngày 06/09: <b>thiếu 0</b>, gồm cả bốn tệp lớp văn hoá. Dữ liệu huấn luyện OCR và phông nạp theo nhu cầu.</td></tr>
 </table>
 </div>
 

@@ -157,13 +157,20 @@ export async function run({ verbose = true } = {}) {
 
     /* Đêm rằm phố cổ chỉ có ở Hội An. Rò sang vùng khác nghĩa là app
        nói với khách ở Hà Nội rằng tối nay phố tắt đèn điện. */
+    /* Bắt bằng câu RIÊNG của mục đêm lồng đèn, không bắt bằng chữ
+       "lantern". Ngày 14/8 âm cũng là áp Trung Thu, và câu báo trước
+       Trung Thu — hiện ở mọi vùng — có chữ "lantern sellers" trong đó.
+       Phép thử bản đầu bắt chữ "lantern" nên đỏ lên ở một chỗ không hề
+       hỏng. Đây đúng là kiểu dương tính giả mà một phép thử bắt theo từ
+       khoá hay mắc. */
+    const RIENG = /switches off its electric lights/i;
     A.S.zone = "hoian-oldtown";
     const ha = co(new Date(2026, 8, 24)).textContent;
     A.S.zone = "hanoi-hoankiem";
     const hn = co(new Date(2026, 8, 24)).textContent;
     A.S.zone = zCu;
-    ck("đêm lồng đèn chỉ hiện ở Hội An",
-      /lantern/i.test(ha) && !/lantern/i.test(hn));
+    ck("đêm lồng đèn chỉ hiện ở Hội An", RIENG.test(ha) && !RIENG.test(hn),
+      `Hội An ${RIENG.test(ha)} · Hà Nội ${RIENG.test(hn)}`);
 
     /* Luật số ba: khối lịch KHÔNG được in ra một con số tiền nào. App
        chưa đo giá ngày lễ; câu duy nhất nó được nói về tiền là dải
@@ -828,6 +835,32 @@ export async function run({ verbose = true } = {}) {
     const after = await H.count();
     ck("ghi được một hoạt động", after === before + 1, `${before} → ${after}`);
 
+    /* ĂN LẠI CÙNG MỘT MÓN PHẢI RA HAI BẢN GHI.
+       Bản 1 của history.js lấy `keyPath: "id"`, mà bản ghi quét cũng
+       mang `id` là MÃ MÓN — nên lượt quét thứ hai của cùng một món là
+       một khoá trùng và IndexedDB từ chối ghi. tx() nuốt lỗi, nên
+       chuyện đó xảy ra hoàn toàn im lặng suốt: nhật ký giữ mãi giá của
+       lần đầu, bưu thiếp đếm mọi món đúng một lần, và số lượt quét
+       không bao giờ vượt nổi số món khác nhau.
+
+       Phép kiểm này chạy CHÍNH đường mà app đi, và nó là lý do bản 2
+       tồn tại. Nếu một ngày nào đó nó đỏ lên, đừng sửa nó — đi tìm ai
+       vừa đặt lại keyPath. */
+    const truoc2 = await H.count();
+    await H.add("scan", { id: "audit-dish", label: "Audit", price: 2000, level: "warn" });
+    const sau2 = await H.count();
+    ck("ăn lại cùng một món vẫn ghi thành bản ghi mới", sau2 === truoc2 + 1,
+      `${truoc2} → ${sau2} · mã món đang bị dùng làm khoá bản ghi`);
+
+    const hai = (await H.list({ kind: "scan", limit: 500 }))
+      .filter((r) => r.id === "audit-dish");
+    ck("hai lượt quét cùng món giữ được hai mức giá khác nhau",
+      new Set(hai.map((r) => r.price)).size >= 2,
+      JSON.stringify(hai.map((r) => r.price)));
+    ck("mỗi bản ghi có khoá riêng, khác mã món",
+      hai.every((r) => r.rid != null && r.rid !== r.id),
+      JSON.stringify(hai.map((r) => [r.rid, r.id])));
+
     const st = await H.stats();
     ck("mọi hoạt động mới đều chờ gửi", st.pending >= 1, `pending ${st.pending}`);
 
@@ -842,7 +875,7 @@ export async function run({ verbose = true } = {}) {
     ck("bản chưa gửi mang cờ sync=0", rows.every((r) => r.sync === 0));
 
     // Dọn dẹp: phép thử không được để lại rác trong dữ liệu người dùng.
-    await H.markSynced(rows.map((r) => r.id));
+    await H.markSynced(rows.map((r) => r.rid));
     const st2 = await H.stats();
     ck("đánh dấu đã gửi thì hết chờ", st2.pending < st.pending, `${st.pending} → ${st2.pending}`);
   }

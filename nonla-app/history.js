@@ -28,7 +28,26 @@
    thì không có byte nào đi đâu cả.
    ═══════════════════════════════════════════════════════════════ */
 
-const DB = "nl-history", STORE = "events", VERSION = 1;
+const DB = "nl-history", STORE = "events", VERSION = 2;
+
+/* ── VÌ SAO CÓ PHIÊN BẢN 2 ──────────────────────────────────────
+   Bản 1 tạo kho với `keyPath: "id"`. Nhưng bản ghi một lượt quét cũng
+   mang trường `id` — và ở đó `id` nghĩa là MÃ MÓN. Hai khái niệm khác
+   nhau đi chung một tên, đúng cái bẫy mà journal.add() đã tránh được
+   một lớp phía trên khi đổi `kind` thành `mode`.
+
+   Hậu quả: quét cao lầu lần thứ hai là một khoá trùng, IndexedDB từ
+   chối ghi — và tx() bọc mọi lối vào trong `quiet()` nên lỗi bị nuốt
+   trọn. Không ngoại lệ, không cảnh báo, không gì cả. Nhật ký giữ mãi
+   giá của LẦN ĐẦU ăn món đó, bưu thiếp đếm mọi món đúng một lần, và
+   số lượt quét không bao giờ vượt được số món khác nhau.
+
+   Đo được ngày 06/09/2026: ghi hai lần cùng `id: "cao-lau"` thì số bản
+   ghi đứng yên 19 → 19 → 19, không lỗi nào ném ra.
+
+   Bản 2 tách hẳn hai khái niệm: khoá bản ghi là `rid` (tự tăng), còn
+   `id` trả về đúng nghĩa mã món. Không đổi tên trường nào mà giao diện
+   đang đọc, nên phần còn lại của app không phải sửa theo. */
 
 /* Trần mềm. Vượt thì bản ghi cũ nhất rơi ra — nhưng CHỈ những bản đã gửi
    xong. Vứt một bản chưa kịp gửi là mất hẳn, và người dùng không có cách
@@ -46,15 +65,46 @@ export const KINDS = ["scan", "place", "sight", "post", "route", "zone", "tax"];
 function open() {
   return new Promise((res, rej) => {
     const rq = indexedDB.open(DB, VERSION);
-    rq.onupgradeneeded = () => {
+    rq.onupgradeneeded = (ev) => {
       const db = rq.result;
-      if (db.objectStoreNames.contains(STORE)) return;
-      const s = db.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
-      s.createIndex("ts", "ts");
-      /* Chỉ mục theo cờ đồng bộ. Không có nó thì mỗi lượt đẩy phải quét
-         cả 5.000 bản ghi để tìm ra vài chục bản chưa gửi. IndexedDB
-         không đánh chỉ mục được giá trị boolean, nên cờ lưu là 0/1. */
-      s.createIndex("sync", "sync");
+
+      const dungKho = () => {
+        const s = db.createObjectStore(STORE, { keyPath: "rid", autoIncrement: true });
+        s.createIndex("ts", "ts");
+        /* Chỉ mục theo cờ đồng bộ. Không có nó thì mỗi lượt đẩy phải quét
+           cả 5.000 bản ghi để tìm ra vài chục bản chưa gửi. IndexedDB
+           không đánh chỉ mục được giá trị boolean, nên cờ lưu là 0/1. */
+        s.createIndex("sync", "sync");
+        return s;
+      };
+
+      if (!db.objectStoreNames.contains(STORE)) { dungKho(); return; }
+      if (ev.oldVersion >= 2) return;
+
+      /* v1 → v2. Không đổi được keyPath của một kho đã tồn tại, nên phải
+         đọc hết ra, xoá kho, dựng lại, rồi ghi vào.
+
+         ĐỌC XONG MỚI XOÁ. Cả ba bước nằm trong cùng một giao dịch nâng
+         cấp, và giao dịch ấy chỉ đóng khi mọi yêu cầu đã xong — nên xoá
+         nằm trong onsuccess của con trỏ chứ không đứng song song với nó.
+         Xoá trước khi đọc xong là mất trắng nhật ký của người dùng, và
+         đây là dữ liệu họ không lấy lại được từ đâu. */
+      const cu = ev.target.transaction.objectStore(STORE);
+      const giu = [];
+      cu.openCursor().onsuccess = (e) => {
+        const c = e.target.result;
+        if (c) { giu.push(c.value); c.continue(); return; }
+        db.deleteObjectStore(STORE);
+        const s = dungKho();
+        /* Cũ trước, để rid tự tăng đi cùng chiều với thời gian. `rid` phải
+           được gỡ ra: bản v1 không có trường này, nhưng nếu một bản ghi
+           nào đó lỡ mang nó thì autoIncrement bị vô hiệu và cái bẫy khoá
+           trùng quay lại nguyên vẹn. */
+        for (const v of giu.sort((a, b) => (a.ts || 0) - (b.ts || 0))) {
+          const { rid, ...con } = v;
+          s.add(con);
+        }
+      };
     };
     rq.onsuccess = () => res(rq.result);
     rq.onerror = () => rej(rq.error);
@@ -111,8 +161,13 @@ export function add(kind, data = {}) {
   if (!KINDS.includes(kind)) return Promise.resolve(null);
   // kind đặt SAU cùng: một trường `kind` lọt vào trong data không được
   // phép ghi đè loại thật của bản ghi.
-  const row = { ts: Date.now(), sync: 0, ...data, kind };
-  return tx("readwrite", (s) => s.add(row)).then((id) => { trim(); return id; });
+  /* `rid` thì phải GỠ HẲN, không phải đặt sau cùng. Đặt sau cũng chỉ ghi
+     đè giá trị, nhưng chỉ cần trường ấy CÓ MẶT là IndexedDB bỏ qua
+     autoIncrement và lấy chính nó làm khoá — tức là mở lại đúng cái bẫy
+     khoá trùng mà bản 2 sinh ra để đóng. */
+  const { rid: _boQua, ...sach } = data;
+  const row = { ts: Date.now(), sync: 0, ...sach, kind };
+  return tx("readwrite", (s) => s.add(row)).then((rid) => { trim(); return rid; });
 }
 
 /** Cắt bớt khi vượt trần: cũ nhất trước, và chỉ bản đã gửi xong. */
@@ -152,11 +207,15 @@ export const unsynced = (limit = 200) =>
   scan("sync", "next", (v, out) => { out.push(v); return out.length < limit; },
     IDBKeyRange.only(0)).then((a) => a.sort((x, y) => x.ts - y.ts));
 
-/** Đánh dấu đã gửi. CHỈ gọi sau khi máy chủ đã xác nhận. */
-export function markSynced(ids) {
-  if (!ids?.length) return Promise.resolve(null);
+/** Đánh dấu đã gửi. CHỈ gọi sau khi máy chủ đã xác nhận.
+ *  Nhận `rid` — KHOÁ BẢN GHI, không phải `id` (mã món). Trước bản 2 hai
+ *  thứ đó tình cờ là một, nên chỗ gọi truyền `r.id` vẫn chạy; từ bản 2
+ *  truyền nhầm `id` sẽ không tìm thấy bản nào, và mọi bản ghi được gửi
+ *  đi lại mãi mà không ai thấy gì sai. */
+export function markSynced(rids) {
+  if (!rids?.length) return Promise.resolve(null);
   return tx("readwrite", (s) => {
-    for (const id of ids) {
+    for (const id of rids) {
       const g = s.get(id);
       g.onsuccess = () => { const v = g.result; if (v) { v.sync = 1; s.put(v); } };
     }

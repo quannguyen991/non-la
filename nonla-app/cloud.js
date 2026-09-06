@@ -138,9 +138,15 @@ export const pushActivity = (rows) => rest("activity", {
     // Tách ba trường có cột riêng; phần còn lại vào payload. Giữ nguyên
     // `sync` bên máy khách thì máy chủ nhận về một cờ nói về máy khác —
     // vô nghĩa với nó và gây nhầm khi đọc lại.
-    const { id, ts, kind, zone, sync, ...rest_ } = r;
+    const { rid, id, ts, kind, zone, sync, ...rest_ } = r;
     return {
-      client_id: id,
+      /* Khoá BẢN GHI, không phải mã món. Trước bản 2 của history.js hai
+         thứ đó là một, nên mọi lượt quét cùng một món gửi lên cùng một
+         client_id — và `resolution=ignore-duplicates` lặng lẽ vứt bản
+         thứ hai đi. Bản ghi thứ hai của cùng một món chưa bao giờ tới
+         được máy chủ. */
+      client_id: String(rid ?? id),
+      dish: id ?? null,
       kind,
       ts: new Date(ts).toISOString(),
       zone: zone || null,
