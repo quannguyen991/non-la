@@ -72,6 +72,18 @@ soat("tệp trong vỏ offline", that.shell, coSo);
 soat("món có chuyện", that.story, coSo);
 soat("ô nạp từ menu công bố", that.sourced, coSo);
 
+/* Số phép thử phải là MỘT con số trong cả cuốn. Bắt được 07/09/2026:
+   bìa ghi 583, chương 0 ghi 739, chương 1 và phụ lục ghi 420 — bốn con
+   số cho cùng một phép đếm, và không con nào đúng (thật là 612). Đây là
+   thứ giám khảo đếm lại được trong ba mươi giây. */
+{
+  const rieng = [...new Set([...doc.matchAll(/(\d{3,4})\s*phép thử/g)].map((m) => m[1]))];
+  const ok = rieng.length <= 1;
+  if (!ok) hong++;
+  console.log(`  ${ok ? "ok  " : "SAI "} ${"số phép thử chỉ có MỘT giá trị".padEnd(34)}`
+    + (ok ? `= ${rieng[0] ?? "(không nhắc)"}` : `thấy ${rieng.length}: ${rieng.join(", ")}`));
+}
+
 console.log("\n── luật riêng ──────────────────────────────");
 /* Số mục danh mục phải khớp với chữ viết trong câu dẫn. Đây đúng là chỗ
    trôi ngày 07/09: thêm ba mục F mà câu dẫn vẫn ghi ba mươi tư. */

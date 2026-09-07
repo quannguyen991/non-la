@@ -25,7 +25,7 @@
     <div class="fact"><b>6</b><i>VÙNG ĐÃ CÓ DỮ LIỆU</i></div>
     <div class="fact"><b>77</b><i>MÓN CÓ TRI THỨC</i></div>
     <div class="fact"><b>2.481</b><i>QUÁN TỪ OSM</i></div>
-    <div class="fact"><b>583</b><i>PHÉP THỬ LÕI, XANH HẾT</i></div>
+    <div class="fact"><b>612</b><i>PHÉP THỬ LÕI, XANH HẾT</i></div>
   </div>
   <div class="foot"><span>Giới thiệu dự án &amp; danh mục tính năng</span><span>nonla-app.vercel.app</span></div>
 </section>
@@ -378,7 +378,7 @@ offline, và quy trình xử lý ngay tại quầy. Một mô hình ngôn ngữ 
   tay vào, nhưng vẫn không phải số ai đó đo tại quầy. Tên cơ sở trong bản chạy là
   <b>tên mô tả chứ không phải tên quán có thật</b>. App tự khai cả hai điều đó ở mọi phán
   quyết. Nghĩa là phần <i>công cụ</i> đã xong — đo, gộp, phán quyết, gắn nhãn, kiểm chứng
-  bằng 739 phép thử — còn phần <i>dữ liệu thật</i> thì đang ở vạch xuất phát.
+  bằng 612 phép thử lõi — còn phần <i>dữ liệu thật</i> thì đang ở vạch xuất phát.
 </div>
 <p>Đây là rủi ro lớn nhất của hồ sơ: nếu bản demo vẫn hiện nhiều cơ sở mang nhãn Đúng Giá
 hay vượt khoảng, câu hỏi đầu tiên của giám khảo sẽ là <i>“các em đã đo những quán này
@@ -565,7 +565,7 @@ chồng lên nhau — quên một tầng thì vẫn còn hai:</p>
 </table>
 <p>Danh sách nguồn ở tầng 2 và tầng 3 phải trùng nhau, và <code>test.mjs</code>
 <b>đọc cả hai tệp rồi so lại</b> — hai bản sao của cùng một luật thì sớm muộn cũng trôi
-khỏi nhau, nên phép thử giữ hộ. Bộ phép thử hiện là <b>420 phép, xanh hết</b>, trong đó
+khỏi nhau, nên phép thử giữ hộ. Bộ phép thử hiện là <b>612 phép, xanh hết</b>, trong đó
 28 phép mới cho riêng ranh giới này: ca đắt nhất là một quán khai giá rất thấp để kéo dải
 của cả khu xuống, và phép thử khoá lại rằng nó <b>không xê dịch được một bách phân vị
 nào</b>, cũng không thổi được cỡ mẫu lên.</p>
@@ -1042,7 +1042,7 @@ bảng so sánh nào không ghi dòng này ra là một bảng không đáng tin
 
 <p class="src" style="margin-top:6mm">Đo ngày 2026-09-06 ·
 gpt-5.5 · claude-haiku-4-5 qua <code>https://codex.hungnguyen.codes/v1</code> ·
-10 lượt mỗi câu · 36 lượt đo · dữ liệu thô ở
+10 lượt mỗi câu · 36 câu hỏi · 357 lượt hỏi thành công · dữ liệu thô ở
 <code>docs/doi-chung-llm.json</code> · chạy lại bằng
 <code>node tools/doi-chung-llm.mjs</code></p>
 <!-- BANG-DOI-CHUNG:KET -->
@@ -1441,19 +1441,19 @@ song với dải giá tham chiếu, không thay nó.</p>
 ba kiểm chính dữ liệu.</p>
 
 <div class="stat-row">
-  <div class="stat"><b>583</b><i>PHÉP THỬ LÕI · <code>node test.mjs</code></i></div>
+  <div class="stat"><b>612</b><i>PHÉP THỬ LÕI · <code>node test.mjs</code></i></div>
   <div class="stat"><b>249</b><i>ĐIỂM KIỂM TƯƠNG TÁC · <code>audit.js</code></i></div>
   <div class="stat"><b>0</b><i>PHÉP THỬ TRƯỢT</i></div>
   <div class="stat"><b>92%</b><i>ĐỘ TIN CẬY OCR TIẾNG VIỆT</i></div>
 </div>
 
 <h2>Tầng 1 — lõi logic, chạy trong Node</h2>
-<p>583 phép thử phủ: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá, đọc
+<p>612 phép thử phủ: chuẩn hoá tiếng Việt, đọc giá, khớp mờ tên món, phán quyết giá, đọc
 mệnh giá tiền, phát hiện nhầm bậc số 0, toàn bộ phép chiếu / khoảng cách / khung nhìn của
 bản đồ, lõi thuần lớp cộng đồng, cách dựng liên kết ra ngoài, bẫy đơn vị, mô hình suy giá,
 phép suy món từ tên quán, ranh giới giữa giá niêm yết với giá đo được, <b>lõi âm lịch</b>,
 <b>tra cứu lịch Việt</b>, <b>trang hành trình</b>, và <b>bộ đọc câu trả lời của mô hình
-ngôn ngữ</b>. Chạy ngày 06/09/2026: <b>583 xanh, 0 trượt</b>.</p>
+ngôn ngữ</b>. Chạy ngày 06/09/2026: <b>612 xanh, 0 trượt</b>.</p>
 
 <p>Ba nhóm mới đáng nói vì chúng neo vào những ca mà một lỗi sẽ đi qua im lặng:</p>
 <ul>
@@ -1552,22 +1552,40 @@ dạng một dấu gạch.</p>
 
 <h2>Vừa nối xong trong đợt này</h2>
 <ol>
-  <li><b>Bẫy đơn vị</b> (<code>units.js</code>) — nhóm sai lệch lớn nhất về tiền tuyệt đối,
-    trước đợt này app hoàn toàn không thấy. Nay có khối riêng trên thẻ kết quả.</li>
-  <li><b>Điền ô trống bảng giá</b> (<code>predict.js</code>) — biến “chưa có dữ liệu” thành
-    một câu trả lời có ghi rõ mức tin cậy, trong một khối tách khỏi các dòng đã đo.</li>
-  <li><b>Nối quán với món</b> (<code>eaterydish.js</code>) — mắt xích còn thiếu giữa 2.481
-    quán OSM và bảng giá theo vùng, hiện thành khối <i>“Probably serves”</i> trên thẻ quán.</li>
-  <li><b>Đổ bảng khảo sát bằng CSV</b> (<code>tools/ingest-survey.mjs</code>) — khép nốt
-    vòng dữ liệu từ ngoài đường về <code>prices.json</code>.</li>
+  <li><b>Lớp văn hoá</b> (<code>amlich.js</code> · <code>lich.js</code> · trường
+    <code>story</code> · <code>hanhtrinh.js</code>) — âm lịch tính bằng thiên văn ngay
+    trên máy, chuyện của 22 món nối vào bảng giá, và trang hành trình xuất ra được.
+    Xem chương 7.</li>
+  <li><b>Đối chứng với mô hình ngôn ngữ</b> (<code>tools/doi-chung-llm.mjs</code>) —
+    36 câu hỏi, 357 lượt hỏi, bảng số trong chương 6 sinh thẳng từ tệp kết quả chứ
+    không gõ tay.</li>
+  <li><b>Sửa một lỗi mất dữ liệu im lặng ở kho nhật ký</b> — quét lại cùng một món
+    không ghi được thêm bản nào, và không có lỗi nào ném ra. Chi tiết ở chương 13.</li>
+  <li><b>Sửa luật không trộn phân khúc</b> — <code>classify()</code> vẫn tính ra bậc
+    nhà hàng nhưng <code>usableFor()</code> vứt đi, nên dòng “phần nhà hàng” nằm chung
+    dải với món vỉa hè. Tám ô có p95 trở về đúng.</li>
+  <li><b>Nguồn giá thứ tư</b> (<code>giaohang.js</code>) — app giao đồ ăn là nguồn duy
+    nhất trên mạng với tới quán vỉa hè, nhưng giá ở đó đã cộng hoa hồng nền tảng nên
+    <code>vaoDai: false</code> cho tới khi có hệ số đo được.</li>
+  <li><b>Lộ trình đi khảo sát</b> (<code>tools/lo-trinh-khao-sat.mjs</code>) — 4.228
+    quán đọc từ sitemap công bố của GrabFood, gộp với lớp OSM, xếp phố theo phố nào
+    trả về nhiều ô giá nhất.</li>
 </ol>
+
+<div class="box">
+  <b>Đợt trước đó</b>
+  Bẫy đơn vị (<code>units.js</code>), điền ô trống bảng giá (<code>predict.js</code>),
+  nối quán với món (<code>eaterydish.js</code>), và đổ bảng khảo sát bằng CSV
+  (<code>tools/ingest-survey.mjs</code>) — bốn mục này nay đã chạy trong giao diện,
+  xem nhóm E của chương 8.
+</div>
 
 <h2>Chưa làm — và vì sao</h2>
 <table>
   <tr><th style="width:34%">Hạng mục</th><th>Ghi chú thẳng</th></tr>
   <tr><td>Khảo sát giá thực địa</td><td>Việc quan trọng nhất còn lại. Công cụ đã xong, chỉ còn công đi bộ: bốn buổi cho một vùng.</td></tr>
   <tr><td>Nhận diện mệnh giá bằng thị giác</td><td>Hiện dựa vào OCR con số in trên tờ tiền. Tốt khi tờ phẳng và số hướng lên; kém khi bị gấp.</td></tr>
-  <tr><td>Deal Recorder · Culture Lens · Local Compass</td><td>Đã có đặc tả, chưa cài đặt.</td></tr>
+  <tr><td>Deal Recorder · Culture Lens · Local Compass</td><td>Đã có đặc tả, chưa cài đặt. <b>Không phải lớp văn hoá ở chương 7</b>: ba mục này cần nhận diện bằng thị giác — chĩa camera vào một mái đình để nhận công trình — còn lớp đã chạy thì dựa hoàn toàn vào thiên văn và văn bản biên soạn tay, không có model nào.</td></tr>
   <tr><td>Địa điểm do người dùng tự thêm</td><td>Lớp cộng đồng mới có nhận xét và ảnh cho quán <i>có sẵn</i>.</td></tr>
   <tr><td>Hồ sơ công khai, theo dõi, nhắn tin, điểm đóng góp</td><td>Chưa có. Cần lớp tài khoản bật lên trước.</td></tr>
   <tr><td>Kiểm duyệt bằng AI</td><td>Cần edge function và chi phí API.</td></tr>
@@ -1663,7 +1681,7 @@ chỗ nó <b>từ chối</b> làm một việc dễ.</p>
   <tr><td><code>imgsvc.js</code></td><td>sinh icon lúc chạy, có lối lui SVG</td></tr>
   <tr><td><code>sw.js</code></td><td>offline: network-first cho vỏ app, cache-first cho CDN</td></tr>
   <tr><td><code>audit.js</code></td><td>phép thử tương tác chạy trong trình duyệt</td></tr>
-  <tr><td><code>test.mjs</code></td><td>420 phép thử lõi, gồm cả lớp kiểm chính dữ liệu</td></tr>
+  <tr><td><code>test.mjs</code></td><td>612 phép thử lõi, gồm cả lớp kiểm chính dữ liệu</td></tr>
   <tr><td><code>../supabase/menu.sql</code></td><td>giá người bán tự khai, tách hẳn khỏi bảng quan sát</td></tr>
   <tr><td><code>web/</code></td><td>chín trang bản máy tính, dùng chung dữ liệu và kho ảnh</td></tr>
 </table>
@@ -1676,7 +1694,7 @@ chỗ nó <b>từ chối</b> làm một việc dễ.</p>
   <tr><td>Triển khai</td><td><code>vercel deploy --prod --cwd nonla-app</code> — hoặc đẩy nguyên thư mục lên bất kỳ hosting tĩnh nào</td></tr>
 </table>
 
-<p class="foot-note">Tài liệu dựng ngày 04/09/2026 từ chính mã nguồn và dữ liệu trong kho.
+<p class="foot-note">Tài liệu dựng ngày 07/09/2026 từ chính mã nguồn và dữ liệu trong kho.
 Số liệu dữ liệu (vùng, món, dòng giá, cơ sở, quán OSM, điểm đi trong ngày, tệp trong danh
 sách cài đặt) được <b>đếm lại</b> từ <code>data/*.json</code> và <code>sw.js</code> cùng ngày;
 số phép thử lấy từ lần chạy <code>node test.mjs</code> và <code>audit.js</code> cùng ngày.
