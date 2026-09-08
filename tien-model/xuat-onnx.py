@@ -102,6 +102,7 @@ def main():
     net = timm.create_model(ten_timm, pretrained=False, num_classes=len(MENH_GIA))
     net.load_state_dict(torch.load(w, map_location="cpu"))
     net.to(may).eval()
+    tham_so = sum(p.numel() for p in net.parameters())
 
     # ── ngưỡng, đo trên tập KHÓ ─────────────────────────────────
     kho = gom(goc / "anh-kho")
@@ -129,26 +130,143 @@ def main():
 
     # ── xuất ONNX ───────────────────────────────────────────────
     ra = goc / f"tien-{a.model}.onnx"
-    torch.onnx.export(
-        net.cpu().eval(), torch.randn(1, 3, CO, CO), str(ra),
-        input_names=["anh"], output_names=["diem"],
-        dynamic_axes={"anh": {0: "lo"}, "diem": {0: "lo"}},
-        opset_version=17,
-    )
+    for p in goc.glob(f"{ra.name}*.data"):
+        p.unlink()
+
+    # DÙNG BỘ XUẤT CŨ (dynamo=False), CÓ LÝ DO.
+    #
+    # Bộ xuất mới của torch 2.x hỏng hai chỗ với model này, và cả hai đều
+    # hỏng im lặng:
+    #
+    # 1. Nó tách trọng số ra tệp `tien-....onnx.data` bên cạnh. Trên máy
+    #    chủ thì vô hại; trong trình duyệt thì service worker cache đúng
+    #    tệp `.onnx` liệt kê trong SHELL, người dùng offline nạp được một
+    #    cái vỏ 0,2 MB không có trọng số, và model VẪN CHẠY — chỉ là đoán
+    #    bậy, không có lỗi nào hiện ra.
+    # 2. Đồ thị nó sinh ra khai sai hình dạng ở lớp phân loại cuối (onnx
+    #    suy ra 1280, đồ thị ghi 9), nên bước lượng tử hoá chết. Không có
+    #    lượng tử hoá thì model là 10 MB thay vì 2,6 MB — với một app mà
+    #    khách du lịch tải bằng 4G ở Việt Nam, đó là khác biệt thật.
+    #
+    # Bộ cũ ghi một tệp và lượng tử hoá chạy. Nếu bản torch nào đó bỏ hẳn
+    # nó thì rơi về bộ mới, và phần đối chiếu bên dưới sẽ bắt được hậu quả.
+    try:
+        torch.onnx.export(
+            net.cpu().eval(), torch.randn(1, 3, CO, CO), str(ra),
+            input_names=["anh"], output_names=["diem"],
+            dynamic_axes={"anh": {0: "lo"}, "diem": {0: "lo"}},
+            opset_version=17, dynamo=False,
+        )
+    except (TypeError, RuntimeError) as e:
+        print(f"bộ xuất cũ không chạy ({e}); thử bộ mới")
+        torch.onnx.export(
+            net.cpu().eval(), torch.randn(1, 3, CO, CO), str(ra),
+            input_names=["anh"], output_names=["diem"],
+            dynamic_axes={"anh": {0: "lo"}, "diem": {0: "lo"}},
+            opset_version=18, external_data=False,
+        )
+
     mb = ra.stat().st_size / 1e6
     print(f"\n{ra.name}  {mb:.1f} MB")
+    # Chặn ngay tại đây thay vì để phát hiện trong trình duyệt: một model
+    # 2,5 triệu tham số fp32 phải quanh 10 MB. Nhỏ hơn nhiều nghĩa là
+    # trọng số đi chỗ khác.
+    du_kien = tham_so * 4 / 1e6
+    if mb < du_kien * 0.6:
+        print(f"*** {mb:.1f} MB nhưng {tham_so/1e6:.2f} triệu tham số cần ~{du_kien:.1f} MB ***")
+        for p in sorted(goc.glob(f"{ra.name}*.data")):
+            print(f"    trọng số nằm ở {p.name} ({p.stat().st_size/1e6:.1f} MB)")
+        print("    Không dùng tệp này cho trình duyệt.")
+        return 1
 
-    # Lượng tử hoá động: cắt còn khoảng một phần tư mà độ chính xác gần
-    # như không đổi với model nhỏ. Đây là chỗ quyết định model có nằm vừa
-    # cache service worker hay không.
+    # LƯỢNG TỬ HOÁ TĨNH, KHÔNG PHẢI ĐỘNG.
+    #
+    # `quantize_dynamic` là thứ ai cũng gọi đầu tiên vì nó không cần dữ
+    # liệu. Với model này nó cho ra một tệp 2,6 MB nạp được, chạy được, và
+    # SAI KẾT LUẬN 48/48 ảnh — bước đối chiếu bên dưới bắt được. Lý do:
+    # lượng tử hoá động chỉ đo thang cho trọng số, còn thang của các
+    # tensor trung gian thì đoán lúc chạy; mạng tích chập tách kênh của
+    # MobileNet có dải giá trị rất khác nhau giữa các kênh nên đoán trượt.
+    #
+    # Bản tĩnh chạy thật vài trăm ảnh qua model để ĐO dải giá trị ở từng
+    # chỗ, cộng với thang riêng cho từng kênh trọng số. Ta có sẵn ảnh nên
+    # không có cớ gì dùng bản động.
+    ra_q = goc / f"tien-{a.model}-int8.onnx"
     try:
-        from onnxruntime.quantization import QuantType, quantize_dynamic
-        ra_q = goc / f"tien-{a.model}-int8.onnx"
-        quantize_dynamic(str(ra), str(ra_q), weight_type=QuantType.QUInt8)
+        from onnxruntime.quantization import (CalibrationDataReader, QuantFormat,
+                                              QuantType, quantize_static)
+        from onnxruntime.quantization.shape_inference import quant_pre_process
+
+        hieu_chuan = gom(goc / "anh")
+        if not hieu_chuan:
+            raise RuntimeError("không có ảnh để hiệu chuẩn")
+        # Vài trăm ảnh là đủ để đo dải giá trị; lấy cách quãng cho trải
+        # đều chín mệnh giá thay vì lấy 300 ảnh đầu (toàn tờ 1.000).
+        buoc = max(1, len(hieu_chuan) // 300)
+        hieu_chuan = hieu_chuan[::buoc][:300]
+
+        class DocHieuChuan(CalibrationDataReader):
+            def __init__(self, ds):
+                self.it = iter(ds)
+
+            def get_next(self):
+                p = next(self.it, None)
+                if p is None:
+                    return None
+                x = BIEN_DOI_KIEM(Image.open(p[0]).convert("RGB"))
+                return {"anh": x.unsqueeze(0).numpy()}
+
+        ra_tam = goc / f"_tien-{a.model}-tienxuly.onnx"
+        quant_pre_process(str(ra), str(ra_tam), skip_symbolic_shape=True)
+        quantize_static(
+            str(ra_tam), str(ra_q), DocHieuChuan(hieu_chuan),
+            quant_format=QuantFormat.QDQ,
+            activation_type=QuantType.QUInt8, weight_type=QuantType.QInt8,
+            # Thang riêng cho từng kênh. Đây là chỗ quyết định với mạng
+            # tích chập tách kênh: một thang chung cho cả lớp là đủ để mất
+            # hẳn những kênh có dải hẹp.
+            per_channel=True,
+        )
+        ra_tam.unlink(missing_ok=True)
         mbq = ra_q.stat().st_size / 1e6
-        print(f"{ra_q.name}  {mbq:.1f} MB  (giảm {(1-mbq/mb)*100:.0f}%)")
+        print(f"{ra_q.name}  {mbq:.1f} MB  (giảm {(1-mbq/mb)*100:.0f}%) "
+              f"· hiệu chuẩn trên {len(hieu_chuan)} ảnh")
     except Exception as e:
         print(f"lượng tử hoá không chạy được: {e}")
+        ra_q = None
+
+    # ── tệp xuất ra có còn là chính model ấy không ───────────────
+    # Xuất "thành công" không có nghĩa là đúng. So thẳng đầu ra của bản
+    # ONNX với bản PyTorch trên vài chục ảnh thật; lệch quá thì tệp này
+    # không được đem đi dùng, dù nó nạp được và trả về đủ chín con số.
+    lech_max = None
+    try:
+        import onnxruntime as ort
+        mau = gom(goc / "anh")[:48] or gom(goc / "anh-kho")[:48]
+        if mau:
+            X = torch.stack([BIEN_DOI_KIEM(Image.open(p).convert("RGB")) for p, _ in mau])
+            with torch.no_grad():
+                goc_torch = net.cpu()(X).numpy()
+            print(f"\nđối chiếu với PyTorch trên {len(mau)} ảnh")
+            for nhan, tep in (("fp32", ra), ("int8", ra_q)):
+                if tep is None or not tep.exists():
+                    continue
+                phien = ort.InferenceSession(str(tep), providers=["CPUExecutionProvider"])
+                goc_onnx = phien.run(None, {"anh": X.numpy()})[0]
+                lech = float(np.abs(goc_torch - goc_onnx).max())
+                khac = int((goc_torch.argmax(1) != goc_onnx.argmax(1)).sum())
+                if nhan == "fp32":
+                    lech_max = lech
+                print(f"  {nhan}  lệch tối đa {lech:.2e} · khác kết luận {khac}/{len(mau)}")
+                # fp32 mà lệch kết luận nghĩa là xuất sai. int8 lệch một
+                # hai ca là bình thường — nhưng lệch nhiều thì cái tệp
+                # 2,6 MB ấy không còn là model ta vừa đo.
+                gioi_han = 0 if nhan == "fp32" else max(1, len(mau) // 25)
+                if khac > gioi_han:
+                    print(f"  *** bản {nhan} kết luận khác quá {gioi_han} ca — không dùng được ***")
+                    return 1
+    except Exception as e:
+        print(f"không đối chiếu được ONNX với PyTorch: {e}")
 
     (goc / "cauhinh-tien.json").write_text(json.dumps({
         "model": ten_timm,
@@ -157,9 +275,21 @@ def main():
         "nguongTinCay": round(float(chon), 2),
         "doDungMucTieu": DO_DUNG_MUC_TIEU,
         "soAnhKhoDaDo": len(kho),
+        "nguongDaHieuChuan": bool(kho),
+        "lechOnnxTorch": lech_max,
         "chuanHoa": {"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]},
-        "_note": "nguongTinCay đo trên tập ảnh KHÓ, không phải tập train. "
-                 "Dưới ngưỡng thì app phải nói không đọc được, không được đoán.",
+        # Tệp cấu hình không được nói dối về xuất xứ của chính nó. Khi
+        # chưa có tập khó thì 0,75 là một con số đặt tạm, và câu ghi chú
+        # phải nói đúng như vậy — chứ không phải chép lại câu của trường
+        # hợp đã đo. Đây đúng loại lỗi tầng-3 mà hồ sơ đang phải sửa.
+        "_note": (
+            "nguongTinCay đo trên tập ảnh KHÓ, không phải tập train. "
+            "Dưới ngưỡng thì app phải nói không đọc được, không được đoán."
+            if kho else
+            "CHƯA HIỆU CHUẨN: anh-kho/ rỗng nên nguongTinCay chỉ là con số "
+            "đặt tạm, chưa đo trên ảnh nào. App không được công bố độ chính "
+            "xác cho tới khi có tập khó và chạy lại tệp này."
+        ),
     }, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"đã ghi {goc / 'cauhinh-tien.json'}")
     return 0

@@ -1,0 +1,44 @@
+{
+ "ungVien": [
+  {
+   "model": "mobilenetv3_small_100",
+   "trieuThamSo": 1.53,
+   "valTotNhat": 0.9895,
+   "khoAcc": null,
+   "khoSoAnh": 0,
+   "nhamCapNguy": {},
+   "giay": 486
+  },
+  {
+   "model": "mobilenetv4_conv_small.e2400_r224_in1k",
+   "trieuThamSo": 2.5,
+   "valTotNhat": 0.9948,
+   "khoAcc": null,
+   "khoSoAnh": 0,
+   "nhamCapNguy": {},
+   "giay": 482
+  },
+  {
+   "model": "efficientnet_lite0",
+   "trieuThamSo": 3.38,
+   "valTotNhat": 0.9948,
+   "khoAcc": null,
+   "khoSoAnh": 0,
+   "nhamCapNguy": {},
+   "giay": 856
+  },
+  {
+   "model": "resnet18",
+   "trieuThamSo": 11.18,
+   "valTotNhat": 0.9895,
+   "khoAcc": null,
+   "khoSoAnh": 0,
+   "nhamCapNguy": {},
+   "giay": 777
+  }
+ ],
+ "soAnhTrain": 1923,
+ "soNguonTrain": 526,
+ "soNguonVal": 132,
+ "soAnhKho": 0
+}

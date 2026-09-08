@@ -270,13 +270,33 @@ def main():
 
     # Xếp theo tập KHÓ, không theo val. Val toàn ảnh cùng loại với train
     # nên nó chỉ nói model có học thuộc không, không nói nó dùng được không.
-    ket_qua.sort(key=lambda r: (-(r["khoAcc"] or 0), r["trieuThamSo"]))
-    print(f"\n{'model':<34}{'val':>7}{'KHÓ':>7}{'triệu':>8}   nhầm cặp nguy")
+    co_kho = any(r["khoAcc"] is not None for r in ket_qua)
+    if co_kho:
+        ket_qua.sort(key=lambda r: (-(r["khoAcc"] or 0), r["trieuThamSo"]))
+    else:
+        # Không có tập khó thì KHÔNG có thứ hạng. Sắp theo thứ tự chạy và
+        # nói thẳng ra, vì một bảng đã sắp bao giờ cũng được đọc là bảng
+        # xếp hạng — dòng đầu thành "quán quân" dù nó chỉ là model nhỏ nhất.
+        print("\n*** Chưa có tập khó: bảng dưới KHÔNG phải xếp hạng. ***")
+    print(f"\n{'model':<40}{'val':>7}{'KHÓ':>7}{'triệu':>8}   nhầm cặp nguy")
     print("-" * 82)
     for r in ket_qua:
         kho = f"{r['khoAcc']*100:.1f}%" if r["khoAcc"] is not None else "—"
         cap = " · ".join(f"{k} {v}" for k, v in r["nhamCapNguy"].items()) or "—"
-        print(f"{r['model']:<34}{r['valTotNhat']*100:>6.1f}%{kho:>7}{r['trieuThamSo']:>8}   {cap}")
+        print(f"{r['model']:<40}{r['valTotNhat']*100:>6.1f}%{kho:>7}{r['trieuThamSo']:>8}   {cap}")
+
+    # Câu đáng đưa vào hồ sơ hơn cả con số độ chính xác: backbone to gấp
+    # bảy lần có ăn được điểm không. Nếu không, ta đang bị chặn bởi DỮ
+    # LIỆU chứ không phải bởi model, và mua model to hơn là mua nhầm.
+    to = max(ket_qua, key=lambda r: r["trieuThamSo"])
+    nho = min(ket_qua, key=lambda r: r["trieuThamSo"])
+    if to is not nho:
+        d = (to["valTotNhat"] - nho["valTotNhat"]) * 100
+        print(f"\n{to['model']} to gấp {to['trieuThamSo']/nho['trieuThamSo']:.0f} lần "
+              f"{nho['model']} và hơn {d:+.1f} điểm val.")
+        if d <= 0.5:
+            print("Chênh lệch ấy nằm trong khoảng dao động của một lần chia tập khác —")
+            print("tức là chưa có bằng chứng model to hơn thì tốt hơn. Nút thắt là dữ liệu.")
 
     (goc / "ketqua.json").write_text(
         json.dumps({"ungVien": ket_qua, "soAnhTrain": len(train_items),
