@@ -21,3 +21,9 @@ __pycache__/
 
 # bản tải thô của sitemap GrabFood — 5MB giấy nháp, chạy lại lệnh là có
 docs/_sitemap-*.json
+
+# trọng số và ảnh tiền — không vào git
+tien-model/*.pt
+tien-model/*.onnx
+tien-model/anh/
+tien-model/anh-kho/
