@@ -27,7 +27,14 @@ BA QUYẾT ĐỊNH ĐÁNG GIẢI THÍCH
    GaussianBlur = tay rung. Đó là lý do một backbone khoẻ hơn ăn điểm —
    không phải vì phân biệt chín tờ khó, mà vì chịu được ảnh nát.
 
-3. CHẠY NHIỀU ỨNG VIÊN ĐỂ ĐO, KHÔNG ĐỂ PHÂN VÂN
+3. CHIA TẬP THEO NGUỒN, KHÔNG THEO ẢNH LẺ
+   `yolo-sang-lop.py` cắt mỗi tờ tiền ra ba mức đệm, và `anh/` sẽ có
+   nhiều ảnh sinh từ cùng một tấm chụp. Chia ngẫu nhiên theo từng ảnh
+   thì ba bản của một tờ nằm cả hai bên, và val đo lại đúng thứ nó vừa
+   học. Ở đây chia theo phần `<nguồn>` trong tên tệp, nên cả cụm ảnh của
+   một tấm chỉ nằm về một bên.
+
+4. CHẠY NHIỀU ỨNG VIÊN ĐỂ ĐO, KHÔNG ĐỂ PHÂN VÂN
    `resnet18` to gấp 7 lần `mobilenetv4_conv_small`. Nếu nó KHÔNG thắng
    thì đó là bằng chứng ta bị chặn bởi DỮ LIỆU chứ không phải bởi model
    — và câu ấy đáng đưa vào hồ sơ hơn là một con số độ chính xác.
@@ -44,14 +51,16 @@ except Exception:
 
 import argparse
 import json
+import random
 import time
+from collections import defaultdict
 from pathlib import Path
 
 import timm
 import torch
 import torch.nn as nn
 from PIL import Image
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms as T
 
 GOC = Path(__file__).resolve().parent
@@ -90,6 +99,34 @@ def gom(thu_muc: Path):
             if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}:
                 ra.append((p, LOP[g]))
     return ra
+
+
+def nguon(p: Path) -> str:
+    """Phần trước `__` trong tên tệp: tấm ảnh gốc mà ảnh này cắt ra."""
+    return p.stem.split("__")[0]
+
+
+def chia_theo_nguon(items, ti_le_val=0.2, hat=7):
+    """Chia train/val sao cho mọi ảnh cùng một nguồn nằm cùng một bên.
+
+    Chia trong TỪNG mệnh giá rồi gộp lại, vì các mệnh giá không có cùng
+    số nguồn — chia chung một lượt thì val dễ thiếu hẳn một lớp và con số
+    val trở nên khó đọc.
+    """
+    theo_lop = defaultdict(lambda: defaultdict(list))
+    for p, y in items:
+        theo_lop[y][nguon(p)].append((p, y))
+
+    rnd = random.Random(hat)
+    tr, va = [], []
+    for y in sorted(theo_lop):
+        ns = sorted(theo_lop[y])
+        rnd.shuffle(ns)
+        # Ít nhất một nguồn về val, và luôn chừa lại ít nhất một cho train.
+        n_va = min(max(1, round(len(ns) * ti_le_val)), max(0, len(ns) - 1))
+        for i, n in enumerate(ns):
+            (va if i < n_va else tr).extend(theo_lop[y][n])
+    return tr, va
 
 
 # Chuẩn hoá theo ImageNet vì backbone được huấn luyện sẵn trên đó.
@@ -202,17 +239,21 @@ def main():
         print("Chạy chuan-bi-anh.py --soat để xem còn thiếu mệnh giá nào.")
         return 1
 
-    n_va = max(9, int(len(train_items) * 0.2))
-    tr, va = random_split(train_items, [len(train_items) - n_va, n_va],
-                          generator=torch.Generator().manual_seed(7))
-    tr_dl = DataLoader(TepTien(list(tr), BIEN_DOI_TRAIN), batch_size=a.batch,
+    tr, va = chia_theo_nguon(train_items)
+    tr_dl = DataLoader(TepTien(tr, BIEN_DOI_TRAIN), batch_size=a.batch,
                        shuffle=True, num_workers=0, pin_memory=True, drop_last=False)
-    va_dl = DataLoader(TepTien(list(va), BIEN_DOI_KIEM), batch_size=a.batch, num_workers=0)
+    va_dl = DataLoader(TepTien(va, BIEN_DOI_KIEM), batch_size=a.batch, num_workers=0)
     kho_dl = (DataLoader(TepTien(kho_items, BIEN_DOI_KIEM), batch_size=a.batch, num_workers=0)
               if kho_items else None)
 
     may = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"máy: {may} · train {len(tr)} · val {len(va)} · khó {len(kho_items)}")
+    n_tr, n_va = len({nguon(p) for p, _ in tr}), len({nguon(p) for p, _ in va})
+    print(f"máy: {may} · train {len(tr)} ảnh / {n_tr} nguồn"
+          f" · val {len(va)} ảnh / {n_va} nguồn · khó {len(kho_items)}")
+    chung = {nguon(p) for p, _ in tr} & {nguon(p) for p, _ in va}
+    if chung:
+        print(f"*** {len(chung)} nguồn nằm cả train lẫn val — val vô nghĩa ***")
+        return 1
     if not kho_items:
         print("*** CHƯA CÓ ẢNH TRONG anh-kho/ — sẽ không có con số nào đáng tin ***")
 
@@ -239,6 +280,7 @@ def main():
 
     (goc / "ketqua.json").write_text(
         json.dumps({"ungVien": ket_qua, "soAnhTrain": len(train_items),
+                    "soNguonTrain": n_tr, "soNguonVal": n_va,
                     "soAnhKho": len(kho_items)}, ensure_ascii=False, indent=1),
         encoding="utf-8")
     print(f"\nđã ghi {goc / 'ketqua.json'}")

@@ -25,6 +25,17 @@ VÌ SAO CÓ BƯỚC NÀY THAY VÌ NÉM THẲNG ẢNH VÀO TRAIN
    `anh-kho/` là ảnh gấp, tối, chồng lên nhau — đúng những ca app sẽ gặp
    thật. Nó chỉ để ĐO. Tệp này băm cả hai bên và báo động nếu có ảnh nằm
    ở cả hai chỗ; lẫn một tấm là con số cuối cùng mất nghĩa.
+
+4. TÊN TỆP PHẢI GIỮ ĐƯỢC ẢNH NÀY TỪ ĐÂU RA
+   Băm nội dung chỉ bắt được bản trùng KHÍT. Nó không bắt được hai ảnh
+   cắt từ cùng một tấm ở hai mức đệm — khác pixel nên khác mã băm, nhưng
+   gần như cùng một tờ tiền dưới cùng ánh sáng, cùng góc, cùng nếp gấp.
+   Nếu hai bản ấy rơi vào hai bên train/val thì val đo lại chính cái nó
+   vừa học.
+
+   Nên tên tệp mang dạng `<nguồn>__<băm>.jpg`, và `train.py` chia tập
+   theo phần `<nguồn>` chứ không theo từng ảnh lẻ. Tệp không có `__` tự
+   nó là một nguồn riêng.
 """
 import sys
 
@@ -39,7 +50,7 @@ except Exception:
 import argparse
 import hashlib
 import json
-import os
+import re
 from pathlib import Path
 
 from PIL import Image, ImageOps
@@ -66,6 +77,29 @@ def bam(im: Image.Image) -> str:
     lưới — mà đó đúng là dạng trùng hay gặp nhất khi lấy ảnh từ mạng.
     """
     return hashlib.sha256(im.convert("RGB").tobytes()).hexdigest()
+
+
+def nhom_tu_ten(p: Path) -> str:
+    """Tên nguồn của ảnh, để chia tập theo NGUỒN chứ không theo ảnh lẻ.
+
+    `yolo-sang-lop.py` đặt tên `<gốc>_<hộp>_<mức đệm>.jpg`, nên bỏ hai
+    đuôi số cuối là về đúng tấm ảnh gốc. Ảnh tự chụp thường tên
+    `IMG_2043.jpg` — không có gì để bỏ, và mỗi tấm là một nguồn.
+    """
+    s = re.sub(r"(_\d+){1,2}$", "", p.stem)
+    s = re.sub(r"[^0-9A-Za-z-]+", "-", s).strip("-")
+    return (s or "le")[:40]
+
+
+def nhom_da_nap(p: Path) -> str:
+    """Nguồn của một ảnh ĐÃ nằm trong anh/ — phần trước `__`.
+
+    Khác `nhom_tu_ten`: cái kia đọc tên tệp thô lúc nạp vào, cái này đọc
+    tên đã đặt lại. Dùng nhầm cái kia ở đây thì mỗi tệp thành một nguồn
+    riêng và con số "nguồn" bằng đúng con số "ảnh" — vô nghĩa nhưng trông
+    vẫn hợp lý, nên đáng tách hẳn ra hai hàm.
+    """
+    return p.stem.split("__")[0]
 
 
 def nap_mot(p: Path):
@@ -130,7 +164,7 @@ def main():
                     trung += 1
                     continue
                 da_co.add(h)
-                im.save(dich / str(g) / f"{h[:16]}.jpg", "JPEG", quality=92)
+                im.save(dich / str(g) / f"{nhom_tu_ten(p)}__{h[:12]}.jpg", "JPEG", quality=92)
                 them += 1
         print(f"nạp vào {a.ra}/: thêm {them} · trùng bỏ {trung} · hỏng {hong}")
 
@@ -156,6 +190,12 @@ def main():
     tong_k = sum(len(v) for v in k.values())
     print("-" * 52)
     print(f"{'cộng':>10} {tong_t:>7} {tong_k:>6}")
+
+    # Số ảnh không phải số mẫu độc lập. Ba ảnh cắt từ một tấm vẫn là một
+    # tấm. In cả hai để không ai đọc nhầm 1.974 thành 1.974 lần chụp.
+    nguon_t = {nhom_da_nap(p) for ds in t.values() for p in ds}
+    nguon_k = {nhom_da_nap(p) for ds in k.values() for p in ds}
+    print(f"{'nguồn':>10} {len(nguon_t):>7} {len(nguon_k):>6}   ảnh gốc khác nhau")
 
     # ── chỗ dễ tự lừa mình nhất: ảnh khó lẫn vào tập train ──────
     bam_t = {}
@@ -185,6 +225,8 @@ def main():
         "canhDai": CANH_DAI,
         "train": {str(g): len(t[g]) for g in MENH_GIA},
         "kho": {str(g): len(k[g]) for g in MENH_GIA},
+        "nguonTrain": len(nguon_t),
+        "nguonKho": len(nguon_k),
         "lan": len(lan),
     }, ensure_ascii=False, indent=1), encoding="utf-8")
 
