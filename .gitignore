@@ -23,7 +23,13 @@ __pycache__/
 docs/_sitemap-*.json
 
 # trọng số và ảnh tiền — không vào git
-tien-model/*.pt
-tien-model/*.onnx
-tien-model/anh/
-tien-model/anh-kho/
+# Thư mục HUẤN LUYỆN: trọng số trung gian và ảnh không vào repo.
+# Ảnh tiền không được công bố (Nghị định 87/2023), và bản .pt là sản phẩm
+# trung gian — bản dùng thật là ONNX đã lượng tử hoá.
+/tien-model/*.pt
+/tien-model/*.onnx
+/tien-model/anh/
+/tien-model/anh-kho/
+# Nhưng model app THẬT SỰ dùng thì phải có trong repo: nó là một phần của
+# sản phẩm nộp, và thiếu nó thì bản clone chạy ra một app khác.
+!nonla-app/tien-model/

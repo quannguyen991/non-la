@@ -1,0 +1,185 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Thử nghiệm người dùng · bản điều phối</title><style>
+:root{--then:#0E2B24;--son:#9C3A24;--giay:#F7F3E9;--vien:#D9CFBA}
+*{box-sizing:border-box}
+body{margin:0 auto;padding:18px 16px 60px;max-width:780px;background:var(--giay);color:#1b1b1b;
+  font:15px/1.55 Cambria,Constantia,"Palatino Linotype","Noto Serif",system-ui,sans-serif}
+h1{font-size:22px;margin:0 0 2px;color:var(--then)}
+h2{font-size:17px;margin:24px 0 8px;color:var(--then);border-bottom:2px solid var(--vien);padding-bottom:4px}
+.sub{color:#5b5b5b;font-size:13px;margin:0 0 14px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+th,td{border:1px solid var(--vien);padding:5px 7px;text-align:left;vertical-align:top}
+th{background:#EFE8D8}
+.kb{background:#fff;border:1px solid var(--vien);border-left:4px solid var(--then);
+  padding:11px 14px;margin:12px 0;page-break-inside:avoid}
+.kb.sach{border-left-color:#2E6B4F}
+.kb h3{margin:0 0 3px;font-size:15.5px;color:var(--then)}
+.kb .ma{float:right;font-size:12px;color:#8a8a8a;letter-spacing:.08em}
+.menu{background:var(--giay);border:1px dashed var(--vien);padding:8px 11px;margin:8px 0;
+  font-size:13.5px;white-space:pre-line}
+.hoi{font-weight:600;margin:8px 0 4px}
+.da{background:#EEF4F0;border-left:3px solid #2E6B4F;padding:8px 11px;margin-top:8px;font-size:13.5px}
+.da b{color:#2E6B4F}
+.sai{color:var(--son);font-size:13px;margin-top:5px}
+.luat{background:#fff;border:1px solid var(--vien);border-left:4px solid var(--son);
+  padding:10px 13px;margin:10px 0}
+.luat b{color:var(--son)}
+.o{border:1px solid var(--vien);min-height:58px;margin:6px 0;background:#fff}
+.cuoi{margin-top:24px;padding-top:10px;border-top:2px solid var(--vien);font-size:13px;color:#5b5b5b}
+@media print{body{padding:0;max-width:none}.kb,.luat{page-break-inside:avoid}}</style></head><body>
+<h1>Thử nghiệm quyết định · bản người điều phối</h1>
+<p class="sub">Sinh bằng <code>node tools/kich-ban-thu.mjs</code>. Đáp án chuẩn tính bằng chính
+units.js / thoathuan.js / change.js / menutax.js mà app dùng — mã đổi thì chạy lại tệp này.
+<b>Bản này KHÔNG được đưa cho người tham gia.</b></p>
+
+<h2>0. Đăng ký trước khi chạy</h2>
+<div class="luat">
+  <b>Không đặt trước ngưỡng kết quả.</b> Không viết "kỳ vọng Nón Lá hơn đối chứng bao nhiêu
+  điểm". Cam kết ở đây là báo cáo bất kỳ con số nào rơi ra — kể cả khi Nón Lá thua ở một
+  chỉ số. Bộ đối chứng mô hình ngôn ngữ của dự án đã hai lần bác giả thuyết của chính đội và
+  cả hai lần đều ghi vào hồ sơ; chỗ này không làm khác.
+</div>
+<p>Người điều phối: _________________ · Ngày ký: ____/____/2026 · Chữ ký: _____________</p>
+
+<h2>1. Cách chạy</h2>
+<ul>
+  <li><b>24–30 người</b>, ít nhất một phần ba không đọc được tiếng Việt.</li>
+  <li>Mỗi người làm <b>cả hai cách</b>: (A) tra tự do bằng Google/ChatGPT, (B) Nón Lá.</li>
+  <li>Chia sáu tình huống làm hai nửa: <b>A1 · B1 · C1</b> và <b>A2 · B2 · C2</b>.
+    Người lẻ làm nửa đầu bằng cách A rồi nửa sau bằng cách B; người chẵn làm ngược lại.
+    Không đảo thì hiệu ứng học nghề dồn hết vào cách làm sau.</li>
+  <li>Không nhắc, không gợi ý, không trả lời câu hỏi trong lúc làm. Ghi lại nguyên văn
+    kết luận người tham gia viết ra.</li>
+  <li>Hỏi thêm một câu sau mỗi tình huống: <b>"vì sao bạn kết luận thế?"</b> — để đo
+    người ta có đọc được nguồn và mức tin cậy không, chứ không phải chỉ tin con số.</li>
+</ul>
+
+<h2>2. Sáu tình huống, kèm đáp án</h2>
+<p class="sub">Hai tình huống viền xanh <b>không có gì bất thường</b>. Cộng thêm hai tình
+huống nữa mà đáp án đúng là <b>"chưa trả lời được"</b> — tổng cộng
+<b>4/6 tình huống mà kết luận
+"tôi bị hớ" là SAI</b>. Đó là chủ ý: nếu tình huống nào cũng có người gian thì người tham gia
+học được sau tình huống thứ hai rằng "cứ nghi là đúng", và cả buổi đo biến thành đo mức độ
+đa nghi.</p>
+<div class="kb">
+  <span class="ma">A1 · có bẫy · "bị hớ" là SAI</span>
+  <h3>Cá song ở một quán hải sản phố cổ</h3>
+  <div class="menu">Cá song hấp xì dầu 100.000/100g
+Rau muống xào tỏi 60.000
+Cơm trắng 20.000</div>
+  <p class="hoi">Bạn định gọi cá song. Trước khi gọi, bạn phải hỏi người bán điều gì?</p>
+  <div class="da">
+    <b>Đáp án chuẩn:</b> Chưa trả lời được. Phải hỏi trọng lượng trước.<br>
+    Nếu con cá 800g thì tiền cá là 800.000₫ — gấp tám lần con số in trên thực đơn.
+    <br><b>Điều kiện phải nêu ra:</b> trọng lượng con cá
+    <div class="sai">Sai phổ biến: Hiểu 100.000 là giá cả con.</div>
+  </div>
+</div><div class="kb sach">
+  <span class="ma">A2 · KHÔNG có gì bất thường · "bị hớ" là SAI</span>
+  <h3>Nồi lẩu cho bốn người</h3>
+  <div class="menu">Lẩu gà lá é 420.000
+Bún ăn kèm 30.000/phần
+Bia hơi 25.000</div>
+  <p class="hoi">Bốn người ăn. Giá này có bất thường không, và bạn cần hỏi gì?</p>
+  <div class="da">
+    <b>Đáp án chuẩn:</b> Bình thường. Dải lẩu ở Hoàn Kiếm là 300.000₫–800.000₫, và 420.000₫ nằm trong đó.<br>
+    Hỏi để biết 420.000₫ là cả nồi hay mỗi người — nếu cả nồi thì bốn người ăn hết khoảng 105.000₫/người.
+    <br><b>Điều kiện phải nêu ra:</b> giá lẩu tính cả nồi hay theo đầu người
+    <div class="sai">Sai phổ biến: Kết luận bị hớ vì con số 420.000 trông lớn.</div>
+  </div>
+</div><div class="kb">
+  <span class="ma">B1 · có bẫy</span>
+  <h3>Bữa tối có dòng chữ nhỏ ở chân thực đơn</h3>
+  <div class="menu">Phở bò 95.000
+Nem rán 90.000
+Cà phê sữa đá 45.000
+Giá chưa bao gồm VAT 8% và phí phục vụ 5%</div>
+  <p class="hoi">Ba món này. Bạn sẽ trả bao nhiêu?</p>
+  <div class="da">
+    <b>Đáp án chuẩn:</b> 259.900₫ — không phải 230.000₫.<br>
+    Chênh 29.900₫, tức 13%.
+    <br><b>Điều kiện phải nêu ra:</b> phụ thu VAT 8% và phí phục vụ 5% chưa nằm trong giá in
+    <div class="sai">Sai phổ biến: Cộng ba con số in trên thực đơn rồi dừng.</div>
+  </div>
+</div><div class="kb sach">
+  <span class="ma">B2 · KHÔNG có gì bất thường · "bị hớ" là SAI</span>
+  <h3>Một món app chưa từng nghe tên</h3>
+  <div class="menu">Phá lấu 60.000
+Bánh mì 25.000
+Trà đá 5.000</div>
+  <p class="hoi">Phá lấu 60.000₫. Giá này có bất thường không?</p>
+  <div class="da">
+    <b>Đáp án chuẩn:</b> Không kết luận được — món này ngoài danh mục, không có dải giá để so.<br>
+    Nón Lá nói được mặt bằng của LOẠI món ở khu này, và nói rõ đó không phải giá của món này.
+    <br><b>Không có điều kiện ẩn nào.</b>
+    <div class="sai">Sai phổ biến: Coi 'không có dữ liệu' là 'đáng ngờ'. Đây là chỗ đo tỉ lệ NGHI OAN.</div>
+  </div>
+</div><div class="kb">
+  <span class="ma">C1 · có bẫy</span>
+  <h3>Biển ngoài cửa và thực đơn trong bàn</h3>
+  <div class="menu">NGOÀI CỬA — Phở bò 60.000 · Bún chả 70.000 · Nem rán 55.000
+TRONG BÀN — Beef pho 90.000 · Bun cha 100.000 · Fried spring rolls 80.000</div>
+  <p class="hoi">Hai tấm chênh nhau. Nên kết luận gì, và nên làm gì?</p>
+  <div class="da">
+    <b>Đáp án chuẩn:</b> Chênh lệch trung vị 1,45× trên 3 món khớp nhau — mức &quot;gap&quot;.<br>
+    Việc nên làm: hỏi để dùng bảng giá ngoài cửa. KHÔNG kết luận quán gian — tấm tiếng Anh có thể in từ năm ngoái, hoặc là suất khác.
+    <br><b>Điều kiện phải nêu ra:</b> hai bảng giá cho cùng ba món
+    <div class="sai">Sai phổ biến: Dùng chữ 'chặt chém' trong câu trả lời.</div>
+  </div>
+</div><div class="kb">
+  <span class="ma">C2 · có bẫy · "bị hớ" là SAI</span>
+  <h3>Trả tiền dưới đèn vàng lúc bảy giờ tối</h3>
+  <div class="menu">Hoá đơn 385.000₫
+Bạn đưa hai tờ 500.000₫
+Nhận lại: MỘT TỜ MÀU XANH LƠ, một tờ 100.000₫, một tờ 10.000₫, một tờ 5.000₫</div>
+  <p class="hoi">Bạn có nhận đủ tiền thối không? Trong tay bạn đang có bao nhiêu, và vì sao bạn chắc?</p>
+  <div class="da">
+    <b>Đáp án chuẩn:</b> Phải thối 615.000₫. Không trả lời được cho tới khi nhìn kỹ tờ xanh lơ: nếu là 500.000₫ thì đủ (615.000₫), nếu là 20.000₫ thì mới có 135.000₫.<br>
+    Chênh giữa hai khả năng là 480.000₫ — 480.000₫ is exactly the gap between a 500.000₫ note and a 20.000₫ one — the two blue notes. Look at that note again before you walk away.
+    <br><b>Điều kiện phải nêu ra:</b> tờ màu xanh lơ có thể là 20.000₫ hoặc 500.000₫
+    <div class="sai">Sai phổ biến: Trừ nhẩm ra 615.000 rồi cho là đủ mà không nhìn lại tờ tiền xanh lơ.</div>
+  </div>
+</div>
+
+<h2>3. Bốn chỉ số</h2>
+<table>
+  <tr><th>Chỉ số</th><th>Cách tính</th></tr>
+  <tr><td><b>Điều kiện ẩn phát hiện được</b></td><td>số điều kiện người tham gia nêu đúng / tổng số điều kiện trong tình huống</td></tr>
+  <tr><td><b>Quyết định đúng</b></td><td>kết luận cuối khớp đáp án chuẩn (đúng số, hoặc đúng câu 'chưa trả lời được')</td></tr>
+  <tr><td><b>NGHI OAN</b></td><td>số lần kết luận 'bị hớ / bị lừa' ở những tình huống mà kết luận ấy là SAI — xem cờ trên đầu mỗi tình huống</td></tr>
+  <tr><td><b>Thời gian tới quyết định</b></td><td>từ lúc đưa tình huống tới lúc viết xong kết luận</td></tr>
+</table>
+<div class="luat">
+  <b>Chỉ số thứ ba là chỉ số an toàn, và nó quan trọng hơn ba chỉ số kia.</b>
+  Một app giúp người ta phát hiện bẫy nhanh hơn nhưng cũng khiến họ nghi oan nhiều hơn là
+  một app làm hại người bán tử tế. Nếu tỉ lệ nghi oan của Nón Lá <i>cao hơn</i> đối chứng,
+  con số ấy phải nằm ở trang kết quả, không nằm ở phụ lục.
+</div>
+<p>Cố ý <b>không</b> đo "mức độ hài lòng". Một người thích app mà vẫn quên hỏi trọng lượng
+con cá thì app đã thất bại.</p>
+
+<h2>4. Bảng ghi kết quả</h2>
+<table>
+  <tr><th>Người</th><th>Cách</th><th>Tình huống</th><th>Điều kiện nêu đúng</th>
+      <th>Kết luận đúng?</th><th>Nghi oan?</th><th>Giây</th></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+
+<p class="cuoi">6 tình huống ·
+2 không có gì bất thường ·
+4 tình huống mà kết luận "bị hớ" là sai ·
+5 điều kiện ẩn tổng cộng ·
+ngưỡng tối thiểu để so hai thực đơn: 3 món khớp.</p>
+</body></html>

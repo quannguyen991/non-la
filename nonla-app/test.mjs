@@ -40,6 +40,7 @@ import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
 import { bandFloor, forZone } from "./premium.js";
 import { giamBatDinh, rongDai, diemO, xepO, xepPho, liDo } from "./uutien.js";
 import { khoaPho, tenHienThi, gomTheoPho } from "../tools/ten-pho.mjs";
+import { moTaTrangThai } from "./tien.js";
 import { dungPhieu, dien, tinh, dieuKienThieu, danhDauDaDoc, doiChieu, tenGon,
          cauDoiChieu, CAU as CAU_TT, BO_QUA_LECH } from "./thoathuan.js";
 import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
@@ -422,6 +423,26 @@ console.log("\n── thoathuan: điều hai bên cùng đọc ─────�
      doiChieu(p, goc.map((r, i) => (i ? r : { ...r, thanhTien: r.thanhTien + BO_QUA_LECH - 1 }))).viec,
      "khop");
   eq("chưa đóng dấu thì không đối chiếu được", doiChieu(dungPhieu(mon, pt), goc), null);
+}
+
+console.log("\n── tien: cửa chặn chưa hiệu chuẩn ───────────");
+{
+  /* Cửa chặn quan trọng hơn model. Bộ phân loại chín lớp LUÔN trả về một
+     trong chín lớp, kể cả khi chỉ nhìn thấy một góc mờ; ngưỡng "không
+     chắc" là thứ duy nhất chặn nó đoán bừa, và ngưỡng ấy phải ĐO trên
+     ảnh khó. Chưa đo thì tien.js từ chối chạy và app rơi về OCR. */
+  const cfg = JSON.parse(readFileSync("./tien-model/cauhinh-tien.json", "utf8"));
+  eq("cấu hình ship kèm app đang ở trạng thái CHƯA hiệu chuẩn",
+     cfg.nguongDaHieuChuan, false);
+  eq("và nói đúng là chưa có ảnh khó nào", cfg.soAnhKhoDaDo, 0);
+  ok("ghi chú nói thẳng chưa hiệu chuẩn", /CHƯA HIỆU CHUẨN/.test(cfg._note));
+  ok("bản ONNX khớp bản PyTorch tới 1e-4", cfg.lechOnnxTorch < 1e-4, String(cfg.lechOnnxTorch));
+
+  /* Câu hiện lên giao diện phải nói ĐÚNG LÝ DO, không đổ cho thiết bị. */
+  const cau = moTaTrangThai({ co: false, lyDo: "chua-hieu-chuan" });
+  ok("câu giải thích nhắc tới ngưỡng chưa đo", /threshold/i.test(cau), cau);
+  ok("và nói rõ app đọc bằng con số in thay thế", /printed number/i.test(cau));
+  eq("đã hiệu chuẩn thì không hiện câu nào", moTaTrangThai({ co: true }), "");
 }
 
 console.log("\n── verdict ─────────────────────────────────");

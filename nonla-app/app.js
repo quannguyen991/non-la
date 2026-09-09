@@ -44,6 +44,7 @@ import * as MonLa from "./monla.js";
 import * as CoSo from "./coso.js";
 import * as PhieuUI from "./phieuui.js";
 import * as TT from "./thoathuan.js";
+import * as Tien from "./tien.js";
 import { bachPhanVi } from "./pricesrc.js";
 import { inferDishes } from "./eaterydish.js";
 import * as Lich from "./lich.js";
@@ -1197,7 +1198,7 @@ function setMode(mode) {
     dish: "Point at the food itself — needs a connection" }[mode] || "";
 }
 
-function showCashResult(text) {
+function showCashResult(text, { tuHinh = null } = {}) {
   const notes = readNotes(text);
 
   /* Đang dở một phiên đếm tiền thối: lần đọc này KHÔNG phải một câu hỏi
@@ -1220,12 +1221,19 @@ function showCashResult(text) {
   }
   const total = notes.reduce((a, b) => a + b, 0);
   const expected = S.session.reduce((a, r) => a + r.price, 0) || null;
+  /* Nói rõ con số này đọc bằng cách nào. Hai cách có kiểu sai khác hẳn
+     nhau — OCR đọc nhầm chữ số, model nhận nhầm cả tờ — nên người dùng
+     đáng được biết mình đang nhìn kết quả của cách nào. */
+  const nguonDoc = tuHinh
+    ? `Read by shape · ${Math.round(tuHinh.tin * 100)}% confident`
+    : "Read from the printed number";
   const slip = zeroSlip(total, expected);
   setEdge(slip ? "high" : "ok");
 
   const counts = notes.reduce((m, v) => (m[v] = (m[v] || 0) + 1, m), {});
   openSheet(`
     <h3>You're holding</h3>
+    <p class="src">${esc(nguonDoc)}</p>
     <p style="font-size:32px;font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin-top:4px">${fmtVND(total)}</p>
     ${wave()}
     ${Object.entries(counts).sort((a,b)=>b[0]-a[0]).map(([v,c]) =>
@@ -1633,6 +1641,18 @@ async function doScan() {
       ${manualBlock(S.mode === "cash" ? "cash" : "menu")}
       <button class="btn sec" data-act="close">Close</button>`);
     return;
+  }
+  /* Chế độ Cash thử ĐỌC BẰNG HÌNH DẠNG trước, rồi mới tới OCR.
+     Hai đường bổ nhau chứ không thay nhau: model nhận được tờ gấp, tờ
+     dưới đèn vàng — những ca OCR chịu; OCR đọc được cả xấp trải phẳng
+     nhiều tờ khác mệnh giá, thứ một bộ phân loại một-nhãn không làm nổi.
+
+     tien.js trả null khi ngưỡng chưa hiệu chuẩn, khi không nạp được
+     model, hoặc khi dưới ngưỡng tin cậy — cả ba đều rơi về OCR, và
+     KHÔNG ca nào được đọc thành "không có tờ tiền nào". */
+  if (S.mode === "cash") {
+    const t = await Tien.doc(c).catch(() => null);
+    if (t) return showCashResult(String(t.menhGia), { tuHinh: t });
   }
   const { text, conf } = await ocr(c);
   handleText(text, conf);
