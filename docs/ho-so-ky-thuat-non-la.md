@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 81 commit · 645 phép thử xanh
+Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 82 commit · 658 phép thử xanh
 
 ---
 
@@ -92,7 +92,7 @@ tiền) và lần nào cũng được giữ — nghĩa là mọi thứ đều ph
 canvas/SVG thuần hoặc bằng một tệp model tải rời.
 
 **(2) Chạy được khi tắt mạng.**
-Service worker `nonla-v46` cache **64 tệp** vỏ app. Ba trong bốn chế độ quét
+Service worker `nonla-v47` cache **65 tệp** vỏ app. Ba trong bốn chế độ quét
 chạy hoàn toàn offline; chỉ chế độ nhận diện món ăn cần mạng, và đó là ngoại lệ
 được ghi rõ ngay trong `index.html`.
 
@@ -117,7 +117,7 @@ nonla-app/
 └── web/                bản bố cục máy tính (12 trang HTML riêng)
 ```
 
-**17.326 dòng JavaScript** trong 46 mô-đun, cộng 5 bảng kiểu CSS.
+**17.501 dòng JavaScript** trong 47 mô-đun, cộng 5 bảng kiểu CSS.
 
 Nguyên tắc chia mô-đun: **lõi thuần tách khỏi giao diện**. Mọi mô-đun không đụng
 DOM (`match.js`, `geo.js`, `iso.js`, `route.js`, `posts.js`, `amlich.js`,
@@ -145,14 +145,14 @@ Mọi con số dưới đây đếm trực tiếp từ tệp dữ liệu, không
 | Món có chuyện kể | **22** | `dishes.json` |
 | Món ngoài danh mục tra được giá | **187** | `menuref.json` |
 | Quán từ OpenStreetMap | **2.481** | `eateries.json` |
-| Cơ sở theo dõi riêng | **77** | `places.json` |
+| Cơ sở theo dõi riêng | **77** | `places.json` — chỉ tên/phố/món/toạ độ, không phán quyết |
 | Nhà hàng phân khúc cao | **22** | `premium.json` |
 | Mốc tham quan | **11** | `famous.json` |
 | Gợi ý đi trong ngày | **51** | `trips.json` |
 | Bài cộng đồng mẫu | **29** | `community.json` |
 | Mục lịch cố định | **9** | `lich.json` |
 | Quán cào từ sitemap giao hàng | **4.228** | `docs/quan-sitemap-*.json` |
-| Tệp trong vỏ offline | **64** | `sw.js` |
+| Tệp trong vỏ offline | **65** | `sw.js` |
 
 ### 4.1 Sáu vùng
 
@@ -1045,7 +1045,7 @@ cả cho những quán không liên quan.**
 
 ## 16. Kiểm thử và tự soát
 
-### 16.1 `test.mjs` — 645 phép thử, 0 hỏng
+### 16.1 `test.mjs` — 658 phép thử, 0 hỏng
 
 Kiểm lõi thuần: khớp món, bách phân vị, phán quyết, phép chiếu bản đồ, tuyến đi
 bộ, âm lịch, đơn vị, so thực đơn, tiền thối, tin cậy, nguồn giá, chấm điểm đối
@@ -1087,7 +1087,7 @@ là 612). Đây là thứ giám khảo đếm lại được trong ba mươi gi�
 Ngày 09/09 nó hở một chỗ khác và đã bịt: luật trên chỉ bắt hồ sơ khai **nhiều**
 con số, nên nó vẫn xanh khi cả cuốn khai thống nhất một con số **đã cũ**. Giờ
 bộ soát **chạy thật** `node test.mjs` rồi so — bắt được đúng lúc hồ sơ còn ghi
-612 trong khi bộ thử đã lên 645.
+612 trong khi bộ thử đã lên 645 (nay là 658).
 
 Nó chỉ soát những con số **đếm được**, không cố hiểu văn xuôi: một bộ soát đoán
 mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát người ta tắt đi.
@@ -1098,22 +1098,49 @@ mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát ngư�
 
 Chương này có mặt vì một hồ sơ không có nó là một hồ sơ đáng ngờ.
 
-### 17.1 Nợ nghiêm trọng — 61 nhãn "Đúng Giá" chưa có thật
+### 17.1 ĐÃ TRẢ (09/09) — 61 nhãn "Đúng Giá" chưa có thật
 
-`places.json` có **77 cơ sở**, trong đó **61 mang cờ `fair: true`**, dựa trên
-tổng cộng **1.863 lượt "scan"** chưa từng xảy ra. Trong khi chương 0 của hồ sơ
-ghi đúng rằng số lượt khảo sát thật **hôm nay = 0**.
+`places.json` từng có **61/77 cơ sở mang cờ `fair: true`**, dựa trên tổng cộng
+**1.863 lượt "scan"** chưa từng xảy ra — trong khi chương 0 ghi đúng rằng số
+khảo sát thật **hôm nay = 0**. Giao diện in con số ấy ra bằng thứ ngôn ngữ
+thuyết phục nhất mà nó có:
+
+> *"A trusted local spot for cao lầu that has stayed inside the local price
+> range across **31 independent scans**."*
 
 Luật lint tầng 3 đáng ra bắt được điều này lại kiểm `p.scans >= 20` — **điều
 kiện ấy được thoả bởi chính con số hư cấu**.
 
-Dưới thể lệ cuộc thi, đây là rủi ro quy chế ("giả mạo dữ liệu thử nghiệm").
-Hai đường xử lý:
+Đào sâu thì còn ba lớp nữa, và lớp sau nặng hơn lớp trước:
 
-- **(A)** đặt `fair: null` cho cả 77 cơ sở — mất một tính năng, giữ tính toàn vẹn;
-- **(B)** đổi nhãn sang thứ mà dữ liệu hiện có đỡ nổi.
+| Trường | Số bản ghi | Nó khai gì |
+|---|---|---|
+| `fair` | 61 | phán quyết "Đúng Giá" cho một quán có thật |
+| `scans` | 1.863 lượt | cỡ mẫu đứng sau phán quyết ấy |
+| `since` | 66 | "được gắn nhãn từ tháng 4/2026" |
+| `prices` | 163 giá | **giá một món cụ thể tại một quán có tên**, kèm phán quyết "Below range" |
+| `flag` | 6 câu | *"Prices above the local range on 11 of 19 scans"* |
 
-**Đang chờ quyết định.**
+`prices` là lớp nặng nhất: nó nêu đích danh một hàng quán có thật rồi khai một
+con số cụ thể mà không ai đo, xong chấm điểm con số đó.
+
+**Cách sửa — không xoá tính năng, mà nối vào dữ liệu thật.** Cơ chế vốn đúng;
+chỉ dữ liệu mồi là bịa. `survey.js` đã ghi `placeId` trong từng quan sát ngay
+từ đầu, chưa ai đọc. Nối vào:
+
+- `survey.js` thêm `theoCoSo()` — gom quan sát theo từng cơ sở;
+- `coso.js` (mới) suy phán quyết lúc chạy: đủ `MIN_QUAN_SAT = 5` mẫu và ≥80%
+  nằm trong khoảng thường gặp thì "Đúng Giá"; dưới ngưỡng là **CHƯA BIẾT**,
+  không phải "chưa đạt" — hai câu ấy khác nhau với người bán;
+- `places.json` chỉ còn dữ kiện kiểm chứng được: tên, phố, phân khúc, món,
+  toạ độ. Năm trường trên **đã gỡ hết**;
+- một phép thử canh cửa: `places.json` chứa bất kỳ trường nào trong số đó là
+  bộ thử đỏ.
+
+Hôm nay app hiện **0 nhãn Đúng Giá, 0 quán trên khoảng** — đúng với chương 0.
+Quét 5 lần ở một quán thì nhãn lên xanh kèm câu *"5 of 5 scans inside the usual
+range"*. Đó cũng là cảnh quay tự nhiên nhất cho video demo 3 phút: con số đi từ
+0 lên 1 ngay trước ống kính.
 
 ### 17.2 Nợ đã biết, đang chờ dữ liệu
 
@@ -1190,7 +1217,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `history.js` | 253 | lịch sử hoạt động (IndexedDB) |
 | `amlich.js` | 244 | lõi âm lịch Việt Nam |
 | `hanhtrinh.js` | 231 | trang hành trình |
-| `sw.js` | 220 | service worker, SHELL 64 tệp |
+| `sw.js` | 220 | service worker, SHELL 65 tệp |
 | `survey.js` | 219 | khảo sát giá tại chỗ |
 | `cloud.js` | 219 | chỗ duy nhất biết tới HTTP |
 | `match.js` | 210 | khớp món, đọc tiền, phán quyết |
@@ -1213,6 +1240,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `change.js` | 136 | đếm tiền thối |
 | `menuref.js` | 110 | 187 món ngoài danh mục |
 | `monla.js` | 243 | ngữ cảnh cho dòng không khớp được món nào |
+| `coso.js` | 111 | nhãn Đúng Giá suy từ lượt quét thật |
 | `pricesync.js` | 96 | đóng góp giá lên máy chủ |
 | `route.js` | 91 | tuyến đi bộ |
 | `outbox.js` | 91 | hàng chờ gửi |

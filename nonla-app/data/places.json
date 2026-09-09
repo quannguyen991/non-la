@@ -1,1723 +1,1169 @@
 {
-  "_note": "DỮ LIỆU HẠT GIỐNG. Trạng thái Đúng Giá thật phải sinh từ lượt quét tích luỹ, không gán tay. Trường `prices` là giá hạt giống theo từng món tại từng cơ sở, dùng cho thanh so giá ở tab Eat. Trường `at` là [vĩ độ, kinh độ] đặt xấp xỉ trên đúng con phố đã ghi — đủ để định hướng và tính khoảng cách, KHÔNG phải địa chỉ đã khảo sát.",
-  "places": [
-    {
-      "id": "ba-be",
-      "name": "Bà Bé · Cao lầu",
-      "zone": "hoian-oldtown",
-      "tier": "street",
-      "street": "Trần Phú",
-      "fair": true,
-      "scans": 31,
-      "since": "2026-04",
-      "known": [
-        "cao-lau",
-        "mi-quang",
-        "tra-da"
-      ],
-      "prices": {
-        "cao-lau": 48000,
-        "mi-quang": 46000,
-        "tra-da": 3000
-      },
-      "at": [
-        15.87755,
-        108.3278
-      ]
-    },
-    {
-      "id": "co-thao",
-      "name": "Cô Thảo · Cơm gà",
-      "zone": "hoian-oldtown",
-      "tier": "casual",
-      "street": "Phan Châu Trinh",
-      "fair": true,
-      "scans": 24,
-      "since": "2026-05",
-      "known": [
-        "com-ga-hoi-an",
-        "che"
-      ],
-      "prices": {
-        "com-ga-hoi-an": 45000,
-        "che": 15000
-      },
-      "at": [
-        15.8791,
-        108.329
-      ]
-    },
-    {
-      "id": "che-mot",
-      "name": "Chè Mót",
-      "zone": "hoian-oldtown",
-      "tier": "street",
-      "street": "Trần Phú",
-      "fair": true,
-      "scans": 48,
-      "since": "2026-03",
-      "known": [
-        "che",
-        "nuoc-mia"
-      ],
-      "prices": {
-        "che": 18000,
-        "nuoc-mia": 12000
-      },
-      "at": [
-        15.87745,
-        108.3261
-      ]
-    },
-    {
-      "id": "quan-bien",
-      "name": "Quán ven sông",
-      "zone": "hoian-oldtown",
-      "tier": "restaurant",
-      "street": "Bạch Đằng",
-      "fair": false,
-      "scans": 19,
-      "since": null,
-      "known": [
-        "hoanh-thanh",
-        "nuoc-dua",
-        "bia-chai"
-      ],
-      "flag": "Prices above the local range on 11 of 19 scans",
-      "prices": {
-        "hoanh-thanh": 110000,
-        "nuoc-dua": 90000,
-        "bia-chai": 65000
-      },
-      "at": [
-        15.8756,
-        108.3285
-      ]
-    },
-    {
-      "id": "banh-mi-goc",
-      "name": "Bánh mì góc phố",
-      "zone": "hoian-oldtown",
-      "tier": "street",
-      "street": "Hoàng Diệu",
-      "fair": true,
-      "scans": 22,
-      "since": "2026-06",
-      "known": [
-        "banh-mi",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "banh-mi": 25000,
-        "ca-phe-sua-da": 20000
-      },
-      "at": [
-        15.8783,
-        108.3315
-      ]
-    },
-    {
-      "id": "chua-xet",
-      "name": "Quán chưa đủ dữ liệu",
-      "zone": "hoian-oldtown",
-      "tier": "casual",
-      "street": "Nguyễn Thái Học",
-      "fair": null,
-      "scans": 6,
-      "since": null,
-      "known": [
-        "cao-lau",
-        "banh-xeo"
-      ],
-      "prices": {
-        "cao-lau": 52000,
-        "banh-xeo": 45000
-      },
-      "at": [
-        15.87665,
-        108.3272
-      ]
-    },
-    {
-      "id": "pho-suong",
-      "name": "Phở Sướng",
-      "zone": "hanoi-hoankiem",
-      "tier": "casual",
-      "street": "Đinh Liệt",
-      "fair": true,
-      "scans": 37,
-      "since": "2026-02",
-      "known": [
-        "pho-bo",
-        "tra-da"
-      ],
-      "prices": {
-        "pho-bo": 45000,
-        "tra-da": 3000
-      },
-      "at": [
-        21.0333,
-        105.8521
-      ]
-    },
-    {
-      "id": "bun-cha-hd",
-      "name": "Bún chả Hàng Quạt",
-      "zone": "hanoi-hoankiem",
-      "tier": "street",
-      "street": "Hàng Quạt",
-      "fair": true,
-      "scans": 29,
-      "since": "2026-04",
-      "known": [
-        "bun-cha",
-        "nem-ran",
-        "tra-da"
-      ],
-      "prices": {
-        "bun-cha": 45000,
-        "nem-ran": 40000,
-        "tra-da": 3000
-      },
-      "at": [
-        21.034,
-        105.8499
-      ]
-    },
-    {
-      "id": "ca-phe-giang",
-      "name": "Cà phê trứng phố cổ",
-      "zone": "hanoi-hoankiem",
-      "tier": "casual",
-      "street": "Nguyễn Hữu Huân",
-      "fair": true,
-      "scans": 41,
-      "since": "2026-01",
-      "known": [
-        "ca-phe-trung",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "ca-phe-trung": 35000,
-        "ca-phe-sua-da": 22000
-      },
-      "at": [
-        21.0347,
-        105.854
-      ]
-    },
-    {
-      "id": "bia-hoi-corner",
-      "name": "Bia hơi ngã tư",
-      "zone": "hanoi-hoankiem",
-      "tier": "street",
-      "street": "Tạ Hiện",
-      "fair": false,
-      "scans": 26,
-      "since": null,
-      "known": [
-        "bia-hoi",
-        "nem-ran"
-      ],
-      "flag": "Beer priced above the local range on 15 of 26 scans",
-      "prices": {
-        "bia-hoi": 18000,
-        "nem-ran": 75000
-      },
-      "at": [
-        21.0339,
-        105.8512
-      ]
-    },
-    {
-      "id": "com-tam-ba",
-      "name": "Cơm tấm Bảy",
-      "zone": "hcmc-district1",
-      "tier": "street",
-      "street": "Nguyễn Trãi",
-      "fair": true,
-      "scans": 33,
-      "since": "2026-03",
-      "known": [
-        "com-tam",
-        "tra-da"
-      ],
-      "prices": {
-        "com-tam": 48000,
-        "tra-da": 3000
-      },
-      "at": [
-        10.767,
-        106.686
-      ]
-    },
-    {
-      "id": "hu-tieu-nam",
-      "name": "Hủ tiếu Nam Vang",
-      "zone": "hcmc-district1",
-      "tier": "casual",
-      "street": "Võ Văn Tần",
-      "fair": true,
-      "scans": 27,
-      "since": "2026-05",
-      "known": [
-        "hu-tieu",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "hu-tieu": 45000,
-        "ca-phe-sua-da": 25000
-      },
-      "at": [
-        10.7759,
-        106.691
-      ]
-    },
-    {
-      "id": "ben-thanh-stall",
-      "name": "Quầy ăn chợ Bến Thành",
-      "zone": "hcmc-district1",
-      "tier": "casual",
-      "street": "Chợ Bến Thành",
-      "fair": false,
-      "scans": 34,
-      "since": null,
-      "known": [
-        "bun-thit-nuong",
-        "goi-cuon",
-        "nuoc-mia"
-      ],
-      "flag": "Prices above the local range on 21 of 34 scans",
-      "prices": {
-        "bun-thit-nuong": 95000,
-        "goi-cuon": 80000,
-        "nuoc-mia": 40000
-      },
-      "at": [
-        10.7725,
-        106.698
-      ]
-    },
-    {
-      "id": "hoian-cam-nam",
-      "name": "Quán hến cồn Cẩm Nam",
-      "zone": "hoian-oldtown",
-      "tier": "street",
-      "street": "Cẩm Nam",
-      "fair": true,
-      "scans": 25,
-      "since": "2026-06",
-      "known": [
-        "hen-tron",
-        "banh-dap",
-        "che-bap"
-      ],
-      "prices": {
-        "hen-tron": 30000,
-        "banh-dap": 20000,
-        "che-bap": 15000
-      },
-      "at": [
-        15.87385,
-        108.3345
-      ]
-    },
-    {
-      "id": "hoian-xi-ma",
-      "name": "Gánh xí mà buổi chiều",
-      "zone": "hoian-oldtown",
-      "tier": "street",
-      "street": "Nguyễn Trường Tộ",
-      "fair": true,
-      "scans": 21,
-      "since": "2026-07",
-      "known": [
-        "xi-ma",
-        "che"
-      ],
-      "prices": {
-        "xi-ma": 15000,
-        "che": 15000
-      },
-      "at": [
-        15.87815,
-        108.33
-      ]
-    },
-    {
-      "id": "hn-pho-ga-pho-co",
-      "name": "Phở gà phố cổ",
-      "zone": "hanoi-hoankiem",
-      "tier": "casual",
-      "street": "Hàng Bồ",
-      "fair": true,
-      "scans": 26,
-      "since": "2026-06",
-      "known": [
-        "pho-ga",
-        "tra-da"
-      ],
-      "prices": {
-        "pho-ga": 45000,
-        "tra-da": 3000
-      },
-      "at": [
-        21.0345,
-        105.8505
-      ]
-    },
-    {
-      "id": "hn-nom-bo-ho",
-      "name": "Nộm bò khô bờ hồ",
-      "zone": "hanoi-hoankiem",
-      "tier": "street",
-      "street": "Hàng Bài",
-      "fair": true,
-      "scans": 22,
-      "since": "2026-05",
-      "known": [
-        "nom-bo-kho",
-        "tra-da"
-      ],
-      "prices": {
-        "nom-bo-kho": 35000,
-        "tra-da": 3000
-      },
-      "at": [
-        21.027,
-        105.853
-      ]
-    },
-    {
-      "id": "sg-oc-hem",
-      "name": "Quán ốc trong hẻm",
-      "zone": "hcmc-district1",
-      "tier": "street",
-      "street": "Cô Giang",
-      "fair": true,
-      "scans": 24,
-      "since": "2026-06",
-      "known": [
-        "oc-hut",
-        "bia-chai"
-      ],
-      "prices": {
-        "oc-hut": 60000,
-        "bia-chai": 28000
-      },
-      "at": [
-        10.766,
-        106.696
-      ]
-    },
-    {
-      "id": "sg-banh-khot-cho",
-      "name": "Bánh khọt gần chợ",
-      "zone": "hcmc-district1",
-      "tier": "casual",
-      "street": "Lê Thánh Tôn",
-      "fair": null,
-      "scans": 11,
-      "since": null,
-      "known": [
-        "banh-khot",
-        "nuoc-sam"
-      ],
-      "prices": {
-        "banh-khot": 60000,
-        "nuoc-sam": 15000
-      },
-      "at": [
-        10.776,
-        106.7
-      ]
-    },
-    {
-      "id": "dn-mi-quang-pho",
-      "name": "Mì Quảng đầu phố",
-      "zone": "danang-hanriver",
-      "tier": "street",
-      "street": "Hoàng Diệu",
-      "fair": true,
-      "scans": 28,
-      "since": "2026-05",
-      "known": [
-        "mi-quang",
-        "tra-da"
-      ],
-      "prices": {
-        "mi-quang": 40000,
-        "tra-da": 3000
-      },
-      "at": [
-        16.062,
-        108.22
-      ]
-    },
-    {
-      "id": "dn-cha-ca-som",
-      "name": "Bún chả cá bán sớm",
-      "zone": "danang-hanriver",
-      "tier": "street",
-      "street": "Hùng Vương",
-      "fair": true,
-      "scans": 34,
-      "since": "2026-04",
-      "known": [
-        "bun-cha-ca",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "bun-cha-ca": 35000,
-        "ca-phe-sua-da": 20000
-      },
-      "at": [
-        16.068,
-        108.2185
-      ]
-    },
-    {
-      "id": "dn-cuon-thit-heo",
-      "name": "Quán cuốn thịt heo",
-      "zone": "danang-hanriver",
-      "tier": "casual",
-      "street": "Trần Phú",
-      "fair": true,
-      "scans": 22,
-      "since": "2026-06",
-      "known": [
-        "banh-trang-cuon-thit-heo",
-        "bia-chai"
-      ],
-      "prices": {
-        "banh-trang-cuon-thit-heo": 100000,
-        "bia-chai": 25000
-      },
-      "at": [
-        16.068,
-        108.2225
-      ]
-    },
-    {
-      "id": "dn-ben-song",
-      "name": "Quán bờ sông Bạch Đằng",
-      "zone": "danang-hanriver",
-      "tier": "restaurant",
-      "street": "Bạch Đằng",
-      "fair": false,
-      "scans": 24,
-      "since": null,
-      "known": [
-        "hai-san-can",
-        "bia-chai",
-        "nuoc-dua"
-      ],
-      "flag": "Prices above the local range on 14 of 24 scans",
-      "prices": {
-        "hai-san-can": 1100000,
-        "bia-chai": 60000,
-        "nuoc-dua": 60000
-      },
-      "at": [
-        16.07,
-        108.2245
-      ]
-    },
-    {
-      "id": "dn-che-hem",
-      "name": "Chè xoa xoa trong hẻm",
-      "zone": "danang-hanriver",
-      "tier": "street",
-      "street": "Phan Châu Trinh",
-      "fair": true,
-      "scans": 26,
-      "since": "2026-03",
-      "known": [
-        "che-xoa-xoa-hat-luu",
-        "kem-bo"
-      ],
-      "prices": {
-        "che-xoa-xoa-hat-luu": 15000,
-        "kem-bo": 30000
-      },
-      "at": [
-        16.064,
-        108.22
-      ]
-    },
-    {
-      "id": "dn-banh-mi-que",
-      "name": "Bánh mì que góc đường",
-      "zone": "danang-hanriver",
-      "tier": "street",
-      "street": "Lê Duẩn",
-      "fair": true,
-      "scans": 20,
-      "since": "2026-07",
-      "known": [
-        "banh-mi-que",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "banh-mi-que": 5000,
-        "ca-phe-sua-da": 18000
-      },
-      "at": [
-        16.07,
-        108.216
-      ]
-    },
-    {
-      "id": "dn-chua-du",
-      "name": "Quán mới chưa đủ dữ liệu",
-      "zone": "danang-hanriver",
-      "tier": "casual",
-      "street": "Nguyễn Chí Thanh",
-      "fair": null,
-      "scans": 7,
-      "since": null,
-      "known": [
-        "mi-quang",
-        "banh-xeo"
-      ],
-      "prices": {
-        "mi-quang": 55000,
-        "banh-xeo": 65000
-      },
-      "at": [
-        16.069,
-        108.2205
-      ]
-    },
-    {
-      "id": "mk-hai-san-mat-bien",
-      "name": "Quán hải sản mặt biển",
-      "zone": "danang-mykhe",
-      "tier": "restaurant",
-      "street": "Võ Nguyên Giáp",
-      "fair": false,
-      "scans": 31,
-      "since": null,
-      "known": [
-        "hai-san-can",
-        "muc-nuong",
-        "bia-chai"
-      ],
-      "flag": "Priced by weight above the local range on 19 of 31 scans",
-      "prices": {
-        "hai-san-can": 1500000,
-        "muc-nuong": 340000,
-        "bia-chai": 60000
-      },
-      "at": [
-        16.0605,
-        108.2468
-      ]
-    },
-    {
-      "id": "mk-hai-san-hem",
-      "name": "Quán hải sản trong hẻm",
-      "zone": "danang-mykhe",
-      "tier": "casual",
-      "street": "Hà Bổng",
-      "fair": true,
-      "scans": 27,
-      "since": "2026-05",
-      "known": [
-        "hai-san-can",
-        "oc-hut",
-        "bia-chai"
-      ],
-      "prices": {
-        "hai-san-can": 520000,
-        "oc-hut": 70000,
-        "bia-chai": 30000
-      },
-      "at": [
-        16.0655,
-        108.2432
-      ]
-    },
-    {
-      "id": "mk-cha-ca-sang",
-      "name": "Bún chả cá buổi sáng",
-      "zone": "danang-mykhe",
-      "tier": "street",
-      "street": "Phạm Văn Đồng",
-      "fair": true,
-      "scans": 23,
-      "since": "2026-06",
-      "known": [
-        "bun-cha-ca",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "bun-cha-ca": 40000,
-        "ca-phe-sua-da": 28000
-      },
-      "at": [
-        16.0738,
-        108.2438
-      ]
-    },
-    {
-      "id": "mk-an-thuong",
-      "name": "Cà phê phố An Thượng",
-      "zone": "danang-mykhe",
-      "tier": "casual",
-      "street": "An Thượng",
-      "fair": null,
-      "scans": 9,
-      "since": null,
-      "known": [
-        "ca-phe-muoi",
-        "sinh-to"
-      ],
-      "prices": {
-        "ca-phe-muoi": 40000,
-        "sinh-to": 45000
-      },
-      "at": [
-        16.0552,
-        108.2438
-      ]
-    },
-    {
-      "id": "mk-kem-bo-bien",
-      "name": "Kem bơ ven biển",
-      "zone": "danang-mykhe",
-      "tier": "street",
-      "street": "Võ Nguyên Giáp",
-      "fair": true,
-      "scans": 22,
-      "since": "2026-07",
-      "known": [
-        "kem-bo",
-        "nuoc-dua"
-      ],
-      "prices": {
-        "kem-bo": 35000,
-        "nuoc-dua": 35000
-      },
-      "at": [
-        16.0685,
-        108.2462
-      ]
-    },
-    {
-      "id": "hue-bun-bo-som",
-      "name": "Bún bò gánh sớm",
-      "zone": "hue-citadel",
-      "tier": "street",
-      "street": "Mai Thúc Loan",
-      "fair": true,
-      "scans": 42,
-      "since": "2026-02",
-      "known": [
-        "bun-bo-hue",
-        "tra-da"
-      ],
-      "prices": {
-        "bun-bo-hue": 35000,
-        "tra-da": 2000
-      },
-      "at": [
-        16.472,
-        107.583
-      ]
-    },
-    {
-      "id": "hue-banh-loc",
-      "name": "Quán bánh bèo nậm lọc",
-      "zone": "hue-citadel",
-      "tier": "casual",
-      "street": "Hàn Thuyên",
-      "fair": true,
-      "scans": 29,
-      "since": "2026-04",
-      "known": [
-        "banh-beo",
-        "banh-bot-loc",
-        "banh-nam"
-      ],
-      "prices": {
-        "banh-beo": 25000,
-        "banh-bot-loc": 25000,
-        "banh-nam": 6000
-      },
-      "at": [
-        16.469,
-        107.58
-      ]
-    },
-    {
-      "id": "hue-com-hen-con",
-      "name": "Cơm hến bên cồn",
-      "zone": "hue-citadel",
-      "tier": "street",
-      "street": "Đinh Tiên Hoàng",
-      "fair": true,
-      "scans": 24,
-      "since": "2026-05",
-      "known": [
-        "com-hen",
-        "che"
-      ],
-      "prices": {
-        "com-hen": 20000,
-        "che": 12000
-      },
-      "at": [
-        16.474,
-        107.579
-      ]
-    },
-    {
-      "id": "hue-pho-tay",
-      "name": "Quán phố Tây",
-      "zone": "hue-citadel",
-      "tier": "restaurant",
-      "street": "Chu Văn An",
-      "fair": false,
-      "scans": 21,
-      "since": null,
-      "known": [
-        "bun-bo-hue",
-        "bia-chai",
-        "ca-phe-sua-da"
-      ],
-      "flag": "Prices above the local range on 12 of 21 scans",
-      "prices": {
-        "bun-bo-hue": 85000,
-        "bia-chai": 55000,
-        "ca-phe-sua-da": 50000
-      },
-      "at": [
-        16.464,
-        107.594
-      ]
-    },
-    {
-      "id": "hue-ca-phe-muoi",
-      "name": "Cà phê muối góc thành",
-      "zone": "hue-citadel",
-      "tier": "casual",
-      "street": "Nguyễn Trãi",
-      "fair": true,
-      "scans": 33,
-      "since": "2026-03",
-      "known": [
-        "ca-phe-muoi",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "ca-phe-muoi": 22000,
-        "ca-phe-sua-da": 18000
-      },
-      "at": [
-        16.472,
-        107.577
-      ]
-    },
-    {
-      "id": "hue-nem-lui",
-      "name": "Nem lụi bên đường",
-      "zone": "hue-citadel",
-      "tier": "street",
-      "street": "Lê Duẩn",
-      "fair": null,
-      "scans": 8,
-      "since": null,
-      "known": [
-        "nem-lui",
-        "banh-uot-thit-nuong"
-      ],
-      "prices": {
-        "nem-lui": 12000,
-        "banh-uot-thit-nuong": 40000
-      },
-      "at": [
-        16.47,
-        107.586
-      ]
-    },
-    {
-      "id": "hn-bun-dau-au-trieu",
-      "name": "Bún đậu ngõ Ấu Triệu",
-      "zone": "hanoi-hoankiem",
-      "tier": "street",
-      "street": "Phố Ấu Triệu",
-      "at": [
-        21.02888,
-        105.84871
-      ],
-      "known": [
-        "bun-dau",
-        "tra-da"
-      ],
-      "prices": {
-        "bun-dau": 50000,
-        "tra-da": 3000
-      },
-      "scans": 24,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "hn-banh-cuon-duong-thanh",
-      "name": "Bánh cuốn Đường Thành",
-      "zone": "hanoi-hoankiem",
-      "tier": "casual",
-      "street": "Đường Thành",
-      "at": [
-        21.03106,
-        105.84728
-      ],
-      "known": [
-        "banh-cuon",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "banh-cuon": 35000,
-        "ca-phe-sua-da": 22000
-      },
-      "scans": 31,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "hn-cha-ca-hang-buom",
-      "name": "Chả cá phố Hàng Buồm",
-      "zone": "hanoi-hoankiem",
-      "tier": "restaurant",
-      "street": "Hàng Buồm",
-      "at": [
-        21.03542,
-        105.85051
-      ],
-      "known": [
-        "cha-ca",
-        "bia-chai"
-      ],
-      "prices": {
-        "cha-ca": 180000,
-        "bia-chai": 25000
-      },
-      "scans": 22,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "hn-ca-phe-ly-quoc-su",
-      "name": "Cà phê Lý Quốc Sư",
-      "zone": "hanoi-hoankiem",
-      "tier": "casual",
-      "street": "Phố Lý Quốc Sư",
-      "at": [
-        21.0302,
-        105.84896
-      ],
-      "known": [
-        "ca-phe-trung",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "ca-phe-trung": 35000,
-        "ca-phe-sua-da": 22000
-      },
-      "scans": 26,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "hn-ca-phe-muoi-hang-trong",
-      "name": "Cà phê muối Hàng Trống",
-      "zone": "hanoi-hoankiem",
-      "tier": "street",
-      "street": "Phố Hàng Trống",
-      "at": [
-        21.03035,
-        105.84971
-      ],
-      "known": [
-        "ca-phe-muoi",
-        "ca-phe-dua"
-      ],
-      "prices": {
-        "ca-phe-muoi": 28000,
-        "ca-phe-dua": 35000
-      },
-      "scans": 20,
-      "fair": true,
-      "since": "2026-04"
-    },
-    {
-      "id": "hn-xoi-hang-giay",
-      "name": "Xôi gánh Hàng Giấy",
-      "zone": "hanoi-hoankiem",
-      "tier": "street",
-      "street": "Phố Hàng Giấy",
-      "at": [
-        21.03924,
-        105.84799
-      ],
-      "known": [
-        "xoi",
-        "tra-da"
-      ],
-      "prices": {
-        "xoi": 20000,
-        "tra-da": 3000
-      },
-      "scans": 21,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "hn-bun-rieu-phung-hung",
-      "name": "Bún riêu Phùng Hưng",
-      "zone": "hanoi-hoankiem",
-      "tier": "street",
-      "street": "Phố Phùng Hưng",
-      "at": [
-        21.03943,
-        105.84685
-      ],
-      "known": [
-        "bun-rieu",
-        "nem-ran"
-      ],
-      "prices": {
-        "bun-rieu": 40000,
-        "nem-ran": 45000
-      },
-      "scans": 25,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "hn-lau-tong-dan",
-      "name": "Lẩu phố Tông Đản",
-      "zone": "hanoi-hoankiem",
-      "tier": "restaurant",
-      "street": "Phố Tông Đản",
-      "at": [
-        21.02726,
-        105.85724
-      ],
-      "known": [
-        "lau",
-        "bia-chai"
-      ],
-      "prices": {
-        "lau": 420000,
-        "bia-chai": 40000
-      },
-      "scans": 19,
-      "fair": false,
-      "since": "2026-04"
-    },
-    {
-      "id": "sg-com-tam-nguyen-du",
-      "name": "Cơm tấm vỉa hè Nguyễn Du",
-      "zone": "hcmc-district1",
-      "tier": "street",
-      "street": "Nguyễn Du",
-      "at": [
-        10.77986,
-        106.70091
-      ],
-      "known": [
-        "com-tam",
-        "tra-da"
-      ],
-      "prices": {
-        "com-tam": 50000,
-        "tra-da": 3000
-      },
-      "scans": 28,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "sg-hu-tieu-ton-that-thiep",
-      "name": "Hủ tiếu Tôn Thất Thiệp",
-      "zone": "hcmc-district1",
-      "tier": "casual",
-      "street": "Tôn Thất Thiệp",
-      "at": [
-        10.77383,
-        106.70217
-      ],
-      "known": [
-        "hu-tieu",
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "hu-tieu": 45000,
-        "ca-phe-sua-da": 28000
-      },
-      "scans": 23,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "sg-banh-mi-pham-ngu-lao",
-      "name": "Bánh mì xe đẩy Phạm Ngũ Lão",
-      "zone": "hcmc-district1",
-      "tier": "street",
-      "street": "Đường Phạm Ngũ Lão",
-      "at": [
-        10.76861,
-        106.69344
-      ],
-      "known": [
-        "banh-mi",
-        "nuoc-mia"
-      ],
-      "prices": {
-        "banh-mi": 30000,
-        "nuoc-mia": 15000
-      },
-      "scans": 33,
-      "fair": true,
-      "since": "2026-01"
-    },
-    {
-      "id": "sg-ca-phe-ly-tu-trong",
-      "name": "Cà phê chung cư Lý Tự Trọng",
-      "zone": "hcmc-district1",
-      "tier": "casual",
-      "street": "Lý Tự Trọng",
-      "at": [
-        10.7774,
-        106.70035
-      ],
-      "known": [
-        "ca-phe-sua-da",
-        "ca-phe-muoi"
-      ],
-      "prices": {
-        "ca-phe-sua-da": 28000,
-        "ca-phe-muoi": 35000
-      },
-      "scans": 26,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "sg-ca-phe-vot-pasteur",
-      "name": "Cà phê vợt Pasteur",
-      "zone": "hcmc-district1",
-      "tier": "street",
-      "street": "Đường Pasteur",
-      "at": [
-        10.77852,
-        106.69867
-      ],
-      "known": [
-        "ca-phe-sua-da"
-      ],
-      "prices": {
-        "ca-phe-sua-da": 20000
-      },
-      "scans": 21,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "sg-bun-thit-nuong-nguyen-trai",
-      "name": "Bún thịt nướng Nguyễn Trãi",
-      "zone": "hcmc-district1",
-      "tier": "casual",
-      "street": "Đường Nguyễn Trãi",
-      "at": [
-        10.77112,
-        106.69334
-      ],
-      "known": [
-        "bun-thit-nuong",
-        "goi-cuon"
-      ],
-      "prices": {
-        "bun-thit-nuong": 45000,
-        "goi-cuon": 40000
-      },
-      "scans": 20,
-      "fair": true,
-      "since": "2026-04"
-    },
-    {
-      "id": "sg-oc-le-thanh-ton",
-      "name": "Quán ốc Lê Thánh Tôn",
-      "zone": "hcmc-district1",
-      "tier": "restaurant",
-      "street": "Lê Thánh Tôn",
-      "at": [
-        10.7739,
-        106.69819
-      ],
-      "known": [
-        "oc-hut",
-        "bia-chai"
-      ],
-      "prices": {
-        "oc-hut": 95000,
-        "bia-chai": 45000
-      },
-      "scans": 17,
-      "fair": false,
-      "since": "2026-04"
-    },
-    {
-      "id": "sg-che-ham-nghi",
-      "name": "Chè Hàm Nghi",
-      "zone": "hcmc-district1",
-      "tier": "street",
-      "street": "Hàm Nghi",
-      "at": [
-        10.7708,
-        106.70013
-      ],
-      "known": [
-        "che",
-        "banh-flan"
-      ],
-      "prices": {
-        "che": 22000,
-        "banh-flan": 18000
-      },
-      "scans": 24,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "dn-mi-quang-trung-nu-vuong",
-      "name": "Mì Quảng Trưng Nữ Vương",
-      "zone": "danang-hanriver",
-      "tier": "casual",
-      "street": "Đường Trưng Nữ Vương",
-      "at": [
-        16.05493,
-        108.22031
-      ],
-      "known": [
-        "mi-quang",
-        "tra-da"
-      ],
-      "prices": {
-        "mi-quang": 40000,
-        "tra-da": 3000
-      },
-      "scans": 29,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "dn-banh-xeo-tran-phu",
-      "name": "Bánh xèo Trần Phú",
-      "zone": "danang-hanriver",
-      "tier": "casual",
-      "street": "Đường Trần Phú",
-      "at": [
-        16.06403,
-        108.22338
-      ],
-      "known": [
-        "banh-xeo",
-        "nem-lui"
-      ],
-      "prices": {
-        "banh-xeo": 45000,
-        "nem-lui": 12000
-      },
-      "scans": 22,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "dn-banh-trang-cuon-thai-phien",
-      "name": "Bánh tráng cuốn thịt heo Thái Phiên",
-      "zone": "danang-hanriver",
-      "tier": "restaurant",
-      "street": "Thái Phiên",
-      "at": [
-        16.0643,
-        108.22299
-      ],
-      "known": [
-        "banh-trang-cuon-thit-heo",
-        "bia-chai"
-      ],
-      "prices": {
-        "banh-trang-cuon-thit-heo": 95000,
-        "bia-chai": 25000
-      },
-      "scans": 26,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "dn-ca-phe-bach-dang",
-      "name": "Cà phê bờ sông Bạch Đằng",
-      "zone": "danang-hanriver",
-      "tier": "casual",
-      "street": "Bạch Đằng",
-      "at": [
-        16.06775,
-        108.22485
-      ],
-      "known": [
-        "ca-phe-sua-da",
-        "ca-phe-muoi"
-      ],
-      "prices": {
-        "ca-phe-sua-da": 20000,
-        "ca-phe-muoi": 25000
-      },
-      "scans": 24,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "dn-ca-phe-le-duan",
-      "name": "Cà phê Lê Duẩn",
-      "zone": "danang-hanriver",
-      "tier": "street",
-      "street": "Lê Duẩn",
-      "at": [
-        16.07178,
-        108.22342
-      ],
-      "known": [
-        "ca-phe-sua-da",
-        "tra-sua"
-      ],
-      "prices": {
-        "ca-phe-sua-da": 18000,
-        "tra-sua": 35000
-      },
-      "scans": 20,
-      "fair": true,
-      "since": "2026-04"
-    },
-    {
-      "id": "dn-bun-cha-ca-le-hong-phong",
-      "name": "Bún chả cá Lê Hồng Phong",
-      "zone": "danang-hanriver",
-      "tier": "street",
-      "street": "Lê Hồng Phong",
-      "at": [
-        16.06399,
-        108.22104
-      ],
-      "known": [
-        "bun-cha-ca",
-        "cha-bo"
-      ],
-      "prices": {
-        "bun-cha-ca": 35000,
-        "cha-bo": 40000
-      },
-      "scans": 31,
-      "fair": true,
-      "since": "2026-01"
-    },
-    {
-      "id": "dn-oc-ngo-gia-tu",
-      "name": "Ốc hút Ngô Gia Tự",
-      "zone": "danang-hanriver",
-      "tier": "casual",
-      "street": "Ngô Gia Tự",
-      "at": [
-        16.06848,
-        108.21743
-      ],
-      "known": [
-        "oc-hut",
-        "tre"
-      ],
-      "prices": {
-        "oc-hut": 55000,
-        "tre": 20000
-      },
-      "scans": 21,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "dn-hai-san-tran-hung-dao",
-      "name": "Hải sản Trần Hưng Đạo",
-      "zone": "danang-hanriver",
-      "tier": "restaurant",
-      "street": "Đường Trần Hưng Đạo",
-      "at": [
-        16.07096,
-        108.22926
-      ],
-      "known": [
-        "hai-san-can",
-        "muc-nuong"
-      ],
-      "prices": {
-        "hai-san-can": 650000,
-        "muc-nuong": 190000
-      },
-      "scans": 15,
-      "fair": false,
-      "since": "2026-04"
-    },
-    {
-      "id": "mk-mi-quang-nguyen-cong-tru",
-      "name": "Mì Quảng Nguyễn Công Trứ",
-      "zone": "danang-mykhe",
-      "tier": "casual",
-      "street": "Đường Nguyễn Công Trứ",
-      "at": [
-        16.0652,
-        108.24072
-      ],
-      "known": [
-        "mi-quang",
-        "tra-da"
-      ],
-      "prices": {
-        "mi-quang": 50000,
-        "tra-da": 5000
-      },
-      "scans": 22,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "mk-banh-xeo-chau-thi-vinh-te",
-      "name": "Bánh xèo Châu Thị Vĩnh Tế",
-      "zone": "danang-mykhe",
-      "tier": "casual",
-      "street": "Đường Châu Thị Vĩnh Tế",
-      "at": [
-        16.04962,
-        108.24066
-      ],
-      "known": [
-        "banh-xeo",
-        "goi-cuon"
-      ],
-      "prices": {
-        "banh-xeo": 55000,
-        "goi-cuon": 40000
-      },
-      "scans": 20,
-      "fair": true,
-      "since": "2026-04"
-    },
-    {
-      "id": "mk-ca-phe-an-thuong-29",
-      "name": "Cà phê An Thượng 29",
-      "zone": "danang-mykhe",
-      "tier": "casual",
-      "street": "Đường An Thượng 29",
-      "at": [
-        16.05143,
-        108.24364
-      ],
-      "known": [
-        "ca-phe-sua-da",
-        "ca-phe-dua"
-      ],
-      "prices": {
-        "ca-phe-sua-da": 30000,
-        "ca-phe-dua": 45000
-      },
-      "scans": 25,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "mk-ca-phe-ho-nghinh",
-      "name": "Cà phê Hồ Nghinh",
-      "zone": "danang-mykhe",
-      "tier": "street",
-      "street": "Đường Hồ Nghinh",
-      "at": [
-        16.06224,
-        108.24369
-      ],
-      "known": [
-        "ca-phe-muoi",
-        "tra-sua"
-      ],
-      "prices": {
-        "ca-phe-muoi": 35000,
-        "tra-sua": 45000
-      },
-      "scans": 21,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "mk-oc-le-huu-trac",
-      "name": "Ốc đêm Lê Hữu Trác",
-      "zone": "danang-mykhe",
-      "tier": "street",
-      "street": "Đường Lê Hữu Trác",
-      "at": [
-        16.05824,
-        108.23991
-      ],
-      "known": [
-        "oc-hut",
-        "bia-chai"
-      ],
-      "prices": {
-        "oc-hut": 70000,
-        "bia-chai": 35000
-      },
-      "scans": 23,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "mk-banh-trang-kep-do-ba",
-      "name": "Bánh tráng kẹp Đỗ Bá",
-      "zone": "danang-mykhe",
-      "tier": "street",
-      "street": "Đường Đỗ Bá",
-      "at": [
-        16.05003,
-        108.24072
-      ],
-      "known": [
-        "banh-trang-kep",
-        "che-xoa-xoa-hat-luu"
-      ],
-      "prices": {
-        "banh-trang-kep": 18000,
-        "che-xoa-xoa-hat-luu": 18000
-      },
-      "scans": 27,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "mk-lau-tran-bach-dang",
-      "name": "Lẩu Trần Bạch Đằng",
-      "zone": "danang-mykhe",
-      "tier": "restaurant",
-      "street": "Đường Trần Bạch Đằng",
-      "at": [
-        16.05905,
-        108.24455
-      ],
-      "known": [
-        "lau",
-        "bia-chai"
-      ],
-      "prices": {
-        "lau": 320000,
-        "bia-chai": 35000
-      },
-      "scans": 20,
-      "fair": true,
-      "since": "2026-04"
-    },
-    {
-      "id": "mk-hai-san-nuong-vo-nguyen-giap",
-      "name": "Hải sản nướng Võ Nguyên Giáp",
-      "zone": "danang-mykhe",
-      "tier": "restaurant",
-      "street": "Đường Võ Nguyên Giáp",
-      "at": [
-        16.07782,
-        108.24518
-      ],
-      "known": [
-        "hai-san-can",
-        "muc-nuong"
-      ],
-      "prices": {
-        "hai-san-can": 900000,
-        "muc-nuong": 250000
-      },
-      "scans": 16,
-      "fair": false,
-      "since": "2026-04"
-    },
-    {
-      "id": "hue-bun-bo-nguyen-tri-phuong",
-      "name": "Bún bò Nguyễn Tri Phương",
-      "zone": "hue-citadel",
-      "tier": "casual",
-      "street": "Nguyễn Tri Phương",
-      "at": [
-        16.46472,
-        107.59276
-      ],
-      "known": [
-        "bun-bo-hue",
-        "tra-da"
-      ],
-      "prices": {
-        "bun-bo-hue": 35000,
-        "tra-da": 2000
-      },
-      "scans": 27,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "hue-banh-uot-vo-thi-sau",
-      "name": "Bánh ướt thịt nướng Võ Thị Sáu",
-      "zone": "hue-citadel",
-      "tier": "casual",
-      "street": "Võ Thị Sáu",
-      "at": [
-        16.46868,
-        107.59525
-      ],
-      "known": [
-        "banh-uot-thit-nuong",
-        "nem-lui"
-      ],
-      "prices": {
-        "banh-uot-thit-nuong": 35000,
-        "nem-lui": 10000
-      },
-      "scans": 23,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "hue-che-hem-hung-vuong",
-      "name": "Chè hẻm Nguyễn Công Trứ",
-      "zone": "hue-citadel",
-      "tier": "street",
-      "street": "Nguyễn Công Trứ",
-      "at": [
-        16.47165,
-        107.59628
-      ],
-      "known": [
-        "che",
-        "banh-flan"
-      ],
-      "prices": {
-        "che": 12000,
-        "banh-flan": 12000
-      },
-      "scans": 25,
-      "fair": true,
-      "since": "2026-02"
-    },
-    {
-      "id": "hue-ca-phe-le-loi",
-      "name": "Cà phê bờ sông Lê Lợi",
-      "zone": "hue-citadel",
-      "tier": "casual",
-      "street": "Lê Lợi",
-      "at": [
-        16.46651,
-        107.5891
-      ],
-      "known": [
-        "ca-phe-sua-da",
-        "ca-phe-dua"
-      ],
-      "prices": {
-        "ca-phe-sua-da": 18000,
-        "ca-phe-dua": 30000
-      },
-      "scans": 24,
-      "fair": true,
-      "since": "2026-03"
-    },
-    {
-      "id": "hue-banh-canh-hai-ba-trung",
-      "name": "Bánh canh cá lóc Hai Bà Trưng",
-      "zone": "hue-citadel",
-      "tier": "street",
-      "street": "Hai Bà Trưng",
-      "at": [
-        16.46063,
-        107.5891
-      ],
-      "known": [
-        "banh-canh-ca-loc",
-        "banh-bot-loc"
-      ],
-      "prices": {
-        "banh-canh-ca-loc": 30000,
-        "banh-bot-loc": 25000
-      },
-      "scans": 21,
-      "fair": true,
-      "since": "2026-04"
-    },
-    {
-      "id": "hue-bun-thit-nuong-ngo-quyen",
-      "name": "Bún thịt nướng Ngô Quyền",
-      "zone": "hue-citadel",
-      "tier": "casual",
-      "street": "Ngô Quyền",
-      "at": [
-        16.46121,
-        107.58839
-      ],
-      "known": [
-        "bun-thit-nuong",
-        "goi-cuon"
-      ],
-      "prices": {
-        "bun-thit-nuong": 35000,
-        "goi-cuon": 30000
-      },
-      "scans": 20,
-      "fair": true,
-      "since": "2026-04"
-    },
-    {
-      "id": "hue-com-hen-dinh-tien-hoang",
-      "name": "Cơm hến Đinh Tiên Hoàng",
-      "zone": "hue-citadel",
-      "tier": "street",
-      "street": "Đinh Tiên Hoàng",
-      "at": [
-        16.47869,
-        107.57769
-      ],
-      "known": [
-        "com-hen",
-        "tra-da"
-      ],
-      "prices": {
-        "com-hen": 20000,
-        "tra-da": 2000
-      },
-      "scans": 29,
-      "fair": true,
-      "since": "2026-01"
-    },
-    {
-      "id": "hue-lau-ben-nghe",
-      "name": "Lẩu Bến Nghé",
-      "zone": "hue-citadel",
-      "tier": "restaurant",
-      "street": "Bến Nghé",
-      "at": [
-        16.46558,
-        107.59475
-      ],
-      "known": [
-        "lau",
-        "bia-chai"
-      ],
-      "prices": {
-        "lau": 330000,
-        "bia-chai": 35000
-      },
-      "scans": 16,
-      "fair": false,
-      "since": "2026-04"
-    }
-  ]
+ "_note": "DỮ LIỆU HẠT GIỐNG. Tệp này KHÔNG chứa phán quyết nào về giá của cơ sở. Nhãn Đúng Giá sinh ra lúc chạy từ lượt quét thật của người dùng (survey.js → coso.js); hôm nay chưa có lượt nào nên chưa cơ sở nào có nhãn. Bản trước gán tay 61 nhãn fair kèm 1.863 lượt scan chưa từng xảy ra, và giao diện in chúng ra như bằng chứng — cùng loại lỗi mà trust.js sinh ra để chặn ở dải giá. Trường `prices` đã gỡ: đó là giá hạt giống nhưng giao diện in nó dưới tiêu đề \"This place\" kèm phán quyết — tức là khai một con số cụ thể tại một hàng quán có thật, có tên. Giá của từng cơ sở giờ chỉ đến từ lượt quét thật. Trường `at` là [vĩ độ, kinh độ] đặt xấp xỉ trên đúng con phố đã ghi — đủ để định hướng và tính khoảng cách, KHÔNG phải địa chỉ đã khảo sát. Trường `flag` cũng đã gỡ: sáu câu kiểu \"above the local range on 11 of 19 scans\" — nêu đích danh một quán có thật kèm một cỡ mẫu chưa từng có. Cảnh báo về một cơ sở giờ chỉ sinh ra khi coso.js đủ mẫu thật.",
+ "places": [
+  {
+   "id": "ba-be",
+   "name": "Bà Bé · Cao lầu",
+   "zone": "hoian-oldtown",
+   "tier": "street",
+   "street": "Trần Phú",
+   "known": [
+    "cao-lau",
+    "mi-quang",
+    "tra-da"
+   ],
+   "at": [
+    15.87755,
+    108.3278
+   ]
+  },
+  {
+   "id": "co-thao",
+   "name": "Cô Thảo · Cơm gà",
+   "zone": "hoian-oldtown",
+   "tier": "casual",
+   "street": "Phan Châu Trinh",
+   "known": [
+    "com-ga-hoi-an",
+    "che"
+   ],
+   "at": [
+    15.8791,
+    108.329
+   ]
+  },
+  {
+   "id": "che-mot",
+   "name": "Chè Mót",
+   "zone": "hoian-oldtown",
+   "tier": "street",
+   "street": "Trần Phú",
+   "known": [
+    "che",
+    "nuoc-mia"
+   ],
+   "at": [
+    15.87745,
+    108.3261
+   ]
+  },
+  {
+   "id": "quan-bien",
+   "name": "Quán ven sông",
+   "zone": "hoian-oldtown",
+   "tier": "restaurant",
+   "street": "Bạch Đằng",
+   "known": [
+    "hoanh-thanh",
+    "nuoc-dua",
+    "bia-chai"
+   ],
+   "at": [
+    15.8756,
+    108.3285
+   ]
+  },
+  {
+   "id": "banh-mi-goc",
+   "name": "Bánh mì góc phố",
+   "zone": "hoian-oldtown",
+   "tier": "street",
+   "street": "Hoàng Diệu",
+   "known": [
+    "banh-mi",
+    "ca-phe-sua-da"
+   ],
+   "at": [
+    15.8783,
+    108.3315
+   ]
+  },
+  {
+   "id": "chua-xet",
+   "name": "Quán chưa đủ dữ liệu",
+   "zone": "hoian-oldtown",
+   "tier": "casual",
+   "street": "Nguyễn Thái Học",
+   "known": [
+    "cao-lau",
+    "banh-xeo"
+   ],
+   "at": [
+    15.87665,
+    108.3272
+   ]
+  },
+  {
+   "id": "pho-suong",
+   "name": "Phở Sướng",
+   "zone": "hanoi-hoankiem",
+   "tier": "casual",
+   "street": "Đinh Liệt",
+   "known": [
+    "pho-bo",
+    "tra-da"
+   ],
+   "at": [
+    21.0333,
+    105.8521
+   ]
+  },
+  {
+   "id": "bun-cha-hd",
+   "name": "Bún chả Hàng Quạt",
+   "zone": "hanoi-hoankiem",
+   "tier": "street",
+   "street": "Hàng Quạt",
+   "known": [
+    "bun-cha",
+    "nem-ran",
+    "tra-da"
+   ],
+   "at": [
+    21.034,
+    105.8499
+   ]
+  },
+  {
+   "id": "ca-phe-giang",
+   "name": "Cà phê trứng phố cổ",
+   "zone": "hanoi-hoankiem",
+   "tier": "casual",
+   "street": "Nguyễn Hữu Huân",
+   "known": [
+    "ca-phe-trung",
+    "ca-phe-sua-da"
+   ],
+   "at": [
+    21.0347,
+    105.854
+   ]
+  },
+  {
+   "id": "bia-hoi-corner",
+   "name": "Bia hơi ngã tư",
+   "zone": "hanoi-hoankiem",
+   "tier": "street",
+   "street": "Tạ Hiện",
+   "known": [
+    "bia-hoi",
+    "nem-ran"
+   ],
+   "at": [
+    21.0339,
+    105.8512
+   ]
+  },
+  {
+   "id": "com-tam-ba",
+   "name": "Cơm tấm Bảy",
+   "zone": "hcmc-district1",
+   "tier": "street",
+   "street": "Nguyễn Trãi",
+   "known": [
+    "com-tam",
+    "tra-da"
+   ],
+   "at": [
+    10.767,
+    106.686
+   ]
+  },
+  {
+   "id": "hu-tieu-nam",
+   "name": "Hủ tiếu Nam Vang",
+   "zone": "hcmc-district1",
+   "tier": "casual",
+   "street": "Võ Văn Tần",
+   "known": [
+    "hu-tieu",
+    "ca-phe-sua-da"
+   ],
+   "at": [
+    10.7759,
+    106.691
+   ]
+  },
+  {
+   "id": "ben-thanh-stall",
+   "name": "Quầy ăn chợ Bến Thành",
+   "zone": "hcmc-district1",
+   "tier": "casual",
+   "street": "Chợ Bến Thành",
+   "known": [
+    "bun-thit-nuong",
+    "goi-cuon",
+    "nuoc-mia"
+   ],
+   "at": [
+    10.7725,
+    106.698
+   ]
+  },
+  {
+   "id": "hoian-cam-nam",
+   "name": "Quán hến cồn Cẩm Nam",
+   "zone": "hoian-oldtown",
+   "tier": "street",
+   "street": "Cẩm Nam",
+   "known": [
+    "hen-tron",
+    "banh-dap",
+    "che-bap"
+   ],
+   "at": [
+    15.87385,
+    108.3345
+   ]
+  },
+  {
+   "id": "hoian-xi-ma",
+   "name": "Gánh xí mà buổi chiều",
+   "zone": "hoian-oldtown",
+   "tier": "street",
+   "street": "Nguyễn Trường Tộ",
+   "known": [
+    "xi-ma",
+    "che"
+   ],
+   "at": [
+    15.87815,
+    108.33
+   ]
+  },
+  {
+   "id": "hn-pho-ga-pho-co",
+   "name": "Phở gà phố cổ",
+   "zone": "hanoi-hoankiem",
+   "tier": "casual",
+   "street": "Hàng Bồ",
+   "known": [
+    "pho-ga",
+    "tra-da"
+   ],
+   "at": [
+    21.0345,
+    105.8505
+   ]
+  },
+  {
+   "id": "hn-nom-bo-ho",
+   "name": "Nộm bò khô bờ hồ",
+   "zone": "hanoi-hoankiem",
+   "tier": "street",
+   "street": "Hàng Bài",
+   "known": [
+    "nom-bo-kho",
+    "tra-da"
+   ],
+   "at": [
+    21.027,
+    105.853
+   ]
+  },
+  {
+   "id": "sg-oc-hem",
+   "name": "Quán ốc trong hẻm",
+   "zone": "hcmc-district1",
+   "tier": "street",
+   "street": "Cô Giang",
+   "known": [
+    "oc-hut",
+    "bia-chai"
+   ],
+   "at": [
+    10.766,
+    106.696
+   ]
+  },
+  {
+   "id": "sg-banh-khot-cho",
+   "name": "Bánh khọt gần chợ",
+   "zone": "hcmc-district1",
+   "tier": "casual",
+   "street": "Lê Thánh Tôn",
+   "known": [
+    "banh-khot",
+    "nuoc-sam"
+   ],
+   "at": [
+    10.776,
+    106.7
+   ]
+  },
+  {
+   "id": "dn-mi-quang-pho",
+   "name": "Mì Quảng đầu phố",
+   "zone": "danang-hanriver",
+   "tier": "street",
+   "street": "Hoàng Diệu",
+   "known": [
+    "mi-quang",
+    "tra-da"
+   ],
+   "at": [
+    16.062,
+    108.22
+   ]
+  },
+  {
+   "id": "dn-cha-ca-som",
+   "name": "Bún chả cá bán sớm",
+   "zone": "danang-hanriver",
+   "tier": "street",
+   "street": "Hùng Vương",
+   "known": [
+    "bun-cha-ca",
+    "ca-phe-sua-da"
+   ],
+   "at": [
+    16.068,
+    108.2185
+   ]
+  },
+  {
+   "id": "dn-cuon-thit-heo",
+   "name": "Quán cuốn thịt heo",
+   "zone": "danang-hanriver",
+   "tier": "casual",
+   "street": "Trần Phú",
+   "known": [
+    "banh-trang-cuon-thit-heo",
+    "bia-chai"
+   ],
+   "at": [
+    16.068,
+    108.2225
+   ]
+  },
+  {
+   "id": "dn-ben-song",
+   "name": "Quán bờ sông Bạch Đằng",
+   "zone": "danang-hanriver",
+   "tier": "restaurant",
+   "street": "Bạch Đằng",
+   "known": [
+    "hai-san-can",
+    "bia-chai",
+    "nuoc-dua"
+   ],
+   "at": [
+    16.07,
+    108.2245
+   ]
+  },
+  {
+   "id": "dn-che-hem",
+   "name": "Chè xoa xoa trong hẻm",
+   "zone": "danang-hanriver",
+   "tier": "street",
+   "street": "Phan Châu Trinh",
+   "known": [
+    "che-xoa-xoa-hat-luu",
+    "kem-bo"
+   ],
+   "at": [
+    16.064,
+    108.22
+   ]
+  },
+  {
+   "id": "dn-banh-mi-que",
+   "name": "Bánh mì que góc đường",
+   "zone": "danang-hanriver",
+   "tier": "street",
+   "street": "Lê Duẩn",
+   "known": [
+    "banh-mi-que",
+    "ca-phe-sua-da"
+   ],
+   "at": [
+    16.07,
+    108.216
+   ]
+  },
+  {
+   "id": "dn-chua-du",
+   "name": "Quán mới chưa đủ dữ liệu",
+   "zone": "danang-hanriver",
+   "tier": "casual",
+   "street": "Nguyễn Chí Thanh",
+   "known": [
+    "mi-quang",
+    "banh-xeo"
+   ],
+   "at": [
+    16.069,
+    108.2205
+   ]
+  },
+  {
+   "id": "mk-hai-san-mat-bien",
+   "name": "Quán hải sản mặt biển",
+   "zone": "danang-mykhe",
+   "tier": "restaurant",
+   "street": "Võ Nguyên Giáp",
+   "known": [
+    "hai-san-can",
+    "muc-nuong",
+    "bia-chai"
+   ],
+   "at": [
+    16.0605,
+    108.2468
+   ]
+  },
+  {
+   "id": "mk-hai-san-hem",
+   "name": "Quán hải sản trong hẻm",
+   "zone": "danang-mykhe",
+   "tier": "casual",
+   "street": "Hà Bổng",
+   "known": [
+    "hai-san-can",
+    "oc-hut",
+    "bia-chai"
+   ],
+   "at": [
+    16.0655,
+    108.2432
+   ]
+  },
+  {
+   "id": "mk-cha-ca-sang",
+   "name": "Bún chả cá buổi sáng",
+   "zone": "danang-mykhe",
+   "tier": "street",
+   "street": "Phạm Văn Đồng",
+   "known": [
+    "bun-cha-ca",
+    "ca-phe-sua-da"
+   ],
+   "at": [
+    16.0738,
+    108.2438
+   ]
+  },
+  {
+   "id": "mk-an-thuong",
+   "name": "Cà phê phố An Thượng",
+   "zone": "danang-mykhe",
+   "tier": "casual",
+   "street": "An Thượng",
+   "known": [
+    "ca-phe-muoi",
+    "sinh-to"
+   ],
+   "at": [
+    16.0552,
+    108.2438
+   ]
+  },
+  {
+   "id": "mk-kem-bo-bien",
+   "name": "Kem bơ ven biển",
+   "zone": "danang-mykhe",
+   "tier": "street",
+   "street": "Võ Nguyên Giáp",
+   "known": [
+    "kem-bo",
+    "nuoc-dua"
+   ],
+   "at": [
+    16.0685,
+    108.2462
+   ]
+  },
+  {
+   "id": "hue-bun-bo-som",
+   "name": "Bún bò gánh sớm",
+   "zone": "hue-citadel",
+   "tier": "street",
+   "street": "Mai Thúc Loan",
+   "known": [
+    "bun-bo-hue",
+    "tra-da"
+   ],
+   "at": [
+    16.472,
+    107.583
+   ]
+  },
+  {
+   "id": "hue-banh-loc",
+   "name": "Quán bánh bèo nậm lọc",
+   "zone": "hue-citadel",
+   "tier": "casual",
+   "street": "Hàn Thuyên",
+   "known": [
+    "banh-beo",
+    "banh-bot-loc",
+    "banh-nam"
+   ],
+   "at": [
+    16.469,
+    107.58
+   ]
+  },
+  {
+   "id": "hue-com-hen-con",
+   "name": "Cơm hến bên cồn",
+   "zone": "hue-citadel",
+   "tier": "street",
+   "street": "Đinh Tiên Hoàng",
+   "known": [
+    "com-hen",
+    "che"
+   ],
+   "at": [
+    16.474,
+    107.579
+   ]
+  },
+  {
+   "id": "hue-pho-tay",
+   "name": "Quán phố Tây",
+   "zone": "hue-citadel",
+   "tier": "restaurant",
+   "street": "Chu Văn An",
+   "known": [
+    "bun-bo-hue",
+    "bia-chai",
+    "ca-phe-sua-da"
+   ],
+   "at": [
+    16.464,
+    107.594
+   ]
+  },
+  {
+   "id": "hue-ca-phe-muoi",
+   "name": "Cà phê muối góc thành",
+   "zone": "hue-citadel",
+   "tier": "casual",
+   "street": "Nguyễn Trãi",
+   "known": [
+    "ca-phe-muoi",
+    "ca-phe-sua-da"
+   ],
+   "at": [
+    16.472,
+    107.577
+   ]
+  },
+  {
+   "id": "hue-nem-lui",
+   "name": "Nem lụi bên đường",
+   "zone": "hue-citadel",
+   "tier": "street",
+   "street": "Lê Duẩn",
+   "known": [
+    "nem-lui",
+    "banh-uot-thit-nuong"
+   ],
+   "at": [
+    16.47,
+    107.586
+   ]
+  },
+  {
+   "id": "hn-bun-dau-au-trieu",
+   "name": "Bún đậu ngõ Ấu Triệu",
+   "zone": "hanoi-hoankiem",
+   "tier": "street",
+   "street": "Phố Ấu Triệu",
+   "at": [
+    21.02888,
+    105.84871
+   ],
+   "known": [
+    "bun-dau",
+    "tra-da"
+   ]
+  },
+  {
+   "id": "hn-banh-cuon-duong-thanh",
+   "name": "Bánh cuốn Đường Thành",
+   "zone": "hanoi-hoankiem",
+   "tier": "casual",
+   "street": "Đường Thành",
+   "at": [
+    21.03106,
+    105.84728
+   ],
+   "known": [
+    "banh-cuon",
+    "ca-phe-sua-da"
+   ]
+  },
+  {
+   "id": "hn-cha-ca-hang-buom",
+   "name": "Chả cá phố Hàng Buồm",
+   "zone": "hanoi-hoankiem",
+   "tier": "restaurant",
+   "street": "Hàng Buồm",
+   "at": [
+    21.03542,
+    105.85051
+   ],
+   "known": [
+    "cha-ca",
+    "bia-chai"
+   ]
+  },
+  {
+   "id": "hn-ca-phe-ly-quoc-su",
+   "name": "Cà phê Lý Quốc Sư",
+   "zone": "hanoi-hoankiem",
+   "tier": "casual",
+   "street": "Phố Lý Quốc Sư",
+   "at": [
+    21.0302,
+    105.84896
+   ],
+   "known": [
+    "ca-phe-trung",
+    "ca-phe-sua-da"
+   ]
+  },
+  {
+   "id": "hn-ca-phe-muoi-hang-trong",
+   "name": "Cà phê muối Hàng Trống",
+   "zone": "hanoi-hoankiem",
+   "tier": "street",
+   "street": "Phố Hàng Trống",
+   "at": [
+    21.03035,
+    105.84971
+   ],
+   "known": [
+    "ca-phe-muoi",
+    "ca-phe-dua"
+   ]
+  },
+  {
+   "id": "hn-xoi-hang-giay",
+   "name": "Xôi gánh Hàng Giấy",
+   "zone": "hanoi-hoankiem",
+   "tier": "street",
+   "street": "Phố Hàng Giấy",
+   "at": [
+    21.03924,
+    105.84799
+   ],
+   "known": [
+    "xoi",
+    "tra-da"
+   ]
+  },
+  {
+   "id": "hn-bun-rieu-phung-hung",
+   "name": "Bún riêu Phùng Hưng",
+   "zone": "hanoi-hoankiem",
+   "tier": "street",
+   "street": "Phố Phùng Hưng",
+   "at": [
+    21.03943,
+    105.84685
+   ],
+   "known": [
+    "bun-rieu",
+    "nem-ran"
+   ]
+  },
+  {
+   "id": "hn-lau-tong-dan",
+   "name": "Lẩu phố Tông Đản",
+   "zone": "hanoi-hoankiem",
+   "tier": "restaurant",
+   "street": "Phố Tông Đản",
+   "at": [
+    21.02726,
+    105.85724
+   ],
+   "known": [
+    "lau",
+    "bia-chai"
+   ]
+  },
+  {
+   "id": "sg-com-tam-nguyen-du",
+   "name": "Cơm tấm vỉa hè Nguyễn Du",
+   "zone": "hcmc-district1",
+   "tier": "street",
+   "street": "Nguyễn Du",
+   "at": [
+    10.77986,
+    106.70091
+   ],
+   "known": [
+    "com-tam",
+    "tra-da"
+   ]
+  },
+  {
+   "id": "sg-hu-tieu-ton-that-thiep",
+   "name": "Hủ tiếu Tôn Thất Thiệp",
+   "zone": "hcmc-district1",
+   "tier": "casual",
+   "street": "Tôn Thất Thiệp",
+   "at": [
+    10.77383,
+    106.70217
+   ],
+   "known": [
+    "hu-tieu",
+    "ca-phe-sua-da"
+   ]
+  },
+  {
+   "id": "sg-banh-mi-pham-ngu-lao",
+   "name": "Bánh mì xe đẩy Phạm Ngũ Lão",
+   "zone": "hcmc-district1",
+   "tier": "street",
+   "street": "Đường Phạm Ngũ Lão",
+   "at": [
+    10.76861,
+    106.69344
+   ],
+   "known": [
+    "banh-mi",
+    "nuoc-mia"
+   ]
+  },
+  {
+   "id": "sg-ca-phe-ly-tu-trong",
+   "name": "Cà phê chung cư Lý Tự Trọng",
+   "zone": "hcmc-district1",
+   "tier": "casual",
+   "street": "Lý Tự Trọng",
+   "at": [
+    10.7774,
+    106.70035
+   ],
+   "known": [
+    "ca-phe-sua-da",
+    "ca-phe-muoi"
+   ]
+  },
+  {
+   "id": "sg-ca-phe-vot-pasteur",
+   "name": "Cà phê vợt Pasteur",
+   "zone": "hcmc-district1",
+   "tier": "street",
+   "street": "Đường Pasteur",
+   "at": [
+    10.77852,
+    106.69867
+   ],
+   "known": [
+    "ca-phe-sua-da"
+   ]
+  },
+  {
+   "id": "sg-bun-thit-nuong-nguyen-trai",
+   "name": "Bún thịt nướng Nguyễn Trãi",
+   "zone": "hcmc-district1",
+   "tier": "casual",
+   "street": "Đường Nguyễn Trãi",
+   "at": [
+    10.77112,
+    106.69334
+   ],
+   "known": [
+    "bun-thit-nuong",
+    "goi-cuon"
+   ]
+  },
+  {
+   "id": "sg-oc-le-thanh-ton",
+   "name": "Quán ốc Lê Thánh Tôn",
+   "zone": "hcmc-district1",
+   "tier": "restaurant",
+   "street": "Lê Thánh Tôn",
+   "at": [
+    10.7739,
+    106.69819
+   ],
+   "known": [
+    "oc-hut",
+    "bia-chai"
+   ]
+  },
+  {
+   "id": "sg-che-ham-nghi",
+   "name": "Chè Hàm Nghi",
+   "zone": "hcmc-district1",
+   "tier": "street",
+   "street": "Hàm Nghi",
+   "at": [
+    10.7708,
+    106.70013
+   ],
+   "known": [
+    "che",
+    "banh-flan"
+   ]
+  },
+  {
+   "id": "dn-mi-quang-trung-nu-vuong",
+   "name": "Mì Quảng Trưng Nữ Vương",
+   "zone": "danang-hanriver",
+   "tier": "casual",
+   "street": "Đường Trưng Nữ Vương",
+   "at": [
+    16.05493,
+    108.22031
+   ],
+   "known": [
+    "mi-quang",
+    "tra-da"
+   ]
+  },
+  {
+   "id": "dn-banh-xeo-tran-phu",
+   "name": "Bánh xèo Trần Phú",
+   "zone": "danang-hanriver",
+   "tier": "casual",
+   "street": "Đường Trần Phú",
+   "at": [
+    16.06403,
+    108.22338
+   ],
+   "known": [
+    "banh-xeo",
+    "nem-lui"
+   ]
+  },
+  {
+   "id": "dn-banh-trang-cuon-thai-phien",
+   "name": "Bánh tráng cuốn thịt heo Thái Phiên",
+   "zone": "danang-hanriver",
+   "tier": "restaurant",
+   "street": "Thái Phiên",
+   "at": [
+    16.0643,
+    108.22299
+   ],
+   "known": [
+    "banh-trang-cuon-thit-heo",
+    "bia-chai"
+   ]
+  },
+  {
+   "id": "dn-ca-phe-bach-dang",
+   "name": "Cà phê bờ sông Bạch Đằng",
+   "zone": "danang-hanriver",
+   "tier": "casual",
+   "street": "Bạch Đằng",
+   "at": [
+    16.06775,
+    108.22485
+   ],
+   "known": [
+    "ca-phe-sua-da",
+    "ca-phe-muoi"
+   ]
+  },
+  {
+   "id": "dn-ca-phe-le-duan",
+   "name": "Cà phê Lê Duẩn",
+   "zone": "danang-hanriver",
+   "tier": "street",
+   "street": "Lê Duẩn",
+   "at": [
+    16.07178,
+    108.22342
+   ],
+   "known": [
+    "ca-phe-sua-da",
+    "tra-sua"
+   ]
+  },
+  {
+   "id": "dn-bun-cha-ca-le-hong-phong",
+   "name": "Bún chả cá Lê Hồng Phong",
+   "zone": "danang-hanriver",
+   "tier": "street",
+   "street": "Lê Hồng Phong",
+   "at": [
+    16.06399,
+    108.22104
+   ],
+   "known": [
+    "bun-cha-ca",
+    "cha-bo"
+   ]
+  },
+  {
+   "id": "dn-oc-ngo-gia-tu",
+   "name": "Ốc hút Ngô Gia Tự",
+   "zone": "danang-hanriver",
+   "tier": "casual",
+   "street": "Ngô Gia Tự",
+   "at": [
+    16.06848,
+    108.21743
+   ],
+   "known": [
+    "oc-hut",
+    "tre"
+   ]
+  },
+  {
+   "id": "dn-hai-san-tran-hung-dao",
+   "name": "Hải sản Trần Hưng Đạo",
+   "zone": "danang-hanriver",
+   "tier": "restaurant",
+   "street": "Đường Trần Hưng Đạo",
+   "at": [
+    16.07096,
+    108.22926
+   ],
+   "known": [
+    "hai-san-can",
+    "muc-nuong"
+   ]
+  },
+  {
+   "id": "mk-mi-quang-nguyen-cong-tru",
+   "name": "Mì Quảng Nguyễn Công Trứ",
+   "zone": "danang-mykhe",
+   "tier": "casual",
+   "street": "Đường Nguyễn Công Trứ",
+   "at": [
+    16.0652,
+    108.24072
+   ],
+   "known": [
+    "mi-quang",
+    "tra-da"
+   ]
+  },
+  {
+   "id": "mk-banh-xeo-chau-thi-vinh-te",
+   "name": "Bánh xèo Châu Thị Vĩnh Tế",
+   "zone": "danang-mykhe",
+   "tier": "casual",
+   "street": "Đường Châu Thị Vĩnh Tế",
+   "at": [
+    16.04962,
+    108.24066
+   ],
+   "known": [
+    "banh-xeo",
+    "goi-cuon"
+   ]
+  },
+  {
+   "id": "mk-ca-phe-an-thuong-29",
+   "name": "Cà phê An Thượng 29",
+   "zone": "danang-mykhe",
+   "tier": "casual",
+   "street": "Đường An Thượng 29",
+   "at": [
+    16.05143,
+    108.24364
+   ],
+   "known": [
+    "ca-phe-sua-da",
+    "ca-phe-dua"
+   ]
+  },
+  {
+   "id": "mk-ca-phe-ho-nghinh",
+   "name": "Cà phê Hồ Nghinh",
+   "zone": "danang-mykhe",
+   "tier": "street",
+   "street": "Đường Hồ Nghinh",
+   "at": [
+    16.06224,
+    108.24369
+   ],
+   "known": [
+    "ca-phe-muoi",
+    "tra-sua"
+   ]
+  },
+  {
+   "id": "mk-oc-le-huu-trac",
+   "name": "Ốc đêm Lê Hữu Trác",
+   "zone": "danang-mykhe",
+   "tier": "street",
+   "street": "Đường Lê Hữu Trác",
+   "at": [
+    16.05824,
+    108.23991
+   ],
+   "known": [
+    "oc-hut",
+    "bia-chai"
+   ]
+  },
+  {
+   "id": "mk-banh-trang-kep-do-ba",
+   "name": "Bánh tráng kẹp Đỗ Bá",
+   "zone": "danang-mykhe",
+   "tier": "street",
+   "street": "Đường Đỗ Bá",
+   "at": [
+    16.05003,
+    108.24072
+   ],
+   "known": [
+    "banh-trang-kep",
+    "che-xoa-xoa-hat-luu"
+   ]
+  },
+  {
+   "id": "mk-lau-tran-bach-dang",
+   "name": "Lẩu Trần Bạch Đằng",
+   "zone": "danang-mykhe",
+   "tier": "restaurant",
+   "street": "Đường Trần Bạch Đằng",
+   "at": [
+    16.05905,
+    108.24455
+   ],
+   "known": [
+    "lau",
+    "bia-chai"
+   ]
+  },
+  {
+   "id": "mk-hai-san-nuong-vo-nguyen-giap",
+   "name": "Hải sản nướng Võ Nguyên Giáp",
+   "zone": "danang-mykhe",
+   "tier": "restaurant",
+   "street": "Đường Võ Nguyên Giáp",
+   "at": [
+    16.07782,
+    108.24518
+   ],
+   "known": [
+    "hai-san-can",
+    "muc-nuong"
+   ]
+  },
+  {
+   "id": "hue-bun-bo-nguyen-tri-phuong",
+   "name": "Bún bò Nguyễn Tri Phương",
+   "zone": "hue-citadel",
+   "tier": "casual",
+   "street": "Nguyễn Tri Phương",
+   "at": [
+    16.46472,
+    107.59276
+   ],
+   "known": [
+    "bun-bo-hue",
+    "tra-da"
+   ]
+  },
+  {
+   "id": "hue-banh-uot-vo-thi-sau",
+   "name": "Bánh ướt thịt nướng Võ Thị Sáu",
+   "zone": "hue-citadel",
+   "tier": "casual",
+   "street": "Võ Thị Sáu",
+   "at": [
+    16.46868,
+    107.59525
+   ],
+   "known": [
+    "banh-uot-thit-nuong",
+    "nem-lui"
+   ]
+  },
+  {
+   "id": "hue-che-hem-hung-vuong",
+   "name": "Chè hẻm Nguyễn Công Trứ",
+   "zone": "hue-citadel",
+   "tier": "street",
+   "street": "Nguyễn Công Trứ",
+   "at": [
+    16.47165,
+    107.59628
+   ],
+   "known": [
+    "che",
+    "banh-flan"
+   ]
+  },
+  {
+   "id": "hue-ca-phe-le-loi",
+   "name": "Cà phê bờ sông Lê Lợi",
+   "zone": "hue-citadel",
+   "tier": "casual",
+   "street": "Lê Lợi",
+   "at": [
+    16.46651,
+    107.5891
+   ],
+   "known": [
+    "ca-phe-sua-da",
+    "ca-phe-dua"
+   ]
+  },
+  {
+   "id": "hue-banh-canh-hai-ba-trung",
+   "name": "Bánh canh cá lóc Hai Bà Trưng",
+   "zone": "hue-citadel",
+   "tier": "street",
+   "street": "Hai Bà Trưng",
+   "at": [
+    16.46063,
+    107.5891
+   ],
+   "known": [
+    "banh-canh-ca-loc",
+    "banh-bot-loc"
+   ]
+  },
+  {
+   "id": "hue-bun-thit-nuong-ngo-quyen",
+   "name": "Bún thịt nướng Ngô Quyền",
+   "zone": "hue-citadel",
+   "tier": "casual",
+   "street": "Ngô Quyền",
+   "at": [
+    16.46121,
+    107.58839
+   ],
+   "known": [
+    "bun-thit-nuong",
+    "goi-cuon"
+   ]
+  },
+  {
+   "id": "hue-com-hen-dinh-tien-hoang",
+   "name": "Cơm hến Đinh Tiên Hoàng",
+   "zone": "hue-citadel",
+   "tier": "street",
+   "street": "Đinh Tiên Hoàng",
+   "at": [
+    16.47869,
+    107.57769
+   ],
+   "known": [
+    "com-hen",
+    "tra-da"
+   ]
+  },
+  {
+   "id": "hue-lau-ben-nghe",
+   "name": "Lẩu Bến Nghé",
+   "zone": "hue-citadel",
+   "tier": "restaurant",
+   "street": "Bến Nghé",
+   "at": [
+    16.46558,
+    107.59475
+   ],
+   "known": [
+    "lau",
+    "bia-chai"
+   ]
+  }
+ ]
 }

@@ -38,6 +38,8 @@ import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
          raoDon as raoDonLlm, daoDong as daoDongLlm, soVoiDai as soVoiDaiLlm,
          trungDapAn as trungDapAnLlm } from "../tools/llmparse.mjs";
 import { bandFloor, forZone } from "./premium.js";
+import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
+         MIN_QUAN_SAT, TI_LE_DUNG } from "./coso.js";
 import { phanKhuc, nhomMon, nhomCuaDanhMuc, daiNhom, mucQuan,
          MIN_MON_NHOM, MIN_DONG_QUAN } from "./monla.js";
 import { readFileSync } from "fs";
@@ -172,6 +174,56 @@ ok("tên vô nghĩa không đọc ra loại nào", nhomMon("zzzqqq") === null);
   ok("hệ số quán quanh 1,2", Math.abs(mucQuan(r).heSo - 1.2) < 0.01, String(mucQuan(r).heSo));
   eq("dưới ngưỡng dòng thì không nói", mucQuan(r.slice(0, MIN_DONG_QUAN - 1)), null);
   eq("dòng không có dải thì không tính", mucQuan([{ price: 1, st: null }]), null);
+}
+
+console.log("\n── coso: nhãn Đúng Giá phải sinh ra ─────────");
+{
+  const dai = { "cao-lau": { p25: 50000, p50: 60000, p75: 70000, p95: 100000 } };
+  const trong = (n) => Array.from({ length: n }, () => ({ dishId: "cao-lau", price: 60000 }));
+  const ngoai = (n) => Array.from({ length: n }, () => ({ dishId: "cao-lau", price: 150000 }));
+
+  eq("chưa quét lần nào thì CHƯA BIẾT, không phải xấu", dgCoSo([], dai).muc, null);
+  eq("dưới ngưỡng mẫu vẫn chưa biết",
+     dgCoSo(trong(MIN_QUAN_SAT - 1), dai).muc, null);
+  eq("đủ mẫu và đều trong dải thì Đúng Giá",
+     dgCoSo(trong(MIN_QUAN_SAT), dai).muc, "fair");
+  eq("đủ mẫu và đều vượt dải thì Trên khoảng",
+     dgCoSo(ngoai(MIN_QUAN_SAT), dai).muc, "high");
+
+  /* Một lần vượt trong nhiều lần đúng KHÔNG được lật nhãn: quán tăng giá
+     một món mùa cao điểm vẫn là quán giữ giá, và một ngưỡng tuyệt đối sẽ
+     bật đỏ vì đúng một lần OCR đọc nhầm. */
+  eq("một lần vượt không lật được nhãn",
+     dgCoSo([...trong(9), ...ngoai(1)], dai).muc, "fair");
+  eq("vượt quá tỉ lệ thì lật",
+     dgCoSo([...trong(5), ...ngoai(5)], dai).muc, "high");
+
+  /* Món vùng chưa có dải vẫn được đếm là hoạt động, nhưng không tham gia
+     phán quyết — không có gì để so. */
+  {
+    const d = dgCoSo(Array.from({ length: 8 }, () => ({ dishId: "mon-la", price: 999000 })), dai);
+    eq("món không có dải thì không phán quyết được", d.muc, null);
+    eq("nhưng vẫn đếm là có quét", d.n, 8);
+    eq("và không có ca nào so được", d.soSoSanh, 0);
+  }
+
+  eq("mức null không sinh pill nào", nhanCoSo({ muc: null, n: 0 }).pill, null);
+  ok("câu cho quán chưa quét không ngụ ý điều xấu",
+     /yet/.test(dongCoSo({ muc: null, n: 0 })), dongCoSo({ muc: null, n: 0 }));
+}
+
+/* CỬA CHẶN DỮ LIỆU: places.json KHÔNG được chứa phán quyết gán tay.
+   Bản trước có 61 nhãn fair kèm 1.863 lượt scan chưa từng xảy ra, và giao
+   diện in chúng ra nguyên văn "across 31 independent scans". Phép thử này
+   là thứ giữ cho nó không quay lại. */
+{
+  const raw = readFileSync("./data/places.json", "utf8");
+  const pj = JSON.parse(raw);
+  const cam = ["fair", "scans", "since", "prices", "flag"];
+  const dinh = pj.places.filter((x) => cam.some((k) => k in x));
+  eq("places.json không còn trường phán quyết hay giá gán tay", dinh.length, 0);
+  ok("và không cơ sở nào có nhãn khi chưa ai quét",
+     Object.values(danhGiaTatCa(pj.places, {}, {})).every((d) => d.muc === null));
 }
 
 console.log("\n── verdict ─────────────────────────────────");

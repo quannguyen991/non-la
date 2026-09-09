@@ -140,6 +140,23 @@ export async function tally() {
   return out;
 }
 
+/**
+ * Quan sát gom theo TỪNG CƠ SỞ: { "ba-be": [{dishId, price, ts, src}, …] }.
+ *
+ * Trường `placeId` đã được ghi từ đầu trong add() nhưng chưa ai đọc — nên
+ * nhãn "Đúng Giá" của từng quán vẫn phải gán tay trong places.json. Hàm
+ * này là đường để nhãn ấy sinh ra từ lượt quét THẬT thay vì từ một con số
+ * viết sẵn. Xem coso.js.
+ */
+export async function theoCoSo() {
+  const out = {};
+  for (const r of await all()) {
+    if (!r.placeId) continue;
+    (out[r.placeId] ||= []).push({ dishId: r.dishId, price: r.price, ts: r.ts, src: r.src });
+  }
+  return out;
+}
+
 /* Phân vị theo phép NỘI SUY TUYẾN TÍNH giữa hai mẫu kề nhau, không phải
    "lấy phần tử thứ round(p×n)". Với 6 mẫu, cách lấy chỉ số sẽ cho p25 và
    p50 trùng nhau khá thường, và một dải rỗng thì phán quyết vô nghĩa. */

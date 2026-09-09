@@ -41,6 +41,8 @@ import * as Welcome from "./welcome.js";
 import * as Units from "./units.js";
 import * as Predict from "./predict.js";
 import * as MonLa from "./monla.js";
+import * as CoSo from "./coso.js";
+import { bachPhanVi } from "./pricesrc.js";
 import { inferDishes } from "./eaterydish.js";
 import * as Lich from "./lich.js";
 import * as HanhTrinh from "./hanhtrinh.js";
@@ -725,6 +727,34 @@ export function refreshTally() {
   return Survey.tally().then((t) => { TALLY = t || {}; }).catch(() => {});
 }
 const surveyedCount = (dishId, z = S.zone) => TALLY[`${z}|${dishId}`] || 0;
+
+/* Phán quyết của từng CƠ SỞ, suy ra từ lượt quét thật. Cùng lý do với
+   TALLY ở trên: nguồn thật nằm trong IndexedDB và đọc nó là bất đồng bộ,
+   còn mọi hàm dựng giao diện ở đây đều đồng bộ. Nạp một lần lúc khởi động
+   rồi cập nhật sau mỗi lần ghi.
+
+   Trước bản này, nhãn "Đúng Giá" đọc thẳng `p.fair` trong places.json —
+   61 nhãn gán tay dựa trên 1.863 lượt quét chưa từng xảy ra. Xem coso.js. */
+let COSO = {};
+let COSO_QS = {};
+export function refreshCoSo() {
+  return Survey.theoCoSo()
+    .then((tc) => {
+      COSO_QS = tc || {};
+      const dai = {};
+      for (const [z, zz] of Object.entries(S.prices || {})) dai[z] = zz.items || {};
+      COSO = CoSo.danhGiaTatCa(S.places || [], COSO_QS, dai);
+    })
+    .catch(() => {});
+}
+/** Trung vị giá ĐÃ QUÉT của một món tại một cơ sở, null nếu chưa quét. */
+function daQuetTai(placeId, dishId) {
+  const g = (COSO_QS[placeId] || []).filter((q) => q.dishId === dishId)
+    .map((q) => q.price).sort((a, b) => a - b);
+  return g.length ? { gia: bachPhanVi(g, 0.5), n: g.length } : null;
+}
+/** Không bao giờ trả undefined: chỗ gọi được phép đọc .muc và .n thẳng. */
+const dgOf = (p) => COSO[p?.id] || { muc: null, n: 0, soSoSanh: 0, trong: 0, ngoai: 0 };
 
 /** Nguồn gốc dải giá của một món ở vùng đang mở. */
 const provOf = (dishId) => Trust.provenance(stat(dishId), surveyedCount(dishId), zone().updated);
@@ -1717,7 +1747,7 @@ function logScan(rows, kind) {
       ghi++;
     }
   }
-  if (ghi) refreshTally();
+  if (ghi) { refreshTally(); refreshCoSo(); }
 }
 
 /* ── Tab Eat ──────────────────────────────────────────────
@@ -1734,8 +1764,8 @@ function featured() {
   const z = zone();
   const sig = z.signature || Object.keys(z.items || {})[0];
   const cands = S.places
-    .filter((p) => p.zone === S.zone && p.fair === true && p.known.includes(sig))
-    .sort((a, b) => b.scans - a.scans);
+    .filter((p) => p.zone === S.zone && p.known.includes(sig) && dgOf(p).muc === "fair")
+    .sort((a, b) => dgOf(b).n - dgOf(a).n);
   return cands.length ? { place: cands[0], dishId: sig } : null;
 }
 
@@ -1758,7 +1788,11 @@ function dishCardHTML(dishId, price) {
 /* Thanh so giá: vị trí của một mức giá trên dải p25 → p95 của vùng */
 function priceCheckHTML(place, dishId) {
   const st = stat(dishId), d = dishById(dishId);
-  const paid = place.prices?.[dishId];
+  /* Giá của CHÍNH quán này chỉ có khi ai đó đã quét menu ở đây. Bản trước
+     lấy place.prices — số hạt giống — nên thanh so giá vẽ một cái chấm ở
+     một vị trí không ai đo được. Chưa quét thì không vẽ thanh nào. */
+  const q = daQuetTai(place.id, dishId);
+  const paid = q?.gia;
   if (!st || paid == null) return "";
   const lo = st.p25, mid = st.p50, hi = st.p95;
   const pct = Math.max(4, Math.min(96, ((paid - lo) / Math.max(1, hi - lo)) * 100));
@@ -1846,8 +1880,8 @@ function renderEat(filter = "") {
         <h1 class="nm">${esc(f.place.name)}</h1>
         <p class="meta">${I.pinSm}${esc(f.place.street)} · ${esc(f.place.tier)}</p>
         <span class="pill ok" style="width:auto">${I.shield}Fair Price</span>
-        <p class="blurb">A trusted local spot for ${esc(heroDish.vi)} that has stayed inside
-          the local price range across ${f.place.scans} independent scans.</p>
+        <p class="blurb">${esc(heroDish.vi)} here has stayed inside the usual range in
+          ${dgOf(f.place).trong} of ${dgOf(f.place).soSoSanh} scans recorded on this phone.</p>
       </div>
     </section>
 
@@ -1877,7 +1911,7 @@ function renderEat(filter = "") {
       <span class="rule" aria-hidden="true"></span>
     </div>
     <div class="dish-rail">
-      ${f.place.known.map((k) => dishCardHTML(k, f.place.prices?.[k])).join("")}
+      ${f.place.known.map((k) => dishCardHTML(k, daQuetTai(f.place.id, k)?.gia)).join("")}
     </div>
 
     <button class="btn save" data-act="save">${I.bookmark}Save trusted spot</button>
@@ -2038,10 +2072,10 @@ function whereToEat(dishId) {
     <h2 class="sect">Where to eat this</h2>
     ${tracked.length ? tracked.map((p) => row(
       p.name,
-      `${p.street || ""} · ${p.scans || 0} scan${p.scans === 1 ? "" : "s"} on record`,
+      `${p.street || ""} · ${CoSo.dong(dgOf(p))}`,
       p.at,
-      p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown",
-      p.prices?.[dishId] ? money(p.prices[dishId]) : "—",
+      CoSo.nhan(dgOf(p)).lvl,
+      daQuetTai(p.id, dishId) ? money(daQuetTai(p.id, dishId).gia) : "—",
     )).join("") : ""}
 
     ${(() => {
@@ -2102,16 +2136,17 @@ function alertCardHTML(p) {
     </span>
     <span class="body">
       <span class="nm">${esc(p.name)}</span>
-      <span class="meta">${esc(p.street)} · ${esc(p.tier)} · ${p.scans} scans</span>
+      <span class="meta">${esc(p.street)} · ${esc(p.tier)} · ${esc(CoSo.dong(dgOf(p)))}</span>
       <span class="pill bad">${I.trendUp}Above range</span>
-      ${p.flag ? `<span class="reason" role="status">${esc(p.flag)}</span>` : ""}
+      <span class="reason" role="status">${esc(CoSo.dong(dgOf(p)))}</span>
       <span class="known"><b>Known for</b>${known}</span>
     </span>
   </button>`;
 }
 
 function miniCardHTML(p) {
-  const ok = p.fair === true;
+  const dg = dgOf(p);
+  const ok = dg.muc === "fair";
   const known = p.known.map((k) => esc(dishById(k)?.vi || k)).join(" · ") || "—";
   return `<button class="mini-card" data-place="${esc(p.id)}">
     <span class="flag ${ok ? "ok" : "unknown"}"
@@ -2121,7 +2156,8 @@ function miniCardHTML(p) {
         .replace('class="ph"', 'class="ph round"')}</span>
       <span><span class="nm">${esc(p.name)}</span>
         <span class="meta">${esc(p.street)} · ${esc(p.tier)}</span>
-        <span style="display:block;margin-top:6px"><span class="chip-scan">${p.scans} scans</span></span></span>
+        <span style="display:block;margin-top:6px"><span class="chip-scan">${
+          esc(CoSo.dong(dg))}</span></span></span>
     </span>
     <span class="known"><b>Known for</b>${known}</span>
   </button>`;
@@ -2132,10 +2168,10 @@ function miniCardHTML(p) {
 const EX_FILTERS = [
   { k: "fair", label: "Fair Price", lvl: "ok", ico: () => I.shield,
     title: "Top fair-price nearby", empty: "No fair-price badge in this area yet.",
-    test: (p) => p.fair === true },
+    test: (p) => dgOf(p).muc === "fair" },
   { k: "over", label: "Above range", lvl: "bad", ico: () => I.trendUp,
     title: "Above the local range", empty: "Nothing above the local range here.",
-    test: (p) => p.fair === false },
+    test: (p) => dgOf(p).muc === "high" },
   { k: "coffee", label: "Coffee", lvl: "", ico: () => I.coffee,
     title: "Coffee nearby", empty: "No coffee spot scanned here yet.",
     test: (p) => p.known.some((k) => /^ca-phe/.test(k)) },
@@ -2144,16 +2180,6 @@ const EX_FILTERS = [
     test: (p) => p.tier === "street" },
 ];
 const exFilter = () => EX_FILTERS.find((f) => f.k === S.exFilter) || EX_FILTERS[0];
-
-/* "2026-04" → "Apr 2026". Tháng viết chữ vì 04/2026 và 2026-04 đọc ngược
-   nhau tuỳ nước người đọc đến từ đâu. */
-function fmtSince(s) {
-  const m = /^(\d{4})-(\d{2})$/.exec(s || "");
-  if (!m) return "";
-  const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${names[+m[2] - 1] || m[2]} ${m[1]}`;
-}
 
 /* ── chọn vùng, ngay trên màn bản đồ ──────────────────────────
    Trước đây ô chọn vùng chỉ nằm trong tab You, dưới một cái <select>.
@@ -2228,18 +2254,17 @@ function sightsRailHTML() {
    không phải điểm bình chọn. Bịa một con số 4,8 ra là nói dối người dùng
    ngay trên thứ họ dùng để quyết định ăn ở đâu. */
 function exCardHTML(p) {
-  const pill = p.fair === true ? `<span class="pill ok">${I.shield}Fair Price</span>`
-    : p.fair === false ? `<span class="pill bad">${I.trendUp}Above range</span>`
+  const dg = dgOf(p);
+  const pill = dg.muc === "fair" ? `<span class="pill ok">${I.shield}Fair Price</span>`
+    : dg.muc === "high" ? `<span class="pill bad">${I.trendUp}Above range</span>`
     : `<span class="pill unknown">${I.question}Not enough data</span>`;
-  const since = p.fair === true && p.since
-    ? `<span class="since">${I.check}since ${esc(fmtSince(p.since))}</span>` : "";
   return `<button class="ex-card" data-place="${esc(p.id)}">
     <span class="ex-thumb">${placePhoto(p, "1/1")
       .replace('class="ph"', 'class="ph sq"')}</span>
     <span class="ex-body">
       <span class="nm">${esc(p.name)}</span>
       <span class="meta">${I.pinSm}${esc(p.street)} · ${esc(p.tier)}</span>
-      <span class="ex-row"><span class="chip-scan">${p.scans} scans</span>${since}</span>
+      <span class="ex-row"><span class="chip-scan">${esc(CoSo.dong(dg))}</span></span>
       ${pill}
     </span>
   </button>`;
@@ -2407,12 +2432,12 @@ function renderMap() {
   S.exMap = null;
 
   const list = S.places.filter((p) => p.zone === S.zone);
-  const badged = list.filter((p) => p.fair === true);
-  const flagged = list.filter((p) => p.fair === false);
+  const badged = list.filter((p) => dgOf(p).muc === "fair");
+  const flagged = list.filter((p) => dgOf(p).muc === "high");
   const F = exFilter();
   // Xếp theo số lượt quét độc lập — càng nhiều lần được xác nhận thì càng
   // đáng tin. Xếp theo thứ tự dữ liệu sẽ biến nhãn "Top" thành lời nói dối.
-  const matched = list.filter(F.test).sort((a, b) => b.scans - a.scans);
+  const matched = list.filter(F.test).sort((a, b) => dgOf(b).n - dgOf(a).n);
   const rest = list.filter((p) => !matched.includes(p));
 
   $("#mapBody").innerHTML = `
@@ -2539,35 +2564,47 @@ function syncRailDots() {
    MÓN NÀO. Bảng này đặt cạnh nhau giá quán đang lấy và khoảng giá phổ
    biến của vùng, từng dòng một, để họ tự đọc ra kết luận.
 
-   Mọi con số ở đây đều CÓ THẬT trong dữ liệu: p.prices là giá đã ghi
-   nhận tại quán, stat(k) là phân phối p25–p75 của vùng. Không có giá thì
-   dòng đó ghi "—", không nội suy. */
+   Không có giá thì dòng đó ghi "—", không nội suy. */
+/* Cột bên phải là GIÁ ĐÃ QUÉT TẠI CHÍNH QUÁN NÀY, không phải giá hạt giống.
+   Bản trước lấy `p.prices[k]` — số hạt giống — rồi in dưới tiêu đề "This
+   place" kèm phán quyết "Below range". Tức là khai một con số cụ thể tại
+   một hàng quán CÓ THẬT, CÓ TÊN, rồi chấm điểm con số đó. Nặng hơn hẳn
+   nhãn "Đúng Giá" gán tay, vì nó nêu đích danh.
+
+   Dòng chân bảng cũng in thẳng `st.n` — đúng trường mà trust.js sinh ra
+   để chặn: với mục seed, n là số hư cấu. Giờ dùng Trust.badge(). */
 function priceBreakdown(p) {
   const rows = (p.known || []).map((k) => {
-    const d = dishById(k), st = stat(k), paid = p.prices?.[k];
+    const d = dishById(k), st = stat(k), q = daQuetTai(p.id, k);
     if (!d) return null;
-    const over = st && paid != null && paid > st.p75;
-    const under = st && paid != null && paid < st.p25;
-    return { d, st, paid, state: paid == null || !st ? "none" : over ? "bad" : under ? "low" : "ok" };
+    const paid = q ? q.gia : null;
+    const state = paid == null || !st ? "none"
+      : paid > st.p75 ? "bad" : paid < st.p25 ? "low" : "ok";
+    return { d, st, paid, n: q?.n || 0, state };
   }).filter(Boolean);
   if (!rows.length) return "";
 
-  const label = { bad: "Above range", ok: "In range", low: "Below range", none: "No data" };
+  const label = { bad: "Above range", ok: "In range", low: "Below range", none: "not scanned" };
+  const daQuet = rows.filter((r) => r.paid != null).length;
   return `
-    <h2 class="sect">Sample prices vs local range</h2>
+    <h2 class="sect">What was scanned here</h2>
     <div class="pcmp">
-      <div class="pcmp-h"><span>Menu item</span><span>Local range</span><span>This place</span></div>
+      <div class="pcmp-h"><span>Menu item</span><span>Local range</span><span>Scanned here</span></div>
       ${rows.map((r) => `<div class="pcmp-r" data-s="${r.state}">
         <span class="it"><span class="nm">${esc(r.d.vi)}</span>
           <span class="un">${esc(r.d.unit || "")}</span></span>
         <span class="rg">${r.st ? `${fmtVND(r.st.p25)} – ${fmtVND(r.st.p75)}` : "—"}</span>
         <span class="pd">${r.paid != null ? money(r.paid) : "—"}
-          <span class="tag">${label[r.state]}</span></span>
+          <span class="tag">${esc(label[r.state])}</span></span>
       </div>`).join("")}
     </div>
-    <p class="src">Ranges come from ${rows[0].st?.n || 0} places recorded in
-      ${esc(zone().name)}, updated ${esc(zone().updated)}. A price inside the range is
-      not a promise the meal is good — only that the number is ordinary here.</p>`;
+    <p class="src">${daQuet
+      ? `Right-hand column is what was read from a menu here, on this phone.`
+      : `Nothing has been scanned here yet — the right-hand column fills in the first
+         time you point the camera at this menu.`} Local ranges: ${
+      esc(Trust.summary(rows.filter((r) => r.st).map((r) => provOf(r.d.id))))}, updated ${
+      esc(zone().updated)}. A price inside the range is not a promise the meal is good —
+      only that the number is ordinary here.</p>`;
 }
 
 /* ── "Nên làm gì" ─────────────────────────────────────────────
@@ -2575,8 +2612,8 @@ function priceBreakdown(p) {
    ngay tại chỗ, không phải lời khuyên chung chung — và tuyệt đối không
    phải lời khuyên tránh quán: app không kết luận ai gian. */
 function whatToDo(p) {
-  if (p.fair !== false) return "";
-  const alt = (S.places || []).filter((x) => x.zone === p.zone && x.fair === true && x.at)
+  if (dgOf(p).muc !== "high") return "";
+  const alt = (S.places || []).filter((x) => x.zone === p.zone && dgOf(x).muc === "fair" && x.at)
     .map((x) => ({ x, m: p.at ? distance(p.at, x.at) : Infinity }))
     .sort((a, b) => a.m - b.m).slice(0, 3);
   return `
@@ -2593,7 +2630,7 @@ function whatToDo(p) {
     ${alt.length ? alt.map(({ x, m }) => `<button class="row" data-place="${esc(x.id)}">
       <span class="dot" data-l="ok"></span>
       <span><span class="nm">${esc(x.name)}</span>
-        <span class="note">${esc(x.street || "")} · ${x.scans} scans</span></span>
+        <span class="note">${esc(x.street || "")} · ${esc(CoSo.dong(dgOf(x)))}</span></span>
       <span class="amt">${fmtDistance(m)}<small>away</small></span></button>`).join("") : ""}`;
 }
 
@@ -2708,20 +2745,25 @@ function showPlace(id, metres = null) {
      lần quét thì không trả lời được, vì phần lớn chỗ họ ghé qua đều
      không quét gì cả. */
   History.add("place", { id: p.id, label: p.name, zone: p.zone }).then(scheduleSync);
-  const lvl = p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown";
-  const pill = p.fair === true ? `<span class="pill ok">${I.shield}Fair Price</span>`
-    : p.fair === false ? `<span class="pill bad">${I.trendUp}Above range</span>`
+  const dg = dgOf(p);
+  const lvl = dg.muc === "fair" ? "ok" : dg.muc === "high" ? "bad" : "unknown";
+  const pill = dg.muc === "fair" ? `<span class="pill ok">${I.shield}Fair Price</span>`
+    : dg.muc === "high" ? `<span class="pill bad">${I.trendUp}Above range</span>`
     : `<span class="pill unknown">${I.question}Not enough data</span>`;
-  setEdge(p.fair === false ? "high" : p.fair === true ? "ok" : null);
+  setEdge(dg.muc === "high" ? "high" : dg.muc === "fair" ? "ok" : null);
   openSheet(`
     ${placePhoto(p, "16/10")}
     <h3>${esc(p.name)}</h3>
-    <p class="src">${esc(p.street)} · ${esc(p.tier)} · ${p.scans} independent scans${p.since ? ` · badged since ${esc(p.since)}` : ""}${metres != null ? ` · ${fmtDistance(metres)} away` : ""}</p>
+    <p class="src">${esc(p.street)} · ${esc(p.tier)} · ${esc(CoSo.dong(dg))}${metres != null ? ` · ${fmtDistance(metres)} away` : ""}</p>
     <div style="margin-top:9px">${pill}</div>
     ${wave()}
-    ${p.flag ? `<div class="warnbox">${I.alert}<span>${esc(p.flag)}</span></div>` : ""}
-    ${p.fair === null ? `<div class="warnbox infobox">${I.clock}<span>Only ${p.scans} scans so far.
-      A place needs 20 before Nón Lá will say anything about it.</span></div>` : ""}
+    ${dg.muc === "high" ? `<div class="warnbox">${I.alert}<span>Worth checking a few
+      items against the menu before you order — and this says nothing about the food.</span></div>` : ""}
+    ${dg.muc === null ? `<div class="warnbox infobox">${I.clock}<span>${
+      dg.n ? `Only ${dg.n} scan${dg.n === 1 ? "" : "s"} here so far.`
+           : "Nobody has scanned a menu here yet."} Nón Lá needs ${
+      CoSo.MIN_QUAN_SAT} before it says anything about this place, and it only counts
+      scans made on this phone.</span></div>` : ""}
     ${priceBreakdown(p)}
     ${whatToDo(p)}
     <h2 class="sect">Known for</h2>
@@ -3197,7 +3239,7 @@ function toggleWatch() {
 function checkNearby() {
   if (!S.me) return;
   const near = S.places
-    .filter((p) => p.fair === false && p.at && !S.warned.has(p.id))
+    .filter((p) => dgOf(p).muc === "high" && p.at && !S.warned.has(p.id))
     .map((p) => ({ p, m: distance(S.me, p.at) }))
     .filter((x) => x.m <= WARN_RADIUS_M)
     .sort((a, b) => a.m - b.m)[0];
@@ -3827,9 +3869,9 @@ function showEatery(e, metres = null) {
 
     ${tracked ? `<h2 class="sect">Tracked as</h2>
       <button class="row" data-place="${esc(tracked.id)}">
-        <span class="dot" data-l="${tracked.fair === true ? "ok" : tracked.fair === false ? "bad" : "unknown"}"></span>
+        <span class="dot" data-l="${CoSo.nhan(dgOf(tracked)).lvl}"></span>
         <span><span class="nm">${esc(tracked.name)}</span>
-          <span class="note">${tracked.scans} scans on record</span></span>
+          <span class="note">${esc(CoSo.dong(dgOf(tracked)))}</span></span>
         <span class="amt">→</span>
       </button>` : ""}
 
@@ -3883,7 +3925,7 @@ function showMark(lm, metres = null) {
 
     ${near.length ? `<h2 class="sect">Tracked places within ${fmtDistance(260)}</h2>
       ${near.map(({ p, m }) => `<button class="row" data-place="${esc(p.id)}">
-        <span class="dot" data-l="${p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown"}"></span>
+        <span class="dot" data-l="${CoSo.nhan(dgOf(p)).lvl}"></span>
         <span><span class="nm">${esc(p.name)}</span>
           <span class="note">${esc(p.known.map((k) => dishById(k)?.vi || k).join(" · ")) || "—"}</span></span>
         <span class="amt">${fmtDistance(m)}<small>away</small></span>
@@ -4896,6 +4938,7 @@ async function boot() {
      0 và tự đúng lại vài trăm mili giây sau, còn chặn khởi động vì một cái
      đếm thì màn hình đầu tiên chậm đi cho tất cả mọi người. */
   refreshTally();
+  refreshCoSo();
 
   Auth.restore().then(async () => {
     if (S.tab === "me") renderMe();
@@ -4976,6 +5019,7 @@ onLang(() => {
 window.__nonla = { S, handleText, judgeRows, go, showDish, showPlace, ocr, doScan, Img,
   checkNearby, toggleWatch,
   canSync, syncData, pullHistory,
+  refreshTally, refreshCoSo, dgOf,
   /* Khối lịch nhận NGÀY từ ngoài chứ không tự đọc đồng hồ, nên audit.js
      kiểm được nó ở ngày mùng một, ngày rằm và đêm 14 âm mà không phải
      chỉnh giờ máy. Đây cũng là lý do lichHTML() có tham số: một khối chỉ
