@@ -42,6 +42,8 @@ import * as Units from "./units.js";
 import * as Predict from "./predict.js";
 import * as MonLa from "./monla.js";
 import * as CoSo from "./coso.js";
+import * as PhieuUI from "./phieuui.js";
+import * as TT from "./thoathuan.js";
 import { bachPhanVi } from "./pricesrc.js";
 import { inferDishes } from "./eaterydish.js";
 import * as Lich from "./lich.js";
@@ -86,6 +88,9 @@ const S = {
   mode: "menu",
   tab: "scan",
   session: [],                       // món đã gọi trong phiên, cho Bill Check
+  /* Phiếu "điều hai bên vừa cùng đọc", giữ qua cả bữa ăn: tờ hoá đơn
+     quét lúc trả tiền phải đối chiếu được với nó. */
+  phieu: null,
   showAll: false,                    // See all mở danh sách đầy đủ
   exFilter: "fair",                  // bộ lọc đang chọn ở tab Nearby
   exMap: null,                       // bản đồ xem trước đang sống ở tab Nearby
@@ -1155,7 +1160,12 @@ function showMenuResult(rows, conf, traps = null) {
           ra". Nút hay dùng nhất nằm ngoài; năm nút còn lại nằm sau một lần
           chạm, không mất đi đâu cả. */""}
     ${rows.length
-      ? `<button class="btn pri" data-act="poOpen">${esc(T("Work out the bill"))}</button>`
+      ? `<button class="btn pri" data-act="poOpen">${esc(T("Work out the bill"))}</button>
+         ${/* Lối vào phiếu nằm NGAY dưới nút chính, không nằm trong khối gập.
+              Nó là việc làm TRƯỚC khi gọi món, nên chôn nó sau một lần chạm
+              là đảm bảo không ai mở nó đúng lúc còn mở được. */""}
+         <button class="btn sec" data-act="ptOpen">${
+           esc(T("Confirm with the seller first"))}</button>`
       : `<button class="btn pri" data-act="noMenu">${esc(T("No menu? Tap a dish instead"))}</button>`}
 
     <details class="fold">
@@ -1533,6 +1543,34 @@ function syncChangeBill() {
   if (bi) S.chg.bill = Number(bi.value) || 0;
 }
 
+/* Đối chiếu tờ hoá đơn với phiếu đã cùng đọc trước bữa ăn.
+
+   Khối này KHÁC hẳn khối "Not on your menu scan" ngay trên nó. Khối kia so
+   với những gì khách ĐÃ GỌI; khối này so với những gì hai bên ĐÃ CÙNG ĐỌC
+   và người bán đã gật đầu — kể cả trọng lượng con cá và phần trăm phụ thu.
+   Đó là hai mức bằng chứng khác nhau, nên không gộp làm một.
+
+   Không kết tội: thoathuan.js trả về chỗ lệch và phần những món gọi thêm
+   KHÔNG giải thích được, còn chữ dùng ở đây nói việc làm được. */
+const doiChieuPhieuHTML = anToan(function (rows) {
+  const kq = TT.doiChieu(S.phieu, rows.map((r) => ({ ten: r.label, thanhTien: r.price })));
+  if (!kq) return "";
+  const cau = TT.cauDoiChieu(kq, curLang() === "vi" ? "vi" : "en");
+  return `
+    <h2 class="sect">${esc(TT.CAU.tieuDe.en)}</h2>
+    <div class="row" style="cursor:default">
+      <span class="dot" data-l="${kq.viec === "khop" ? "ok" : kq.viec === "co-dong-moi" ? "warn" : "high"}"></span>
+      <span><span class="nm">${esc(cau)}</span>
+        <span class="note">${esc(TT.CAU.daDoc.en)} ${new Date(S.phieu.xacNhan.luc)
+          .toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></span>
+      <span class="amt">${fmtVND(kq.tongPhieu)}<small>on the slip</small></span>
+    </div>
+    ${kq.themVao.length ? `<p class="src">${kq.themVao.length} line${
+      kq.themVao.length === 1 ? "" : "s"} not on the slip, ${fmtVND(kq.giaThemVao)} in total${
+      Math.abs(kq.conLai) > TT.BO_QUA_LECH
+        ? ` — that still leaves ${fmtVND(Math.abs(kq.conLai))} unexplained.` : "."}</p>` : ""}`;
+});
+
 function showBillResult(rows) {
   // Giữ lại để nút "Split this bill" dựng được màn chia mà không phải quét lại.
   S.billRows = rows;
@@ -1555,6 +1593,7 @@ function showBillResult(rows) {
       ${extra.length
         ? `${extra.length} line${extra.length===1?"":"s"} you didn't order. Expected ${fmtVND(expected)}.`
         : `Every line matches what you ordered.`}</div>` : ""}
+    ${doiChieuPhieuHTML(rows)}
     ${rows.length > 1 ? `<button class="btn pri" data-act="splitOpen">${I.coins}${esc(T("Split this bill"))}</button>` : ""}
     <button class="btn sec" data-act="chOpen">${esc(T("Check my change"))}</button>
     ${extra.length ? sayBlock("Cho tôi xem lại hoá đơn", "chaw toy sem lai hwa dun") : ""}
@@ -3305,6 +3344,30 @@ function soQuanTheoMon() {
   return ra;
 }
 
+/* Phiếu "điều hai bên vừa cùng đọc". Mở từ thẻ kết quả quét, mang theo
+   đúng những dòng vừa đọc được cộng phụ thu ở chân thực đơn.
+
+   S.phieu giữ lại sau khi đóng màn: tờ hoá đơn quét sau đó phải đối chiếu
+   được với nó, mà giữa hai lần ấy người dùng còn ăn xong một bữa. */
+function openPhieu() {
+  const nguon = S.preorder?.rows || [];
+  if (!nguon.length) return toast(T("Scan a menu first"));
+  PhieuUI.open({
+    host: $("#v-phieu"),
+    rows: nguon.map((r) => ({
+      id: r.id, label: r.label, name: r.name,
+      price: r.price,
+      /* Đơn vị đọc từ CHÍNH dòng menu, không đọc từ mã món: hai quán bán
+         cùng một món có thể một bên tính phần, một bên tính cân. */
+      unit: Units.detectUnit(r.name || r.label || ""),
+      soPhan: r.qty > 0 ? r.qty : 1,
+    })),
+    surcharges: S.preorder?.surcharges || [],
+    onConfirm: (ph) => { S.phieu = ph; },
+    onClose: (ph) => { if (ph) S.phieu = ph; },
+  });
+}
+
 function openSurvey() {
   const z = zone();
   SurveyUI.open({
@@ -4736,6 +4799,7 @@ document.addEventListener("click", async (ev) => {
 
   /* ── khảo sát giá ────────────────────────────────────── */
   if (el("[data-act='surveyOpen']")) { closeSheet(); return openSurvey(); }
+  if (el("[data-act='ptOpen']")) { closeSheet(); return openPhieu(); }
 
   /* ── mục Dữ liệu ─────────────────────────────────────── */
   if (el("[data-act='surveyDownload']")) {

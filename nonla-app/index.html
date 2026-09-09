@@ -68,6 +68,12 @@
        chục phút và gõ liên tục, nên nó không được nằm trong sheet dùng
        chung — sheet đóng lại khi chạm ra ngoài. -->
   <section id="v-survey" hidden aria-label="Price survey"></section>
+  <!-- Phiếu "điều hai bên vừa cùng đọc". Toàn màn hình như màn xoay ngược,
+       và cùng lý do: nó được chìa qua bàn cho người thứ hai đọc, nên không
+       được có gì của app đè lên. Khác một chỗ — màn kia chỉ để ĐỌC, màn này
+       để người bán CHẠM VÀO, nên nó phải nhận sự kiện chứ không chỉ vẽ ra. -->
+  <section id="v-phieu" hidden aria-label="What we both just read"></section>
+
   <!-- Màn xoay ngược cho người bán đọc. Toàn màn hình và z-index CAO HƠN
        sheet: nó được mở TỪ trong sheet, và một thẻ kết quả còn nằm đè lên
        trong lúc bạn chìa máy qua bàn là đúng thứ làm hỏng cả cử chỉ. -->

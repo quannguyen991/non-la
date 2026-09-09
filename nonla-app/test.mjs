@@ -40,6 +40,8 @@ import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
 import { bandFloor, forZone } from "./premium.js";
 import { giamBatDinh, rongDai, diemO, xepO, xepPho, liDo } from "./uutien.js";
 import { khoaPho, tenHienThi, gomTheoPho } from "../tools/ten-pho.mjs";
+import { dungPhieu, dien, tinh, dieuKienThieu, danhDauDaDoc, doiChieu, tenGon,
+         cauDoiChieu, CAU as CAU_TT, BO_QUA_LECH } from "./thoathuan.js";
 import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
          MIN_QUAN_SAT, TI_LE_DUNG } from "./coso.js";
 import { phanKhuc, nhomMon, nhomCuaDanhMuc, daiNhom, mucQuan,
@@ -317,6 +319,109 @@ console.log("\n── ten-pho: gom tên phố trước khi đếm ────�
     eq("hai dạng gom về một phố", g.size, 1);
     eq("và đếm đủ cả hai quán", [...g.values()][0].quan.length, 2);
   }
+}
+
+console.log("\n── thoathuan: điều hai bên cùng đọc ─────────");
+{
+  const uCan = detectUnit("Ca song 100.000/100g");
+  const pt = detectSurcharges("Gia chua bao gom VAT 8% va phi phuc vu 5%");
+  eq("VAT chỉ ra MỘT dòng, dòng nói được con số", pt.filter((x) => x.kind === "vat").length, 1);
+  eq("và giữ đúng phần trăm", pt.find((x) => x.kind === "vat").pct, 8);
+  eq("hai chỗ nhắc VAT vẫn gộp làm một",
+     detectSurcharges("chua bao gom VAT. Ap dung VAT 10%.").filter((x) => x.kind === "vat").length, 1);
+
+  /* Dọn mảnh đơn vị khỏi tên món để hiển thị. Ba phép thử dưới canh đúng
+     lỗi đã mắc: luật đầu để `\d*` nên chữ `g` cuối tên món cũng khớp, và
+     "Cua gạch" thành "Cua ạch". Một hàm dọn tên làm hỏng tên là hỏng nặng
+     hơn cái nó đi dọn. */
+  eq("bỏ mảnh đơn vị dính lại", tenGon("Ca song /100g"), "Ca song");
+  eq("bỏ đơn vị không có số", tenGon("Tôm sú / lạng"), "Tôm sú");
+  eq("KHÔNG ăn chữ g cuối tên món", tenGon("Cua gạch"), "Cua gạch");
+  eq("KHÔNG ăn chữ g giữa tên món", tenGon("Ca song"), "Ca song");
+  eq("tên sạch thì giữ nguyên", tenGon("Lẩu cá kèo"), "Lẩu cá kèo");
+
+  const mon = [
+    { label: "Cá song", price: 100000, unit: uCan },
+    { label: "Lẩu cá kèo", price: 420000, unit: null },
+    { label: "Rau muống xào", price: 60000, unit: null },
+  ];
+  let p = dungPhieu(mon, pt);
+
+  /* Luật 3: chưa biết trọng lượng thì KHÔNG có tổng. Không hiện khoảng
+     đoán — cận trên của khoảng ấy là bịa. */
+  {
+    const t = tinh(p);
+    eq("chưa đủ dữ kiện thì không chắc", t.chac, false);
+    eq("và tuyệt đối không kèm con số nào", t.tong, null);
+    ok("nêu ra được câu phải hỏi",
+       t.thieu.some((x) => x.dieuKien.ma === "trongLuong"));
+    ok("và cả câu hỏi khẩu phần cho món tính nhiều người",
+       t.thieu.some((x) => x.dieuKien.ma === "khauPhan"));
+    ok("câu khẩu phần CHẶN tổng — nó đổi được tổng gấp mấy lần",
+       t.thieu.find((x) => x.dieuKien.ma === "khauPhan").dieuKien.chan);
+  }
+
+  p = dien(p, 0, { gamThuc: 800, nguonDuKien: "seller" });
+  p = dien(p, 1, { soSuat: 1 });          // lẩu: tính cả phần
+  {
+    const t = tinh(p);
+    eq("có trọng lượng thì tính được", t.chac, true);
+    eq("trước phụ thu", t.truoc, 800000 + 420000 + 60000);
+    eq("sau phụ thu 13%", t.sau, Math.round(1280000 * 1.13));
+  }
+
+  /* Luật 2: mọi thứ trên phiếu là lời khai của người bán, không bao giờ
+     là quan sát độc lập — nên không được vào dải giá. */
+  eq("phiếu mang nguồn khai", p.nguon, "declared");
+  ok("và nguồn khai không được vào dải", !vaoDai(p.nguon));
+
+  /* Sửa dữ kiện thì dấu "đã cùng đọc" phải mất. Nếu không thì người bán
+     gật đầu với một tờ phiếu và dấu ấy còn nguyên trên một tờ khác hẳn. */
+  p = danhDauDaDoc(p, "seller");
+  ok("đóng dấu được khi đủ dữ kiện", !!p.xacNhan);
+  eq("dấu ghi lại đúng tổng lúc đó", p.xacNhan.tong, tinh(p).tong);
+  {
+    const sua = dien(p, 0, { gamThuc: 1200 });
+    eq("sửa dữ kiện thì huỷ dấu", sua.xacNhan, null);
+  }
+
+  /* Luật 1: không chỗ nào được gọi đây là hợp đồng hay thoả thuận. */
+  ok("câu chốt nói rõ đây KHÔNG phải hợp đồng",
+     /not an agreement/i.test(CAU_TT.khongPhaiHopDong.en));
+  ok("không dùng chữ 'agreement' làm tiêu đề",
+     !/agree/i.test(CAU_TT.tieuDe.en), CAU_TT.tieuDe.en);
+
+  // ── đối chiếu hoá đơn ──
+  const phuThuVnd = Math.round(1280000 * 0.13);
+  const goc = [
+    { ten: "Cá song", thanhTien: 800000 },
+    { ten: "Lẩu cá kèo", thanhTien: 420000 },
+    { ten: "Rau muống xào", thanhTien: 60000 },
+    { ten: "Phí phục vụ + VAT", thanhTien: phuThuVnd },
+  ];
+  eq("hoá đơn khớp", doiChieu(p, goc).viec, "khop");
+
+  /* Dòng phụ thu KHÔNG phải một món gọi thêm. */
+  eq("phụ thu không bị đếm là món", doiChieu(p, goc).themVao.length, 0);
+
+  eq("gọi thêm một món thì nói đúng thế",
+     doiChieu(p, [...goc, { ten: "Bia Hà Nội", thanhTien: 90000 }]).viec, "co-dong-moi");
+
+  /* Ca quan trọng nhất: CÓ dòng lạ nhưng nó KHÔNG giải thích được chỗ
+     lệch. Bản đầu chỉ kiểm themVao.length và trấn an sai ở đúng đây. */
+  {
+    const doiGia = goc.map((r) => (r.ten === "Cá song" ? { ...r, thanhTien: 1200000 } : r));
+    const kq = doiChieu(p, [...doiGia, { ten: "Bia Hà Nội", thanhTien: 90000 }]);
+    eq("dòng lạ không giải thích hết thì phải hỏi lại", kq.viec, "hoi-lai");
+    eq("và nói rõ còn bao nhiêu chưa giải thích", kq.conLai, 400000);
+    ok("câu trả về không kết tội ai",
+       !/cheat|scam|lừa|gian/i.test(cauDoiChieu(kq, "vi") + cauDoiChieu(kq, "en")));
+  }
+
+  eq("lệch dưới ngưỡng tiền lẻ thì coi như khớp",
+     doiChieu(p, goc.map((r, i) => (i ? r : { ...r, thanhTien: r.thanhTien + BO_QUA_LECH - 1 }))).viec,
+     "khop");
+  eq("chưa đóng dấu thì không đối chiếu được", doiChieu(dungPhieu(mon, pt), goc), null);
 }
 
 console.log("\n── verdict ─────────────────────────────────");

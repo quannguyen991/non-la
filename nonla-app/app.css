@@ -1917,3 +1917,80 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   display:flex;flex-direction:column;line-height:1.25}
 .lich-when i{font-style:normal;font-size:10px;font-weight:400;color:var(--muc-nhat)}
 .lich-what{font-size:12.5px;line-height:1.5;font-weight:300;color:var(--muc-nhat)}
+
+/* ── phiếu "điều hai bên vừa cùng đọc" (phieuui.js) ───────────
+   Cùng khuôn với #v-show: toàn màn hình, nền then, z-index trên sheet.
+   Khác một chỗ quan trọng — màn kia chỉ để ĐỌC, màn này người bán CHẠM
+   VÀO, nên vùng chạm phải to hơn hẳn và không có gì nhỏ hơn 44px. */
+#v-phieu{position:fixed;inset:0;z-index:76;overflow-y:auto;
+  background:var(--then);color:var(--diep);
+  padding:0 var(--pad-x) calc(20px + var(--safe))}
+#v-phieu[hidden]{display:none}
+
+.pt-thanh{display:flex;justify-content:space-between;padding:10px 0;
+  position:sticky;top:0;background:var(--then);z-index:2}
+.pt-thanh .iconbtn{background:rgba(245,240,228,.1);border-color:rgba(201,162,39,.4);
+  color:var(--diep);box-shadow:none;font-size:18px}
+.pt-thanh .iconbtn.on{background:var(--dong);color:var(--then-sau);border-color:var(--dong)}
+
+/* Lật cả tờ phiếu 180°, không lật từng phần: người bán đọc một tờ giấy
+   quay ngược, không đọc một giao diện bị đảo lộn từng mảnh. */
+.pt-mat.lat{transform:rotate(180deg)}
+
+.pt-tieu{margin:4px 0 14px;font-size:15px;line-height:1.35;font-weight:600}
+.pt-tieu span{display:block}
+.pt-tieu span[lang=en]{color:rgba(245,240,228,.6);font-weight:400;font-size:13.5px}
+
+.pt-dong{border-top:1px solid rgba(245,240,228,.16);padding:11px 0}
+.pt-dong.thieu{border-left:3px solid var(--dong);padding-left:10px;
+  margin-left:-13px;background:rgba(201,162,39,.06)}
+.pt-ten{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.pt-ten b{font-size:16px}
+.pt-ten span{font-size:13px;color:rgba(245,240,228,.62);white-space:nowrap}
+.pt-tien{text-align:right;font-size:15px;font-variant-numeric:tabular-nums;margin-top:2px}
+
+.pt-hoi{margin-top:8px}
+.pt-hoi p{margin:0;font-size:14px;line-height:1.4}
+.pt-hoi p[lang=en]{color:rgba(245,240,228,.58);font-size:12.5px}
+.pt-o{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.pt-o input{min-height:44px;min-width:96px;padding:8px 12px;font-size:16px;
+  border-radius:10px;border:1px solid rgba(201,162,39,.45);
+  background:rgba(245,240,228,.08);color:var(--diep)}
+.pt-g{color:rgba(245,240,228,.6);font-size:13px}
+.pt-nguoi{display:inline-flex;align-items:center;gap:7px;font-size:13px;
+  color:rgba(245,240,228,.72)}
+.pt-chon{min-height:44px;padding:9px 15px;border-radius:22px;font-size:14px;
+  border:1px solid rgba(201,162,39,.45);background:rgba(245,240,228,.08);
+  color:var(--diep);cursor:pointer}
+.pt-chon:active{background:var(--dong);color:var(--then-sau)}
+
+.pt-tong{border-top:2px solid rgba(201,162,39,.5);margin-top:14px;padding:14px 0}
+.pt-tong.chua{border-color:rgba(201,162,39,.35);display:grid;
+  grid-template-columns:1fr auto;align-items:center;gap:4px 12px}
+.pt-tong.chua p{margin:0;font-size:14px}
+.pt-tong.chua p[lang=en]{color:rgba(245,240,228,.58);font-size:12.5px;grid-column:1}
+.pt-tong.chua b{grid-row:1/3;grid-column:2;font-size:30px;color:var(--dong);
+  font-variant-numeric:tabular-nums}
+.pt-mot{display:block;text-align:right;font-size:28px;color:var(--dong);
+  font-variant-numeric:tabular-nums}
+.pt-hai span{display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;padding:3px 0;font-variant-numeric:tabular-nums}
+.pt-hai i{font-style:normal;font-size:12.5px;color:rgba(245,240,228,.6)}
+.pt-hai i[lang=en]{flex:1}
+.pt-hai b{font-size:22px;color:var(--dong)}
+
+.pt-dau{margin:12px 0;padding:10px 12px;border-radius:10px;
+  background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.4)}
+.pt-dau p{margin:0;font-size:13.5px}
+.pt-dau p[lang=en]{color:rgba(245,240,228,.6);font-size:12px}
+.pt-dau time{display:block;margin-top:4px;font-size:12px;color:var(--dong)}
+
+#v-phieu .btn.pri{width:100%;margin-top:12px;min-height:52px}
+#v-phieu .btn.pri[disabled]{opacity:.4;pointer-events:none}
+
+/* Câu "đây không phải hợp đồng". Nhỏ nhưng KHÔNG mờ tới mức đọc không
+   ra — nó là thứ giữ tấm phiếu ở đúng chỗ của nó. */
+.pt-chan{margin:14px 0 0;font-size:12px;line-height:1.45;
+  color:rgba(245,240,228,.72)}
+.pt-chan span{display:block}
+.pt-chan span[lang=en]{color:rgba(245,240,228,.5)}

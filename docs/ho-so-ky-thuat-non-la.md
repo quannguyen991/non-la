@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 84 commit · 690 phép thử xanh
+Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 85 commit · 721 phép thử xanh
 
 ---
 
@@ -92,7 +92,7 @@ tiền) và lần nào cũng được giữ — nghĩa là mọi thứ đều ph
 canvas/SVG thuần hoặc bằng một tệp model tải rời.
 
 **(2) Chạy được khi tắt mạng.**
-Service worker `nonla-v48` cache **66 tệp** vỏ app. Ba trong bốn chế độ quét
+Service worker `nonla-v49` cache **68 tệp** vỏ app. Ba trong bốn chế độ quét
 chạy hoàn toàn offline; chỉ chế độ nhận diện món ăn cần mạng, và đó là ngoại lệ
 được ghi rõ ngay trong `index.html`.
 
@@ -152,7 +152,7 @@ Mọi con số dưới đây đếm trực tiếp từ tệp dữ liệu, không
 | Bài cộng đồng mẫu | **29** | `community.json` |
 | Mục lịch cố định | **9** | `lich.json` |
 | Quán cào từ sitemap giao hàng | **4.228** | `docs/quan-sitemap-*.json` |
-| Tệp trong vỏ offline | **66** | `sw.js` |
+| Tệp trong vỏ offline | **68** | `sw.js` |
 
 ### 4.1 Sáu vùng
 
@@ -1119,7 +1119,7 @@ cả cho những quán không liên quan.**
 
 ## 16. Kiểm thử và tự soát
 
-### 16.1 `test.mjs` — 690 phép thử, 0 hỏng
+### 16.1 `test.mjs` — 721 phép thử, 0 hỏng
 
 Kiểm lõi thuần: khớp món, bách phân vị, phán quyết, phép chiếu bản đồ, tuyến đi
 bộ, âm lịch, đơn vị, so thực đơn, tiền thối, tin cậy, nguồn giá, chấm điểm đối
@@ -1161,7 +1161,7 @@ là 612). Đây là thứ giám khảo đếm lại được trong ba mươi gi�
 Ngày 09/09 nó hở một chỗ khác và đã bịt: luật trên chỉ bắt hồ sơ khai **nhiều**
 con số, nên nó vẫn xanh khi cả cuốn khai thống nhất một con số **đã cũ**. Giờ
 bộ soát **chạy thật** `node test.mjs` rồi so — bắt được đúng lúc hồ sơ còn ghi
-612 trong khi bộ thử đã lên 645 (nay là 690).
+612 trong khi bộ thử đã lên 645 (nay là 721).
 
 Nó chỉ soát những con số **đếm được**, không cố hiểu văn xuôi: một bộ soát đoán
 mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát người ta tắt đi.
@@ -1291,7 +1291,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `history.js` | 253 | lịch sử hoạt động (IndexedDB) |
 | `amlich.js` | 244 | lõi âm lịch Việt Nam |
 | `hanhtrinh.js` | 231 | trang hành trình |
-| `sw.js` | 220 | service worker, SHELL 66 tệp |
+| `sw.js` | 220 | service worker, SHELL 68 tệp |
 | `survey.js` | 219 | khảo sát giá tại chỗ |
 | `cloud.js` | 219 | chỗ duy nhất biết tới HTTP |
 | `match.js` | 210 | khớp món, đọc tiền, phán quyết |

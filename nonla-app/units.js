@@ -123,7 +123,16 @@ export function detectSurcharges(text) {
     const m = s.match(p.re);
     if (!m) continue;
     const pct = typeof p.pct === "function" ? p.pct(m) : p.pct;
-    if (!out.some((x) => x.kind === p.kind && x.pct === pct)) out.push({ kind: p.kind, pct });
+    /* Một khoản, một dòng — kể cả khi hai luật cùng bắt được nó.
+       "Giá chưa bao gồm VAT 8%" khớp CẢ luật "chưa gồm VAT" (pct null) lẫn
+       luật "VAT 8%" (pct 8), và bản trước giữ cả hai vì null ≠ 8. Chỗ gọi
+       cộng phần trăm lại thì được 8, đúng tình cờ; nhưng một tấm thực đơn
+       ghi "chưa gồm VAT" ở đầu và "VAT 10%" ở cuối sẽ ra hai dòng VAT trên
+       phiếu, và người bán nhìn thấy app khai quán mình thu VAT hai lần.
+       Giữ dòng NÓI ĐƯỢC CON SỐ, bỏ dòng chỉ nói "có". */
+    const cu = out.findIndex((x) => x.kind === p.kind);
+    if (cu < 0) { out.push({ kind: p.kind, pct }); continue; }
+    if (out[cu].pct == null && pct != null) out[cu] = { kind: p.kind, pct };
   }
   return out;
 }
