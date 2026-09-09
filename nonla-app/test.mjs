@@ -39,6 +39,7 @@ import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
          trungDapAn as trungDapAnLlm } from "../tools/llmparse.mjs";
 import { bandFloor, forZone } from "./premium.js";
 import { giamBatDinh, rongDai, diemO, xepO, xepPho, liDo } from "./uutien.js";
+import { khoaPho, tenHienThi, gomTheoPho } from "../tools/ten-pho.mjs";
 import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
          MIN_QUAN_SAT, TI_LE_DUNG } from "./coso.js";
 import { phanKhuc, nhomMon, nhomCuaDanhMuc, daiNhom, mucQuan,
@@ -284,6 +285,38 @@ console.log("\n── uutien: đi đo ở đâu thì đáng nhất ────�
   }
 
   ok("lí do không in điểm số trần trụi", !/\d+\.\d{3}/.test(liDo(xepO(zi, {}, {})[0])));
+}
+
+console.log("\n── ten-pho: gom tên phố trước khi đếm ───────");
+{
+  eq("bỏ tiền tố Phố", khoaPho("Phố Hàng Buồm"), khoaPho("Hàng Buồm"));
+  eq("bỏ tiền tố Đường", khoaPho("Đường Thành"), "thành");
+  eq("bỏ HẬU tố tiếng Anh", khoaPho("Nguyen Hoang Street"), khoaPho("Nguyen Hoang"));
+  eq("bỏ hậu tố viết tắt", khoaPho("Loseby st"), "loseby");
+  eq("gom khoảng trắng thừa", khoaPho("Phố   Hàng  Bạc"), khoaPho("Hàng Bạc"));
+
+  /* Địa chỉ đầy đủ lọt vào ô tên phố thì phải bị loại, không được tạo ra
+     một "phố" một quán rồi đi vào bảng phân tầng. */
+  eq("địa chỉ bắt đầu bằng số bị loại", khoaPho("9 Hang Voi St. (2nd Floor)"), "");
+  eq("địa chỉ đầy đủ bị loại", khoaPho("12 Hàng Gà, Hoàn Kiếm, Hà Nội"), "");
+  eq("chuỗi rỗng bị loại", khoaPho("  "), "");
+
+  /* KHÔNG được gộp mờ: Hàng Bồ và Hàng Bè là hai phố thật. Bỏ sót thì
+     thừa vài dòng trong bảng; gộp nhầm thì hỏng dữ liệu. */
+  ok("không gộp hai phố tên gần giống", khoaPho("Hàng Bồ") !== khoaPho("Hàng Bè"));
+
+  eq("tên hiển thị lấy dạng đầy đủ nhất",
+     tenHienThi(["Hàng Bạc", "Phố Hàng Bạc"]), "Phố Hàng Bạc");
+  eq("không có dạng nào thì trả rỗng", tenHienThi([]), "");
+
+  {
+    const g = gomTheoPho([
+      { street: "Hàng Bạc" }, { street: "Phố Hàng Bạc" },
+      { street: "9 Hang Voi St. (2nd Floor)" }, { street: "" },
+    ]);
+    eq("hai dạng gom về một phố", g.size, 1);
+    eq("và đếm đủ cả hai quán", [...g.values()][0].quan.length, 2);
+  }
 }
 
 console.log("\n── verdict ─────────────────────────────────");

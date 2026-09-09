@@ -34,6 +34,7 @@ import { fileURLToPath } from "url";
 import { inferDishes } from "../nonla-app/eaterydish.js";
 import { MIN_SAMPLES } from "../nonla-app/trust.js";
 import { xepO, xepPho, liDo } from "../nonla-app/uutien.js";
+import { khoaPho, tenHienThi } from "./ten-pho.mjs";
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), "..");
 const argv = process.argv.slice(2);
@@ -67,12 +68,16 @@ try {
 } catch { /* chưa chạy quan-tu-sitemap.mjs — phiếu vẫn dựng được từ OSM */ }
 
 /* ── phố nào gợi ra món nào ─────────────────────────────────── */
+/* Gom theo tên phố ĐÃ CHUẨN HOÁ: "Hàng Buồm" và "Phố Hàng Buồm" là một
+   con phố, và đếm tách ra thì một phố mười ba quán trông như hai phố tầm
+   thường — bảng xếp hạng phố nào đi trước sai theo. Xem ten-pho.mjs. */
 const pho = new Map();
 for (const e of quan) {
-  const ten = (e.street || "").trim();
-  if (!ten) continue;                    // quán không có tên phố thì không xếp vào lộ trình được
-  if (!pho.has(ten)) pho.set(ten, { ten, quan: [], mon: new Map() });
-  const p = pho.get(ten);
+  const k = khoaPho(e.street);
+  if (!k) continue;                      // không có tên phố, hoặc là một địa chỉ
+  if (!pho.has(k)) pho.set(k, { khoa: k, ten: "", dang: [], quan: [], mon: new Map() });
+  const p = pho.get(k);
+  p.dang.push(e.street);
   p.quan.push(e);
   for (const m of inferDishes(e, dishes)) {
     if (!oGia.includes(m.id)) continue;  // món vùng này không có ô giá thì khảo sát cũng không vào đâu
@@ -86,14 +91,15 @@ for (const e of quan) {
    đầu từ. */
 const doc = (sl) => sl.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 for (const q of themSitemap) {
-  const ten = [...pho.keys()].find((k) =>
-    k.normalize("NFC").toLowerCase().replace(/^(phố|đường)\s+/, "").replace(/\s+/g, "-") === q.pho)
-    || doc(q.pho);
-  if (!pho.has(ten)) pho.set(ten, { ten, quan: [], mon: new Map(), tuSitemap: 0 });
-  const p = pho.get(ten);
+  const k = [...pho.keys()].find((x) => x.replace(/\s+/g, "-") === q.pho) || khoaPho(doc(q.pho));
+  if (!k) continue;
+  if (!pho.has(k)) pho.set(k, { khoa: k, ten: "", dang: [doc(q.pho)], quan: [], mon: new Map(), tuSitemap: 0 });
+  const p = pho.get(k);
   p.tuSitemap = (p.tuSitemap || 0) + 1;
   for (const id of q.mon || []) if (oGia.includes(id)) p.mon.set(id, Math.max(p.mon.get(id) || 0, 0.6));
 }
+
+for (const p of pho.values()) p.ten = tenHienThi(p.dang) || p.khoa;
 
 /* ── xếp theo BẤT ĐỊNH GIẢM ĐƯỢC, không theo độ phủ ──────────
    Bản trước xếp phố theo "gợi ra nhiều ô giá nhất". Nó tham lam theo độ

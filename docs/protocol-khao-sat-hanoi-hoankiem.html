@@ -1,0 +1,226 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protocol khảo sát · Hà Nội · Hoàn Kiếm</title>
+<style>
+:root{--then:#0E2B24;--son:#9C3A24;--giay:#F7F3E9;--vien:#D9CFBA}
+*{box-sizing:border-box}
+body{margin:0;padding:18px 16px 60px;background:var(--giay);color:#1b1b1b;
+  font:15px/1.55 Cambria,Constantia,"Palatino Linotype","Noto Serif",system-ui,sans-serif;
+  max-width:760px;margin-inline:auto}
+h1{font-size:22px;margin:0 0 2px;color:var(--then)}
+h2{font-size:17px;margin:26px 0 8px;color:var(--then);border-bottom:2px solid var(--vien);padding-bottom:4px}
+h3{font-size:15px;margin:16px 0 4px;color:var(--son)}
+.sub{color:#5b5b5b;font-size:13px;margin:0 0 14px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+th,td{border:1px solid var(--vien);padding:5px 7px;text-align:left;vertical-align:top}
+th{background:#EFE8D8}
+.tang{border-left:4px solid var(--then);padding:8px 12px;margin:10px 0;background:#fff}
+.tang b{color:var(--then)}
+.chip{display:inline-block;background:#EFE8D8;border:1px solid var(--vien);border-radius:11px;
+  padding:1px 8px;margin:2px 3px 2px 0;font-size:12.5px}
+.luat{background:#fff;border:1px solid var(--vien);border-left:4px solid var(--son);
+  padding:10px 13px;margin:10px 0}
+.luat b{color:var(--son)}
+.o{letter-spacing:2px;color:#8a8a8a}
+.cam{background:#FBEFEA;border-left:4px solid var(--son)}
+ol,ul{margin:6px 0 6px 20px;padding:0}
+li{margin:3px 0}
+.cuoi{margin-top:26px;padding-top:10px;border-top:2px solid var(--vien);font-size:13px;color:#5b5b5b}
+@media print{body{padding:0;max-width:none}h2{page-break-after:avoid}.tang,.luat{page-break-inside:avoid}}
+</style></head><body>
+
+<h1>Protocol khảo sát giá · Hà Nội · Hoàn Kiếm</h1>
+<p class="sub">Sinh bằng <code>node tools/protocol-khao-sat.mjs hanoi-hoankiem</code> ·
+285 quán có cả tên phố lẫn toạ độ · ngưỡng tầng cắt tại tứ phân vị của chính
+phân bố ấy. Bản in này là bản ĐĂNG KÝ TRƯỚC: ký ngày vào ô dưới rồi mới đi thu.</p>
+
+<h2>0. Câu hỏi, và điều đã cam kết trước khi đo</h2>
+<p><b>Câu hỏi:</b> giá cùng một món có thay đổi theo khoảng cách tới tâm khu du lịch không,
+và thay đổi bao nhiêu?</p>
+<div class="luat cam">
+  <b>Không đặt trước con số kỳ vọng.</b> Protocol này cố ý KHÔNG viết "kỳ vọng lõi đắt hơn
+  rìa 30%". Viết ra con số mình muốn thấy trước khi đo là cách chắc chắn nhất để đo cho tới
+  khi thấy nó. Cam kết ở đây là: <b>báo cáo bất kỳ con số nào rơi ra, kể cả 0%</b>, kể cả
+  khi nó làm hỏng một câu đã viết trong hồ sơ.
+</div>
+<p>Người thu: ______________________ · Ngày ký: ____ / ____ / 2026 · Chữ ký: ______________</p>
+
+<h2>1. Ba tầng, cắt bằng số</h2>
+<p class="sub">Không dùng chữ "phố đông khách". Dùng ngưỡng mét, đo từ tâm vùng
+[21.0285, 105.8542].</p>
+<div class="tang">
+  <b>Tầng A — Lõi du lịch</b> · ≤ 522 m tính từ tâm vùng · 23 phố · 54 quán
+  <div><span class="chip">Phố Đinh Tiên Hoàng <i>6q · 343m</i></span><span class="chip">Phố Nhà Thờ <i>6q · 491m</i></span><span class="chip">Phố Tông Đản <i>5q · 365m</i></span><span class="chip">Phố Lê Thái Tổ <i>5q · 439m</i></span><span class="chip">Phố Lý Đạo Thành <i>4q · 486m</i></span><span class="chip">Phố Lê Phụng Hiểu <i>3q · 385m</i></span><span class="chip">Phố Ngô Quyền <i>3q · 359m</i></span><span class="chip">Phố Bà Triệu <i>3q · 444m</i></span><span class="chip">Phố Cầu Gỗ <i>3q · 470m</i></span><span class="chip">Hàng Hành <i>2q · 514m</i></span><span class="chip">Ngõ Bảo Khánh <i>2q · 455m</i></span><span class="chip">Phố Hàng Khay <i>1q · 386m</i></span><span class="chip">… +11 phố</span></div>
+</div><div class="tang">
+  <b>Tầng B — Phố cổ vòng ngoài</b> · 522–939 m · 48 phố · 158 quán
+  <div><span class="chip">Phố Nguyễn Hữu Huân <i>14q · 568m</i></span><span class="chip">Phố Hàng Buồm <i>13q · 858m</i></span><span class="chip">Phố Ấu Triệu <i>8q · 557m</i></span><span class="chip">Phố Lý Quốc Sư <i>8q · 573m</i></span><span class="chip">Phố Hàng Điếu <i>7q · 887m</i></span><span class="chip">Phố Hàng Trống <i>6q · 538m</i></span><span class="chip">Phố Đào Duy Từ <i>6q · 836m</i></span><span class="chip">Phố Mã Mây <i>6q · 699m</i></span><span class="chip">Đường Thành <i>5q · 862m</i></span><span class="chip">Phố Lãn Ông <i>5q · 916m</i></span><span class="chip">Phố Hàng Tre <i>5q · 526m</i></span><span class="chip">Phố Hàng Bè <i>5q · 532m</i></span><span class="chip">… +36 phố</span></div>
+</div><div class="tang">
+  <b>Tầng C — Rìa khu</b> · &gt; 939 m · 25 phố · 73 quán
+  <div><span class="chip">Phố Phùng Hưng <i>11q · 1351m</i></span><span class="chip">Phố Hàng Cót <i>10q · 1366m</i></span><span class="chip">Phố Bát Đàn <i>9q · 942m</i></span><span class="chip">Phố Hàng Giấy <i>6q · 1374m</i></span><span class="chip">Phố Hàng Cá <i>4q · 1013m</i></span><span class="chip">Phố Hàng Chiếu <i>4q · 1033m</i></span><span class="chip">Phố Hàng Gà <i>3q · 1082m</i></span><span class="chip">Phố Quán Thánh <i>2q · 1589m</i></span><span class="chip">Phố Hàng Lược <i>2q · 1206m</i></span><span class="chip">Phố Hàng Vải <i>2q · 1101m</i></span><span class="chip">Phố Chả Cá <i>2q · 947m</i></span><span class="chip">Ngõ Gạch <i>2q · 946m</i></span><span class="chip">… +13 phố</span></div>
+</div>
+
+<h2>2. Chọn quán thế nào — luật quan trọng nhất</h2>
+<div class="luat">
+  <b>Bước đều, không chọn quán trông được.</b> Vào phố, đi hết một lượt đếm số quán ăn
+  <i>n</i>. Bốc một số ngẫu nhiên <i>k</i> từ 1 đến 3 (tung xúc xắc cũng được). Vào quán thứ
+  <i>k</i>, rồi cứ cách <b>3 quán</b> lại vào một quán, cho tới hết phố.
+  <br><br>
+  Đây là luật dễ phá nhất, vì phá nó không thấy đau ở đâu cả: chọn quán trông ngon thì
+  sáu mươi dòng thu được đo <i>gu chọn quán của người đi</i>, không đo mặt bằng giá của khu.
+  Không có cách nào sửa việc đó sau khi đã về nhà.
+</div>
+
+<h3>Được bỏ qua một quán khi, và chỉ khi</h3>
+<ol>
+  <li>Quán đóng cửa hoặc đang dọn.</li>
+  <li>Không có bảng giá / thực đơn nào nhìn thấy được từ ngoài, và hỏi thì không được trả lời.</li>
+  <li>Không bán món nào trong danh mục 35 ô của vùng.</li>
+  <li>Người bán từ chối.</li>
+</ol>
+<p><b>Mỗi lần bỏ qua phải ghi một dòng</b> vào bảng loại mẫu ở mục 6 — số quán bị bỏ và lý do
+là một phần của kết quả, không phải rác. Bỏ qua nhiều ở một tầng mà không ghi thì tầng ấy
+mất nghĩa.</p>
+
+<h2>3. Ghi gì cho mỗi dòng</h2>
+<table>
+  <tr><th>Trường</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+  <tr><td>Tầng (A/B/C)</td><td>có</td><td>theo phố đang đứng</td></tr>
+  <tr><td>Tên phố</td><td>có</td><td>chép đúng biển phố</td></tr>
+  <tr><td>Tên quán</td><td>có</td><td>chép đúng biển hiệu</td></tr>
+  <tr><td>Món</td><td>có</td><td>chọn trong app; không có thì ghi tên nguyên văn</td></tr>
+  <tr><td>Giá</td><td>có</td><td>con số in trên bảng, không làm tròn</td></tr>
+  <tr><td>Đơn vị</td><td>có</td><td>một phần / một con / 100g / lạng / thời giá</td></tr>
+  <tr><td>Phụ thu</td><td>có</td><td>ghi 0 nếu không có; đừng để trống</td></tr>
+  <tr><td>Nguồn</td><td>có</td><td>biển ngoài / thực đơn trong bàn / hỏi người bán</td></tr>
+  <tr><td>Giờ</td><td>có</td><td>app tự ghi</td></tr>
+  <tr><td>Ghi chú</td><td>không</td><td>bất thường gì thì viết một câu</td></tr>
+</table>
+<div class="luat">
+  <b>Đơn vị quan trọng ngang con số.</b> "100.000" không nói gì nếu không biết đó là một phần
+  hay 100 gam — đúng nhóm hiểu nhầm gây thiệt hại lớn nhất. Dòng thiếu đơn vị là dòng bị loại.
+</div>
+
+<h2>4. Bao nhiêu dòng thì đủ</h2>
+<p>Mục tiêu tối thiểu: <b>120 dòng</b> = 8 ô ưu tiên ×
+5 mẫu × 3 tầng. Đây không phải con số tròn cho đẹp: đó là số dòng
+ít nhất để nói được một câu về <i>từng tầng</i>.</p>
+<table>
+  <tr><th>#</th><th>Món ưu tiên</th><th>Dải đang dùng</th><th>Bề rộng</th><th>Cần mỗi tầng</th></tr>
+  <tr><td>1</td><td>Lẩu</td>
+    <td>300.000₫–800.000₫</td>
+    <td>500.000₫</td>
+    <td class="o">☐ ☐ ☐ ☐ ☐</td></tr>
+  <tr><td>2</td><td>Chả cá</td>
+    <td>170.000₫–450.000₫</td>
+    <td>280.000₫</td>
+    <td class="o">☐ ☐ ☐ ☐ ☐</td></tr>
+  <tr><td>3</td><td>Phở bò</td>
+    <td>50.000₫–140.000₫</td>
+    <td>90.000₫</td>
+    <td class="o">☐ ☐ ☐ ☐ ☐</td></tr>
+  <tr><td>4</td><td>Bún chả</td>
+    <td>50.000₫–130.000₫</td>
+    <td>80.000₫</td>
+    <td class="o">☐ ☐ ☐ ☐ ☐</td></tr>
+  <tr><td>5</td><td>Cà phê sữa đá</td>
+    <td>20.000₫–70.000₫</td>
+    <td>50.000₫</td>
+    <td class="o">☐ ☐ ☐ ☐ ☐</td></tr>
+  <tr><td>6</td><td>Bánh mì</td>
+    <td>20.000₫–70.000₫</td>
+    <td>50.000₫</td>
+    <td class="o">☐ ☐ ☐ ☐ ☐</td></tr>
+  <tr><td>7</td><td>Bún đậu mắm tôm</td>
+    <td>50.000₫–130.000₫</td>
+    <td>80.000₫</td>
+    <td class="o">☐ ☐ ☐ ☐ ☐</td></tr>
+  <tr><td>8</td><td>Phở gà</td>
+    <td>50.000₫–120.000₫</td>
+    <td>70.000₫</td>
+    <td class="o">☐ ☐ ☐ ☐ ☐</td></tr>
+</table>
+<p class="sub">Thứ tự này lấy từ <code>uutien.js</code>, cùng bộ luật với màn khảo sát trong
+app — nên thứ tự trên giấy và trên điện thoại không lệch nhau. Gặp món ngoài bảng thì vẫn
+gõ; bảng này là thứ tự ưu tiên khi phải bỏ dở, không phải danh sách đóng.</p>
+
+<h2>5. Thu đôi 20% — phép đo duy nhất đo chính người thu</h2>
+<div class="luat">
+  <b>24 dòng phải có hai người ghi độc lập.</b> Cùng quán, cùng món, hai người không
+  nhìn màn hình của nhau, ghi xong mới so.
+  <br><br>
+  Không có con số này thì mọi con số khác không biết sai bao nhiêu. Báo cáo tỉ lệ hai bản
+  ghi khớp nhau, và <b>liệt kê từng ca lệch</b> kèm nguyên nhân — lệch vì đọc nhầm chữ số,
+  vì nhìn hai bảng giá khác nhau, hay vì hai người hiểu "một phần" khác nhau.
+</div>
+
+<h2>6. Bảng loại mẫu</h2>
+<table>
+  <tr><th>Tầng</th><th>Phố</th><th>Quán</th><th>Lý do bỏ qua</th></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+</table>
+
+<h2>7. Riêng tư — đọc trước khi giơ máy lên</h2>
+<ul>
+  <li><b>Ảnh thực đơn:</b> chỉ chụp bảng giá, không lấy mặt người. Ảnh không rời khỏi máy trừ
+    khi bấm nộp có chủ ý.</li>
+  <li><b>Không chụp trộm.</b> Hỏi một câu trước: "cháu ghi lại giá để so sánh, được không ạ?"
+    Bị từ chối thì ghi vào bảng loại mẫu rồi đi.</li>
+  <li><b>Không ghi tên riêng của người bán</b>, không ghi số điện thoại, không ghi biển số.</li>
+  <li><b>Toạ độ chính xác chỉ dùng để gán tầng rồi bỏ</b>; app không gửi toạ độ đi đâu.</li>
+</ul>
+
+<h2>8. Nhiệm vụ kèm theo: ảnh tiền trong điều kiện thật</h2>
+<p>Bộ nhận mệnh giá đang thiếu tập ảnh khó, và không có nó thì ngưỡng "không chắc" chưa hiệu
+chuẩn được — model chưa nối vào app được. Đi khảo sát là lúc trong tay đang có tiền lẻ.</p>
+<table>
+  <tr><th>Mệnh giá</th><th>Cần</th><th>Kiểu ảnh phải có</th></tr>
+  <tr><td>1.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+  <tr><td>2.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+  <tr><td>5.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+  <tr><td>10.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+  <tr><td>20.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+  <tr><td>50.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+  <tr><td>100.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+  <tr><td>200.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+  <tr><td>500.000₫</td><td class="o">☐ ☐ ☐ ☐ ☐</td>
+     <td>gấp đôi · đèn vàng · ngón tay che góc · tờ chồng tờ · chụp nghiêng</td></tr>
+</table>
+<div class="luat cam">
+  <b>Đừng chụp ảnh đẹp.</b> Ảnh phẳng, đủ sáng, chụp thẳng thì đã có 1.923 tấm rồi và chúng
+  cho 99,5% — một con số vô nghĩa. Cái còn thiếu đúng là ảnh nát: đó mới là ảnh app sẽ gặp
+  khi khách cầm nắm tiền thối dưới đèn quán lúc bảy giờ tối.
+  <br><br>
+  Nghị định 87/2023: ảnh một mặt tờ tiền phải nhỏ hơn 75% cỡ thật. Bộ nạp tự hạ mọi ảnh
+  xuống cạnh dài 320px và không giữ bản gốc; bộ ảnh <b>không công bố</b>.
+</div>
+
+<h2>9. Sau mỗi buổi, trước khi ngủ</h2>
+<ol>
+  <li>Mở app → tab <b>You → Survey prices</b> → nút gửi lên bảng giá chung.</li>
+  <li>Chụp lại màn hình số dòng đã ghi trong buổi — đó là nhật ký thu thập.</li>
+  <li>Chép bảng loại mẫu ở mục 6 vào tệp chung.</li>
+  <li>Đổ ảnh tiền vào một thư mục theo mệnh giá.</li>
+</ol>
+
+<p class="cuoi">
+  Vùng Hà Nội · Hoàn Kiếm · 35 ô giá ·
+  ngưỡng tầng 522 m / 939 m ·
+  mục tiêu 120 dòng, thu đôi 24 dòng ·
+  5 mẫu một ô là ô ấy rời bậc "ước lượng".
+</p>
+</body></html>
