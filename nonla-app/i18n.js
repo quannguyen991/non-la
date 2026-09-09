@@ -110,6 +110,24 @@ const DICT = {
     "Hold this up, or lay the phone on the counter": "Giơ lên, hoặc đặt máy xuống quầy",
     "Usual price here": "Giá thường ở đây",
     "Order this dish": "Gọi món này",
+    // dòng menu app không khớp được món nào (monla.js)
+    "Not in the catalogue — what we can still say":
+      "Ngoài danh mục — vẫn nói được điều này",
+    "Not in our catalogue — see below": "Ngoài danh mục — xem khối dưới",
+    "this line says": "dòng này tự ghi là",
+    "street range does not apply": "dải giá vỉa hè không áp được",
+    "no verdict": "không phán quyết",
+    "no reference for this kind of dish here": "chưa có mặt bằng cho loại món này ở đây",
+    here: "ở đây", dishes: "món",
+    "usually priced for several people — ask how many it serves":
+      "thường tính cho nhiều người — hỏi suất cho mấy người",
+    "may be priced by weight — ask before ordering":
+      "có thể tính theo cân — hỏi trước khi gọi",
+    "On this menu, the": "Trên tấm thực đơn này,",
+    "lines we could price sit at": "dòng tra được giá đang ở mức",
+    "the local median.": "so với trung vị của khu.",
+    "These are ranges for a KIND of dish, not for this dish. Nón Lá does not judge a price it cannot compare.":
+      "Đây là dải của một LOẠI món, không phải của món này. Nón Lá không phán quyết một cái giá nó không so được.",
   },
   ko: {
     Nearby: "주변", Eat: "먹거리", Community: "커뮤니티", You: "내 정보",

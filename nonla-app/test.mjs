@@ -1,6 +1,6 @@
 /* Kiểm thử lõi khớp món và phán quyết giá — chạy: node test.mjs */
 import { normalize, dice, parsePrice, parseLine, parseMenu, matchDish,
-         verdict, readNotes, zeroSlip, fmtVND } from "./match.js";
+         verdict, readNotes, zeroSlip, fmtVND, cungMon } from "./match.js";
 import { project, unproject, distance, fmtDistance, Viewport, boundsOf } from "./geo.js";
 import { summarise, priceBand, validate, farFrom } from "./posts.js";
 import { camera, drawTown } from "./iso.js";
@@ -38,6 +38,8 @@ import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
          raoDon as raoDonLlm, daoDong as daoDongLlm, soVoiDai as soVoiDaiLlm,
          trungDapAn as trungDapAnLlm } from "../tools/llmparse.mjs";
 import { bandFloor, forZone } from "./premium.js";
+import { phanKhuc, nhomMon, nhomCuaDanhMuc, daiNhom, mucQuan,
+         MIN_MON_NHOM, MIN_DONG_QUAN } from "./monla.js";
 import { readFileSync } from "fs";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
@@ -91,12 +93,86 @@ eq("dòng đầu", rows[0], { name: "Cao lau", price: 55000 });
 console.log("\n── matchDish (chịu lỗi OCR) ────────────────");
 ok("khớp 'Cao lau' → cao-lau", matchDish("Cao lau", dishes)?.dish.id === "cao-lau");
 ok("khớp 'Mi Quang' → mi-quang", matchDish("Mi Quang", dishes)?.dish.id === "mi-quang");
-ok("khớp sai chính tả 'Banh mie'", matchDish("Banh mie", dishes)?.dish.id === "banh-mi");
+/* ĐỔI HÀNH VI CÓ CHỦ Ý, kèm số đo.
+   Bản trước khớp 'Banh mie' → banh-mi bằng hệ số Dice trên bigram ký tự.
+   Cùng phép ấy khớp 'Banh can' → banh-canh-ca-loc ở 0,933, 'Pha lau' →
+   lau, 'Bun oc' → bun-bo-hue. Đo trên 187 tên món thật lấy từ menu công
+   bố: 126 tên khớp vào danh mục, và trong 89 ca vùng đó có dải để phán
+   quyết thì 38 ca app KÊU OAN người bán, 7 ca bỏ lọt.
+
+   Nới cho 'mie'→'mi' mà chặn 'can'→'canh' là không làm được: cả hai đều
+   thêm đúng một chữ cái vào cuối một tiếng ngắn. Đã đo cả biến thể nới
+   (cho sai một chữ khi hai tên cùng số tiếng): số ca kêu oan y nguyên 18,
+   nhưng 'Banh can' vẫn khớp thành bánh canh cá lóc qua alias — và một nhãn
+   món sai không chỉ hiện sai trên màn hình, nó còn đi thẳng vào
+   Survey.add(), tức là vào kho giá sẽ THAY dải hạt giống.
+
+   Nên chọn luật chặt, và cái mất là đây: OCR làm rụng một chữ trong một
+   tiếng ngắn thì mất cả dòng. Đỡ lại bằng monla.js — vẫn đọc ra loại món. */
+ok("'Banh mie' KHÔNG còn khớp bừa vào banh-mi", matchDish("Banh mie", dishes) === null);
+ok("nhưng vẫn đọc ra loại món", nhomMon("Banh mie")?.id === "banh");
 ok("khớp 'Nuoc dua tuoi' → nuoc-dua", matchDish("Nuoc dua tuoi", dishes)?.dish.id === "nuoc-dua");
 ok("khớp tiếng Anh 'Fresh coconut'", matchDish("Fresh coconut", dishes)?.dish.id === "nuoc-dua");
 ok("khớp 'PHO BO' hoa toàn phần", matchDish("PHO BO", dishes)?.dish.id === "pho-bo");
 ok("từ vô nghĩa không khớp bừa", matchDish("zzzqqq xkcd", dishes) === null,
    JSON.stringify(matchDish("zzzqqq xkcd", dishes)));
+
+console.log("\n── cungMon: cửa chặn khớp nhầm ──────────────");
+ok("món một tiếng phải đứng ĐẦU: lẩu cá kèo là lẩu", cungMon("lau ca keo", "lau"));
+ok("phá lấu KHÔNG phải lẩu", !cungMon("pha lau", "lau"));
+ok("chè khúc bạch vẫn là chè", cungMon("che khuc bach", "che"));
+ok("kem xôi KHÔNG phải xôi", !cungMon("kem xoi", "xoi"));
+ok("bánh căn KHÔNG phải bánh canh cá lóc", !cungMon("banh can", "banh canh ca loc"));
+ok("bún ốc KHÔNG phải bún bò huế", !cungMon("bun oc", "bun bo hue"));
+ok("chả rươi KHÔNG phải chả cá", !cungMon("cha ruoi", "cha ca"));
+ok("bún chay KHÔNG phải bún chả", !cungMon("bun chay", "bun cha"));
+ok("tiếng dài vẫn chịu được lỗi OCR", cungMon("mi quangg", "mi quang"));
+ok("thêm phụ từ vẫn khớp", cungMon("pho bo dac biet", "pho bo"));
+
+/* Phép đo, không phải giai thoại: chạy CẢ danh mục qua matchDish và đòi mọi
+   món tự khớp được chính nó. Siết cửa chặn mà làm rụng một món trong danh
+   mục thì đó là hồi quy, không phải đánh đổi. */
+{
+  const tu = dishes.filter((d) => matchDish(d.vi, dishes)?.dish.id === d.id).length;
+  eq("mọi món danh mục vẫn tự khớp đúng", tu, dishes.length);
+}
+
+console.log("\n── monla: không biết món thì nói gì ─────────");
+ok("dòng tự khai fine dining", phanKhuc("Pho bo phien ban fine dining")?.en === "fine dining");
+ok("dòng tự khai nguyên con", !!phanKhuc("Muc ong nuong nguyen con"));
+ok("dòng tự khai phần nhà hàng", !!phanKhuc("Cao lau phan nha hang"));
+ok("'đặc biệt' KHÔNG tính là khác phân khúc", phanKhuc("Pho bo dac biet") === null);
+ok("dòng thường thì không có dấu nào", phanKhuc("Cao lau") === null);
+
+eq("bún ốc là món nước", nhomMon("bun oc")?.id, "mon-nuoc");
+eq("lẩu là món tính cho nhiều người", nhomMon("lau ca keo")?.chung, true);
+eq("hải sản có thể tính theo cân", nhomMon("tom su rang me")?.theoCan, true);
+eq("cơm chiên hải sản là suất CƠM, không phải hải sản cân",
+   nhomMon("com chien hai san")?.id, "com");
+eq("cà phê là đồ uống, không phải cá", nhomMon("ca phe sua da")?.id, "do-uong");
+ok("tên vô nghĩa không đọc ra loại nào", nhomMon("zzzqqq") === null);
+
+{
+  const nt = nhomCuaDanhMuc(dishes);
+  ok("đọc ra loại cho phần lớn danh mục", Object.keys(nt).length >= dishes.length * 0.85,
+     `${Object.keys(nt).length}/${dishes.length}`);
+  const ha = prices["hoian-oldtown"].items;
+  const d = daiNhom("mon-nuoc", ha, nt);
+  ok("dải món nước Hội An dựng được", !!d && d.soMon >= MIN_MON_NHOM);
+  ok("dải theo loại nằm đúng thứ tự", d.thap <= d.giua && d.giua <= d.cao);
+  ok("KHÔNG có trường level trong dải theo loại", !("level" in d));
+  eq("loại chỉ có một hai món thì im", daiNhom("lau", ha, nt), null);
+  eq("loại không tồn tại thì im", daiNhom("khong-co", ha, nt), null);
+}
+
+{
+  const r = [{ price: 70000, st: { p50: 60000 } }, { price: 80000, st: { p50: 60000 } },
+             { price: 120000, st: { p50: 100000 } }];
+  eq("mặt bằng quán đo được từ 3 dòng", mucQuan(r).soDong, 3);
+  ok("hệ số quán quanh 1,2", Math.abs(mucQuan(r).heSo - 1.2) < 0.01, String(mucQuan(r).heSo));
+  eq("dưới ngưỡng dòng thì không nói", mucQuan(r.slice(0, MIN_DONG_QUAN - 1)), null);
+  eq("dòng không có dải thì không tính", mucQuan([{ price: 1, st: null }]), null);
+}
 
 console.log("\n── verdict ─────────────────────────────────");
 /* Dải giá DỰNG TAY, không lấy từ prices.json.

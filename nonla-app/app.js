@@ -40,6 +40,7 @@ import * as LocalPrices from "./localprices.js";
 import * as Welcome from "./welcome.js";
 import * as Units from "./units.js";
 import * as Predict from "./predict.js";
+import * as MonLa from "./monla.js";
 import { inferDishes } from "./eaterydish.js";
 import * as Lich from "./lich.js";
 import * as HanhTrinh from "./hanhtrinh.js";
@@ -689,10 +690,22 @@ function rowHTML(r) {
   /* Dòng tra từ menuref cũng phải mang nhãn nguồn. Bỏ trống ở đây là để
      một dải giá đi một mình đúng chỗ người đọc dễ tin nó nhất. */
   const src = Trust.badge(provOfRow(r));
-  const note = v.level === "unknown"
-    ? T("Not enough data")
-    : `${T("typical")} ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)}${src ? ` · ${src}` : ""}`;
-  const badge = v.level === "ok" ? "fair"
+  /* Dòng bị bỏ phán quyết vì tự khai phân khúc khác KHÔNG được hiện
+     "Not enough data". Dữ liệu có đủ; điều app từ chối làm là đem dải giá
+     vỉa hè áp lên một suất nhà hàng. Nói đúng lý do, vì "thiếu dữ liệu" ở
+     đây là một câu app tự nói sai về chính mình. */
+  /* Dòng không khớp món nào KHÔNG được ghi "Not enough data" nữa: khối
+     monLaHTML bên dưới đang nói mặt bằng của loại món ấy, nên hai chỗ trên
+     cùng một tấm thẻ sẽ mâu thuẫn nhau. "Ngoài danh mục" đúng hơn, và nó
+     dẫn mắt xuống đúng khối trả lời. */
+  const note = r.pk
+    ? `${T("this line says")} ${curLang() === "vi" ? r.pk.vi : r.pk.en} · ${
+        T("street range does not apply")}`
+    : v.level === "unknown"
+      ? (r.st ? T("Not enough data") : T("Not in our catalogue — see below"))
+      : `${T("typical")} ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)}${src ? ` · ${src}` : ""}`;
+  const badge = r.pk ? "own segment"
+    : v.level === "ok" ? "fair"
     : v.level === "warn" ? "above 75%"
     : v.level === "high" ? (v.pct != null ? `+${v.pct}%` : "high") : "unknown";
   return `<button class="row" data-dish="${esc(r.id || "")}">
@@ -768,8 +781,28 @@ function judgeRows(pairs) {
     const m = matchDish(name, S.dishes);
     const id = m?.dish.id || null;
     const st = id ? stat(id) : null;
-    return { id, label: m ? m.dish.vi : name, price, st, v: verdict(price, st) };
+    return boPhanQuyetKhacPhanKhuc(
+      { id, label: m ? m.dish.vi : name, name, price, st, v: verdict(price, st) });
   });
+}
+
+/* Dòng menu TỰ KHAI nó thuộc phân khúc khác thì bỏ phán quyết bất lợi.
+
+   Đo trên 187 tên món thật: sau khi siết match.js còn 18 ca app kêu oan
+   người bán, và 11 ca trong đó có một cụm như "phiên bản fine dining",
+   "phần nhà hàng", "nguyên con", "thủ công" ngay trong chữ của chính dòng
+   ấy. Khớp món ở đó ĐÚNG — "Phở bò phiên bản fine dining" thật sự là phở
+   bò. Sai là đem 500.000₫ của một suất nhà hàng so với dải giá vỉa hè rồi
+   phán "high".
+
+   Chỉ bỏ phán quyết BẤT LỢI. Dòng nào tự khai phân khúc khác mà giá vẫn
+   nằm trong dải thì câu "trong khoảng thường gặp" không hại ai và vẫn có
+   ích. Bỏ cả hai chiều là bỏ luôn những ca app trả lời được. */
+function boPhanQuyetKhacPhanKhuc(r) {
+  if (!r.st || r.v.level === "ok" || r.v.level === "unknown") return r;
+  const pk = MonLa.phanKhuc(r.name || r.label);
+  if (!pk) return r;
+  return { ...r, pk, v: { level: "unknown", label: "Different segment", pct: null } };
 }
 
 /* Cảnh báo bẫy đơn vị. Mô tả ĐƠN VỊ, không quy kết người bán: bán hải sản
@@ -913,6 +946,52 @@ const predictedHTML = anToan(function (preds) {
     <p class="seedwarn">${esc(T("These are worked out from prices in other zones, not measured here. Treat them as a rough bearing, not a verdict."))}</p>`;
 });
 
+/* Dòng menu app KHÔNG khớp được món nào. Trước bản này chúng hiện "Not
+   enough data" và hết — chương đối chứng của hồ sơ đo được đúng chỗ này:
+   100/100 lượt hỏi món ngoài danh mục thì mô hình ngôn ngữ trả lời được,
+   Nón Lá trả về một dấu gạch.
+
+   Khối này KHÔNG chữa bằng cách đoán giá món đó. Nó nói ba thứ đo được:
+   loại món đọc từ tên, mặt bằng của loại ấy ở vùng này, và mặt bằng của
+   chính tấm menu đang quét. Không dòng nào ở đây có đèn xanh đỏ — dải của
+   cả một loại món thì quá rộng để phán quyết một món, và dùng nó để kêu
+   "quá cao" là dựng lại đúng cái lỗi khớp nhầm vừa đi sửa. */
+const monLaHTML = anToan(function (rows) {
+  const la = rows.filter((r) => !r.id && !r.ref && !r.pk);
+  if (!la.length) return "";
+  const nhomTheoMon = MonLa.nhomCuaDanhMuc(S.dishes || []);
+  const muc = MonLa.mucQuan(rows.filter((r) => r.st));
+  const khoi = la.map((r) => MonLa.ngucanh(r.name || r.label,
+    { zoneItems: zone().items || {}, nhomTheoMon, muc })).filter((x) => x.coGi);
+  if (!khoi.length) return "";
+
+  return `
+    <h2 class="sect">${esc(T("Not in the catalogue — what we can still say"))}</h2>
+    ${khoi.map((k, i) => {
+      const r = la[i];
+      const bo = [];
+      /* fmtVND chứ không money(): money() nối thêm quy đổi ngoại tệ, và một
+         KHOẢNG hai đầu thành "60.000₫≈ $2.30–67.500₫≈ $2.59" — bốn con số
+         cho một khoảng. Dòng "typical" của rowHTML cũng dùng fmtVND đúng vì
+         lý do này. */
+      if (k.dai) bo.push(`${esc(curLang() === "vi" ? k.nhom.vi : k.nhom.en)}: ${
+        fmtVND(k.dai.thap)}–${fmtVND(k.dai.cao)} ${
+        esc(T("here"))} · ${k.dai.soMon} ${esc(T("dishes"))}`);
+      if (k.nhom?.chung) bo.push(esc(T("usually priced for several people — ask how many it serves")));
+      if (k.nhom?.theoCan) bo.push(esc(T("may be priced by weight — ask before ordering")));
+      return `<div class="row" style="cursor:default">
+        <span class="dot" data-l="unknown"></span>
+        <span><span class="nm">${esc(r.label)}</span><span class="note">${
+          bo.join(" · ") || esc(T("no reference for this kind of dish here"))}</span></span>
+        <span class="amt" data-l="unknown">${money(r.price)}<small>${esc(T("no verdict"))}</small></span>
+      </div>`;
+    }).join("")}
+    ${muc ? `<p class="src">${esc(T("On this menu, the"))} ${muc.soDong} ${
+      esc(T("lines we could price sit at"))} ${muc.heSo.toLocaleString("vi-VN")}× ${
+      esc(T("the local median."))}</p>` : ""}
+    <p class="seedwarn">${esc(T("These are ranges for a KIND of dish, not for this dish. Nón Lá does not judge a price it cannot compare."))}</p>`;
+});
+
 /* ── Chế độ "không có thực đơn" ──────────────────────────────
    Cả app tới giờ giả định có CHỮ để chĩa camera vào. Nhưng chỗ bị hớ nặng
    nhất lại là chỗ không có thực đơn nào: xe đẩy, gánh hàng rong, quán không
@@ -1032,6 +1111,7 @@ function showMenuResult(rows, conf, traps = null) {
     <p class="src">${rows.length} item${rows.length===1?"":"s"} read · ${esc(basis)} · updated ${esc(z.updated)}${conf!=null?` · OCR confidence ${Math.round(conf)}%`:""}</p>
     ${wave()}
     ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">No prices found in that shot. Move closer, hold steady, or enter by hand.</p>`}
+    ${monLaHTML(rows)}
     ${trapLineHTML(traps)}
     ${lichHTML()}
     ${/* Lối vào đếm tiền thối và so hai tấm thực đơn nằm trong khối gập bên
@@ -1626,7 +1706,13 @@ function logScan(rows, kind) {
        góp đáng tin nhất, vì không có OCR đọc nhầm số ở giữa. Chỉ khác nguồn:
        OCR sai kiểu đọc nhầm chữ số, tay sai kiểu bấm nhầm phím. */
     const src = kind === "manual" ? "hand" : "scan";
-    if (kind === "menu" || kind === "bill" || kind === "manual") {
+    /* Dòng tự khai phân khúc khác KHÔNG được vào kho giá quan sát.
+       Kho này là thứ sẽ THAY dải hạt giống khi đủ mẫu, nên ghi 500.000₫
+       của "Phở bò phiên bản fine dining" vào đó là tự tay đẩy dải giá phở
+       vỉa hè lên — cùng một lỗi trộn phân khúc đã phải đi sửa ở
+       menuband.mjs, chỉ khác đường vào. Dòng ấy vẫn nằm trong nhật ký
+       hoạt động phía trên: người dùng vẫn thấy mình đã ăn gì. */
+    if ((kind === "menu" || kind === "bill" || kind === "manual") && !r.pk) {
       Survey.add({ zone: S.zone, dishId: r.id, price: r.price, src });
       ghi++;
     }

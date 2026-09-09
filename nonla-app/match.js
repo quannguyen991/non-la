@@ -34,6 +34,72 @@ export function dice(a, b) {
   return (2 * hit) / total;
 }
 
+/* ── cửa chặn khớp nhầm ──────────────────────────────────────
+   HỆ SỐ DICE MỘT MÌNH KHÔNG ĐỦ, VÀ ĐÂY LÀ SỐ ĐO
+
+   Chạy 187 tên món thật lấy từ menu công bố — toàn bộ là món NGOÀI danh
+   mục 77 món — qua matchDish() bản cũ: 126 tên được khớp vào một món
+   trong danh mục. Trong 89 ca mà vùng đó có dải để phán quyết:
+
+     · 38 ca app kêu OAN người bán. "Tôm hùm nướng bơ tỏi" 1.150.000₫
+       khớp thành "Bò lá lốt" (dải 60–140k) rồi bị phán "high". Khách mang
+       câu đó ra đứng trước một nhà hàng không làm gì sai.
+     · 7 ca app BỎ LỌT. "Cơm chiên hải sản" 160.000₫ khớp thành "Hải sản
+       cân" (dải 450k–1,75tr) rồi được phán "ok" — kể cả khi bị hét giá.
+     · 44 ca vô hại tình cờ.
+
+   Tức là hơn một nửa số ca khớp nhầm cho ra một phán quyết SAI, và phần
+   lớn sai theo hướng buộc tội. Đó tệ hơn hẳn việc im lặng.
+
+   HAI CHỖ HỎNG, HAI LUẬT
+
+   1. `normalize()` bỏ dấu thanh cho chịu được OCR — nên "lấu" và "lẩu"
+      cùng thành "lau", và phần thưởng "một tên nằm trọn trong tên kia"
+      kéo "phá lấu" (bát 30–50k) về "Lẩu" (nồi 300–500k cho ba bốn người).
+      → Món một tiếng chỉ được khớp khi nó là tiếng ĐẦU của tên đọc được.
+        Tên món Việt đặt loại món lên trước: "lẩu cá kèo" là lẩu, "phá
+        lấu" thì không.
+
+   2. Dice đếm bigram ký tự nên "banh can" với "banh canh ca loc" đạt
+      0,933 — chỉ khác nhau ở đúng tiếng phân biệt hai món.
+      → Mọi tiếng của tên ngắn hơn phải có mặt trong tên kia. Tiếng ngắn
+        (≤4 ký tự) phải trùng KHÍT: "can" không được coi là "canh".
+
+   CÁI GIÁ PHẢI TRẢ, VÀ VÌ SAO TRẢ
+   Chặt hơn thì bỏ sót nhiều hơn — OCR mất một chữ cái trong một tiếng
+   ngắn là mất luôn cả dòng. Đánh đổi này đã được chọn từ menuref.js và
+   lý do không đổi: bỏ sót thì app im lặng, còn khớp nhầm thì app nói sai
+   một cách tự tin. Phần bỏ sót giờ có chỗ đỡ — monla.js trả về mặt bằng
+   của LOẠI món thay vì một dấu gạch.
+   ──────────────────────────────────────────────────────────── */
+
+/** Tiếng ngắn phải trùng khít; tiếng dài được sai một chút cho OCR. */
+const TIENG_NGAN = 4;
+
+function tiengKhop(a, b) {
+  if (a === b) return true;
+  if (a.length <= TIENG_NGAN || b.length <= TIENG_NGAN) return false;
+  return a[0] === b[0] && dice(a, b) >= 0.8;
+}
+
+/**
+ * Tên đọc được và tên món có nói về cùng một món không — xét theo TIẾNG.
+ * Chặn trước khi tính điểm, nên một điểm Dice cao không cứu nổi một cặp
+ * lệch tiếng.
+ */
+export function cungMon(q, n) {
+  const tq = q.split(" ").filter(Boolean);
+  const tn = n.split(" ").filter(Boolean);
+  if (!tq.length || !tn.length) return false;
+
+  // Món một tiếng ("Lẩu", "Chè", "Xôi", "Phở") chỉ nhận khi nó đứng đầu.
+  if (tn.length === 1) return tiengKhop(tn[0], tq[0]);
+
+  // Còn lại: mọi tiếng của tên NGẮN hơn phải có mặt bên kia.
+  const [ngan, dai] = tq.length <= tn.length ? [tq, tn] : [tn, tq];
+  return ngan.every((t) => dai.some((u) => tiengKhop(t, u)));
+}
+
 /**
  * Đọc số tiền VND từ một chuỗi.
  * Xử lý: 55.000 · 55,000 · 55 000 · 55k · 55K · 55.0 · 120000
@@ -103,6 +169,9 @@ export function matchDish(name, dishes, threshold = 0.45) {
     for (const c of cands) {
       const n = normalize(c);
       if (!n) continue;
+      // Cửa chặn đứng TRƯỚC phép tính điểm: một điểm Dice cao không được
+      // phép cứu một cặp lệch tiếng. Xem cungMon() ở trên.
+      if (!cungMon(q, n)) continue;
       let score = dice(q, n);
       // thưởng khi tên chuẩn nằm trọn trong chuỗi đọc được
       if (q.includes(n) || n.includes(q)) score = Math.max(score, 0.82);

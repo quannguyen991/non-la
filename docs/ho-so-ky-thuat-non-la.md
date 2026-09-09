@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 08/09/2026 · nhánh `community-v1` · 80 commit · 612 phép thử xanh
+Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 81 commit · 645 phép thử xanh
 
 ---
 
@@ -14,7 +14,7 @@ Bản dựng ngày 08/09/2026 · nhánh `community-v1` · 80 commit · 612 phép
 4. [Dữ liệu — những con số đếm được](#4-dữ-liệu--những-con-số-đếm-được)
 5. [Lớp tin cậy: xương sống của sản phẩm](#5-lớp-tin-cậy-xương-sống-của-sản-phẩm)
 6. [Bốn nguồn giá, và vì sao không nguồn nào đủ](#6-bốn-nguồn-giá-và-vì-sao-không-nguồn-nào-đủ)
-7. [Tính năng — nhóm A: soi giá](#7-tính-năng--nhóm-a-soi-giá)
+7. [Tính năng — nhóm A: soi giá](#7-tính-năng--nhóm-a-soi-giá) · [7.8 món ngoài danh mục](#78-món-ngoài-danh-mục--monlajs-và-cửa-chặn-khớp-nhầm)
 8. [Tính năng — nhóm B: đứng ở quầy](#8-tính-năng--nhóm-b-đứng-ở-quầy)
 9. [Tính năng — nhóm C: bản đồ và khám phá](#9-tính-năng--nhóm-c-bản-đồ-và-khám-phá)
 10. [Tính năng — nhóm D: lớp văn hoá](#10-tính-năng--nhóm-d-lớp-văn-hoá)
@@ -67,7 +67,7 @@ còn thiếu, hoặc im lặng.
 | Tình huống | Cách làm dễ | Nón Lá làm |
 |---|---|---|
 | Menu ghi "100.000/100g" | Đoán con cá 800g → hiện "bạn sẽ trả 800.000" | Chỉ ra dòng này tính theo cân, đưa phép nhân, để khách tự hỏi trọng lượng |
-| Món không có trong dữ liệu | Khớp mờ vào món gần giống nhất | Trả về dấu gạch |
+| Món không có trong dữ liệu | Khớp mờ vào món gần giống nhất | Nói mặt bằng của *loại* món, không phán quyết (7.8) |
 | Hai tấm menu chênh nhau | "Quán này chặt chém" | "Chênh lệch trung vị 1,4×" — một phép đo, không phải lời buộc tội |
 | Chưa ai đo giá ở vùng này | In con số hạt giống ra như số thật | Nói rõ đây là ước lượng, chưa ai đo tại quầy |
 
@@ -92,7 +92,7 @@ tiền) và lần nào cũng được giữ — nghĩa là mọi thứ đều ph
 canvas/SVG thuần hoặc bằng một tệp model tải rời.
 
 **(2) Chạy được khi tắt mạng.**
-Service worker `nonla-v45` cache **62 tệp** vỏ app. Ba trong bốn chế độ quét
+Service worker `nonla-v46` cache **64 tệp** vỏ app. Ba trong bốn chế độ quét
 chạy hoàn toàn offline; chỉ chế độ nhận diện món ăn cần mạng, và đó là ngoại lệ
 được ghi rõ ngay trong `index.html`.
 
@@ -117,7 +117,7 @@ nonla-app/
 └── web/                bản bố cục máy tính (12 trang HTML riêng)
 ```
 
-**16.905 dòng JavaScript** trong 45 mô-đun, cộng 5 bảng kiểu CSS (19.814 dòng cả CSS).
+**17.326 dòng JavaScript** trong 46 mô-đun, cộng 5 bảng kiểu CSS.
 
 Nguyên tắc chia mô-đun: **lõi thuần tách khỏi giao diện**. Mọi mô-đun không đụng
 DOM (`match.js`, `geo.js`, `iso.js`, `route.js`, `posts.js`, `amlich.js`,
@@ -152,7 +152,7 @@ Mọi con số dưới đây đếm trực tiếp từ tệp dữ liệu, không
 | Bài cộng đồng mẫu | **29** | `community.json` |
 | Mục lịch cố định | **9** | `lich.json` |
 | Quán cào từ sitemap giao hàng | **4.228** | `docs/quan-sitemap-*.json` |
-| Tệp trong vỏ offline | **62** | `sw.js` |
+| Tệp trong vỏ offline | **64** | `sw.js` |
 
 ### 4.1 Sáu vùng
 
@@ -249,12 +249,13 @@ nguyên trên mục `sourced`.
 ### 6.2 Nguồn 2 — menu công bố
 
 `tools/nhap-gia-menu.mjs` + `tools/menuband.mjs` nạp giá tra từ menu công bố,
-bài hướng dẫn và review. 53 ô được nạp.
+bài hướng dẫn và review. **66 ô** mang cờ `sourced`, trong đó **53 ô** được
+dựng lại dải (có trường `base` để chạy lại vẫn ra đúng kết quả).
 
 **Phép đo quan trọng nhất của nguồn này là một phép đo tiêu cực:**
 
-> Trong 53 ô đã nạp, đầu rẻ của dải (`p25`) **lên đúng 0 lần**. Đầu đắt (`p95`)
-> lên 12 lần.
+> Trong 53 ô đã dựng lại dải, đầu rẻ (`p25`) **lên đúng 0 lần** — nó chỉ đi
+> xuống, 2 lần. Đầu đắt (`p95`) lên 6 lần.
 
 Nghĩa là: menu công bố chỉ tồn tại ở quán **có website**, tức là đúng đầu đắt
 của thị trường. Cào thêm menu không bao giờ chạm tới xe đẩy và quán vỉa hè.
@@ -381,6 +382,113 @@ Cùng một món, sáu vùng, sáu dải — cho thấy cấu trúc giá theo đ
 ở 7.3 dựa vào.
 
 ---
+
+### 7.8 Món ngoài danh mục — `monla.js` và cửa chặn khớp nhầm
+
+Mục 14.2 ghi rằng Nón Lá thua mô hình ngôn ngữ ở những món ngoài danh mục vì
+nó "trả về một dấu gạch". Đi sửa thì đo được rằng dấu gạch **không phải lỗi tệ
+nhất** — nó chỉ là phần nhỏ.
+
+#### Phép đo
+
+Cho **187 tên món thật** lấy từ menu công bố (toàn bộ là món ngoài danh mục 77
+món) chạy qua `matchDish()` bản cũ:
+
+| | |
+|---|---|
+| khớp vào một món trong danh mục | **126** |
+| trong đó vùng có dải để phán quyết | 89 |
+| → app **kêu oan người bán** (giá thật vượt `p95` của món bị khớp) | **38** |
+| → app **bỏ lọt** (giá thật dưới `p25`, nên bị hét vẫn phán "ok") | 7 |
+| → vô hại tình cờ | 44 |
+
+Nghĩa là hơn một nửa số ca khớp nhầm cho ra một phán quyết **sai**, và phần lớn
+sai theo hướng buộc tội:
+
+| Dòng menu thật | Bị khớp thành | Giá thật | Dải áp lên | App phán |
+|---|---|---|---|---|
+| Tôm hùm nướng bơ tỏi | Bò lá lốt | 1.150.000₫ | 60–140k | high |
+| Cua hoàng đế hấp | Cháo lòng | 1.000.000₫ | 30–80k | high |
+| Phá lấu | Lẩu | ~60.000₫ | 250–500k | ok |
+| Cơm chiên hải sản | Hải sản cân | 160.000₫ | 450k–1,75tr | ok |
+
+#### Hai chỗ hỏng
+
+**(1) Bỏ dấu thanh + thưởng điểm "nằm trọn trong".** `normalize()` bỏ dấu để
+chịu được OCR, nên "lấu" và "lẩu" cùng thành `lau`; rồi luật thưởng 0,82 khi một
+tên nằm trọn trong tên kia kéo "phá lấu" (bát 30–50k) về "Lẩu" (nồi 300–500k cho
+ba bốn người).
+
+**(2) Dice đếm bigram ký tự.** `banh can` với `banh canh ca loc` đạt **0,933** —
+chỉ khác nhau ở đúng tiếng phân biệt hai món.
+
+#### Luật mới: `cungMon()`
+
+- Món **một tiếng** (`Lẩu`, `Chè`, `Xôi`, `Phở`) chỉ được khớp khi nó là tiếng
+  **đầu** của tên đọc được. Tên món Việt đặt loại món lên trước: "lẩu cá kèo" là
+  lẩu, "phá lấu" thì không.
+- Mọi **tiếng** của tên ngắn hơn phải có mặt trong tên kia. Tiếng ngắn (≤4 ký
+  tự) phải trùng **khít**: `can` không được coi là `canh`.
+
+| | Trước | Sau |
+|---|---|---|
+| kêu oan | 38 | **7** |
+| bỏ lọt | 7 | **0** |
+| món danh mục tự khớp đúng | 77/77 | **77/77** |
+
+Trong 7 ca còn lại, 4 ca chỉ vượt `p95` dưới 15% — ở mức đó câu "cao hơn mức
+thường gặp" là một câu đúng.
+
+#### Cái giá, và vì sao trả
+
+Chặt hơn thì bỏ sót nhiều hơn: `"Banh mie"` (OCR gõ rụng chữ) không còn khớp
+vào bánh mì. Đã đo một biến thể **nới** (cho sai một chữ khi hai tên cùng số
+tiếng): số ca kêu oan **y nguyên**, và nó giữ được `Banh mie` — nhưng vẫn khớp
+`Bánh căn → Bánh canh cá lóc` qua alias.
+
+Chọn luật chặt vì một nhãn món sai không chỉ hiện sai trên màn hình:
+
+```js
+Survey.add({ zone: S.zone, dishId: r.id, price: r.price, src });
+```
+
+Kho quan sát này là thứ sẽ **thay** dải hạt giống khi đủ mẫu. Một nhãn sai ghi
+giá bánh căn vào ô bánh canh cá lóc là tự tay đầu độc đúng bộ dữ liệu cả dự án
+được dựng để thu.
+
+#### `monla.js` đỡ phần im lặng
+
+Ba thứ nói được mà không bịa một con số nào:
+
+**a. Dòng menu tự khai phân khúc.** 11 trong 18 ca kêu oan còn lại sau khi siết
+`match.js` có một cụm như *"phiên bản fine dining"*, *"phần nhà hàng"*, *"nguyên
+con"*, *"thủ công"* ngay trong chữ. Khớp món ở đó **đúng** — sai là đem một suất
+nhà hàng so với dải giá vỉa hè. Gặp dấu ấy thì app bỏ **phán quyết bất lợi** và
+nói ra lý do; dòng ấy cũng **không được vào kho giá quan sát**.
+
+`"đặc biệt"` cố ý **không** nằm trong danh sách: "phở bò đặc biệt" là suất thêm
+thịt ở quán vỉa hè, bỏ phán quyết cho nó là bỏ đúng những ca app cần trả lời.
+
+**b. Loại món đọc từ tên.** 11 nhóm suy từ tiếng đầu, phủ **71/77** món danh
+mục. Từ đó dựng mặt bằng của **loại** món ở vùng này — bằng chính những món app
+đã có dải, không thêm dữ liệu nào từ ngoài. Dưới 3 món cùng loại thì im.
+
+Hai cờ quan trọng hơn cả dải: `chung` (lẩu, set, buffet — con số thường tính cho
+nhiều người) và `theoCan` (hải sản đứng đầu tên — có thể tính theo cân). App
+**không** nhân ra "mỗi người 112.500₫": trọng lượng và số người là dữ kiện app
+không có.
+
+**c. Mặt bằng của chính tấm menu đang quét.** Những dòng khớp được cho biết quán
+này ở đâu so với khu — *"4 dòng tra được giá đang ở mức 1,25× trung vị của
+khu"*. Đây là một **phép đo có cỡ mẫu**, và nó áp được cho cả dòng app không
+biết là món gì.
+
+#### Luật không được phá
+
+Dải của một **loại** món **không bao giờ** sinh ra phán quyết. Nó rộng — "món
+nước ở Hội An 60–68k" gộp cả cao lầu với cháo — nên dùng nó để kêu "quá cao" là
+dựng lại đúng cái lỗi vừa đi sửa, chỉ thay khớp nhầm bằng gộp nhầm. `ngucanh()`
+cố ý **không có trường `level`**, và có một phép thử canh đúng điều đó.
 
 ## 8. Tính năng — nhóm B: đứng ở quầy
 
@@ -876,6 +984,10 @@ hữu ích — bánh căn, bún ốc, phá lấu, chả rươi. Nón Lá trả v
 Một mô hình ngôn ngữ phủ rộng hơn hẳn, và **bất kỳ bảng so sánh nào không ghi
 dòng này ra là một bảng không đáng tin.**
 
+Đi sửa chỗ này ngày 09/09 thì phát hiện dấu gạch **không phải** lỗi tệ nhất —
+xem mục 7.8. App không im lặng cho phần lớn món ngoài danh mục: nó khớp bừa
+rồi phán quyết bằng dải giá của một món khác.
+
 ### 14.3 Kết luận
 
 Mô hình ngôn ngữ trả lời **rộng** hơn Nón Lá rất nhiều, và khá ổn định. Thứ nó
@@ -933,7 +1045,7 @@ cả cho những quán không liên quan.**
 
 ## 16. Kiểm thử và tự soát
 
-### 16.1 `test.mjs` — 612 phép thử, 0 hỏng
+### 16.1 `test.mjs` — 645 phép thử, 0 hỏng
 
 Kiểm lõi thuần: khớp món, bách phân vị, phán quyết, phép chiếu bản đồ, tuyến đi
 bộ, âm lịch, đơn vị, so thực đơn, tiền thối, tin cậy, nguồn giá, chấm điểm đối
@@ -971,6 +1083,11 @@ từ dữ liệu, không viết tay"* — và tệp này **áp luật ấy lên 
 trong cả cuốn.** Nó bắt được: bìa ghi 583, chương 0 ghi 739, chương 1 và phụ
 lục ghi 420 — **bốn con số cho cùng một phép đếm, và không con nào đúng** (thật
 là 612). Đây là thứ giám khảo đếm lại được trong ba mươi giây.
+
+Ngày 09/09 nó hở một chỗ khác và đã bịt: luật trên chỉ bắt hồ sơ khai **nhiều**
+con số, nên nó vẫn xanh khi cả cuốn khai thống nhất một con số **đã cũ**. Giờ
+bộ soát **chạy thật** `node test.mjs` rồi so — bắt được đúng lúc hồ sơ còn ghi
+612 trong khi bộ thử đã lên 645.
 
 Nó chỉ soát những con số **đếm được**, không cố hiểu văn xuôi: một bộ soát đoán
 mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát người ta tắt đi.
@@ -1073,7 +1190,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `history.js` | 253 | lịch sử hoạt động (IndexedDB) |
 | `amlich.js` | 244 | lõi âm lịch Việt Nam |
 | `hanhtrinh.js` | 231 | trang hành trình |
-| `sw.js` | 220 | service worker, SHELL 62 tệp |
+| `sw.js` | 220 | service worker, SHELL 64 tệp |
 | `survey.js` | 219 | khảo sát giá tại chỗ |
 | `cloud.js` | 219 | chỗ duy nhất biết tới HTTP |
 | `match.js` | 210 | khớp món, đọc tiền, phán quyết |
@@ -1095,6 +1212,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `giaohang.js` | 140 | quy giá app giao hàng về quầy |
 | `change.js` | 136 | đếm tiền thối |
 | `menuref.js` | 110 | 187 món ngoài danh mục |
+| `monla.js` | 243 | ngữ cảnh cho dòng không khớp được món nào |
 | `pricesync.js` | 96 | đóng góp giá lên máy chủ |
 | `route.js` | 91 | tuyến đi bộ |
 | `outbox.js` | 91 | hàng chờ gửi |

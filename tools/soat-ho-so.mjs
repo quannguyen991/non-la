@@ -22,6 +22,7 @@
    là một bộ soát người ta tắt đi.
    ═══════════════════════════════════════════════════════════════ */
 
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -82,6 +83,26 @@ soat("ô nạp từ menu công bố", that.sourced, coSo);
   if (!ok) hong++;
   console.log(`  ${ok ? "ok  " : "SAI "} ${"số phép thử chỉ có MỘT giá trị".padEnd(34)}`
     + (ok ? `= ${rieng[0] ?? "(không nhắc)"}` : `thấy ${rieng.length}: ${rieng.join(", ")}`));
+
+  /* Nhất quán KHÔNG phải đúng. Luật trên chỉ bắt hồ sơ khai bốn con số
+     khác nhau cho cùng một phép đếm; nó vẫn xanh khi cả cuốn khai thống
+     nhất một con số đã cũ. Bắt được 09/09/2026: hồ sơ khai 612 trong khi
+     bộ thử đã lên 645 sau khi thêm cửa chặn khớp nhầm — và 612 là con số
+     giám khảo chạy lại được bằng một dòng lệnh. Nên chạy thật. */
+  try {
+    const ra = execFileSync(process.execPath, ["test.mjs"],
+      { cwd: join(GOC, "nonla-app"), encoding: "utf8" });
+    const tong = /(\d+)\s*pass\s*·\s*(\d+)\s*fail/.exec(ra);
+    if (!tong) throw new Error("không đọc được dòng tổng kết của test.mjs");
+    const [, pass, fail] = tong;
+    const khop = rieng.length === 1 && rieng[0] === pass && fail === "0";
+    if (!khop) hong++;
+    console.log(`  ${khop ? "ok  " : "SAI "} ${"số phép thử khớp bộ thử THẬT".padEnd(34)}`
+      + `chạy thật = ${pass} pass · ${fail} fail, hồ sơ viết = ${rieng[0] ?? "(không nhắc)"}`);
+  } catch (e) {
+    hong++;
+    console.log(`  SAI  ${"số phép thử khớp bộ thử THẬT".padEnd(34)}${e.message.split("\n")[0]}`);
+  }
 }
 
 console.log("\n── luật riêng ──────────────────────────────");
