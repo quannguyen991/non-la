@@ -28,6 +28,7 @@
 
 import * as Survey from "./survey.js";
 import * as Pricesync from "./pricesync.js";
+import { xepO, liDo } from "./uutien.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -46,19 +47,39 @@ const k = (n) => `${Math.round(n / 1000)}k`;
 /* ── vẽ ─────────────────────────────────────────────────────── */
 
 function dishRows() {
-  const need = (id) => Math.max(0, Survey.MIN_SAMPLES - (M.tally[`${M.zone}|${id}`] || 0));
-  /* Xếp theo còn thiếu bao nhiêu, rồi tới tên. Món đã đủ mẫu tụt xuống
-     đáy chứ KHÔNG biến mất: giá thay đổi theo mùa, và một món đã đủ vẫn
-     đáng ghi thêm khi đi qua lần nữa. */
-  const list = [...M.dishes].sort((a, b) => need(b.id) - need(a.id) || a.vi.localeCompare(b.vi));
-  return list.map((d) => {
-    const have = M.tally[`${M.zone}|${d.id}`] || 0;
+  /* Xếp theo LƯỢNG BẤT ĐỊNH GIẢM ĐƯỢC, không theo số mẫu còn thiếu.
+
+     Bản trước xếp theo "còn thiếu bao nhiêu mẫu", nên bốn mươi món chưa
+     ai đo đứng ngang hàng nhau rồi phân định bằng thứ tự bảng chữ cái —
+     và người khảo sát đi đo món đầu bảng chữ cái trước. Nhưng một ô dải
+     rộng một triệu đồng sai thì tốn gấp hai mươi lần một ô dải rộng năm
+     mươi nghìn, và đó là thứ quyết định nên gõ món nào trước khi buổi
+     sáng chỉ còn mười lăm phút.
+
+     uutien.js là chỗ giữ luật ấy, và phiếu khảo sát in ra
+     (tools/lo-trinh-khao-sat.mjs) dùng chung đúng bộ luật này — nên thứ
+     tự trên giấy và thứ tự trên màn hình không bao giờ lệch nhau.
+
+     Món đã đủ mẫu tụt xuống đáy chứ KHÔNG biến mất: giá thay đổi theo
+     mùa, và một món đã đủ vẫn đáng ghi thêm khi đi qua lần nữa — đó cũng
+     chính là điều giamBatDinh() nói, nó nhỏ dần chứ không về 0. */
+  const nThat = {};
+  for (const d of M.dishes) nThat[d.id] = M.tally[`${M.zone}|${d.id}`] || 0;
+  const ziLoc = M.prices?.items || {};
+  const themMon = M.dishes.map((d) => d.id).filter((id) => !ziLoc[id]);
+  const hang = xepO(ziLoc, nThat, M.soQuan || {}, themMon);
+  const theoId = new Map(M.dishes.map((d) => [d.id, d]));
+
+  return hang.map((o) => {
+    const d = theoId.get(o.dishId);
+    if (!d) return "";
+    const have = o.mau;
     const done = have >= Survey.MIN_SAMPLES;
-    const seed = M.prices?.items?.[d.id];
+    const seed = ziLoc[d.id];
     return `<button class="sv-dish${done ? " done" : ""}${M.pick === d.id ? " on" : ""}"
       data-svdish="${esc(d.id)}">
       <span class="nm">${esc(d.vi)}</span>
-      <span class="svsub">${seed ? `seed ${k(seed.p50)}` : "chưa có dải"}</span>
+      <span class="svsub">${esc(liDo(o))}${seed ? ` · seed ${k(seed.p50)}` : ""}</span>
       <span class="tick">${have}/${Survey.MIN_SAMPLES}</span>
     </button>`;
   }).join("");
@@ -221,9 +242,13 @@ async function gui() {
 
 /* ── API ────────────────────────────────────────────────────── */
 
-export async function open({ host, zone, zoneName, dishes, places, prices, onClose, toast, onApply }) {
+export async function open({ host, zone, zoneName, dishes, places, prices, soQuan,
+                            onClose, toast, onApply }) {
   M.host = host; M.zone = zone; M.zoneName = zoneName;
   M.places = places || []; M.prices = prices || null;
+  /* Số quán trong vùng gợi ra từng món. Bảng ưu tiên cần nó để biết
+     món nào nhiều người gặp; app.js tính vì chỉ ở đó mới có eateries. */
+  M.soQuan = soQuan || {};
   M.cb = { onClose, toast, onApply };
   M.pick = null; M.recent = [];
   /* Chỉ những món vùng này thật sự có dải giá. Cho khảo sát cả 77 món ở

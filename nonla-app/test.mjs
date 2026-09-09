@@ -38,6 +38,7 @@ import { docSo as docSoLlm, tienViet as tienVietLlm, tuChoi as tuChoiLlm,
          raoDon as raoDonLlm, daoDong as daoDongLlm, soVoiDai as soVoiDaiLlm,
          trungDapAn as trungDapAnLlm } from "../tools/llmparse.mjs";
 import { bandFloor, forZone } from "./premium.js";
+import { giamBatDinh, rongDai, diemO, xepO, xepPho, liDo } from "./uutien.js";
 import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
          MIN_QUAN_SAT, TI_LE_DUNG } from "./coso.js";
 import { phanKhuc, nhomMon, nhomCuaDanhMuc, daiNhom, mucQuan,
@@ -224,6 +225,65 @@ console.log("\n── coso: nhãn Đúng Giá phải sinh ra ──────�
   eq("places.json không còn trường phán quyết hay giá gán tay", dinh.length, 0);
   ok("và không cơ sở nào có nhãn khi chưa ai quét",
      Object.values(danhGiaTatCa(pj.places, {}, {})).every((d) => d.muc === null));
+}
+
+console.log("\n── uutien: đi đo ở đâu thì đáng nhất ────────");
+{
+  /* Mẫu đầu tiên phải đáng giá hơn hẳn mẫu thứ hai mươi mốt — đó là toàn
+     bộ lý do bảng ưu tiên tồn tại. */
+  ok("mẫu đầu đáng hơn mẫu sau", giamBatDinh(0) > giamBatDinh(1));
+  ok("giá trị giảm đều theo n", giamBatDinh(5) > giamBatDinh(20));
+  ok("mẫu đầu hơn mẫu thứ 21 hơn 50 lần",
+     giamBatDinh(0) / giamBatDinh(20) > 50, String(giamBatDinh(0) / giamBatDinh(20)));
+  eq("không có dải thì bề rộng bằng 0", rongDai(null), 0);
+  eq("bề rộng là p95 − p25", rongDai({ p25: 30000, p95: 70000 }), 40000);
+
+  const hep = { p25: 30000, p50: 40000, p75: 45000, p95: 50000 };   // rộng 20k
+  const rong = { p25: 300000, p50: 600000, p75: 900000, p95: 1300000 }; // rộng 1tr
+  ok("ô đắt và rộng đáng đo hơn ô rẻ và hẹp, khi cùng cỡ mẫu",
+     diemO(rong, 0, 5) > diemO(hep, 0, 5));
+  ok("ô chưa ai đo đáng hơn chính nó sau khi đã đo",
+     diemO(hep, 0, 5) > diemO(hep, 5, 5));
+
+  /* Chỗ dễ sai nhất: "0 quán" là eaterydish.js không suy ra được, KHÔNG
+     phải không ai bán. Nhân thành 0 là mang lệch mẫu của bộ suy món vào
+     bảng ưu tiên rồi coi như sự thật. */
+  ok("món chưa định vị được quán vẫn có điểm dương", diemO(hep, 0, 0) > 0);
+  ok("nhưng thấp hơn hẳn món đã biết chỗ bán", diemO(hep, 0, 0) < diemO(hep, 0, 30));
+
+  const zi = { re: hep, dat: rong };
+  {
+    const ds = xepO(zi, {}, { re: 5, dat: 5 });
+    eq("xếp đủ số ô", ds.length, 2);
+    eq("ô đắt đứng trước", ds[0].dishId, "dat");
+    ok("mỗi ô giải thích được vì sao", "mau" in ds[0] && "rong" in ds[0] && "quan" in ds[0]);
+  }
+  {
+    // Đo đủ ô đắt rồi thì ô rẻ phải lên đầu.
+    const ds = xepO(zi, { dat: 20 }, { re: 5, dat: 5 });
+    eq("đo xong rồi thì nhường chỗ", ds[0].dishId, "re");
+  }
+  {
+    // Ô chưa có dải là lý do MẠNH NHẤT để đi đo, nên phải được xếp.
+    const ds = xepO(zi, {}, { re: 5, dat: 5, moi: 5 }, ["moi"]);
+    eq("ô chưa có dải vẫn vào bảng", ds.length, 3);
+    ok("và được đánh dấu là chưa có dải", ds.find((o) => o.dishId === "moi").chuaCoDai);
+    ok("không rơi xuống đáy vì bề rộng bằng 0",
+       ds.findIndex((o) => o.dishId === "moi") < 2);
+  }
+
+  /* Một phố mười hàng phở không được tính giá trị của phở mười lần. */
+  {
+    const phos = [
+      { ten: "Phố nhiều quán một món", mon: ["re"], soQuan: 40 },
+      { ten: "Phố hai món", mon: ["re", "dat"], soQuan: 2 },
+    ];
+    const xp = xepPho(phos, zi, {}, { re: 5, dat: 5 });
+    eq("phố chạm được ô đắt vẫn thắng", xp[0].ten, "Phố hai món");
+    ok("mỗi phố nói được nó đóng góp ở ô nào", Array.isArray(xp[0].gop) && xp[0].gop.length === 2);
+  }
+
+  ok("lí do không in điểm số trần trụi", !/\d+\.\d{3}/.test(liDo(xepO(zi, {}, {})[0])));
 }
 
 console.log("\n── verdict ─────────────────────────────────");

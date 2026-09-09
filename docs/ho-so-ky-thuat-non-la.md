@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 82 commit · 658 phép thử xanh
+Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 83 commit · 677 phép thử xanh
 
 ---
 
@@ -92,7 +92,7 @@ tiền) và lần nào cũng được giữ — nghĩa là mọi thứ đều ph
 canvas/SVG thuần hoặc bằng một tệp model tải rời.
 
 **(2) Chạy được khi tắt mạng.**
-Service worker `nonla-v47` cache **65 tệp** vỏ app. Ba trong bốn chế độ quét
+Service worker `nonla-v48` cache **66 tệp** vỏ app. Ba trong bốn chế độ quét
 chạy hoàn toàn offline; chỉ chế độ nhận diện món ăn cần mạng, và đó là ngoại lệ
 được ghi rõ ngay trong `index.html`.
 
@@ -152,7 +152,7 @@ Mọi con số dưới đây đếm trực tiếp từ tệp dữ liệu, không
 | Bài cộng đồng mẫu | **29** | `community.json` |
 | Mục lịch cố định | **9** | `lich.json` |
 | Quán cào từ sitemap giao hàng | **4.228** | `docs/quan-sitemap-*.json` |
-| Tệp trong vỏ offline | **65** | `sw.js` |
+| Tệp trong vỏ offline | **66** | `sw.js` |
 
 ### 4.1 Sáu vùng
 
@@ -489,6 +489,80 @@ Dải của một **loại** món **không bao giờ** sinh ra phán quyết. N�
 nước ở Hội An 60–68k" gộp cả cao lầu với cháo — nên dùng nó để kêu "quá cao" là
 dựng lại đúng cái lỗi vừa đi sửa, chỉ thay khớp nhầm bằng gộp nhầm. `ngucanh()`
 cố ý **không có trường `level`**, và có một phép thử canh đúng điều đó.
+
+### 7.9 Đi đo ở đâu thì đáng nhất — `uutien.js`
+
+Bảng giá là lưới vùng × món và mọi ô đều thiếu dữ liệu thật. Một buổi sáng đi bộ
+ghi được vài chục dòng. Ghi ở đâu?
+
+Cho tới bản này, cả phiếu khảo sát in ra lẫn màn khảo sát trong app đều xếp theo
+**độ phủ**: phố nào gợi ra nhiều món nhất thì đi trước, món nào thiếu nhiều mẫu
+nhất thì gõ trước. Với 40 món cùng ở mức 0 mẫu, cách ấy phân định bằng **thứ tự
+bảng chữ cái**.
+
+#### Luật thay thế
+
+Sai số chuẩn của một trung vị giảm theo 1/√n, nên thêm đúng một mẫu vào ô đang
+có n mẫu làm bất định giảm đi:
+
+```
+giamBatDinh(n) = 1/√(n+1) − 1/√(n+2)
+```
+
+| n | giá trị một mẫu nữa |
+|---|---|
+| 0 | 0,293 |
+| 5 | 0,030 |
+| 20 | 0,005 |
+
+Mẫu đầu tiên đáng giá gần **sáu mươi lần** mẫu thứ hai mươi mốt. Đó là một phát
+biểu thống kê, không phải một trọng số nghĩ ra.
+
+Nhưng "bất định" phải đo bằng đơn vị nào đó, và ở đây là **đồng**: bề rộng dải
+`p95 − p25`. Một ô dải 30–70k thì bất định 40.000₫; ô "Hải sản cân" ở Hội An
+rộng 1.050.000₫. Sai ở ô thứ hai tốn gấp hai mươi sáu lần.
+
+```
+điểm(ô) = giamBatDinh(n) × (p95 − p25) × log(2 + soQuán)
+```
+
+#### Vì sao `log(2 + q)` chứ không `log(1 + q)`
+
+Vì **"0 quán" không có nghĩa là không ai bán**. `eaterydish.js` suy món từ *tên*
+quán nên chỉ thấy quán tự đặt tên theo món. Cà phê muối ở Hoàn Kiếm đếm ra 0
+quán, và Hoàn Kiếm thì đầy cà phê muối. `log(1+q)` nhân điểm với 0 và đẩy món ấy
+xuống đáy — tức là mang đúng lệch mẫu của bộ suy món vào bảng ưu tiên rồi coi
+như một sự thật.
+
+#### Kết quả
+
+| Vùng | Ba ô đứng đầu |
+|---|---|
+| Hà Nội · Hoàn Kiếm | Lẩu · Chả cá · Phở bò |
+| Hội An · Phố cổ | Hải sản cân · Phở bò · Lẩu |
+| TP.HCM · Quận 1 | Lẩu · Hải sản cân · Cơm tấm |
+| Huế · Kinh thành | Lẩu · Bún bò Huế · Cà phê sữa đá |
+
+"Hải sản cân" đứng đầu ở ba vùng biển — đúng ô mà sai thì tốn tiền nhất, và cũng
+đúng ô dính bẫy tính theo cân của `units.js`.
+
+Đo 5 mẫu Lẩu ở Hoàn Kiếm thì nó tụt từ hạng 1 xuống **hạng 14/35**, và Chả cá
+lên đầu. Bảng tự nhường chỗ, không cần ai chỉnh tay.
+
+#### Một luật cho hai chỗ
+
+`uutien.js` không phụ thuộc DOM, nên **phiếu khảo sát in ra trên giấy và màn
+khảo sát trên điện thoại dùng chung đúng một bộ luật** — thứ tự hai bên không
+bao giờ lệch nhau. Nó cũng chạy hoàn toàn offline: không có lời gọi mạng nào
+trong đường ưu tiên.
+
+#### Chỗ phải nói thẳng
+
+Ba thừa số đều là số **đếm được**. Việc **nhân** chúng với nhau là một lựa chọn
+thiết kế, và mã nguồn ghi rõ như vậy. Thứ nó bảo đảm là: thứ hạng dựng lại được
+từ dữ liệu, ai chạy cũng ra đúng thứ tự ấy, và mỗi ô giải thích được vì sao nó
+đứng chỗ đó — giao diện hiện *"nothing measured yet · range spans 280k"* chứ
+không hiện một điểm số trần trụi.
 
 ## 8. Tính năng — nhóm B: đứng ở quầy
 
@@ -1045,7 +1119,7 @@ cả cho những quán không liên quan.**
 
 ## 16. Kiểm thử và tự soát
 
-### 16.1 `test.mjs` — 658 phép thử, 0 hỏng
+### 16.1 `test.mjs` — 677 phép thử, 0 hỏng
 
 Kiểm lõi thuần: khớp món, bách phân vị, phán quyết, phép chiếu bản đồ, tuyến đi
 bộ, âm lịch, đơn vị, so thực đơn, tiền thối, tin cậy, nguồn giá, chấm điểm đối
@@ -1087,7 +1161,7 @@ là 612). Đây là thứ giám khảo đếm lại được trong ba mươi gi�
 Ngày 09/09 nó hở một chỗ khác và đã bịt: luật trên chỉ bắt hồ sơ khai **nhiều**
 con số, nên nó vẫn xanh khi cả cuốn khai thống nhất một con số **đã cũ**. Giờ
 bộ soát **chạy thật** `node test.mjs` rồi so — bắt được đúng lúc hồ sơ còn ghi
-612 trong khi bộ thử đã lên 645 (nay là 658).
+612 trong khi bộ thử đã lên 645 (nay là 677).
 
 Nó chỉ soát những con số **đếm được**, không cố hiểu văn xuôi: một bộ soát đoán
 mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát người ta tắt đi.
@@ -1217,7 +1291,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `history.js` | 253 | lịch sử hoạt động (IndexedDB) |
 | `amlich.js` | 244 | lõi âm lịch Việt Nam |
 | `hanhtrinh.js` | 231 | trang hành trình |
-| `sw.js` | 220 | service worker, SHELL 65 tệp |
+| `sw.js` | 220 | service worker, SHELL 66 tệp |
 | `survey.js` | 219 | khảo sát giá tại chỗ |
 | `cloud.js` | 219 | chỗ duy nhất biết tới HTTP |
 | `match.js` | 210 | khớp món, đọc tiền, phán quyết |
@@ -1241,6 +1315,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `menuref.js` | 110 | 187 món ngoài danh mục |
 | `monla.js` | 243 | ngữ cảnh cho dòng không khớp được món nào |
 | `coso.js` | 111 | nhãn Đúng Giá suy từ lượt quét thật |
+| `uutien.js` | 171 | xếp ô giá theo lượng bất định giảm được |
 | `pricesync.js` | 96 | đóng góp giá lên máy chủ |
 | `route.js` | 91 | tuyến đi bộ |
 | `outbox.js` | 91 | hàng chờ gửi |

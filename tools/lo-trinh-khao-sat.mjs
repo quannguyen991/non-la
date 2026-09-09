@@ -33,6 +33,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { inferDishes } from "../nonla-app/eaterydish.js";
 import { MIN_SAMPLES } from "../nonla-app/trust.js";
+import { xepO, xepPho, liDo } from "../nonla-app/uutien.js";
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), "..");
 const argv = process.argv.slice(2);
@@ -94,15 +95,34 @@ for (const q of themSitemap) {
   for (const id of q.mon || []) if (oGia.includes(id)) p.mon.set(id, Math.max(p.mon.get(id) || 0, 0.6));
 }
 
-/* Xếp phố: nhiều món gợi ra trước, rồi tới nhiều quán. Một buổi sáng có
-   hạn, nên phố nào trả về nhiều ô giá nhất thì đi trước. */
-const dsPho = [...pho.values()]
-  .filter((p) => p.mon.size > 0)
-  .sort((a, b) => b.mon.size - a.mon.size
-    || (b.quan.length + (b.tuSitemap || 0)) - (a.quan.length + (a.tuSitemap || 0)));
+/* ── xếp theo BẤT ĐỊNH GIẢM ĐƯỢC, không theo độ phủ ──────────
+   Bản trước xếp phố theo "gợi ra nhiều ô giá nhất". Nó tham lam theo độ
+   phủ: đi một vòng chạm được nhiều ô. Nhưng chạm một ô đang có mười mẫu
+   thì gần như không thêm gì, còn chạm một ô chưa ai đo thì đổi hẳn câu
+   trả lời của app ở ô đó — và một ô dải rộng một triệu đồng sai thì tốn
+   gấp hai mươi lần một ô dải rộng năm mươi nghìn.
+
+   uutien.js giữ luật ấy, và app dùng chung đúng bộ luật này. */
+const soQuanTheoMon = {};
+for (const p of pho.values()) for (const id of p.mon.keys()) {
+  soQuanTheoMon[id] = (soQuanTheoMon[id] || 0) + p.quan.length + (p.tuSitemap || 0);
+}
+/* Chưa ai đi khảo sát thì mọi ô đều 0 mẫu THẬT. Trường n của dữ liệu seed
+   KHÔNG được dùng ở đây: nó là số hư cấu, và dùng nó sẽ khiến phiếu bảo
+   "ô này đủ mẫu rồi" cho một ô chưa ai đo. */
+const nThat = {};
+
+const uuTien = xepO(z.items, nThat, soQuanTheoMon);
+const hangO = new Map(uuTien.map((o, i) => [o.dishId, { ...o, hang: i + 1 }]));
+
+const dsPho = xepPho(
+  [...pho.values()].filter((p) => p.mon.size > 0).map((p) => ({
+    ...p, mon: [...p.mon.keys()], monTin: p.mon, soQuan: p.quan.length + (p.tuSitemap || 0),
+  })),
+  z.items, nThat, soQuanTheoMon);
 
 /* ── món nào chưa phố nào gợi ra ────────────────────────────── */
-const daPhu = new Set(dsPho.flatMap((p) => [...p.mon.keys()]));
+const daPhu = new Set(dsPho.flatMap((p) => p.mon));
 const conLai = oGia.filter((id) => !daPhu.has(id));
 
 /* ── trang ──────────────────────────────────────────────────── */
@@ -165,21 +185,36 @@ Vài phố dài — Bà Triệu, Hai Bà Trưng — chạy qua nhiều quận, n
 có nghĩa là quán ấy nằm trong khu này. Gặp bảng giá nào thì gõ bảng giá ấy, đừng bám phiếu.</p>
 
 <h2>Đi phố nào trước</h2>
+<p class="sub">Xếp theo lượng bất định GIẢM ĐƯỢC, không theo số ô chạm tới. Một ô chưa ai
+đo và có dải rộng đáng đi hơn năm ô đã đủ mẫu. Món in đậm là món đóng góp nhiều nhất
+cho thứ hạng của phố đó.</p>
 ${dsPho.slice(0, 14).map((p) => `<div class="pho">
   <b>${esc(p.ten)}</b>
-  <span class="q">${p.quan.length + (p.tuSitemap || 0)} quán${
+  <span class="q">${p.soQuan} quán${
     p.tuSitemap ? ` (${p.quan.length} có toạ độ, ${p.tuSitemap} từ sitemap)` : ""
-  } · gợi ra ${p.mon.size} ô giá</span>
-  <div class="mon">${[...p.mon.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([id, c]) => `<span class="chip">${esc(ten(id))}<i> ${Math.round(c * 100)}%</i></span>`)
-    .join("")}</div>
+  } · gợi ra ${p.mon.length} ô giá</span>
+  <div class="mon">${p.gop.slice(0, 10).map(({ dishId }, i) => {
+    const o = hangO.get(dishId);
+    return `<span class="chip">${i === 0 ? "<b>" : ""}${esc(ten(dishId))}${i === 0 ? "</b>" : ""}<i> #${
+      o ? o.hang : "?"}</i></span>`;
+  }).join("")}</div>
 </div>`).join("")}
+
+<h2>Mười ô đáng đi đo nhất</h2>
+<p class="sub">Đây là thứ tự nên đuổi theo khi phải bỏ dở giữa chừng.</p>
+<table>
+  <tr><th>#</th><th>Món</th><th>Dải đang dùng</th><th>Bề rộng</th><th>Quán biết</th></tr>
+  ${uuTien.slice(0, 10).map((o, i) => `<tr><td>${i + 1}</td>
+    <td>${esc(ten(o.dishId))}</td>
+    <td class="dai">${z.items[o.dishId] ? `${vnd(z.items[o.dishId].p25)}–${vnd(z.items[o.dishId].p95)}` : "—"}</td>
+    <td class="dai">${vnd(o.rong)}</td>
+    <td>${o.quan}</td></tr>`).join("\n  ")}
+</table>
 
 <h2>Bảng gõ — ${oGia.length} ô, mỗi ô ${MIN_SAMPLES} mẫu</h2>
 <table>
   <tr><th>Món</th><th>Dải đang dùng</th><th>Đã gõ</th></tr>
-  ${oGia.map((id) => {
+  ${uuTien.map((o) => o.dishId).map((id) => {
     const it = z.items[id];
     return `<tr><td>${esc(ten(id))}</td>
       <td class="dai">${vnd(it.p25)}–${vnd(it.p95)}</td>
@@ -204,4 +239,5 @@ writeFileSync(RA, html, "utf8");
 console.log(`${RA}
   ${oGia.length} ô giá · ${oGia.length * MIN_SAMPLES} lần gõ để phủ hết
   ${dsPho.length} phố gợi ra được món, in ${Math.min(14, dsPho.length)} phố đầu
+  đầu bảng ưu tiên: ${uuTien.slice(0, 3).map((o) => ten(o.dishId)).join(", ")}
   ${conLai.length} ô không phố nào gợi ra`);

@@ -3288,6 +3288,23 @@ function openShow(dishId = null) {
   });
 }
 
+/* Đếm quán trong vùng gợi ra từng món, từ chính tên quán (eaterydish.js).
+   Bảng ưu tiên khảo sát dùng con số này làm ước lượng "bao nhiêu người gặp
+   phải món đó". Nó ĐẾM THIẾU — chỉ thấy quán tự đặt tên theo món — nên
+   uutien.js cố ý không để nó nhân thành 0. */
+let SO_QUAN_MON = null;
+function soQuanTheoMon() {
+  if (SO_QUAN_MON && SO_QUAN_MON._zone === S.zone) return SO_QUAN_MON;
+  const ra = { _zone: S.zone };
+  for (const e of (S.eateries || []).filter((x) => x.zone === S.zone)) {
+    for (const m of inferDishes(e, S.dishes || [])) {
+      if (m.confidence >= 0.6) ra[m.id] = (ra[m.id] || 0) + 1;
+    }
+  }
+  SO_QUAN_MON = ra;
+  return ra;
+}
+
 function openSurvey() {
   const z = zone();
   SurveyUI.open({
@@ -3297,6 +3314,7 @@ function openSurvey() {
     dishes: S.dishes,
     places: S.places.filter((p) => p.zone === S.zone),
     prices: S.prices[S.zone],
+    soQuan: soQuanTheoMon(),
     toast,
     onClose: () => { refreshTally().then(renderMe); },
     onApply: (what) => (what === "export" ? exportSurvey() : buildPriceTable()),
