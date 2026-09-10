@@ -2076,3 +2076,8 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 
 #v-hochieu .btn{width:100%;margin-top:10px;min-height:50px}
 #v-hochieu .btn.pri[disabled]{opacity:.4;pointer-events:none}
+
+/* Dấu "khách tự ghi" nhạt hơn dấu "người bán đã đọc": hai mức bằng chứng
+   khác nhau thì không được trông giống nhau. */
+.pt-dau.nhe{background:rgba(245,240,228,.07);border-color:rgba(245,240,228,.22)}
+.pt-dau.nhe time{color:rgba(245,240,228,.5)}

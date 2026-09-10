@@ -133,15 +133,25 @@ function paint() {
       ${p.dong.map(dongHTML).join("")}
       ${tongHTML(t)}
 
-      ${p.xacNhan ? `<div class="pt-dau">
-        <p lang="vi">${esc(TT.CAU.daDoc.vi)}</p>
-        <p lang="en">${esc(TT.CAU.daDoc.en)}</p>
+      ${p.xacNhan ? `<div class="pt-dau${p.xacNhan.boi === TT.BOI.KHACH ? " nhe" : ""}">
+        <p lang="vi">${esc(TT.cauXacNhan(p, "vi"))}</p>
+        <p lang="en">${esc(TT.cauXacNhan(p, "en"))}</p>
         <time>${new Date(p.xacNhan.luc).toLocaleTimeString("vi-VN",
           { hour: "2-digit", minute: "2-digit" })}</time>
       </div>` : ""}
 
-      <button class="btn pri" data-ptact="doc" ${t.chac ? "" : "disabled"}>
-        ${p.xacNhan ? "✓ " : ""}${esc(TT.CAU.daDoc.en)}
+      ${/* HAI nút, vì đây là hai mức bằng chứng khác hẳn nhau. Người bán
+           quay màn hình đọc rồi chạm là một chuyện; khách tự ghi vì người
+           bán đang bận hoặc không muốn chạm vào máy lạ là chuyện khác. Gộp
+           làm một nút rồi in chung câu "hai bên đã cùng đọc" là bịa ra sự
+           đồng thuận của một người chưa hề nhìn tấm phiếu. */""}
+      <button class="btn pri" data-ptact="doc" data-boi="${TT.BOI.BAN}"
+        ${t.chac ? "" : "disabled"}>
+        ${p.xacNhan?.boi === TT.BOI.BAN ? "✓ " : ""}${esc(TT.CAU.daDoc.en)}
+      </button>
+      <button class="btn sec" data-ptact="doc" data-boi="${TT.BOI.KHACH}"
+        ${t.chac ? "" : "disabled"}>
+        ${p.xacNhan?.boi === TT.BOI.KHACH ? "✓ " : ""}Just note it for myself
       </button>
 
       ${/* Câu này bắt buộc có mặt trên MỌI bản vẽ của phiếu — nó là thứ
@@ -163,7 +173,7 @@ function onTap(e) {
   if (act === "dong") return close();
   if (act === "lat") { M.lat = !M.lat; return paint(); }
   if (act === "doc") {
-    M.phieu = TT.danhDauDaDoc(M.phieu, "seller");
+    M.phieu = TT.danhDauDaDoc(M.phieu, el.dataset.boi || TT.BOI.BAN);
     M.cb.onConfirm?.(M.phieu);
     return paint();
   }

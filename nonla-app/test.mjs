@@ -43,7 +43,8 @@ import { khoaPho, tenHienThi, gomTheoPho } from "../tools/ten-pho.mjs";
 import { moTaTrangThai } from "./tien.js";
 import { DON_VI, LOI, soatDong, congBoDuoc, tinhTrang, chenh, laQuanSat,
          CAU as CAU_HC, GAM_MIN, GAM_MAX } from "./hochieu.js";
-import { dungPhieu, dien, tinh, dieuKienThieu, danhDauDaDoc, doiChieu, tenGon,
+import { doiChieuTong, cauXacNhan, BOI,
+         dungPhieu, dien, tinh, dieuKienThieu, danhDauDaDoc, doiChieu, tenGon,
          cauDoiChieu, CAU as CAU_TT, BO_QUA_LECH } from "./thoathuan.js";
 import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
          MIN_QUAN_SAT, TI_LE_DUNG } from "./coso.js";
@@ -518,6 +519,54 @@ console.log("\n── hochieu: quán tự khai, app kiểm lời khai ───"
     eq("chênh tính đúng", c.lech, 30000);
     eq("và đổi ra phần trăm", c.phanTram, 33);
     ok("KHÔNG có trường phán quyết nào", !("level" in c) && !("verdict" in c));
+  }
+}
+
+console.log("\n── thoathuan: quán vỉa hè không có hoá đơn ───");
+{
+  let p = dungPhieu([{ label: "Bún chả", price: 70000 },
+                     { label: "Nem rán", price: 55000 }], []);
+
+  eq("chưa đóng dấu thì không đối chiếu được", doiChieuTong(p, 125000), null);
+  p = danhDauDaDoc(p, BOI.BAN);
+  eq("không có số tiền thì cũng không", doiChieuTong(p, 0), null);
+
+  eq("trả đúng thì khớp", doiChieuTong(p, 125000).viec, "khop");
+  eq("lệch dưới ngưỡng tiền lẻ vẫn khớp", doiChieuTong(p, 126000).viec, "khop");
+  {
+    const k = doiChieuTong(p, 180000);
+    eq("lệch đáng kể thì phải hỏi lại", k.viec, "hoi-lai");
+    eq("và nói đúng lệch bao nhiêu", k.lech, 55000);
+
+    /* KHÔNG có nhánh "co-dong-moi" ở đây: không có dòng nào để biết có món
+       gọi thêm hay không, và đoán bừa một lời trấn an là đúng cái lỗi vừa
+       phải đi sửa ở doiChieu(). */
+    eq("không đoán ra món gọi thêm", k.themVao.length, 0);
+    ok("và tự đánh dấu là chỉ có tổng", k.chiCoTong);
+
+    /* Hai vế "xem lại từng dòng" và "chưa biết lệch ở dòng nào" tự phủ
+       nhau, nên ca này phải có câu RIÊNG chứ không ghép thêm vào. */
+    const cau = cauDoiChieu(k, "vi");
+    ok("câu riêng cho ca chỉ có tổng", /từng món/.test(cau), cau);
+    ok("không ghép câu của ca có hoá đơn", !/từng dòng/.test(cau), cau);
+    ok("và không kết tội ai", !/lừa|gian|cheat|scam/i.test(cau));
+  }
+
+  /* Hai mức bằng chứng: người bán đã đọc ≠ khách tự ghi. Gộp lại rồi in
+     chung một câu là bịa ra sự đồng thuận của người chưa nhìn tấm phiếu. */
+  {
+    const ban = danhDauDaDoc(dungPhieu([{ label: "X", price: 1000 }], []), BOI.BAN);
+    const khach = danhDauDaDoc(dungPhieu([{ label: "X", price: 1000 }], []), BOI.KHACH);
+    eq("ghi lại ai đã đọc", ban.xacNhan.boi, "seller");
+    eq("và ghi khi khách tự ghi", khach.xacNhan.boi, "guest");
+    ok("hai câu KHÁC nhau",
+       cauXacNhan(ban, "vi") !== cauXacNhan(khach, "vi"));
+    ok("câu của khách nói rõ người bán CHƯA đọc",
+       /chưa đọc/.test(cauXacNhan(khach, "vi")), cauXacNhan(khach, "vi"));
+    ok("câu tiếng Anh cũng thế",
+       /has not read/i.test(cauXacNhan(khach, "en")), cauXacNhan(khach, "en"));
+    eq("chưa đóng dấu thì không có câu nào",
+       cauXacNhan(dungPhieu([], []), "vi"), "");
   }
 }
 

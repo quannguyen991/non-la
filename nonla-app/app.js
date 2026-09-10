@@ -1161,13 +1161,17 @@ function showMenuResult(rows, conf, traps = null) {
           chính đặc tả sản phẩm viết "mọi thao tác thừa là thao tác không xảy
           ra". Nút hay dùng nhất nằm ngoài; năm nút còn lại nằm sau một lần
           chạm, không mất đi đâu cả. */""}
+    ${/* PHIẾU là nút chính, không phải "Work out the bill".
+          Hai nút làm hai việc gần giống nhau nên phải chọn một cái đứng
+          ngoài: ước tính hoá đơn CỘNG những con số in trên thực đơn; tấm
+          phiếu ĐIỀN NỐT những dữ kiện thực đơn không nói — trọng lượng,
+          khẩu phần, phụ thu — rồi mới cộng. Cái sau trả lời được cả những
+          ca cái trước im lặng, và nó là việc phải làm TRƯỚC khi gọi món,
+          tức là trước cả cái kia về mặt thời gian. */""}
     ${rows.length
-      ? `<button class="btn pri" data-act="poOpen">${esc(T("Work out the bill"))}</button>
-         ${/* Lối vào phiếu nằm NGAY dưới nút chính, không nằm trong khối gập.
-              Nó là việc làm TRƯỚC khi gọi món, nên chôn nó sau một lần chạm
-              là đảm bảo không ai mở nó đúng lúc còn mở được. */""}
-         <button class="btn sec" data-act="ptOpen">${
-           esc(T("Confirm with the seller first"))}</button>`
+      ? `<button class="btn pri" data-act="ptOpen">${
+           esc(T("Confirm with the seller first"))}</button>
+         <button class="btn sec" data-act="poOpen">${esc(T("Work out the bill"))}</button>`
       : `<button class="btn pri" data-act="noMenu">${esc(T("No menu? Tap a dish instead"))}</button>`}
 
     <details class="fold">
@@ -1502,6 +1506,7 @@ function renderChange() {
       <input id="chBill" type="number" inputmode="numeric" value="${g.bill || ""}"
         placeholder="e.g. 320000" min="0" step="1000">
     </label>
+    ${doiChieuTongHTML(g.bill)}
 
     <h2 class="sect">${esc(T("You handed over"))}</h2>
     <div class="ch-tally">${tallyLine("paid", g.paid)}<b>${paid ? fmtVND(paid) : ""}</b></div>
@@ -1561,6 +1566,31 @@ function syncChangeBill() {
 
    Không kết tội: thoathuan.js trả về chỗ lệch và phần những món gọi thêm
    KHÔNG giải thích được, còn chữ dùng ở đây nói việc làm được. */
+/* Đối chiếu khi KHÔNG có hoá đơn giấy — chỉ có con số người bán nói ra và
+   khách vừa gõ vào ô "The bill".
+
+   Đây là ca của quán vỉa hè, tức đúng nhóm người dùng cả sản phẩm sinh ra
+   để phục vụ, và trước bản này nó là ca DUY NHẤT không khép được vòng: tấm
+   phiếu đóng dấu xong rồi nằm im, vì đường đối chiếu chỉ chạy khi có hoá
+   đơn quét được. Phần lớn hàng vỉa hè không in hoá đơn bao giờ.
+
+   Không có dòng nào để tách "món gọi thêm" khỏi "một dòng đội giá", nên
+   thoathuan.js cố ý không đoán nguyên nhân — nó nói lệch bao nhiêu và bảo
+   nhờ người bán đọc lại từng món. */
+const doiChieuTongHTML = anToan(function (tong) {
+  const kq = TT.doiChieuTong(S.phieu, tong);
+  if (!kq) return "";
+  const vi = curLang() === "vi";
+  return `<div class="row" style="cursor:default;border-top:1px solid var(--line)">
+    <span class="dot" data-l="${kq.viec === "khop" ? "ok" : "high"}"></span>
+    <span><span class="nm">${esc(TT.cauDoiChieu(kq, vi ? "vi" : "en"))}</span>
+      <span class="note">${esc(TT.cauXacNhan(S.phieu, vi ? "vi" : "en"))} ${
+        new Date(S.phieu.xacNhan.luc).toLocaleTimeString("vi-VN",
+          { hour: "2-digit", minute: "2-digit" })}</span></span>
+    <span class="amt">${fmtVND(kq.tongPhieu)}<small>on the slip</small></span>
+  </div>`;
+});
+
 const doiChieuPhieuHTML = anToan(function (rows) {
   const kq = TT.doiChieu(S.phieu, rows.map((r) => ({ ten: r.label, thanhTien: r.price })));
   if (!kq) return "";
@@ -1570,7 +1600,7 @@ const doiChieuPhieuHTML = anToan(function (rows) {
     <div class="row" style="cursor:default">
       <span class="dot" data-l="${kq.viec === "khop" ? "ok" : kq.viec === "co-dong-moi" ? "warn" : "high"}"></span>
       <span><span class="nm">${esc(cau)}</span>
-        <span class="note">${esc(TT.CAU.daDoc.en)} ${new Date(S.phieu.xacNhan.luc)
+        <span class="note">${esc(TT.cauXacNhan(S.phieu, "en"))} ${new Date(S.phieu.xacNhan.luc)
           .toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span></span>
       <span class="amt">${fmtVND(kq.tongPhieu)}<small>on the slip</small></span>
     </div>

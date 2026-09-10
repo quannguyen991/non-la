@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 88 commit · 753 phép thử xanh
+Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 89 commit · 770 phép thử xanh
 
 ---
 
@@ -630,6 +630,33 @@ gọi thêm **không giải thích được**.
 - Câu hỏi khẩu phần để `chan: false` nên số suất **không vào phép tính** — nồi
   lẩu tính theo đầu người cho bốn người ra tổng của một người: **sai gấp bốn và
   trông hoàn toàn bình thường.** Câu hỏi nào đổi được tổng thì phải chặn tổng.
+
+#### Hai mức bằng chứng, hai nút
+
+Người bán quay màn hình đọc rồi chạm là **một** chuyện; khách tự ghi lại vì người
+bán đang bận hoặc không muốn chạm vào máy lạ là chuyện **khác hẳn**. Gộp làm một
+nút rồi in chung câu *"hai bên đã cùng đọc"* là bịa ra sự đồng thuận của một
+người chưa hề nhìn tấm phiếu. Nên có hai nút, phiếu ghi lại `boi`, và câu hiện ra
+khác nhau — bản của khách nói thẳng *"người bán chưa đọc tờ này"*.
+
+#### Khép vòng ở quán không có hoá đơn giấy
+
+Trước bản này, đường đối chiếu chỉ chạy khi **quét được hoá đơn**. Phần lớn hàng
+vỉa hè không in hoá đơn bao giờ — tức là ca duy nhất không khép được vòng lại
+đúng là nhóm người dùng cả sản phẩm sinh ra để phục vụ.
+
+`doiChieuTong()` nhận đúng một con số: cái người bán nói ra và khách gõ vào ô
+"The bill" ở màn đếm tiền thối.
+
+| Trả | Câu app nói |
+|---|---|
+| 880.000₫ | *"Bill matches what was read"* |
+| 1.200.000₫ | *"Số tiền lệch so với phiếu. Nhờ người bán đọc lại từng món — chỉ có mỗi con số tổng thì không thấy được lệch ở dòng nào."* |
+
+Không có dòng nào để tách "món gọi thêm" khỏi "một dòng đội giá", nên hàm này
+**cố ý không đoán nguyên nhân**. Nó cũng có câu **riêng**, không ghép thêm vào
+câu của ca có hoá đơn: *"xem lại từng dòng"* cộng *"chưa biết lệch ở dòng nào"*
+là hai vế tự phủ nhau trong cùng một hơi.
 
 #### Chữ song ngữ cùng lúc, không phải nút đổi ngôn ngữ
 
@@ -1310,7 +1337,7 @@ cả cho những quán không liên quan.**
 
 ## 16. Kiểm chứng: máy, hồ sơ, và ngoài đường
 
-### 16.1 `test.mjs` — 753 phép thử, 0 hỏng
+### 16.1 `test.mjs` — 770 phép thử, 0 hỏng
 
 Kiểm lõi thuần: khớp món, bách phân vị, phán quyết, phép chiếu bản đồ, tuyến đi
 bộ, âm lịch, đơn vị, so thực đơn, tiền thối, tin cậy, nguồn giá, chấm điểm đối
@@ -1352,7 +1379,7 @@ là 612). Đây là thứ giám khảo đếm lại được trong ba mươi gi�
 Ngày 09/09 nó hở một chỗ khác và đã bịt: luật trên chỉ bắt hồ sơ khai **nhiều**
 con số, nên nó vẫn xanh khi cả cuốn khai thống nhất một con số **đã cũ**. Giờ
 bộ soát **chạy thật** `node test.mjs` rồi so — bắt được đúng lúc hồ sơ còn ghi
-612 trong khi bộ thử đã lên 645 (nay là 753).
+612 trong khi bộ thử đã lên 645 (nay là 770).
 
 Nó chỉ soát những con số **đếm được**, không cố hiểu văn xuôi: một bộ soát đoán
 mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát người ta tắt đi.

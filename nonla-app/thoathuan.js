@@ -228,11 +228,18 @@ export function tinh(phieu) {
  * thật: vào lúc này, tấm phiếu này đã được quay sang cho người bán đọc, và
  * người bán chạm nút. Không suy ra gì thêm từ cái chạm ấy.
  */
-export function danhDauDaDoc(phieu, boi = "seller") {
+export const BOI = { BAN: "seller", KHACH: "guest" };
+
+export function danhDauDaDoc(phieu, boi = BOI.BAN) {
   const t = tinh(phieu);
   if (!t.chac) return { ...phieu, xacNhan: null, loi: "thieu-du-kien" };
   return {
     ...phieu,
+    /* `boi` KHÔNG phải chi tiết vụn. Người bán quay màn hình đọc rồi chạm
+       là một mức bằng chứng; khách tự ghi lại vì người bán đang bận hoặc
+       không muốn chạm vào máy lạ là một mức khác hẳn. Gộp hai thứ lại rồi
+       in chung một câu "hai bên đã cùng đọc" là bịa ra sự đồng thuận của
+       một người chưa hề nhìn tấm phiếu. */
     xacNhan: { luc: Date.now(), boi, tong: t.tong, truoc: t.truoc, sau: t.sau },
   };
 }
@@ -289,6 +296,34 @@ export function doiChieu(phieu, hoaDon = []) {
   };
 }
 
+/**
+ * Đối chiếu khi KHÔNG có hoá đơn giấy — chỉ có một con số người bán nói ra.
+ *
+ * Đây là ca của quán vỉa hè, tức là đúng nhóm người dùng mà cả sản phẩm
+ * sinh ra để phục vụ. `doiChieu()` phía trên cần từng dòng để tách được
+ * "món gọi thêm" khỏi "một dòng đội giá"; ở đây không có dòng nào, nên nó
+ * KHÔNG được phép đoán nguyên nhân. Nó nói đúng hai điều: lệch bao nhiêu,
+ * và đó là con số cần hỏi lại.
+ */
+export function doiChieuTong(phieu, tongThuc) {
+  if (!phieu?.xacNhan || !(tongThuc > 0)) return null;
+  const lech = Math.round(tongThuc) - phieu.xacNhan.tong;
+  return {
+    tongPhieu: phieu.xacNhan.tong,
+    tongHoaDon: Math.round(tongThuc),
+    lech,
+    dangKe: Math.abs(lech) > BO_QUA_LECH,
+    themVao: [],
+    giaThemVao: 0,
+    conLai: lech,
+    /* Không có nhánh "co-dong-moi": không có dòng nào để biết có món gọi
+       thêm hay không. Đoán bừa một lời trấn an ở đây là đúng cái lỗi vừa
+       phải đi sửa ở doiChieu(). */
+    viec: Math.abs(lech) <= BO_QUA_LECH ? "khop" : "hoi-lai",
+    chiCoTong: true,
+  };
+}
+
 /* ── câu chữ song ngữ ─────────────────────────────────────────
    Gom vào đây vì đây là chỗ dễ trượt lại nhất: một câu "hai bên đã thống
    nhất giá" viết trong lúc vội là quay về đúng luật 1 vừa lập ra. */
@@ -303,6 +338,22 @@ export const CAU = {
   daDoc: {
     en: "Shown to the seller and read together",
     vi: "Đã quay màn hình cho người bán cùng đọc",
+  },
+  /* Khách tự ghi khi người bán đang bận hoặc không muốn chạm vào máy lạ.
+     Vẫn có ích — nó là bản ghi của chính khách — nhưng KHÔNG được in ra
+     bằng câu của trường hợp người bán đã đọc. */
+  tuGhi: {
+    en: "Noted by you — the seller has not read this",
+    vi: "Bạn tự ghi lại — người bán chưa đọc tờ này",
+  },
+  /* Ca chỉ có mỗi con số tổng phải có câu RIÊNG, không ghép thêm vào câu
+     kia: "nên xem lại cùng nhau từng dòng" cộng "chưa nói được lệch ở dòng
+     nào" là hai vế tự phủ nhau trong cùng một hơi. */
+  lechChiCoTong: {
+    en: "The amount differs from the slip. Ask for it item by item — "
+      + "with only a total there is no way to see which line moved.",
+    vi: "Số tiền lệch so với phiếu. Nhờ người bán đọc lại từng món — "
+      + "chỉ có mỗi con số tổng thì không thấy được lệch ở dòng nào.",
   },
   /* Câu này phải có mặt trên MỌI bản in của phiếu. Nó là thứ giữ tấm
      phiếu ở đúng chỗ của nó. */
@@ -326,5 +377,16 @@ export function cauDoiChieu(kq, lang = "en") {
   if (!kq) return "";
   const k = kq.viec === "khop" ? CAU.lechKhop
     : kq.viec === "co-dong-moi" ? CAU.lechCoDongMoi : CAU.lechHoiLai;
+  if (kq.chiCoTong && kq.viec !== "khop") {
+    return CAU.lechChiCoTong[lang] || CAU.lechChiCoTong.en;
+  }
+  return k[lang] || k.en;
+}
+
+/** Câu mô tả ai đã đọc tờ phiếu. Hai mức bằng chứng, hai câu. */
+export function cauXacNhan(phieu, lang = "en") {
+  const b = phieu?.xacNhan?.boi;
+  if (!b) return "";
+  const k = b === BOI.KHACH ? CAU.tuGhi : CAU.daDoc;
   return k[lang] || k.en;
 }
