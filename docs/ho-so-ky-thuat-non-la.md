@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 89 commit · 770 phép thử xanh
+Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 90 commit · 770 phép thử xanh
 
 ---
 
@@ -1468,6 +1468,44 @@ lượng con cá thì app đã thất bại.
 Bản đầu chú thích *"ba trong sáu tình huống không có gì bất thường"* trong khi
 thật ra là hai. Giờ mọi con số trong bản in được **đếm** từ danh sách.
 
+### 16.6 Bộ giấy pilot và kịch bản video — `bo-pilot-quan.mjs`, `kich-ban-video.mjs`
+
+Hai bộ này không phải tài liệu trang trí; chúng là điều kiện để hai mốc còn lại
+xảy ra được.
+
+**Bộ giấy pilot** — ba tờ: giới thiệu, phiếu đồng ý, phiếu theo dõi. Mốc pilot là
+*"5–10 quán tự nguyện"*, và chữ **tự nguyện** chỉ có nghĩa khi người ta biết mình
+đang đồng ý với cái gì và rút lại được. Không có tờ đồng ý thì đó không phải
+pilot, đó là đi xin dữ liệu.
+
+Tờ giới thiệu mở đầu bằng **cái quán được**, không bằng cái ta cần — người bán
+không quan tâm dự án dự thi cái gì. Rồi ba câu **phủ định** in đậm ngang phần
+khẳng định: không chấm điểm quán, không xếp hạng, không có danh sách công khai
+quán nào "đắt". Người bán Việt Nam đã quen với ứng dụng đánh giá sao và họ có lý
+do để cảnh giác.
+
+Phiếu theo dõi có cột **lý do từ chối**, và bốn lý do đã lường trước. Một pilot
+báo *"10/10 quán đồng ý"* mà không nói đã hỏi bao nhiêu quán là một con số vô
+nghĩa — và lý do từ chối mới là dữ kiện đáng giá nhất cho vòng sau. Lý do thứ tư
+(*"giá tôi thay đổi theo ngày, khai không xuể"*) là lý do đáng nghe nhất: nó nói
+rằng bảng khai cần một lối cho món **thời giá** — mà ứng dụng đã có sẵn.
+
+**Kịch bản video**: mọi con số trong lời thoại **sinh từ mã**, không gõ tay. Gõ
+tay một lời thoại rồi ba tuần sau sửa luật phụ thu là video nói một đằng, app
+hiện một nẻo — đúng loại sai mà giám khảo bắt được bằng cách mở app ra bấm thử.
+Kèm một **bảng đối chiếu khi quay**: bấm đúng những bước đó thì app phải hiện
+đúng những số đó; lệch một con số nghĩa là đã sửa luật mà chưa chạy lại kịch bản.
+
+Video demo kể **đúng một giao dịch** — không bản đồ, không lịch âm, không cộng
+đồng. Bốn thứ phải thấy được trong ba phút: app phát hiện điều khách *không biết
+để hỏi*; app **từ chối** đưa ra tổng khi còn thiếu dữ kiện; màn hình quay sang
+phía người bán; và lúc trả tiền, con số được đối chiếu.
+
+Một luật cho cả hai video: **không dựng cảnh người bán gian.** Quán trong kịch
+bản bán hải sản theo lạng — cách bán hoàn toàn bình thường — và vấn đề là *khách
+không đọc được đơn vị*. Dựng một người bán gian để video kịch tính hơn là phản
+lại chính luận điểm của sản phẩm.
+
 ## 17. Những chỗ đang nợ
 
 Chương này có mặt vì một hồ sơ không có nó là một hồ sơ đáng ngờ.
@@ -1647,6 +1685,8 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `lo-trinh-khao-sat.mjs` | sinh tờ lộ trình khảo sát |
 | `protocol-khao-sat.mjs` | protocol thu dữ liệu, phân tầng bằng số |
 | `kich-ban-thu.mjs` | 6 tình huống có đáp án chuẩn |
+| `bo-pilot-quan.mjs` | bộ giấy mang đi gặp chủ quán (giới thiệu · đồng ý · theo dõi) |
+| `kich-ban-video.mjs` | kịch bản hai video, số liệu sinh từ mã |
 | `ten-pho.mjs` | gom tên phố về một dạng trước khi đếm |
 | `llmparse.mjs` | bóc con số khỏi câu trả lời của model |
 | `shots.mjs` | chụp ảnh màn hình cho hồ sơ |

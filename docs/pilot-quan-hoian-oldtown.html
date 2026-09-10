@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bộ giấy pilot · Hội An · Phố cổ</title><style>
+:root{--then:#0E2B24;--son:#9C3A24;--giay:#F7F3E9;--vien:#D9CFBA}
+*{box-sizing:border-box}
+body{margin:0 auto;padding:20px 18px 50px;max-width:760px;background:var(--giay);color:#1b1b1b;
+  font:15.5px/1.6 Cambria,Constantia,"Palatino Linotype","Noto Serif",system-ui,sans-serif}
+h1{font-size:23px;margin:0 0 3px;color:var(--then)}
+h2{font-size:17px;margin:22px 0 7px;color:var(--then);border-bottom:2px solid var(--vien);padding-bottom:4px}
+h3{font-size:15.5px;margin:15px 0 4px;color:var(--son)}
+.sub{color:#5b5b5b;font-size:13px;margin:0 0 16px}
+.duoc{background:#fff;border:1px solid var(--vien);border-left:4px solid #2E6B4F;
+  padding:11px 14px;margin:10px 0}
+.duoc b{color:#2E6B4F}
+.khong{background:#FBEFEA;border:1px solid #E8CFC4;border-left:4px solid var(--son);
+  padding:11px 14px;margin:12px 0}
+.khong b{color:var(--son)}
+.khong ul{margin:6px 0 0 18px;padding:0}
+.khong li{margin:4px 0;font-weight:600}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th,td{border:1px solid var(--vien);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:#EFE8D8}
+.ky{margin:20px 0;padding:14px;border:1px dashed var(--vien);background:#fff}
+.ky p{margin:9px 0}
+.o{display:inline-block;min-width:180px;border-bottom:1px solid #999}
+.tach{page-break-before:always;border-top:3px double var(--vien);margin-top:34px;padding-top:20px}
+.cuoi{margin-top:22px;padding-top:9px;border-top:2px solid var(--vien);font-size:12.5px;color:#5b5b5b}
+@media print{body{padding:0;max-width:none}.duoc,.khong,.ky{page-break-inside:avoid}}</style></head><body>
+
+<h1>Nón Lá — mời quán tham gia thử nghiệm</h1>
+<p class="sub">Hội An · Phố cổ · sinh bằng <code>node tools/bo-pilot-quan.mjs hoian-oldtown</code></p>
+
+<h2>Quán được gì</h2>
+
+<div class="duoc">
+  <b>1. Thực đơn 5 thứ tiếng, miễn phí.</b><br>
+  English · Tiếng Việt · 한국어 · 中文 · 日本語. Quán khai giá một lần, khách nước ngoài mở app
+  ra là đọc được tên món bằng tiếng của họ. Không phải in lại thực đơn, không phải
+  thuê ai dịch.
+</div>
+
+<div class="duoc">
+  <b>2. Một chỗ nói rõ điều kiện giá.</b><br>
+  Bán hải sản theo lạng là cách bán bình thường, nhưng khách nước ngoài đọc
+  “120.000” trên bảng và hiểu là giá cả con. Khai rõ một lần — theo lạng, một phần
+  nặng bao nhiêu, đã gồm phụ thu hay chưa — thì app hỏi hộ quán trước khi khách
+  gọi món. Bớt đi những cuộc tranh cãi ở quầy mà không ai muốn có.
+</div>
+
+<div class="duoc">
+  <b>3. Lịch sử đổi giá.</b><br>
+  Mỗi lần sửa đều có ngày. Khi cần, quán chỉ được vào đó để chứng minh mình bán
+  một giá cho mọi người, không đổi giá theo mặt khách.
+</div>
+
+<h2>App KHÔNG làm gì</h2>
+<div class="khong">
+  <b>Ba điều này viết ra để quán khỏi phải hỏi:</b>
+  <ul>
+    <li>Không chấm điểm quán, không có sao, không có xếp hạng.</li>
+    <li>Không có danh sách công khai quán nào “đắt”, quán nào “chặt chém”.</li>
+    <li>Không dùng chữ “chặt chém” ở bất kỳ đâu trong app.</li>
+  </ul>
+  <p style="margin:8px 0 0;font-weight:400">
+    Giá quán khai được hiện ra kèm đúng một nhãn: <b>“Quán đã tự khai đầy đủ điều kiện giá”</b>.
+    Không phải “giá công bằng”, không phải “đã được xác thực” — app không có tư
+    cách cấp những lời đó.</p>
+</div>
+
+<h2>Còn cái này thì app có làm, và quán nên biết trước</h2>
+<p>Khách dùng app có thể ghi lại giá họ đã trả ở quán. Khi có từ <b>5
+lượt ghi trở lên</b>, app so con số ấy với giá quán khai. Nếu lệch, app hiện ra —
+nhưng hiện như <b>một câu hỏi</b>, kèm sẵn ba lý do lương thiện:</p>
+<p style="margin-left:16px;font-style:italic">“Khách ghi nhận mức khác ở đây. Có thể là suất khác, thực đơn cũ, hay giá đã gồm phí — đáng hỏi lại, không phải một kết luận.”</p>
+<p>Quán có quyền trả lời, và câu trả lời ấy hiện cạnh con số. App không tự sửa
+gì, và không kết luận về động cơ của ai.</p>
+
+<h2>Việc quán cần làm</h2>
+<table>
+  <tr><th>Bước</th><th>Mất bao lâu</th></tr>
+  <tr><td>Khai giá và điều kiện cho những món chính</td><td>10–15 phút, một lần</td></tr>
+  <tr><td>Sửa khi đổi giá</td><td>vài giây mỗi lần</td></tr>
+  <tr><td>Cho nhóm thử nghiệm quay một đoạn ngắn ở quầy (không bắt buộc)</td>
+      <td>5 phút</td></tr>
+</table>
+
+<div class="tach"></div>
+
+<h1>Phiếu đồng ý tham gia</h1>
+<p class="sub">Một bản quán giữ, một bản nhóm thử nghiệm giữ.</p>
+
+<p>Tôi đồng ý cho nhóm thử nghiệm Nón Lá:</p>
+<table>
+  <tr><th style="width:34px">☐</th><td>Nhập giá và điều kiện giá của quán tôi vào ứng dụng,
+    hiển thị công khai kèm nhãn <b>giá do quán tự khai</b>.</td></tr>
+  <tr><th>☐</th><td>Ghi tên quán và tên phố. <i>Không</i> ghi tên riêng của tôi,
+    số điện thoại, hay số tài khoản.</td></tr>
+  <tr><th>☐</th><td>Chụp ảnh bảng giá / thực đơn. <i>Không</i> chụp mặt người.</td></tr>
+  <tr><th>☐</th><td>Quay một đoạn ngắn ở quầy để làm video dự thi.
+    <i>(bỏ trống nếu không đồng ý — các mục trên vẫn có hiệu lực)</i></td></tr>
+</table>
+
+<div class="ky">
+  <p><b>Rút lại lúc nào cũng được.</b> Chỉ cần nhắn một câu cho người ở dưới, và
+  nhóm sẽ gỡ toàn bộ dữ liệu của quán trong vòng 48 giờ, kể cả phần đã đưa vào
+  video nếu video chưa nộp.</p>
+  <p>Tên quán: <span class="o"></span> &nbsp; Phố: <span class="o"></span></p>
+  <p>Người đại diện quán ký: <span class="o"></span> &nbsp; Ngày: ____/____/2026</p>
+  <p>Người của nhóm thử nghiệm: <span class="o"></span></p>
+  <p>Liên hệ để rút lại: <span class="o"></span></p>
+</div>
+
+<div class="tach"></div>
+
+<h1>Phiếu theo dõi — người đi ghi</h1>
+<p class="sub">Ghi <b>mọi</b> lượt gặp, kể cả lượt bị từ chối. Một pilot báo “10/10
+quán đồng ý” mà không nói đã hỏi bao nhiêu quán là một con số vô nghĩa — và lý do
+từ chối mới là dữ kiện đáng giá nhất cho vòng sau.</p>
+<table>
+  <tr><th>#</th><th>Quán</th><th>Phố</th><th>Tầng</th><th>Đồng ý?</th>
+      <th>Nếu không: lý do nguyên văn</th></tr>
+  <tr><td>1</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>2</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>3</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>4</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>5</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>6</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>7</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>8</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>9</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>10</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>11</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>12</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>13</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>14</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>15</td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td>16</td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+
+<h3>Bốn lý do từ chối đã lường trước — đánh dấu nếu gặp</h3>
+<table>
+  <tr><th style="width:34px">☐</th><td>“Sợ bị chấm điểm / bị so với quán khác.”</td></tr>
+  <tr><th>☐</th><td>“Không có thời gian.”</td></tr>
+  <tr><th>☐</th><td>“Phải hỏi chủ, tôi chỉ làm thuê.”</td></tr>
+  <tr><th>☐</th><td>“Giá tôi thay đổi theo ngày, khai không xuể.”</td></tr>
+</table>
+<p>Lý do thứ tư là lý do đáng nghe nhất: nó nói rằng bảng khai cần một lối cho món
+<b>thời giá</b> — mà ứng dụng đã có sẵn. Gặp thì mở ra cho họ xem ngay.</p>
+
+<p class="cuoi">
+  Hội An · Phố cổ · ngưỡng so sánh 5 lượt ghi ·
+  câu trên phiếu giao dịch: “Đây là cách hai bên cùng đọc tấm thực đơn, không phải hợp đồng hay hoá đơn.”
+</p>
+</body></html>
