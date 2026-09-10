@@ -151,15 +151,17 @@ if (signedIn()) document.getElementById("progress").innerHTML = `
     account server on this build, so nothing here follows you to another device.</p>`;
 
 /* ── nơi đã đạt nhãn Đúng Giá, xếp theo lượt quét ───────────── */
-const fair = places.places.filter((p) => p.zone === zid && p.fair === true)
-  .sort((a, b) => (b.scans || 0) - (a.scans || 0)).slice(0, 5);
+/* Không còn danh sách "quán Đúng Giá": nhãn ấy suy từ lượt quét thật, và
+   trang này không có kho lượt quét. */
+const fair = places.places.filter((p) => p.zone === zid)
+  .slice(0, 5);
 document.getElementById("verified").innerHTML = fair.map((p) => `
   <a href="place.html?id=${encodeURIComponent(p.id)}">
     <span class="ph" style="width:44px;height:44px;border-radius:10px;overflow:hidden;
       background:var(--kem);flex:0 0 auto">${photo(placePhoto(p, true), p.name)}</span>
     <span><b style="font-size:14.5px">${esc(p.name)}</b>
       <span class="small muted" style="display:block">${esc(p.street)}</span></span>
-    <span class="amt"><span class="pill ok soft">${I.shield}${p.scans}</span></span>
+    <span class="amt"><span class="small muted">${esc(p.tier)}</span></span>
   </a>`).join("") || `<span class="small muted">No badged place in this area yet.</span>`;
 </script>
 </body>

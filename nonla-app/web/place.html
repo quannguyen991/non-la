@@ -95,8 +95,8 @@ if (!p) {
         <div class="inner">
           <h1>${esc(p.name)}</h1>
           <p class="muted" style="margin-top:8px">${I.pin} ${esc(p.street)} ·
-            ${esc(p.tier)} · ${p.scans} independent scans${p.since ? ` · badged since ${esc(p.since)}` : ""}</p>
-          <div style="margin-top:12px">${verdictPill(p.fair)}</div>
+            ${esc(p.tier)}</p>
+          <div style="margin-top:12px">${verdictPill()}</div>
           <div class="facts">
             <div class="fact"><b>${I.bowl}Known for</b>
               <p>${(p.known || []).map((k) => esc(dishOf(k)?.vi || k)).join(" · ") || "—"}</p></div>

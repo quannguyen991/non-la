@@ -87,11 +87,11 @@ const dishOf = (id) => dishes.dishes.find((d) => d.id === id);
    một trang cộng đồng khoe "128 shared scans" mà máy chủ chưa nối là
    con số bịa, và nó bịa đúng thứ người đọc dùng để quyết định tin hay không. */
 const mine = places.places.filter((p) => p.zone === zid);
-const scans = mine.reduce((n, p) => n + (p.scans || 0), 0);
+const scans = 0;   // trường scans đã gỡ khỏi places.json; xem web.js
 document.getElementById("stats").innerHTML = [
   [I.scan, scans, "recorded scans", "Seed scan counts behind the badges in this area"],
   [I.people, posts.length, "sample posts", "Shipped with the app so the feed is readable offline"],
-  [I.shield, mine.filter((p) => p.fair === true).length, "fair-price spots",
+  [I.shield, 0, "fair-price spots",
     "Places whose prices sit inside the local range"],
 ].map(([ico, n, label, sub]) => `
   <article class="panel pad" style="display:flex;gap:16px;align-items:center">

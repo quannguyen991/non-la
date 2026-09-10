@@ -62,16 +62,24 @@ const zone = prices.zones[zid];
 const mine = places.places.filter((p) => p.zone === zid && p.at);
 
 document.getElementById("mapLede").textContent =
-  `${mine.length} tracked places in ${(zone.en || zone.name).replace(" · ", ", ")}. `
-  + "Prices come from accumulated scans, not from a rating.";
-document.getElementById("lg1").innerHTML = `${I.shield}<span><b>Fair Price</b><i>inside the local range</i></span>`;
-document.getElementById("lg2").innerHTML = `${I.alert}<span><b>Above range</b><i>prices run higher here</i></span>`;
-document.getElementById("lg3").innerHTML = `${I.clock}<span><b>Not enough data</b><i>fewer than 20 scans</i></span>`;
+  `${mine.length} places tracked in ${(zone.en || zone.name).replace(" · ", ", ")}. `
+  + "This page shows where they are and what they are known for — not a verdict on their prices.";
+
+/* Chú giải phải khớp với số màu ghim THẬT SỰ vẽ ra. Bản trước liệt kê ba
+   bậc — Đúng Giá / Trên khoảng / Chưa đủ dữ liệu "dưới 20 lượt quét" —
+   trong khi ghim giờ chỉ còn một màu, và con số 20 là ngưỡng cũ đã bỏ.
+   Một chú giải ba màu cho một bản đồ một màu là một chú giải nói dối. */
+document.getElementById("lg1").innerHTML =
+  `${I.clock}<span><b>No verdict here</b><i>this page has no scan history</i></span>`;
+document.getElementById("lg2").innerHTML =
+  `${I.bowl}<span><b>Known for</b><i>dishes the name points to</i></span>`;
+document.getElementById("lg3").innerHTML =
+  `${I.pinSm || I.compass}<span><b>Pin</b><i>right block, not the exact doorway</i></span>`;
 
 /* ── bộ lọc ─────────────────────────────────────────────────── */
 const FILTERS = [
   { k: "all", label: "All spots", ico: "grid", test: () => true },
-  { k: "fair", label: "Fair price", ico: "shield", test: (p) => p.fair === true },
+
   { k: "street", label: "Street food", ico: "bowl", test: (p) => p.tier === "street" },
   { k: "cafe", label: "Coffee", ico: "coffee", test: (p) => (p.known || []).some((k) => /^ca-phe/.test(k)) },
   { k: "sit", label: "Sit-down", ico: "bag", test: (p) => p.tier === "restaurant" },
@@ -126,7 +134,7 @@ function paint() {
       const q = toImg(p.at);
       const x = (q.x / geo.art.w) * 100, y = (q.y / geo.art.h) * 100;
       if (x < -2 || x > 102 || y < -2 || y > 102) continue;   // ngoài mép tranh thì bỏ
-      const colour = p.fair === true ? "#0E4A3C" : p.fair === false ? "#B0201A" : "#8A7A66";
+      const colour = "#8A7A66";   // một màu: trang này không có cơ sở phân loại
       stage.insertAdjacentHTML("beforeend", `
         <a class="mappin" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%"
            href="place.html?id=${encodeURIComponent(p.id)}" aria-label="${esc(p.name)}">
@@ -138,23 +146,20 @@ function paint() {
     }
   }
 
-  const dishes = list.length ? null : null;
   document.getElementById("list").innerHTML = list.map((p) => {
     /* Tên món viết ra bằng tiếng Việt, không phải id trong tệp: "cao-lau"
        là khoá dữ liệu, người đọc cần thấy "Cao lầu". */
     const named = (p.known || []).map((k) => dishName(k)).filter(Boolean).slice(0, 3);
-    /* Giá hiện là giá của MÓN CHÍNH ở quán này, không phải giá thấp nhất:
-       "from 3.000₫" ở một hàng cao lầu là giá cốc trà đá, và nó nói sai
-       hẳn về việc ăn ở đây tốn bao nhiêu. */
-    const lead = (p.known || []).find((k) => (p.prices || {})[k]);
     return `<a class="spotrow" href="place.html?id=${encodeURIComponent(p.id)}">
       <span class="ph">${photo(placePhoto(p, true), p.name)}</span>
       <span>
         <h4>${esc(p.name)}</h4>
-        <span class="meta">${esc(p.street)} · ${esc(p.tier)} · ${p.scans} scans</span>
+        <span class="meta">${esc(p.street)} · ${esc(p.tier)}</span>
         <span class="meta">${named.length ? esc(named.join(" · ")) : "—"}</span>
-        <span class="r2">${verdictPill(p.fair)}
-          ${lead ? `<span class="small muted tnum">${esc(dishName(lead))} ${money(p.prices[lead])}</span>` : ""}
+        <span class="r2">${verdictPill()}
+          ${/* Bỏ giá theo từng quán: trường `prices` trong places.json đã gỡ vì
+                nó khai một con số cụ thể tại một hàng quán có tên mà không ai
+                đo. Dải giá của KHU thì vẫn thật và vẫn hiện ở trang món. */""}
         </span>
       </span>
     </a>`;

@@ -22,7 +22,12 @@ import { I, esc, load, zoneId, money } from "./web.js";
 
 const KEY_STORE = "nl.aiKey";
 const BASE_STORE = "nl.aiBase";
-const DEFAULT_BASE = "https://codex.hungnguyen.codes/v1";
+/* KHÔNG ghi cứng một địa chỉ proxy nào ở đây.
+   Bản trước để mặc định là một proxy riêng của người viết app. Chạy trên
+   máy mình thì tiện; đẩy repo lên công khai thì đó là đem địa chỉ hạ tầng
+   cá nhân đi quảng cáo cho cả internet, và mọi lượt gọi lạ sẽ đổ về đó.
+   Người dùng tự nhập cả địa chỉ lẫn khoá, và cả hai chỉ nằm trong máy họ. */
+const DEFAULT_BASE = "";
 const MODEL = "claude-fable-5";
 
 const getKey = () => localStorage.getItem(KEY_STORE) || "";
@@ -44,9 +49,13 @@ async function buildContext() {
       + `typical ${it.p50 / 1000}k, high ${it.p95 / 1000}k`;
   }).join("\n");
 
+  /* KHÔNG đưa lượt quét hay phán quyết vào lời hệ thống. Bản trước đọc
+     `p.scans` và `p.fair` — hai trường đã gỡ khỏi places.json — nên model
+     nhận vào chuỗi "undefined scans" rồi nói lại nó cho khách. Một con số
+     hỏng đi qua một mô hình ngôn ngữ thì ra một câu trôi chảy, và đó là
+     kiểu sai khó bắt nhất. */
   const placeLines = places.places.filter((p) => p.zone === zid).map((p) =>
-    `${p.name} — ${p.street}, ${p.tier}, ${p.scans} scans, `
-    + `${p.fair === true ? "Fair Price badge" : p.fair === false ? "above local range" : "not enough data"}`
+    `${p.name} — ${p.street}, ${p.tier}`
     + `${(p.known || []).length ? `, known for ${(p.known || []).map((k) => dishOf(k)?.vi || k).join(", ")}` : ""}`
   ).join("\n");
 
@@ -150,18 +159,26 @@ export function mountChat() {
 
   function keyForm(note) {
     const el = bubble("bot", "");
+    /* Xin CẢ địa chỉ cổng, không chỉ khoá. Từ khi bỏ proxy ghi cứng thì
+       base rỗng, và `fetch("/chat/completions")` sẽ gọi vào chính origin
+       của trang rồi hỏng im lặng — một lỗi không có thông báo nào. */
     el.innerHTML = `
-      <b>Cần khoá API để chạy</b><br>
+      <b>Cần cổng model và khoá API để chạy</b><br>
       ${esc(note || "")}<br>
+      <input class="keyin" id="chatBase" type="url" placeholder="https://…/v1"
+        autocomplete="off" spellcheck="false" value="${esc(getBase())}">
       <input class="keyin" id="chatKey" type="password" placeholder="sk-…"
-        autocomplete="off" spellcheck="false">
+        autocomplete="off" spellcheck="false" style="margin-top:6px">
       <button class="btn pri" id="chatKeySave" style="margin-top:8px;padding:9px 16px;
-        min-height:auto;font-size:13px">Lưu khoá</button>
-      <span class="tiny">Khoá nằm trong trình duyệt này, không gửi đi đâu ngoài đúng cổng model
-        (${esc(getBase())}). Xoá bằng cách xoá dữ liệu trang.</span>`;
+        min-height:auto;font-size:13px">Lưu</button>
+      <span class="tiny">Cả hai nằm trong trình duyệt này và chỉ đi tới đúng cổng bạn
+        vừa nhập. Nón Lá không có cổng model dùng chung — trang này là tệp tĩnh,
+        không giữ khoá hộ ai. Xoá bằng cách xoá dữ liệu trang.</span>`;
     el.querySelector("#chatKeySave").onclick = () => {
+      const b = el.querySelector("#chatBase").value.trim();
       const v = el.querySelector("#chatKey").value.trim();
-      if (!v) return;
+      if (!b || !v) return;
+      localStorage.setItem(BASE_STORE, b);
       localStorage.setItem(KEY_STORE, v);
       el.remove();
       bubble("bot", "Đã lưu khoá. Hỏi lại câu vừa rồi nhé.");
@@ -179,8 +196,8 @@ export function mountChat() {
     input.value = "";
     bubble("me", q);
 
-    if (!getKey()) {
-      keyForm("Trang này là tệp tĩnh nên không giữ khoá hộ ai — dán khoá của bạn để dùng.");
+    if (!getKey() || !getBase()) {
+      keyForm("Dán địa chỉ cổng tương thích OpenAI và khoá của bạn để dùng.");
       return;
     }
 

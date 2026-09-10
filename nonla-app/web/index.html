@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nón Lá — fair prices in Vietnam</title>
+<title>Nón Lá — street prices in Vietnam</title>
 <meta name="description" content="Live scan insights, local tips and honest prices from people who love Vietnam. Eat well, spend smart, support locals.">
 <link rel="icon" href="../icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,7 @@
 
   <section class="hero">
     <div>
-      <h1>Ready to explore<br>fair prices in <span id="heroZone">Hội An</span>?</h1>
+      <h1>Ready to explore<br>street prices in <span id="heroZone">Hội An</span>?</h1>
       <p class="lede">Live scan insights, local tips and honest prices from people who love
         this place. Eat well, spend smart, and support the people who cook.</p>
       <div class="hero-tools">
@@ -28,7 +28,7 @@
         <a class="chip" href="map.html?f=street" id="c1"></a>
         <a class="chip" href="map.html?f=cafe" id="c2"></a>
         <a class="chip" href="map.html?f=sit" id="c3"></a>
-        <a class="chip" href="map.html?f=fair" id="c4"></a>
+        <a class="chip" href="map.html?f=all" id="c4"></a>
       </div>
       <p class="kicker" style="margin-top:22px">Which area?</p>
       <div class="chiprow" style="margin-top:10px" id="zonePick"></div>
@@ -73,9 +73,9 @@
         <a class="more" href="map.html">See all</a>
       </div>
       <div class="spots3" id="topSpots"></div>
-      <p class="small muted" style="margin-top:14px">Badge status comes from accumulated scans,
-        never assigned by hand — a place loses it automatically when prices drift outside the
-        local range.</p>
+      <p class="small muted" style="margin-top:14px">The Fair Price badge is built from scans
+        accumulated on your own phone, so it only appears in the app — not on this page. The
+        area price ranges below are the full thing.</p>
     </div>
 
     <div class="panel pad">
@@ -109,7 +109,7 @@ zonePicker("zonePick");
 document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
 document.getElementById("langPick").innerHTML = `${I.globe}English`;
 for (const [id, ico, label] of [["c1", "bowl", "Street food"], ["c2", "coffee", "Coffee"],
-  ["c3", "bag", "Sit-down"], ["c4", "shield", "Fair price only"]]) {
+  ["c3", "bag", "Sit-down"], ["c4", "compass", "Everything"]]) {
   document.getElementById(id).innerHTML = `${I[ico]}${label}`;
 }
 
@@ -127,14 +127,15 @@ document.getElementById("statLine").innerHTML =
    <b>${sights}</b> sights · updated ${esc(zone.updated || "")}`;
 
 /* Ba chỗ đứng đầu = nhiều lượt quét nhất, không phải "được chọn". */
-const top = [...mine].sort((a, b) => (b.scans || 0) - (a.scans || 0)).slice(0, 3);
+/* Không xếp theo lượt quét nữa — trường đó đã gỡ. Giữ thứ tự dữ liệu. */
+const top = mine.slice(0, 3);
 document.getElementById("topSpots").innerHTML = top.map((p) => `
   <a class="spot" href="place.html?id=${encodeURIComponent(p.id)}">
     <span class="ph">${photo(placePhoto(p, true), p.name)}</span>
     <span>
       <h4>${esc(p.name)}</h4>
       <span class="meta">${I.pin}${esc(p.street)} · ${esc(p.tier)}</span>
-      <span class="row2"><span class="scans">${p.scans} scans</span>${verdictPill(p.fair)}</span>
+      <span class="row2">${verdictPill()}</span>
     </span>
   </a>`).join("");
 

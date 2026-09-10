@@ -127,11 +127,16 @@ export function gate(title, why, cta = "Log in to continue") {
   </div>`;
 }
 
-export const verdictPill = (fair) => fair === true
-  ? `<span class="pill ok soft">${I.shield}Fair Price</span>`
-  : fair === false
-    ? `<span class="pill bad">${I.alert}Above range</span>`
-    : `<span class="pill unknown">${I.clock}Not enough data</span>`;
+/* Bản web máy tính KHÔNG có kho lượt quét: nó là mặt đọc bảng giá, không
+   phải mặt khảo sát. Nhãn Đúng Giá suy ra từ lượt quét thật (coso.js) nằm
+   trong IndexedDB của app trên điện thoại, và trang này không với tới.
+
+   Trước bản này nó đọc `p.fair` và `p.scans` trong places.json — hai
+   trường đã bị gỡ vì chúng là phán quyết gán tay. Nên nó hiện
+   "undefined scans" và luôn "Not enough data". Giờ nó nói đúng một câu mà
+   nó có cơ sở để nói. */
+export const verdictPill = () =>
+  `<span class="pill unknown">${I.clock}No scans on this device</span>`;
 
 /* ── khung trang ─────────────────────────────────────────────
    Thanh trên và chân trang dựng bằng JS để mười trang không phải chép
