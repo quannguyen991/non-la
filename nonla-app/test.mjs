@@ -41,6 +41,8 @@ import { bandFloor, forZone } from "./premium.js";
 import { giamBatDinh, rongDai, diemO, xepO, xepPho, liDo } from "./uutien.js";
 import { khoaPho, tenHienThi, gomTheoPho } from "../tools/ten-pho.mjs";
 import { moTaTrangThai } from "./tien.js";
+import { DON_VI, LOI, soatDong, congBoDuoc, tinhTrang, chenh, laQuanSat,
+         CAU as CAU_HC, GAM_MIN, GAM_MAX } from "./hochieu.js";
 import { dungPhieu, dien, tinh, dieuKienThieu, danhDauDaDoc, doiChieu, tenGon,
          cauDoiChieu, CAU as CAU_TT, BO_QUA_LECH } from "./thoathuan.js";
 import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
@@ -443,6 +445,80 @@ console.log("\n── tien: cửa chặn chưa hiệu chuẩn ──────
   ok("câu giải thích nhắc tới ngưỡng chưa đo", /threshold/i.test(cau), cau);
   ok("và nói rõ app đọc bằng con số in thay thế", /printed number/i.test(cau));
   eq("đã hiệu chuẩn thì không hiện câu nào", moTaTrangThai({ co: true }), "");
+}
+
+console.log("\n── hochieu: quán tự khai, app kiểm lời khai ───");
+{
+  const dai = { p25: 50000, p50: 90000, p75: 110000, p95: 140000 };
+
+  eq("dòng khai đủ thì không có lỗi nào",
+     soatDong({ dishId: "pho-bo", price: 90000, unit: DON_VI.PHAN }, dai).length, 0);
+
+  /* THIẾU và MÂU THUẪN chặn công bố. Ranh giới với "đáng xem lại" là chỗ
+     dễ sai nhất của cả tệp. */
+  ok("bán theo cân mà thiếu khối lượng thì chặn",
+     soatDong({ dishId: "x", price: 100000, unit: DON_VI.TRAM_GAM }, null)
+       .some((l) => l.ma === "thieuKhoiLuong" && l.chan));
+  ok("thời giá mà vẫn điền số thì chặn",
+     soatDong({ dishId: "x", price: 500000, unit: DON_VI.THOI_GIA }, null)
+       .some((l) => l.ma === "thoiGiaCoSo"));
+  eq("thời giá không có số thì hợp lệ",
+     soatDong({ dishId: "x", unit: DON_VI.THOI_GIA }, null).length, 0);
+  ok("khai gồm phí phục vụ mà vẫn có phụ thu thì chặn",
+     soatDong({ dishId: "x", price: 90000, unit: DON_VI.PHAN,
+                serviceIncluded: true, surchargePct: 10 }, dai)
+       .some((l) => l.ma === "phuThuMauThuan"));
+  ok("khối lượng vô lý thì chặn",
+     soatDong({ dishId: "x", price: 100000, unit: DON_VI.LANG, portionG: GAM_MAX + 1 }, null)
+       .some((l) => l.ma === "khoiLuongLa"));
+  eq("khối lượng trong giới hạn thì không sao",
+     soatDong({ dishId: "x", price: 100000, unit: DON_VI.LANG, portionG: 800 }, null).length, 0);
+
+  /* Giá cao KHÔNG phải lỗi. Chặn nó lại là app tự phong quyền quyết định
+     quán nào được bán đắt — đúng thứ premium.js sinh ra để tránh. */
+  {
+    const l = soatDong({ dishId: "pho-bo", price: 850000, unit: DON_VI.PHAN }, dai);
+    ok("giá trên dải chỉ là cảnh báo", l.some((x) => x.ma === "ngoaiDai"));
+    ok("và KHÔNG chặn công bố", congBoDuoc(l));
+  }
+  eq("so với đầu ĐẮT của dải, không so trung vị",
+     soatDong({ dishId: "pho-bo", price: dai.p75, unit: DON_VI.PHAN }, dai).length, 0);
+
+  // ── tình trạng cả bảng khai ──
+  {
+    const daiTheo = { "pho-bo": dai };
+    eq("chưa khai gì", tinhTrang([], daiTheo).muc, "trong");
+    eq("còn dòng chưa đủ",
+       tinhTrang([{ dishId: "pho-bo", price: 0, unit: DON_VI.PHAN }], daiTheo).muc, "dang");
+    const t = tinhTrang([{ dishId: "pho-bo", price: 90000, unit: DON_VI.PHAN }], daiTheo);
+    eq("khai đủ", t.muc, "du");
+    eq("và mang cờ lời khai", t.khai, true);
+    eq("nguồn là declared", t.nguon, "declared");
+  }
+
+  /* LUẬT SỐ MỘT: không chỗ nào được in chữ "giá công bằng" / "fair price".
+     "Fair Price Passport" là cái tên trong bản chiến lược, và nó mất hiệu
+     lực bằng đúng một lần copy-paste nếu không có phép thử này. */
+  {
+    const moiCau = Object.values(CAU_HC).map((c) => `${c.vi} ${c.en}`).join(" ");
+    ok("không có chữ 'fair price'", !/fair\s*price/i.test(moiCau));
+    ok("không có chữ 'giá công bằng'", !/công bằng/i.test(moiCau));
+    ok("không tự nhận đã xác thực", !/verified|xác thực/i.test(moiCau));
+    ok("và có câu nói rõ đây là lời khai", /never enter/i.test(CAU_HC.laLoiKhai.en));
+  }
+
+  /* LUẬT SỐ HAI: lời khai không bao giờ vào dải giá. Tầng thứ tư. */
+  eq("declared không được vào dải", laQuanSat(), false);
+
+  // ── khoảng chênh khai ↔ đo ──
+  eq("thiếu một phía thì không suy diễn", chenh(90000, null), null);
+  eq("dưới 3 mẫu thì chưa nói gì", chenh(90000, { p50: 120000, n: 2 }), null);
+  {
+    const c = chenh(90000, { p50: 120000, n: 7 });
+    eq("chênh tính đúng", c.lech, 30000);
+    eq("và đổi ra phần trăm", c.phanTram, 33);
+    ok("KHÔNG có trường phán quyết nào", !("level" in c) && !("verdict" in c));
+  }
 }
 
 console.log("\n── verdict ─────────────────────────────────");

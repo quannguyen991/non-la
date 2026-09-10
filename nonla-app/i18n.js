@@ -115,6 +115,7 @@ const DICT = {
       "Ngoài danh mục — vẫn nói được điều này",
     "Not in our catalogue — see below": "Ngoài danh mục — xem khối dưới",
     "Confirm with the seller first": "Chốt với người bán trước",
+    "Price conditions this place declared": "Điều kiện giá quán này khai",
     "Scan a menu first": "Quét một tấm thực đơn trước đã",
     "this line says": "dòng này tự ghi là",
     "street range does not apply": "dải giá vỉa hè không áp được",

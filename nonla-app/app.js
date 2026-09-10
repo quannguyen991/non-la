@@ -45,6 +45,7 @@ import * as CoSo from "./coso.js";
 import * as PhieuUI from "./phieuui.js";
 import * as TT from "./thoathuan.js";
 import * as Tien from "./tien.js";
+import * as HoChieuUI from "./hochieuui.js";
 import { bachPhanVi } from "./pricesrc.js";
 import { inferDishes } from "./eaterydish.js";
 import * as Lich from "./lich.js";
@@ -2823,6 +2824,8 @@ function showPlace(id, metres = null) {
            : "Nobody has scanned a menu here yet."} Nón Lá needs ${
       CoSo.MIN_QUAN_SAT} before it says anything about this place, and it only counts
       scans made on this phone.</span></div>` : ""}
+    <button class="btn sec" data-act="hcOpen" data-place="${esc(p.id)}">${
+      esc(T("Price conditions this place declared"))}</button>
     ${priceBreakdown(p)}
     ${whatToDo(p)}
     <h2 class="sect">Known for</h2>
@@ -3369,6 +3372,22 @@ function soQuanTheoMon() {
 
    S.phieu giữ lại sau khi đóng màn: tờ hoá đơn quét sau đó phải đối chiếu
    được với nó, mà giữa hai lần ấy người dùng còn ăn xong một bữa. */
+/* Bảng khai điều kiện giá của một cơ sở. Truyền dải giá của vùng vào để
+   hochieu.js cảnh báo được khi chủ quán gõ thừa một số 0 — cảnh báo, KHÔNG
+   chặn: một quán vốn đắt không có lỗi gì. */
+function openHoChieu(placeId) {
+  const p = (S.places || []).find((x) => x.id === placeId);
+  if (!p) return;
+  HoChieuUI.open({
+    host: $("#v-hochieu"),
+    place: p,
+    dishes: S.dishes || [],
+    daiTheoMon: S.prices?.[p.zone]?.items || {},
+    toast,
+    onClose: () => {},
+  });
+}
+
 function openPhieu() {
   const nguon = S.preorder?.rows || [];
   if (!nguon.length) return toast(T("Scan a menu first"));
@@ -4394,6 +4413,13 @@ document.addEventListener("click", async (ev) => {
   // ở đây trước khi rơi xuống nhánh mở lại thẻ quán.
   const rv = el("[data-act='review']");
   if (rv) { closeSheet(); return openComposer(rv.dataset.place); }
+
+  /* Cùng lý do với nhánh trên, và tôi đã mắc đúng cái bẫy này: nút mở
+     bảng khai mang CẢ data-act lẫn data-place, nên nếu để nó rơi xuống
+     nhánh [data-place] phía dưới thì chạm vào chỉ mở lại thẻ quán đang
+     mở — không lỗi nào hiện ra, chỉ là không có gì xảy ra. */
+  const hc = el("[data-act='hcOpen']");
+  if (hc) { closeSheet(); return openHoChieu(hc.dataset.place); }
 
   const sy = el("[data-say]"); if (sy) return say(sy.dataset.say);
 

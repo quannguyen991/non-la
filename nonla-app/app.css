@@ -1994,3 +1994,85 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   color:rgba(245,240,228,.72)}
 .pt-chan span{display:block}
 .pt-chan span[lang=en]{color:rgba(245,240,228,.5)}
+
+/* ── bảng khai điều kiện giá (hochieuui.js) ───────────────────
+   Nền GIẤY, không nền then như #v-phieu và #v-show. Hai màn kia được
+   chìa qua bàn trong một khoảnh khắc căng; màn này là một tờ khai người
+   ta đọc kỹ, và chủ quán ngồi gõ số ở đây hàng chục phút. */
+#v-hochieu{position:fixed;inset:0;z-index:74;overflow-y:auto;
+  background:var(--giay);color:#1b1b1b;
+  padding:0 var(--pad-x) calc(24px + var(--safe))}
+#v-hochieu[hidden]{display:none}
+
+.hc-thanh{display:flex;align-items:center;gap:10px;padding:10px 0;
+  position:sticky;top:0;background:var(--giay);z-index:2}
+.hc-thanh p{flex:1;margin:0;font-size:11.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:#6b6b6b}
+
+.hc-tieu{margin:6px 0 1px;font-size:20px;color:var(--then)}
+.hc-pho{margin:0 0 12px;font-size:13px;color:#6b6b6b}
+
+/* Ba bậc, và không bậc nào nói gì về giá cao hay thấp. */
+.hc-muc{border-left:4px solid var(--vien,#D9CFBA);background:#fff;
+  padding:9px 12px;margin:10px 0;border-radius:0 8px 8px 0}
+.hc-muc[data-m="du"]{border-left-color:#2E6B4F}
+.hc-muc[data-m="dang"]{border-left-color:var(--dong)}
+.hc-muc b{display:block;font-size:14.5px}
+.hc-muc span{display:block;font-size:12.5px;color:#6b6b6b}
+.hc-muc i{display:block;margin-top:3px;font-size:12px;font-style:normal;color:#8a8a8a}
+
+/* Câu "đây là lời khai". Nhỏ nhưng KHÔNG mờ tới mức đọc không ra. */
+.hc-loikhai{margin:10px 0 14px;font-size:12px;line-height:1.45;color:#5b5b5b}
+.hc-loikhai span{display:block}
+.hc-loikhai span[lang=en]{color:#8a8a8a}
+
+.hc-chup{margin:0 0 12px;padding:8px 11px;border-radius:8px;font-size:12.5px;
+  background:#FBF3E3;border:1px solid #E4D3A8;color:#6b5520}
+
+.hc-dong{border-top:1px solid #E4DCC9;padding:11px 0}
+.hc-ten b{font-size:16px}
+.hc-ten i{display:block;font-style:normal;font-size:12.5px;color:#8a8a8a}
+.hc-gia{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 9px;margin-top:4px}
+.hc-gia .so{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.hc-gia .so em{font-size:14px;font-style:normal;font-weight:600;color:var(--son)}
+.hc-gia .dv{font-size:12.5px;color:#6b6b6b}
+/* Nhãn nguồn nằm TRONG khối giá, không ở chân trang. */
+.hc-khai{font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  background:#EFE8D8;border:1px solid #D9CFBA;border-radius:9px;padding:1px 7px;color:#6b6b6b}
+.hc-note{margin:4px 0 0;font-size:12.5px;color:#5b5b5b}
+.hc-thieu{margin:5px 0 0;font-size:12.5px;color:var(--son)}
+.hc-trong{margin:16px 0;font-size:14px;color:#6b6b6b}
+
+/* Khoảng chênh khai ↔ đo. KHÔNG đỏ, KHÔNG dấu cảnh báo: nó là một câu
+   hỏi, và ba lý do lương thiện nằm ngay trong cùng khối. */
+.hc-chenh{margin-top:7px;padding:8px 11px;border-radius:8px;
+  background:#EEF2F4;border-left:3px solid #4A6B7A;font-size:12.5px}
+.hc-chenh b{font-variant-numeric:tabular-nums}
+.hc-chenh span{display:block;margin-top:3px;color:#5b6b73}
+.hc-chenh span[lang=en]{color:#8a9a9f}
+
+.hc-sect{margin:20px 0 4px;font-size:15px;color:var(--then)}
+.hc-nhan{display:block;margin:12px 0 4px;font-size:12.5px;color:#5b5b5b}
+.hc-sua h3{margin:8px 0 2px;font-size:17px;color:var(--then)}
+.hc-sua input[type=number]{width:100%;min-height:46px;padding:9px 12px;font-size:16px;
+  border-radius:10px;border:1px solid #D9CFBA;background:#fff;color:#1b1b1b}
+.hc-tick{display:flex;align-items:center;gap:9px;margin:12px 0;font-size:13.5px;
+  min-height:44px}
+.hc-tick input{width:22px;height:22px}
+
+.hc-chips{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0}
+.hc-chip{min-height:40px;padding:8px 13px;border-radius:20px;font-size:13px;
+  border:1px solid #D9CFBA;background:#fff;color:#1b1b1b;cursor:pointer}
+.hc-chip.on{background:var(--then);color:var(--diep);border-color:var(--then)}
+
+/* Lỗi CHẶN và lỗi ĐÁNG XEM LẠI phải trông khác nhau: một cái khoá nút
+   Lưu, một cái không. Cùng màu là mời người ta bỏ qua cả hai. */
+.hc-loi{margin:12px 0;padding:9px 12px;border-radius:8px;font-size:13px;
+  background:#FBF3E3;border-left:3px solid var(--dong)}
+.hc-loi.chan{background:#FBEFEA;border-left-color:var(--son)}
+.hc-loi p{margin:0 0 4px}
+.hc-loi p:last-child{margin-bottom:0}
+.hc-loi span[lang=en]{display:block;font-size:11.5px;color:#8a8a8a}
+
+#v-hochieu .btn{width:100%;margin-top:10px;min-height:50px}
+#v-hochieu .btn.pri[disabled]{opacity:.4;pointer-events:none}

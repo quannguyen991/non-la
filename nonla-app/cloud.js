@@ -217,3 +217,75 @@ export const pullIndex = ({ zone = null, dishId = null } = {}) =>
 /** Xoá mọi quan sát giá của chính mình trên máy chủ. Đối trọng của
  *  pushPrices: rút lại quyền mà không xoá được thứ đã gửi là nói dối. */
 export const wipePrices = () => rest("price_observations?client_id=gte.0", { method: "DELETE" });
+
+/* ── bảng khai điều kiện giá (hochieu.js) ─────────────────────
+   Ba đường, và ranh giới quyền của chúng khác hẳn nhau:
+
+     pullMenu        — ĐỌC CÔNG KHAI, không cần đăng nhập. Đó chính là mục
+                       đích: khách ở quầy phải xem được mà không phải tạo
+                       tài khoản.
+     coSoCuaToi      — quán nào tôi được sửa. Bảng menu_owners KHÔNG có
+                       policy insert: quyền sở hữu chỉ cấp qua một đường có
+                       xác minh ngoài ứng dụng, không phải bằng một lượt gọi
+                       API. Nên đây chỉ là một phép ĐỌC.
+     luuMonKhai      — ghi, và RLS phía máy chủ tự chặn nếu không phải chủ.
+                       Không kiểm quyền ở máy khách rồi coi thế là xong:
+                       kiểm ở máy khách chỉ để giao diện bớt hiện nút vô ích.
+
+   Trả về camelCase ngay tại biên, đúng khuôn toPost() phía trên. */
+
+const toMon = (r) => ({
+  placeId: r.place_id, dishId: r.dish_id,
+  price: r.price, unit: r.unit,
+  portionG: r.portion_g,
+  surchargePct: Number(r.surcharge_pct) || 0,
+  serviceIncluded: !!r.service_included,
+  note: r.note || "",
+  updatedAt: r.updated_at,
+});
+
+/** Thực đơn quán tự khai. Đọc được khi CHƯA đăng nhập. */
+export const pullMenu = (placeId) =>
+  rest("menu_items?select=place_id,dish_id,price,unit,portion_g,surcharge_pct,"
+    + `service_included,note,updated_at&place_id=eq.${encodeURIComponent(placeId)}`)
+    .then((rows) => (rows || []).map(toMon));
+
+/** Những quán tôi được phép sửa thực đơn. Chỉ ĐỌC — xem chú thích trên. */
+export const coSoCuaToi = () =>
+  rest("menu_owners?select=place_id,granted_at")
+    .then((rows) => (rows || []).map((r) => ({ placeId: r.place_id, from: r.granted_at })));
+
+/** Ghi một dòng khai. Một quán một món một dòng, nên đây là upsert. */
+export const luuMonKhai = (placeId, m) =>
+  rest("menu_items?on_conflict=place_id,dish_id", {
+    method: "POST",
+    prefer: "resolution=merge-duplicates,return=minimal",
+    body: [{
+      place_id: placeId,
+      dish_id: m.dishId,
+      price: m.unit === "market_price" ? null : Math.round(m.price) || null,
+      unit: m.unit,
+      portion_g: m.portionG > 0 ? Math.round(m.portionG) : null,
+      surcharge_pct: Number(m.surchargePct) || 0,
+      service_included: !!m.serviceIncluded,
+      note: String(m.note || "").slice(0, 200),
+      updated_at: new Date().toISOString(),
+    }],
+  });
+
+export const xoaMonKhai = (placeId, dishId) =>
+  rest(`menu_items?place_id=eq.${encodeURIComponent(placeId)}`
+    + `&dish_id=eq.${encodeURIComponent(dishId)}`, { method: "DELETE" });
+
+/**
+ * Giá ĐO ĐƯỢC tại chính quán đó, từ view place_price_measured.
+ * View chỉ trả ô có từ 3 quan sát trở lên, nên nó không lộ ai ghi gì.
+ * Đây là vế thứ hai của phép đối chiếu — KHÔNG phải dải giá của khu.
+ */
+export const pullDoTaiQuan = (placeId) =>
+  rest("place_price_measured?select=zone,place_id,dish_id,p50,n,updated_at"
+    + `&place_id=eq.${encodeURIComponent(placeId)}`)
+    .then((rows) => (rows || []).map((r) => ({
+      zone: r.zone, placeId: r.place_id, dishId: r.dish_id,
+      p50: r.p50, n: r.n, updatedAt: r.updated_at,
+    })));

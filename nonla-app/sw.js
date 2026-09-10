@@ -33,6 +33,10 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v51: hochieu.js + hochieuui.js — bảng khai điều kiện giá. Phải có trong
+//      SHELL vì màn này CỐ Ý chạy được khi mất sóng: khách mở lại ở quầy thấy
+//      bản chụp lần đọc trước, kèm ngày đọc. Thiếu tệp .js thì app.js chết ở
+//      dòng import, mất cả app chứ không mất một màn.
 // v50: tien.js — đọc mệnh giá bằng hình dạng. CHỈ tệp .js vào SHELL; tệp
 //      model 2,8 MB thì KHÔNG: nhét nó vào đây là mọi người dùng, kể cả người
 //      chỉ tra giá, tải thêm 2,8 MB ở lần mở đầu trên 4G. Model nạp lười ở
@@ -99,7 +103,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v50";
+const CACHE = "nonla-v51";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -113,7 +117,7 @@ const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css", "./community.css", "./welcome.css", "./you.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./route.js",
   "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
-  "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js", "./units.js", "./predict.js", "./eaterydish.js", "./pricesync.js", "./menuref.js", "./premium.js", "./amlich.js", "./lich.js", "./hanhtrinh.js", "./monla.js", "./pricesrc.js", "./coso.js", "./uutien.js", "./thoathuan.js", "./phieuui.js", "./tien.js",
+  "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js", "./units.js", "./predict.js", "./eaterydish.js", "./pricesync.js", "./menuref.js", "./premium.js", "./amlich.js", "./lich.js", "./hanhtrinh.js", "./monla.js", "./pricesrc.js", "./coso.js", "./uutien.js", "./thoathuan.js", "./phieuui.js", "./tien.js", "./hochieu.js", "./hochieuui.js",
   "./manifest.json", "./icon.svg",
   "./data/dishes.json", "./data/prices.json", "./data/places.json",
   "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./data/trips.json",

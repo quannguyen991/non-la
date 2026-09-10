@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 86 commit · 728 phép thử xanh
+Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 87 commit · 753 phép thử xanh
 
 ---
 
@@ -92,7 +92,7 @@ tiền) và lần nào cũng được giữ — nghĩa là mọi thứ đều ph
 canvas/SVG thuần hoặc bằng một tệp model tải rời.
 
 **(2) Chạy được khi tắt mạng.**
-Service worker `nonla-v50` cache **69 tệp** vỏ app. Ba trong bốn chế độ quét
+Service worker `nonla-v51` cache **71 tệp** vỏ app. Ba trong bốn chế độ quét
 chạy hoàn toàn offline; chỉ chế độ nhận diện món ăn cần mạng, và đó là ngoại lệ
 được ghi rõ ngay trong `index.html`.
 
@@ -152,7 +152,7 @@ Mọi con số dưới đây đếm trực tiếp từ tệp dữ liệu, không
 | Bài cộng đồng mẫu | **29** | `community.json` |
 | Mục lịch cố định | **9** | `lich.json` |
 | Quán cào từ sitemap giao hàng | **4.228** | `docs/quan-sitemap-*.json` |
-| Tệp trong vỏ offline | **69** | `sw.js` |
+| Tệp trong vỏ offline | **71** | `sw.js` |
 
 ### 4.1 Sáu vùng
 
@@ -840,6 +840,93 @@ vứt đi. Số đo đó không bao giờ rời khỏi máy.
 
 ---
 
+### 11.7 Bảng khai điều kiện giá — `hochieu.js` + `hochieuui.js`
+
+Đây là đường **ngược lại** duy nhất trong cả sản phẩm: mọi thứ khác nhìn người
+bán từ bên ngoài (khách quét, app phán quyết); mô-đun này để quán tự khai giá,
+khẩu phần, đơn vị, phụ thu — và app soát lời khai ấy.
+
+#### Cái tên bị bỏ, và vì sao
+
+Bản chiến lược gọi nó là **"Hộ chiếu Giá Công bằng"**. Cái tên nghe hay và nó
+sai: app **không biết** giá của quán này có công bằng không. Nó chỉ biết quán đã
+khai gì và lời khai ấy có đầy đủ không. Nhập hai việc ấy lại là bán một lời
+chứng nhận mà app không có tư cách cấp.
+
+Câu duy nhất được in ra là **"quán đã tự khai đầy đủ điều kiện giá"**. Không
+"được xác thực", không "đáng tin cậy", không "giá công bằng". Có một phép thử
+quét mọi chuỗi hiển thị và **đỏ nếu chữ `fair price` / `công bằng` / `xác thực`
+lọt vào** — cái tên ấy mất hiệu lực bằng đúng một lần copy-paste nếu không có nó.
+
+#### Hai loại lỗi, và ranh giới giữa chúng là chỗ dễ sai nhất
+
+| Loại | Ví dụ | Hậu quả |
+|---|---|---|
+| **Chặn** | bán theo cân mà không ghi khối lượng một phần | không công bố được |
+| **Chặn** | chọn "thời giá" mà vẫn điền số | hai trường tự phủ nhau |
+| **Chặn** | khai "đã gồm phí phục vụ" mà vẫn có phụ thu | |
+| **Đáng xem lại** | 850.000₫ một đĩa, trên `p95` của khu | **không chặn gì** |
+
+Dòng cuối là chỗ dễ sai nhất: một quán fine dining khai 850.000₫ **không có lỗi
+gì**, và chặn nó lại là app tự phong quyền quyết định quán nào được bán đắt.
+Cảnh báo cũng so với **đầu đắt** của dải (`p95`), không so trung vị — so trung vị
+thì nửa số quán trong khu bị gắn cảnh báo, và một cảnh báo gắn cho nửa số quán
+là một cảnh báo người ta tắt đi.
+
+#### Tầng thứ tư của ranh giới khai ↔ đo
+
+Ba tầng đã có (bảng riêng · ràng buộc cột chặn `src='declared'` · `pricesrc.js`).
+Mô-đun này là tầng thứ tư: nó **không có hàm nào trả về dải giá**, mọi thứ nó
+trả về mang cờ `khai: true` và `nguon: declared`, và có phép thử đòi
+`vaoDai("declared") === false`.
+
+#### Chỗ dữ kiện thiếu được người biết nó điền vào
+
+`units.js` cố ý **từ chối đoán** trọng lượng con cá. Bảng khai là nơi con số ấy
+xuất hiện hợp pháp: quán khai `per_lạng` **kèm** khối lượng một phần, và app
+tính được ngay.
+
+> Hải sản cân · **120.000₫** một lạng (100 g) · *quán khai*
+> Một phần 800 g → **960.000₫**
+
+Đó là cùng một dữ kiện mà phiếu "điều hai bên vừa cùng đọc" (§7.10) hỏi tại
+quầy — chỉ khác là ở đây quán khai trước một lần cho mọi khách.
+
+#### Ba thứ có ích thật cho người bán
+
+Không phải một cái huy hiệu:
+
+1. **Thực đơn đa ngữ miễn phí** — món trong danh mục đã có tên năm thứ tiếng
+   trong `dishes.json`, nên quán khai một lần là khách Hàn, Trung, Nhật đọc được
+   ngay. Việc một quán vỉa hè không tự làm nổi.
+2. **Một chỗ nói rõ điều kiện giá** — bán cá theo lạng là cách bán bình thường;
+   vấn đề là khách không đọc được đơn vị. Khai ra một lần thì app hỏi hộ, và
+   quán bớt tranh cãi ở quầy.
+3. **Lịch sử đổi giá**, để chứng minh mình không đổi giá theo mặt khách.
+
+Không phần nào trong ba thứ ấy đánh đổi bằng quyền kéo dải giá.
+
+#### Khoảng chênh khai ↔ đo là một câu hỏi
+
+View `menu_vs_measured` ghép giá khai với `place_price_measured` (ngưỡng 3 quan
+sát tại chính quán đó). Giao diện hiện nó **không đỏ, không dấu cảnh báo**, và
+ba lý do lương thiện nằm ngay trong cùng một câu với con số: *"có thể là suất
+khác, thực đơn cũ, hay giá đã gồm phí — đáng hỏi lại, không phải một kết luận."*
+Hàm `chenh()` trả `null` khi thiếu một phía và **không có trường phán quyết nào**.
+
+#### Chạy được khi mất sóng
+
+Bản khai đọc về được lưu theo từng quán, nên khách mở lại lúc mất sóng vẫn thấy
+— **kèm ngày đọc được**, để họ biết đang xem bản chụp chứ không phải bản hiện
+tại. Ghi thì cần mạng, và khi mất mạng thì nói thẳng và **giữ nguyên ô đang gõ**
+thay vì nhận dữ liệu rồi vứt đi.
+
+#### Quyền chủ quán không tự đăng ký được
+
+Bảng `menu_owners` **cố ý không có policy `insert`**: quyền chỉ cấp qua một
+đường có xác minh ngoài ứng dụng. Kiểm quyền ở máy khách chỉ để giao diện bớt
+hiện nút vô ích; chốt thật nằm ở RLS phía máy chủ.
+
 ## 12. Tính năng — nhóm F: dữ liệu của chính người dùng
 
 ### 12.1 Lịch sử hoạt động — `history.js`
@@ -1119,7 +1206,7 @@ cả cho những quán không liên quan.**
 
 ## 16. Kiểm thử và tự soát
 
-### 16.1 `test.mjs` — 728 phép thử, 0 hỏng
+### 16.1 `test.mjs` — 753 phép thử, 0 hỏng
 
 Kiểm lõi thuần: khớp món, bách phân vị, phán quyết, phép chiếu bản đồ, tuyến đi
 bộ, âm lịch, đơn vị, so thực đơn, tiền thối, tin cậy, nguồn giá, chấm điểm đối
@@ -1161,7 +1248,7 @@ là 612). Đây là thứ giám khảo đếm lại được trong ba mươi gi�
 Ngày 09/09 nó hở một chỗ khác và đã bịt: luật trên chỉ bắt hồ sơ khai **nhiều**
 con số, nên nó vẫn xanh khi cả cuốn khai thống nhất một con số **đã cũ**. Giờ
 bộ soát **chạy thật** `node test.mjs` rồi so — bắt được đúng lúc hồ sơ còn ghi
-612 trong khi bộ thử đã lên 645 (nay là 728).
+612 trong khi bộ thử đã lên 645 (nay là 753).
 
 Nó chỉ soát những con số **đếm được**, không cố hiểu văn xuôi: một bộ soát đoán
 mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát người ta tắt đi.
@@ -1224,6 +1311,9 @@ range"*. Đó cũng là cảnh quay tự nhiên nhất cho video demo 3 phút: c
   có người xác nhận → đang bị lọc khỏi giao diện.
 - **219/219 ô giá vẫn mang cờ `seed`** — chưa ô nào lên tới bậc `fair`.
 - **Hệ số quy đổi giá app giao hàng chưa đo** → nguồn 3 chưa chảy vào dải.
+- **Chưa quán nào được cấp quyền chủ** — `menu_owners` cố ý không có policy
+  `insert`, nên quyền chỉ cấp qua một đường có xác minh ngoài ứng dụng. Bảng
+  khai điều kiện giá đã chạy cả hai chiều nhưng chưa có lời khai thật nào.
 
 ### 17.3 Giới hạn theo thiết kế
 
@@ -1291,7 +1381,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `history.js` | 253 | lịch sử hoạt động (IndexedDB) |
 | `amlich.js` | 244 | lõi âm lịch Việt Nam |
 | `hanhtrinh.js` | 231 | trang hành trình |
-| `sw.js` | 220 | service worker, SHELL 69 tệp |
+| `sw.js` | 220 | service worker, SHELL 71 tệp |
 | `survey.js` | 219 | khảo sát giá tại chỗ |
 | `cloud.js` | 219 | chỗ duy nhất biết tới HTTP |
 | `match.js` | 210 | khớp món, đọc tiền, phán quyết |
@@ -1316,6 +1406,8 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `monla.js` | 243 | ngữ cảnh cho dòng không khớp được món nào |
 | `coso.js` | 111 | nhãn Đúng Giá suy từ lượt quét thật |
 | `uutien.js` | 171 | xếp ô giá theo lượng bất định giảm được |
+| `hochieuui.js` | 333 | màn bảng khai điều kiện giá |
+| `hochieu.js` | 210 | soát lời khai của quán, không cấp chứng nhận |
 | `pricesync.js` | 96 | đóng góp giá lên máy chủ |
 | `route.js` | 91 | tuyến đi bộ |
 | `outbox.js` | 91 | hàng chờ gửi |
