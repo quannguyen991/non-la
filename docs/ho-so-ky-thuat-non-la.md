@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 87 commit · 753 phép thử xanh
+Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 88 commit · 753 phép thử xanh
 
 ---
 
@@ -23,7 +23,7 @@ Bản dựng ngày 09/09/2026 · nhánh `community-v1` · 87 commit · 753 phép
 13. [Bộ nhận mệnh giá tiền](#13-bộ-nhận-mệnh-giá-tiền)
 14. [Đối chứng với mô hình ngôn ngữ](#14-đối-chứng-với-mô-hình-ngôn-ngữ)
 15. [Lớp máy chủ](#15-lớp-máy-chủ)
-16. [Kiểm thử và tự soát](#16-kiểm-thử-và-tự-soát)
+16. [Kiểm chứng: máy, hồ sơ, và ngoài đường](#16-kiểm-chứng-máy-hồ-sơ-và-ngoài-đường)
 17. [Những chỗ đang nợ](#17-những-chỗ-đang-nợ)
 18. [Cách chạy](#18-cách-chạy)
 19. [Danh mục tệp mã nguồn](#19-danh-mục-tệp-mã-nguồn)
@@ -117,7 +117,7 @@ nonla-app/
 └── web/                bản bố cục máy tính (12 trang HTML riêng)
 ```
 
-**17.501 dòng JavaScript** trong 47 mô-đun, cộng 5 bảng kiểu CSS.
+**19.208 dòng JavaScript** trong 53 mô-đun, cộng 5 bảng kiểu CSS.
 
 Nguyên tắc chia mô-đun: **lõi thuần tách khỏi giao diện**. Mọi mô-đun không đụng
 DOM (`match.js`, `geo.js`, `iso.js`, `route.js`, `posts.js`, `amlich.js`,
@@ -563,6 +563,78 @@ thiết kế, và mã nguồn ghi rõ như vậy. Thứ nó bảo đảm là: th
 từ dữ liệu, ai chạy cũng ra đúng thứ tự ấy, và mỗi ô giải thích được vì sao nó
 đứng chỗ đó — giao diện hiện *"nothing measured yet · range spans 280k"* chứ
 không hiện một điểm số trần trụi.
+
+### 7.10 Phiếu "điều hai bên vừa cùng đọc" — `thoathuan.js` + `phieuui.js`
+
+Đây là tính năng **lõi**, và nó khác mọi thứ còn lại ở một điểm: **thời điểm**.
+
+Mọi mô-đun khác can thiệp **sau** — khách nhìn một cái giá rồi app nói giá ấy có
+bình thường không. Mô-đun này can thiệp **trước**: lúc dữ kiện còn thiếu, món
+chưa nấu, và cả hai bên còn đổi ý được.
+
+> Một mô hình ngôn ngữ trả lời rất giỏi câu *"cá song 100.000/100g nghĩa là gì"*.
+> Thứ nó không làm được là **quay màn hình sang phía người bán**, để hai người
+> không chung tiếng nói cùng nhìn một tờ giấy trước khi con cá xuống bếp.
+
+#### Luồng, đo trên trình duyệt
+
+| Bước | Màn hình nói gì |
+|---|---|
+| Vừa quét menu | **5 câu phải hỏi. Không hiện tổng. Nút xác nhận bị khoá.** |
+| Người bán gõ 800 g | tiền cá 800.000₫ |
+| Chọn "cả phần" cho lẩu | |
+| Chọn "chưa gồm phụ thu" | **1.280.000₫ → 1.446.400₫** (+13%) |
+| Lật màn hình, người bán chạm | đóng dấu **16:45** |
+
+#### Ba luật, mỗi luật chặn một cách tính năng này có thể hỏng
+
+**1. Đây không phải hợp đồng, và chữ dùng phải nói đúng thế.** Không "thoả
+thuận", không "cam kết", không "hai bên đồng ý". Tờ phiếu không có giá trị pháp
+lý nào, và gọi nó là hợp đồng sẽ khiến khách tin quá mức rồi mang nó ra tranh
+cãi ở đúng lúc họ yếu thế nhất. Chữ đã chốt: **"Điều hai bên vừa cùng đọc"**.
+Câu *"đây không phải hợp đồng hay hoá đơn"* bắt buộc có trên **mọi** bản vẽ, và
+có phép thử canh tiêu đề không chứa chữ `agreement`.
+
+**2. Số người bán gõ vào là `declared`, không bao giờ vào dải giá.** Đây là chỗ
+nguy hiểm nhất của cả tính năng: nó mở một đường **mới** cho lời khai của người
+bán đi vào máy khách. Phiếu mang `NGUON.DECLARED` và có phép thử đòi
+`vaoDai()` trả `false`.
+
+**3. Không đoán dữ kiện còn thiếu — đó là lý do tệp tồn tại.** `units.js` cố ý
+không đoán trọng lượng con cá; cám dỗ ở đây là để phiếu tự điền 800 g cho đẹp.
+Chưa biết thì hiện câu **hỏi**, và tổng **không** hiện ra — kể cả một khoảng
+đoán, vì cận trên của khoảng ấy là bịa. Phụ thu thì ngược lại: cả hai đầu đều in
+trên thực đơn, nên khoảng "trước phụ thu → sau phụ thu" là một khoảng **có thật**.
+
+#### Đối chiếu hoá đơn, và lỗi nguy hiểm nhất đã mắc
+
+Sau bữa ăn, tờ hoá đơn được đối chiếu với phiếu đã đóng dấu:
+
+| Hoá đơn | Câu app nói |
+|---|---|
+| khớp | *"Hoá đơn khớp với phiếu"* |
+| thêm một chai bia 90.000₫ | *"có dòng không nằm trên phiếu — nhiều khả năng là món gọi thêm"* |
+| cá song 800k → 1,2tr **và** có bia | *"lệch so với phiếu. Nên xem lại cùng nhau từng dòng"* |
+
+Bản đầu chỉ kiểm *"có dòng lạ không"* nên nó nói **"nhiều khả năng là món gọi
+thêm"** cho cả ca lệch 405.000₫ ở một dòng *có* trên phiếu. Một câu trấn an sai
+vào đúng lúc khách cần mở hoá đơn ra xem. Giờ nó tính phần lệch mà những dòng
+gọi thêm **không giải thích được**.
+
+#### Ba lỗi khác chỉ chạy thật mới lộ
+
+- Dòng phụ thu trên hoá đơn bị đếm là **món gọi thêm**.
+- `detectSurcharges` trả **VAT hai dòng**: "chưa gồm VAT 8%" khớp cả luật "chưa
+  gồm VAT" (`pct: null`) lẫn luật "VAT 8%". Cộng lại vẫn đúng tình cờ, nhưng một
+  menu ghi VAT ở hai chỗ sẽ hiện quán thu VAT hai lần.
+- Câu hỏi khẩu phần để `chan: false` nên số suất **không vào phép tính** — nồi
+  lẩu tính theo đầu người cho bốn người ra tổng của một người: **sai gấp bốn và
+  trông hoàn toàn bình thường.** Câu hỏi nào đổi được tổng thì phải chặn tổng.
+
+#### Chữ song ngữ cùng lúc, không phải nút đổi ngôn ngữ
+
+Cả hai người phải đọc được **cùng một dòng** — đó là toàn bộ lý do tấm phiếu tồn
+tại, và một nút đổi ngôn ngữ chỉ phục vụ được một người tại một lúc.
 
 ## 8. Tính năng — nhóm B: đứng ở quầy
 
@@ -1100,6 +1172,38 @@ Bước ấy giờ là cửa chặn: fp32 lệch một ca là dừng, int8 lệc
 
 ---
 
+### 13.9 Nối vào app, sau một cửa chặn
+
+Model 2,8 MB int8 nạp và chạy được trong trình duyệt. Đo trên máy thật:
+**nạp 1,4 giây, suy luận 24–56 ms một tờ.**
+
+**Nhưng nó đang tắt, và đó là chủ ý.** `cauhinh-tien.json` mang cờ
+`nguongDaHieuChuan: false` vì `anh-kho/` còn rỗng — ngưỡng 0,75 chưa ai đo. Khi
+cờ ấy `false`, `tien.js` **từ chối chạy** và app rơi về OCR như cũ. Không phải
+vì model tệ, mà vì một con số chưa ai đo không đủ tư cách quyết định khi nào app
+dám nói *"đây là tờ 500.000"*.
+
+Bật cờ tạm để kiểm đường dây rồi trả lại ngay:
+
+| Ảnh | Model đọc | Tin cậy |
+|---|---|---|
+| 500.000 | ✓ 500.000 | 0,90 |
+| 1.000 | ✓ 1.000 | 0,90 |
+| 20.000 | **im lặng** | 0,619 — dưới ngưỡng |
+
+Tờ 20.000 nó đoán **đúng** nhưng chỉ 61,9%, nên nó không nói gì. Đúng hành vi đã
+thiết kế. Ba ảnh ấy là **ảnh train** — chúng chứng minh đường dây chạy, *không*
+chứng minh độ chính xác.
+
+Model **không** vào vỏ offline: 2,8 MB nhét vào SHELL là mọi người dùng, kể cả
+người chỉ tra giá, tải thêm 2,8 MB ở lần mở đầu trên 4G. Nó nạp lười ở lần đầu
+bấm chế độ Cash rồi nằm trong cache riêng, và từ đó dùng được offline.
+
+Mọi đường trong `tien.js` trả `null` khi hỏng — mất mạng lần đầu, CDN bị chặn,
+máy cũ không chạy nổi wasm đều có thật, và không nhánh nào ném lỗi ra ngoài. Thẻ
+kết quả nói rõ con số đọc bằng cách nào: hai cách có **kiểu sai khác hẳn nhau**
+(OCR đọc nhầm chữ số, model nhận nhầm cả tờ) nên người dùng đáng được biết.
+
 ## 14. Đối chứng với mô hình ngôn ngữ
 
 Đo ngày 06/09/2026. **36 câu hỏi × 10 lượt**, hai model (`gpt-5.5`,
@@ -1204,7 +1308,7 @@ cả cho những quán không liên quan.**
 
 ---
 
-## 16. Kiểm thử và tự soát
+## 16. Kiểm chứng: máy, hồ sơ, và ngoài đường
 
 ### 16.1 `test.mjs` — 753 phép thử, 0 hỏng
 
@@ -1254,6 +1358,88 @@ Nó chỉ soát những con số **đếm được**, không cố hiểu văn xu
 mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát người ta tắt đi.
 
 ---
+
+### 16.4 Protocol khảo sát — `tools/protocol-khao-sat.mjs`
+
+Phiếu lộ trình trả lời *"đi phố nào, gõ món nào"*. Tệp này trả lời câu khác:
+**dữ liệu thu về có được coi là bằng chứng không.**
+
+**Phân tầng bằng số, không bằng cảm giác.** Khoảng cách tới tâm vùng, cắt tại
+tứ phân vị của chính phân bố quán trong dữ liệu. Hoàn Kiếm ra:
+
+| Tầng | Ngưỡng | Phố | Quán |
+|---|---|---|---|
+| A — Lõi du lịch | ≤ 522 m | 23 | 54 |
+| B — Phố cổ vòng ngoài | 522–939 m | 48 | 158 |
+| C — Rìa khu | > 939 m | 25 | 73 |
+
+*"Phố đông khách"* là một cụm từ; *"≤522 m tính từ Hồ Gươm"* là một ngưỡng ai
+cũng dựng lại được. Việc này cũng đổi pilot từ "đi thu dữ liệu" thành **đo độ
+dốc giá theo khoảng cách** — tự nó là một kết quả.
+
+**Luật quan trọng nhất, và cũng dễ phá nhất:** đếm quán trên phố, bốc `k` ngẫu
+nhiên, vào quán thứ `k` rồi **cách 3 quán vào một quán**. Chọn quán trông ngon
+thì sáu mươi dòng thu về đo *gu chọn quán của người đi*, không đo mặt bằng giá —
+và không sửa được sau khi đã về nhà. Mỗi quán bỏ qua phải ghi lý do.
+
+**Thu đôi 20%** (24/120 dòng) là phép đo duy nhất trong cả protocol đo **người
+thu** chứ không đo thị trường.
+
+**Không đặt trước ngưỡng kết quả.** Không viết *"kỳ vọng lõi đắt hơn rìa 30%"* —
+viết ra con số mình muốn thấy trước khi đo là cách chắc chắn nhất để đo cho tới
+khi thấy nó. Chỉ đăng ký **phép đo** và cam kết báo cáo bất kỳ con số nào rơi ra.
+
+Mục tiêu **120 dòng** = 8 ô ưu tiên × 5 mẫu × 3 tầng — không phải số tròn cho
+đẹp, mà là số dòng ít nhất để nói được một câu về *từng* tầng.
+
+Bản in đầu tiên phơi ra một lỗi dữ liệu: **"Hàng Buồm" và "Phố Hàng Buồm" bị đếm
+thành hai phố** — 21 phố ở Hoàn Kiếm bị tách như thế, cộng ba dòng là địa chỉ đầy
+đủ lọt vào ô tên phố. Đếm tách thì một phố 13 quán trông như hai phố tầm thường;
+tệ hơn, hai bản ghi cùng phố lệch vài mét nên có thể **rơi vào hai tầng khác
+nhau**, làm cả thiết kế phân tầng mất nghĩa. `tools/ten-pho.mjs` bỏ chữ chỉ loại
+đường ở **cả hai đầu** (tiếng Việt đứng trước, tiếng Anh đứng sau) và cố ý
+**không gộp mờ**: "Hàng Bồ" và "Hàng Bè" là hai phố thật. 120 dạng tên → 96 phố.
+
+### 16.5 Bộ đo quyết định — `tools/kich-ban-thu.mjs`
+
+Một tính năng lõi mạnh vẫn chỉ là lời kể cho tới khi có con số. Sáu tình huống
+có **đáp án chuẩn**, và đáp án tính bằng chính `units.js` / `thoathuan.js` /
+`change.js` / `menutax.js` mà app dùng — mã đổi thì chạy lại là đáp án đổi theo,
+không gõ tay con số nào.
+
+| | Tình huống | Đáp án chuẩn |
+|---|---|---|
+| A1 | Cá song 100.000/100g | *Chưa trả lời được* — phải hỏi trọng lượng |
+| A2 | Lẩu 420.000 cho 4 người | **Bình thường** (dải Hoàn Kiếm 300k–800k) |
+| B1 | Ba món + VAT 8% + phí 5% | **259.900₫**, không phải 230.000₫ |
+| B2 | Phá lấu 60.000 | **Không kết luận được** — ngoài danh mục |
+| C1 | Hai tấm menu Việt/Anh | Chênh trung vị **1,45×** trên 3 món — *hỏi*, không buộc tội |
+| C2 | Tờ xanh lơ trong tiền thối | *Chưa trả lời được* — 500.000₫ hay 20.000₫, chênh 480.000₫ |
+
+**Quyết định thiết kế quan trọng nhất: ở 4/6 tình huống, "tôi bị lừa" là câu trả
+lời SAI.** Hai tình huống không có gì bất thường, hai tình huống nữa đáp án đúng
+là "chưa trả lời được". Nếu tình huống nào cũng có người gian thì người tham gia
+học được sau tình huống thứ hai rằng *"cứ nghi là đúng"*, và cả buổi đo biến
+thành đo mức độ đa nghi.
+
+Bốn chỉ số, và chỉ số thứ ba quan trọng hơn ba chỉ số kia:
+
+| Chỉ số | Cách tính |
+|---|---|
+| Điều kiện ẩn phát hiện được | số điều kiện nêu đúng / tổng |
+| Quyết định đúng | kết luận cuối khớp đáp án chuẩn |
+| **NGHI OAN** | số lần kết luận "bị hớ" ở những ca mà kết luận ấy là **sai** |
+| Thời gian tới quyết định | từ lúc đưa tình huống tới lúc viết xong |
+
+> Một app giúp người ta phát hiện bẫy nhanh hơn nhưng cũng khiến họ nghi oan
+> nhiều hơn là một app làm hại người bán tử tế. **Nếu tỉ lệ nghi oan của Nón Lá
+> cao hơn đối chứng, con số ấy nằm ở trang kết quả, không nằm ở phụ lục.**
+
+Cố ý **không** đo "mức độ hài lòng": một người thích app mà vẫn quên hỏi trọng
+lượng con cá thì app đã thất bại.
+
+Bản đầu chú thích *"ba trong sáu tình huống không có gì bất thường"* trong khi
+thật ra là hai. Giờ mọi con số trong bản in được **đếm** từ danh sách.
 
 ## 17. Những chỗ đang nợ
 
@@ -1364,7 +1550,7 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 
 | Tệp | Dòng | Vai trò |
 |---|---|---|
-| `app.js` | 4.901 | bộ điều phối, dựng giao diện, định tuyến |
+| `app.js` | 5.020 | bộ điều phối, dựng giao diện, định tuyến |
 | `bigmap.js` | 1.515 | màn bản đồ chi tiết |
 | `audit.js` | 1.291 | tự kiểm giao diện trong trình duyệt |
 | `iso.js` | 752 | dựng phố cổ 3D bằng SVG |
@@ -1406,7 +1592,10 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `monla.js` | 243 | ngữ cảnh cho dòng không khớp được món nào |
 | `coso.js` | 111 | nhãn Đúng Giá suy từ lượt quét thật |
 | `uutien.js` | 171 | xếp ô giá theo lượng bất định giảm được |
+| `thoathuan.js` | 330 | phiếu "điều hai bên vừa cùng đọc" (lõi) |
 | `hochieuui.js` | 333 | màn bảng khai điều kiện giá |
+| `phieuui.js` | 226 | màn phiếu, song ngữ, lật 180° |
+| `tien.js` | 186 | đọc mệnh giá bằng hình dạng, sau cửa chặn |
 | `hochieu.js` | 210 | soát lời khai của quán, không cấp chứng nhận |
 | `pricesync.js` | 96 | đóng góp giá lên máy chủ |
 | `route.js` | 91 | tuyến đi bộ |
@@ -1429,6 +1618,15 @@ python tien-model/xuat-onnx.py --model mobilenetv4_conv_small
 | `he-so-giao-hang.mjs` | đo hệ số quy đổi giao hàng → quầy |
 | `reprice.mjs` | dựng lại bảng giá |
 | `lo-trinh-khao-sat.mjs` | sinh tờ lộ trình khảo sát |
+| `protocol-khao-sat.mjs` | protocol thu dữ liệu, phân tầng bằng số |
+| `kich-ban-thu.mjs` | 6 tình huống có đáp án chuẩn |
+| `ten-pho.mjs` | gom tên phố về một dạng trước khi đếm |
+| `llmparse.mjs` | bóc con số khỏi câu trả lời của model |
+| `shots.mjs` | chụp ảnh màn hình cho hồ sơ |
+| `md-sang-docx.py` | dựng bản Word từ Markdown |
+| `truth-map.py`, `check-anchors.py` | soát neo và bản đồ dữ liệu |
+| `contact-sheet.py`, `soften-scene.py`, `clean-glyph.py` | xử ảnh và glyph |
+| `doc-xlsx-gia.py` | đọc bảng giá từ tệp xlsx |
 | `gen-intro.mjs`, `gen-assets.mjs`, `gen-motifs.mjs`, `gen-sights.mjs`, `gen-web-art.mjs` | sinh tài sản đồ hoạ |
 | `in-pdf.py`, `gop-ho-so.py` | in và gộp hồ sơ |
 | `serve.py` | máy chủ tĩnh để chạy app |
