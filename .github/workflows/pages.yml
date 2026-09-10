@@ -1,0 +1,55 @@
+# Đăng bản web của Nón Lá lên GitHub Pages.
+#
+# VÌ SAO PHẢI QUA WORKFLOW CHỨ KHÔNG CHỌN THẲNG MỘT THƯ MỤC
+# Pages chỉ phục vụ được từ gốc repo hoặc từ /docs. App nằm ở nonla-app/,
+# còn /docs đang giữ hồ sơ và các phiếu in — trộn hai thứ vào một chỗ là
+# đem tài liệu nội bộ ra làm trang web. Workflow này lấy đúng nonla-app/
+# làm gốc trang, không phải di chuyển tệp nào.
+#
+# APP KHÔNG CÓ BƯỚC BUILD, và đó là lý do khối này ngắn: không npm install,
+# không bundler, không cache node_modules. Đẩy nguyên thư mục lên là chạy.
+name: Pages
+
+on:
+  push:
+    branches: [community-v1]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Một lượt đăng tại một thời điểm. Không huỷ lượt đang chạy giữa đường:
+# huỷ giữa lúc đang đăng có thể để trang ở trạng thái nửa vời.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Bộ phép thử chạy TRƯỚC khi đăng, và trang không lên nếu nó đỏ.
+      # Cuốn hồ sơ có một luật: "số liệu trên trang phải đếm thật từ dữ
+      # liệu". Đăng một bản mà bộ thử đang đỏ là phá đúng luật đó.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Phép thử lõi
+        working-directory: nonla-app
+        run: node test.mjs
+      - name: Hồ sơ có khớp mã không
+        run: node tools/soat-ho-so.mjs
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: nonla-app
+      - id: deploy
+        uses: actions/deploy-pages@v4
