@@ -129,6 +129,14 @@ const KHAI = [
     viec: "Phông giao diện.", giay: "SIL OFL 1.1", nguon: "fonts.google.com",
     ranh: "Có bộ phông dự phòng của hệ thống; mất mạng thì giao diện vẫn đọc được." },
 
+  { khoa: "gpt-image-2", nhom: "Công cụ AI dùng trong QUÁ TRÌNH LÀM",
+    ten: "gpt-image-2 (sinh ảnh)",
+    viec: "Sinh 6 ảnh minh hoạ cho hồ sơ 12 trang (tools/sinh-anh-hoso.py).",
+    giay: "API thương mại", nguon: "cổng tương thích OpenAI",
+    ranh: "Chỉ dùng cho HỒ SƠ, không nằm trong sản phẩm. Mọi ảnh gắn nhãn “minh "
+        + "hoạ tạo bằng AI” ngay trên ảnh — không phải ảnh chụp thực địa. Không vẽ "
+        + "tiền đọc được mệnh giá (NĐ 87/2023), không dựng cảnh người bán gian." },
+
   { khoa: "Claude", nhom: "Công cụ AI dùng trong QUÁ TRÌNH LÀM", ten: "Claude (Anthropic)",
     viec: "Viết mã, soát mã, viết tài liệu, thiết kế phép đo — cùng người trong đội.",
     giay: "Dịch vụ thương mại", nguon: "claude.ai / Claude Code",
@@ -145,12 +153,17 @@ const NGUON_QUET = [
   "nonla-app/config.js", "nonla-app/bigmap.js", "nonla-app/web/chat.js",
   "tien-model/train.py", "tien-model/xuat-onnx.py", "tien-model/chuan-bi-anh.py",
   "tien-model/yolo-sang-lop.py", "tools/quan-tu-sitemap.mjs",
+  /* Bản trước không quét tệp này, nên cửa đối chiếu báo "khớp" trong khi
+     sáu ảnh của hồ sơ nộp được sinh bằng một model chưa kê khai. Một cửa
+     kiểm chỉ nhìn vào mã sản phẩm thì bỏ sót đúng những công cụ dùng để
+     làm HỒ SƠ — mà thể lệ đòi khai cả những thứ đó. */
+  "tools/sinh-anh-hoso.py",
 ];
 const CAN_KHAI = [
   "tesseract.js", "onnxruntime-web", "api.openai.com", "supabase",
   "tile.openstreetmap.org", "fonts.googleapis.com",
   "mobilenetv4_conv_small", "mobilenetv3_small_100", "efficientnet_lite0", "resnet18",
-  "torch", "timm", "numpy", "GrabFood",
+  "torch", "timm", "numpy", "GrabFood", "gpt-image-2",
 ];
 
 const daKhai = new Set(KHAI.map((k) => k.khoa));

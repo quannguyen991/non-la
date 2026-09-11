@@ -44,6 +44,7 @@ except Exception:
 
 import argparse
 import difflib
+import re
 from pathlib import Path
 
 PHU_TOI_THIEU = 82      # dưới mức này là trang chưa viết xong
@@ -103,7 +104,24 @@ def do(html: Path):
         than = np.where(khac[: len(khac) - 70] > 8)[0]
         phu = round((than.max() / len(khac)) * 100) if len(than) else 0
 
+        # CHỖ MÙ THỨ BA: chữ lấn vào vùng chân trang. Nó KHÔNG vượt mép giấy
+        # nên phép so hai bản in không thấy gì — nhưng người đọc thấy một
+        # đoạn chữ đè lên dòng "Nón Lá · Bảng B · 4 / 12". Đo bằng toạ độ
+        # khối chữ: khối nào (trừ chính chân trang) có đáy thấp hơn lề dưới
+        # 19 mm là đang lấn. Trang bìa không có chân trang nên bỏ qua.
+        cham = []
+        if i > 0:
+            gioi = a[i].rect.height - 19 * 72 / 25.4
+            for blk in a[i].get_text("blocks"):
+                t = blk[4]
+                la_chan = ("Bảng B ·" in t) or re.fullmatch(r"\s*\d+\s*/\s*12\s*", t)
+                if blk[3] > gioi and not la_chan:
+                    cham.append(t.strip().replace(chr(10), " "))
+
         ghi = []
+        if cham:
+            ghi.append("ĐÈ CHÂN TRANG: " + cham[0][:44])
+            hong.append(i + 1)
         if thieu:
             ghi.append("CẮT MẤT: " + " ⏎ ".join(x.replace(chr(10), " ") for x in thieu)[:58])
             hong.append(i + 1)

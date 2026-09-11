@@ -81,7 +81,16 @@ tr.manh td{background:#FFFBF2}
   font-style:italic;color:#4A463C}
 
 /* ── ảnh ───────────────────────────────────────────────── */
-figure{margin:0 0 3mm}
+figure{margin:0 0 3mm;position:relative}
+/* Ảnh trong hồ sơ là ảnh minh hoạ sinh bằng AI, không phải ảnh chụp thực
+   địa — và nhãn phải nằm TRÊN ảnh, ở đúng chỗ người đọc nhìn thấy nó.
+   Một hồ sơ lấy luận điểm "không trình bày thứ chưa đo như thứ đã đo" mà
+   để ảnh vẽ trông như ảnh chụp thì tự phản lại mình. */
+figure::before,.bia .hinh::before{content:"Minh hoạ tạo bằng AI";position:absolute;
+  z-index:3;font-size:6.2pt;letter-spacing:.06em;text-transform:uppercase;
+  background:rgba(8,32,26,.8);color:#F7F3E9;padding:.7mm 1.7mm;border-radius:1mm}
+figure::before{top:1.6mm;left:1.6mm}
+.bia .hinh::before{top:7mm;left:8mm}
 figure img{width:100%;display:block;border:.6pt solid var(--vien)}
 figcaption{font-size:7.6pt;color:#6B6558;margin-top:1.2mm;line-height:1.3}
 
@@ -191,8 +200,6 @@ figcaption{font-size:7.6pt;color:#6B6558;margin-top:1.2mm;line-height:1.3}
         <p><b>Bất cân xứng thông tin tại điểm bán.</b> Cả hai bên đều muốn một giao
           dịch rõ ràng; thứ thiếu là một mặt phẳng chung để cùng đọc điều kiện giá
           trước khi tiền đổi chủ.</p>
-        <p>Nên phát biểu ấy quyết định luôn hình dạng của giải pháp: không phải một
-          bộ tra giá, mà <b>một mặt phẳng hai người cùng đọc</b>.</p>
       </div>
     </div>
   </div>
@@ -245,6 +252,18 @@ figcaption{font-size:7.6pt;color:#6B6558;margin-top:1.2mm;line-height:1.3}
         <p>Cửa chặn khớp món siết từ <b>38</b> ca khớp nhầm xuống <b>7</b> trên cùng
           bộ thử, và phần bỏ sót tăng lên — đó là đánh đổi đã chọn có ý thức.</p>
       </div>
+
+      <h3>Từ vấn đề ra yêu cầu</h3>
+      <p style="font-size:8.8pt">Mỗi yêu cầu đi thẳng từ một hoàn cảnh có thật của
+      người đang đứng ở quầy — không yêu cầu nào đến từ danh sách tính năng.</p>
+      <table>
+        <tr><th>Yêu cầu</th><th>Vì hoàn cảnh nào</th></tr>
+        <tr><td><b>Chạy khi tắt mạng</b></td><td>phố cổ mất sóng; eSIM chưa kích hoạt</td></tr>
+        <tr><td><b>Không bắt đăng nhập</b></td><td>đang đứng ở quầy, không ai tạo tài khoản lúc ấy</td></tr>
+        <tr><td><b>Ảnh không rời máy</b></td><td>ảnh chụp quán, người, tờ tiền là dữ liệu nhạy cảm</td></tr>
+        <tr class="manh"><td><b>Song ngữ cùng lúc</b></td>
+          <td>hai người không chung tiếng nói phải đọc <b>cùng một dòng</b></td></tr>
+      </table>
     </div>
     <div>
       <h3>Luồng dữ liệu</h3>
@@ -255,15 +274,6 @@ figcaption{font-size:7.6pt;color:#6B6558;margin-top:1.2mm;line-height:1.3}
         <b>→</b> đối chiếu lúc trả tiền<br>
         <span style="color:var(--son)">⌐ ảnh không rời khỏi máy ở bất kỳ bước nào ¬</span>
       </p>
-      <h3>Bốn mức quyết định, và mức thứ ba là một đầu ra ĐÚNG</h3>
-      <table>
-        <tr><th>Mức</th><th>Khi nào</th></tr>
-        <tr><td><b>Tham chiếu</b></td><td>có dải và giá nằm trong khoảng thường gặp</td></tr>
-        <tr><td><b>Hỏi thêm</b></td><td>còn điều kiện chưa biết — đơn vị, khẩu phần, phụ thu</td></tr>
-        <tr class="manh"><td><b>Không kết luận</b></td>
-          <td>chưa đủ mẫu, hoặc món ngoài danh mục. <b>Không phải lỗi.</b></td></tr>
-      </table>
-
       <h3>Ranh giới bốn loại giá</h3>
       <table>
         <tr><th>Loại</th><th>Vào dải?</th></tr>
@@ -338,10 +348,6 @@ figcaption{font-size:7.6pt;color:#6B6558;margin-top:1.2mm;line-height:1.3}
         <tr class="manh"><td>một dòng đội giá <b>và</b> có bia</td>
           <td>“lệch so với phiếu. Nên xem lại cùng nhau <b>từng dòng</b>”</td></tr>
       </table>
-      <p style="font-size:8.8pt">Bản đầu chỉ kiểm “có dòng lạ không” nên nó trấn an
-      sai ở ca thứ ba — một câu <i>“nhiều khả năng là món gọi thêm”</i> cho khoản lệch
-      405.000₫. Giờ nó tính phần lệch mà những dòng gọi thêm
-      <b>không giải thích được</b>.</p>
 
       <div class="hop jade">
         <span class="nhan">Khép vòng ở quán vỉa hè</span>
@@ -655,12 +661,10 @@ figcaption{font-size:7.6pt;color:#6B6558;margin-top:1.2mm;line-height:1.3}
           bao giờ chịu nói không biết”; tự mắc lại thì nặng hơn thiếu một tính năng.</p>
       </div>
 
-      <h3>Hai lần xuất hỏng im lặng</h3>
-      <p><b>①</b> Bộ xuất tách trọng số ra tệp riêng — tệp model còn <b>0,2 MB</b>,
-      vẫn nạp được, vẫn chạy, <b>đoán bậy</b>, không lỗi nào hiện ra.</p>
-      <p><b>②</b> Lượng tử hoá động cho tệp 2,6 MB nạp được và <b>sai kết luận
-      48/48 ảnh</b>. Thay bằng bản tĩnh có hiệu chuẩn: <b>2,8 MB, khác 0/48</b>.
-      Cả hai chỉ lộ ra nhờ bước <b>đối chiếu ONNX ↔ PyTorch trên ảnh thật</b>.</p>
+      <p><b>Hai lần xuất hỏng im lặng</b>, cả hai bị bắt nhờ đối chiếu ONNX ↔
+      PyTorch trên ảnh thật: tệp model văng trọng số ra ngoài còn <b>0,2 MB</b> mà
+      vẫn chạy; và lượng tử hoá động <b>sai kết luận 48/48 ảnh</b> — bản tĩnh thay
+      thế khác <b>0/48</b>.</p>
     </div>
   </div>
   <div class="chan">
@@ -869,6 +873,9 @@ figcaption{font-size:7.6pt;color:#6B6558;margin-top:1.2mm;line-height:1.3}
         <tr><td>Dataset</td><td>bộ ảnh tiền công khai, giấy phép MIT</td></tr>
         <tr><td>Dữ liệu ngoài</td><td>OpenStreetMap (ODbL) · sitemap công bố của nền tảng giao hàng</td></tr>
         <tr><td>API</td><td>Supabase (tuỳ chọn) · API ảnh (người dùng tự bật bằng khoá riêng)</td></tr>
+        <tr class="manh"><td>Ảnh trong hồ sơ này</td>
+          <td><b>gpt-image-2</b> — 6 ảnh minh hoạ, <b>không phải ảnh chụp thực địa</b>,
+            không nằm trong sản phẩm</td></tr>
       </table>
 
       <div class="hop" style="border-left-color:var(--son)">
@@ -882,9 +889,6 @@ figcaption{font-size:7.6pt;color:#6B6558;margin-top:1.2mm;line-height:1.3}
           <b>AI đề xuất sai đã bị đo rồi bác</b> — trong đó có hai giả thuyết của
           chính đội bị số liệu phản bác và được ghi nguyên vào hồ sơ.</p>
       </div>
-      <p style="font-size:8.4pt">Ảnh tiền dùng huấn luyện <b>không</b> nằm trong repo:
-      Nghị định 87/2023/NĐ-CP giới hạn việc sao chụp tiền Việt Nam, và mọi ảnh được hạ
-      xuống cạnh dài 320 px.</p>
     </div>
   </div>
   <div class="chan">
