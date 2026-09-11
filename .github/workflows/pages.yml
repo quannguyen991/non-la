@@ -47,6 +47,13 @@ jobs:
       - name: Hồ sơ có khớp mã không
         run: node tools/soat-ho-so.mjs
 
+      # Bản kê khai là mục BỊ CHẤM của cuộc thi, và thể lệ cấm "che giấu
+      # nguồn mã/dataset/API". Nó đối chiếu bảng giấy phép với thứ thật sự
+      # tìm được trong mã, và thoát 1 nếu lệch — thêm một thư viện mà quên
+      # khai thì chặn ở đây, không chặn ở phòng thi.
+      - name: Bản kê khai có khớp mã không
+        run: node tools/ke-khai.mjs
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

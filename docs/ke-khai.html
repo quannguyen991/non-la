@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản kê khai — Nón Lá</title><style>
+:root{--then:#0E2B24;--son:#9C3A24;--giay:#F7F3E9;--vien:#D9CFBA}
+*{box-sizing:border-box}
+body{margin:0 auto;padding:20px 18px 50px;max-width:900px;background:var(--giay);color:#1b1b1b;
+  font:14.5px/1.55 Cambria,Constantia,"Palatino Linotype","Noto Serif",system-ui,sans-serif}
+h1{font-size:23px;margin:0 0 3px;color:var(--then)}
+h2{font-size:16.5px;margin:24px 0 7px;color:var(--then);border-bottom:2px solid var(--vien);padding-bottom:4px}
+.sub{color:#5b5b5b;font-size:13px;margin:0 0 16px}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}
+th,td{border:1px solid var(--vien);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:#EFE8D8}
+.luat{background:#fff;border:1px solid var(--vien);border-left:4px solid var(--son);
+  padding:10px 13px;margin:12px 0}
+.luat b{color:var(--son)}
+.ok{background:#EEF4F0;border-left-color:#2E6B4F}
+.ok b{color:#2E6B4F}
+.cuoi{margin-top:22px;padding-top:9px;border-top:2px solid var(--vien);font-size:12.5px;color:#5b5b5b}
+@media print{body{padding:0;max-width:none}table{page-break-inside:avoid}}
+</style></head><body>
+
+<h1>Bản kê khai công cụ AI, mô hình, dữ liệu, thư viện và API</h1>
+<p class="sub">Dự án <b>Nón Lá</b> · Cuộc thi Sáng tạo trẻ Quốc gia trong lĩnh vực Trí tuệ
+nhân tạo 2026, Bảng B · sinh bằng <code>node tools/ke-khai.mjs</code></p>
+
+<div class="luat ok">
+  <b>Đã đối chiếu với mã nguồn: khớp</b><br>
+  Bản kê khai này <b>đọc thẳng từ repo</b> — CDN trong index.html, model trong
+  train.py, model đối chứng trong docs/doi-chung-llm.json, thư viện trong các tệp
+  .py — rồi so với bảng giấy phép do đội tự viết.
+  
+  
+  
+  <br><br>Thêm một thư viện hay đổi một model mà quên khai thì chạy lại tệp này
+       là thấy — một bản kê khai gõ tay chỉ đúng vào ngày gõ.
+</div>
+
+<h2>Thư viện AI</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>Tesseract.js 5</b></td><td>OCR chữ trên thực đơn, hoá đơn, tờ tiền. Chạy HOÀN TOÀN trên thiết bị.</td>
+    <td>Apache-2.0</td><td>cdn.jsdelivr.net</td><td>Ảnh không rời khỏi máy người dùng. Không có lời gọi mạng nào mang ảnh đi.</td></tr>
+  <tr>
+    <td><b>ONNX Runtime Web 1.19.2</b></td><td>Chạy model nhận mệnh giá tiền trong trình duyệt (WebAssembly).</td>
+    <td>MIT</td><td>cdn.jsdelivr.net</td><td>Nạp lười ở lần đầu dùng chế độ Cash, sau đó chạy offline.</td></tr>
+</table><h2>Mô hình</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>MobileNetV4-Conv-Small (timm)</b></td><td>Nhận mệnh giá tiền bằng hình dạng. Huấn luyện lại (transfer learning) trên 1.923 ảnh; xuất ONNX int8 2,8 MB.</td>
+    <td>Apache-2.0 (timm / trọng số ImageNet)</td><td>huggingface.co/timm</td><td>ĐANG TẮT trong bản nộp: ngưỡng tin cậy chưa hiệu chuẩn trên tập ảnh khó, nên app rơi về OCR. Xem cờ nguongDaHieuChuan trong cauhinh-tien.json.</td></tr>
+  <tr>
+    <td><b>MobileNetV3-Small-100 (timm)</b></td><td>Ứng viên đối chứng khi chọn model. Không dùng trong bản nộp.</td>
+    <td>Apache-2.0</td><td>huggingface.co/timm</td><td>Chỉ để so sánh.</td></tr>
+  <tr>
+    <td><b>EfficientNet-Lite0 (timm)</b></td><td>Ứng viên đối chứng. Không dùng trong bản nộp.</td>
+    <td>Apache-2.0</td><td>huggingface.co/timm</td><td>Chỉ để so sánh.</td></tr>
+  <tr>
+    <td><b>ResNet-18 (timm)</b></td><td>Ứng viên đối chứng — to gấp 7 lần và KHÔNG hơn điểm, đó là kết quả được báo cáo.</td>
+    <td>Apache-2.0</td><td>huggingface.co/timm</td><td>Chỉ để so sánh.</td></tr>
+</table><h2>Mô hình ngôn ngữ (chỉ để ĐO ĐỐI CHỨNG)</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>GPT-5.5</b></td><td>Bên đối chứng trong phép đo 36 câu × 10 lượt (chương 14 hồ sơ).</td>
+    <td>API thương mại</td><td>cổng tương thích OpenAI</td><td>KHÔNG nằm trong sản phẩm. Không lời gọi nào tới nó trong app.</td></tr>
+  <tr>
+    <td><b>Claude Haiku 4.5</b></td><td>Bên đối chứng trong cùng phép đo.</td>
+    <td>API thương mại</td><td>cổng tương thích OpenAI</td><td>KHÔNG nằm trong sản phẩm.</td></tr>
+</table><h2>API ngoài (tuỳ chọn)</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>OpenAI Images API</b></td><td>Sinh icon minh hoạ, do người dùng tự bật bằng khoá của họ.</td>
+    <td>API thương mại</td><td>api.openai.com</td><td>Lớp TÔ ĐIỂM. Không khoá nào nhúng trong mã; khoá nằm trong bộ nhớ phiên, không vào localStorage. Không có khoá thì app chạy đủ với bộ icon vẽ tay.</td></tr>
+</table><h2>API ngoài</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>Supabase (Postgres + Auth + Storage)</b></td><td>Lớp cộng đồng, đồng bộ lịch sử, kho quan sát giá, bảng khai của quán.</td>
+    <td>Dịch vụ, gói free</td><td>supabase.com</td><td>TUỲ CHỌN: không cấu hình thì bốn tab còn lại chạy như cũ. Khoá trong config.js là khoá công khai theo thiết kế; an toàn nằm ở Row Level Security (supabase/schema.sql).</td></tr>
+</table><h2>Dữ liệu ngoài</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>OpenStreetMap — tile</b></td><td>Nền bản đồ ở màn bản đồ chi tiết.</td>
+    <td>ODbL</td><td>openstreetmap.org</td><td>Có ghi công trên giao diện. Bản đồ chính của app VẼ BẰNG CODE, không dùng tile.</td></tr>
+  <tr>
+    <td><b>OpenStreetMap — Overpass API</b></td><td>2.481 quán ăn (tên, toạ độ, tên phố) trong 6 vùng.</td>
+    <td>ODbL</td><td>overpass-api.de</td><td>Cào một lần, lưu trong repo. Có ghi công.</td></tr>
+  <tr>
+    <td><b>Sitemap công bố của GrabFood</b></td><td>4.228 quán (tên + phố) để dựng lộ trình khảo sát.</td>
+    <td>Trang công bố công khai</td><td>sitemap của nền tảng</td><td>CHỈ để biết đi phố nào. Giá trên app giao hàng KHÔNG được vào dải giá (pricesrc.js đặt nguồn delivery ở vaoDai: false).</td></tr>
+</table><h2>Dataset</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>Kaggle — maitrc/vietnamese-currency-dataset</b></td><td>658 ảnh tiền Việt kèm hộp toạ độ YOLO; cắt thành 1.923 ảnh phân loại.</td>
+    <td>MIT</td><td>kaggle.com</td><td>Bộ ảnh KHÔNG công bố lại. Mọi ảnh hạ xuống cạnh dài 320px theo Nghị định 87/2023/NĐ-CP về sao chụp tiền Việt Nam.</td></tr>
+</table><h2>Thư viện huấn luyện</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>PyTorch + torchvision</b></td><td>Huấn luyện model nhận mệnh giá.</td>
+    <td>BSD-3-Clause</td><td>pytorch.org</td><td>Chỉ chạy lúc huấn luyện, không nằm trong sản phẩm.</td></tr>
+  <tr>
+    <td><b>timm (PyTorch Image Models)</b></td><td>Nạp backbone huấn luyện sẵn.</td>
+    <td>Apache-2.0</td><td>github.com/huggingface/pytorch-image-models</td><td>Chỉ lúc huấn luyện.</td></tr>
+  <tr>
+    <td><b>NumPy</b></td><td>Tính ngưỡng tin cậy, đối chiếu ONNX với PyTorch.</td>
+    <td>BSD-3-Clause</td><td>numpy.org</td><td>Chỉ lúc huấn luyện.</td></tr>
+</table><h2>Tài nguyên ngoài</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>Google Fonts — Inter, Playfair Display</b></td><td>Phông giao diện.</td>
+    <td>SIL OFL 1.1</td><td>fonts.google.com</td><td>Có bộ phông dự phòng của hệ thống; mất mạng thì giao diện vẫn đọc được.</td></tr>
+</table><h2>Công cụ AI dùng trong QUÁ TRÌNH LÀM</h2>
+<table>
+  <tr><th style="width:20%">Tên</th><th style="width:26%">Dùng làm gì</th>
+      <th style="width:13%">Giấy phép</th><th style="width:14%">Nguồn</th>
+      <th>Ranh giới sử dụng</th></tr>
+  <tr>
+    <td><b>Claude (Anthropic)</b></td><td>Viết mã, soát mã, viết tài liệu, thiết kế phép đo — cùng người trong đội.</td>
+    <td>Dịch vụ thương mại</td><td>claude.ai / Claude Code</td><td>Toàn bộ lịch sử câu lệnh nộp kèm theo Prompt Log. Đội chịu trách nhiệm với mọi dòng mã: 770 phép thử tự viết, và những chỗ AI đề xuất sai đã bị đo rồi bác — xem chương 14 và 17 của hồ sơ kỹ thuật.</td></tr>
+</table>
+
+<h2>Ba điều đội xin nói rõ, vì chúng dễ bị hiểu ngược</h2>
+<div class="luat">
+  <b>1. Mô hình ngôn ngữ KHÔNG nằm trong sản phẩm.</b>
+  GPT-5.5 và Claude Haiku 4.5 xuất hiện trong dự án đúng một lần: làm <i>bên đối
+  chứng</i> của một phép đo 36 câu × 10 lượt. Không có lời gọi nào tới chúng trong
+  ứng dụng. Mọi phán quyết về giá đều đến từ dữ liệu truy nguyên được.
+</div>
+<div class="luat">
+  <b>2. Mô hình nhận mệnh giá tiền đang TẮT trong bản nộp.</b>
+  Nó nạp và chạy được (1,4 giây · 24–56 ms một tờ), nhưng ngưỡng tin cậy chưa được
+  hiệu chuẩn trên tập ảnh khó, nên <code>tien.js</code> từ chối chạy và app đọc con
+  số in trên tờ tiền như cũ. Một con số chưa ai đo không đủ tư cách quyết định khi
+  nào app dám nói "đây là tờ 500.000".
+</div>
+<div class="luat">
+  <b>3. Claude được dùng để viết phần lớn mã, và đội khai điều đó ở đây.</b>
+  Toàn bộ lịch sử câu lệnh nộp kèm Prompt Log. Đội chịu trách nhiệm với mọi dòng:
+  770 phép thử, một bộ soát tự động đối chiếu hồ sơ với mã, và những chỗ AI đề xuất
+  sai đã bị đo rồi bác — trong đó có hai giả thuyết của chính đội bị số liệu phản
+  bác và được ghi nguyên vào hồ sơ.
+</div>
+
+<p class="cuoi">
+  19 mục kê khai · 10 nhóm ·
+  đối chiếu trên 11 tệp nguồn ·
+  2 model đối chứng đọc từ docs/doi-chung-llm.json
+</p>
+</body></html>
