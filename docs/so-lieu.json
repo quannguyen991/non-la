@@ -1,0 +1,69 @@
+{
+ "taoLuc": "2026-09-11",
+ "commit": 95,
+ "pheThu": {
+  "pass": 770,
+  "fail": 0
+ },
+ "vung": 6,
+ "mon": 77,
+ "oGia": 219,
+ "seed": 219,
+ "doThat": 0,
+ "monNgoaiDanhMuc": 187,
+ "monCoChuyen": 22,
+ "quanOSM": 2481,
+ "coSo": 77,
+ "quanSitemap": 4228,
+ "trangQuet": 135125,
+ "leCoDinh": 9,
+ "moDun": 53,
+ "dongJS": 19310,
+ "shell": 71,
+ "ngonNgu": 5,
+ "llm": {
+  "soCau": 36,
+  "soLuot": 10,
+  "models": [
+   "gpt-5.5",
+   "claude-haiku-4-5-20251001"
+  ],
+  "luotCoSo": 357,
+  "tuChoi": 0,
+  "coDai": 12,
+  "duoiDai": 6,
+  "trenDai": 0,
+  "daoDongMin": 1.17,
+  "daoDongMax": 1.75
+ },
+ "tien": {
+  "soAnhTrain": 1923,
+  "soNguonTrain": 526,
+  "soAnhKho": 0,
+  "ungVien": [
+   {
+    "ten": "mobilenetv3_small_100",
+    "val": 0.9895,
+    "trieu": 1.53
+   },
+   {
+    "ten": "mobilenetv4_conv_small",
+    "val": 0.9948,
+    "trieu": 2.5
+   },
+   {
+    "ten": "efficientnet_lite0",
+    "val": 0.9948,
+    "trieu": 3.38
+   },
+   {
+    "ten": "resnet18",
+    "val": 0.9895,
+    "trieu": 11.18
+   }
+  ],
+  "daHieuChuan": false,
+  "nguong": 0.75,
+  "lechOnnx": 0.000010251998901367188
+ }
+}
