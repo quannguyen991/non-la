@@ -33,3 +33,9 @@ docs/_sitemap-*.json
 # Nhưng model app THẬT SỰ dùng thì phải có trong repo: nó là một phần của
 # sản phẩm nộp, và thiếu nó thì bản clone chạy ra một app khác.
 !nonla-app/tien-model/
+
+# Prompt Log sinh ra chứa nguyên văn lịch sử làm việc. Nộp cho BTC thì có,
+# đẩy lên repo công khai thì phải là quyết định riêng — không mặc định.
+/docs/prompt-log.html
+/docs/prompt-log.md
+/docs/prompt-log.pdf
