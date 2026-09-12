@@ -16,20 +16,14 @@ export const SUPABASE_URL  = "https://okyyzqogslsarmjnsrme.supabase.co";
    cloud.js dùng nó ở đúng chỗ cũ — cả hai header apikey và Bearer đều nhận. */
 export const SUPABASE_ANON = "sb_publishable_ExBVmw2ApfMSMvNhkd8drg_McdX_Vye";
 
-/* ── THƯ ĐI ĐƯỢC TỚI NGƯỜI LẠ CHƯA? ───────────────────────────────────
-   Supabase gói free KHÔNG gửi thư cho địa chỉ ngoài nhóm dự án:
+/* ── ĐĂNG NHẬP: HỎI MÁY CHỦ, KHÔNG CHÉP CỜ VÀO ĐÂY ────────────────────
+   Bản trước có cờ EMAIL_DANG_NHAP đặt tay ở đây. Bỏ đi vì hai công tắc
+   quyết định chuyện ấy nằm ở dashboard Supabase (đăng ký mở/đóng, có bắt
+   xác nhận email hay không), và một cờ trong repo sẽ trôi khỏi sự thật
+   ngay lần đầu ai đó gạt công tắc — theo đúng hướng nguy hiểm: app mời
+   đăng nhập trong khi máy chủ không cho.
 
-     "Unless you configure a custom SMTP server for your project, Supabase
-      Auth will refuse to deliver messages to addresses that are not part
-      of the project's team."          (docs/guides/auth/auth-smtp)
-
-   và trần là 2 thư/giờ. Nghĩa là nút "Email me a code" trả về 200, app hiện
-   ô nhập mã, còn hộp thư của người dùng thì KHÔNG BAO GIỜ có gì — một màn
-   hình hứa một việc máy chủ không làm. Đúng thứ sản phẩm này lấy làm luận
-   điểm để chống, nên nó không được phép nằm trong app.
-
-   Cờ này để FALSE cho tới khi dựng xong SMTP riêng (Resend/Brevo/…) VÀ mẫu
-   thư có {{ .Token }} — mẫu mặc định của Supabase gửi một ĐƯỜNG LINK, không
-   phải mã 6 số, nên kể cả thư tới nơi thì màn nhập mã vẫn không dùng được.
-   Bật lên là phải thử gửi thật tới một hộp thư ngoài nhóm dự án. */
-export const EMAIL_DANG_NHAP = false;
+   Nay auth.js gọi /auth/v1/settings lúc khởi động (thamDo) và màn tài
+   khoản chỉ hiện khi máy chủ nói là đi tới nơi được. Đăng nhập bằng EMAIL
+   + MẬT KHẨU, không gửi thư — vì gói free từ chối gửi thư cho địa chỉ
+   ngoài nhóm dự án. */

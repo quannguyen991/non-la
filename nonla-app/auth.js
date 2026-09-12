@@ -31,6 +31,7 @@ const S = {
   access: "", user: null, profile: null,
   status: "idle",              // idle | busy | in | error
   error: "",
+  cai: null,                   // cấu hình đọc được TỪ MÁY CHỦ, xem thamDo()
   listeners: new Set(),
 };
 
@@ -103,6 +104,43 @@ function adopt(session) {
   return S.user;
 }
 
+/* ── MÁY CHỦ CÓ LÀM NỔI VIỆC MÀN ĐĂNG NHẬP ĐANG MỜI KHÔNG ──────
+   Hai công tắc nằm ở dashboard chứ không nằm trong repo, và một cờ chép
+   vào mã sẽ trôi khỏi sự thật ngay lần đầu ai đó gạt công tắc:
+
+   · disable_signup     — đóng thì "tạo tài khoản" luôn hỏng;
+   · mailer_autoconfirm — TẮT nghĩa là Supabase bắt xác nhận qua email,
+     mà gói free từ chối gửi thư ra ngoài nhóm dự án (docs auth-smtp).
+     Tài khoản tạo xong nằm đó chờ một lá thư không tới, và người dùng
+     đăng nhập lại thì nhận "Email not confirmed".
+
+   Nên app HỎI máy chủ. Không hỏi được (mất mạng, chưa cấu hình) thì coi
+   như chưa sẵn sàng: thà thiếu một tính năng tuỳ chọn còn hơn mời người
+   ta đi vào một ngõ cụt. */
+export async function thamDo() {
+  if (!isConfigured()) { S.cai = null; emit(); return null; }
+  try {
+    const res = await fetch(`${S.url}/auth/v1/settings`, { headers: { apikey: S.anon } });
+    const j = await res.json();
+    S.cai = {
+      emailBat: j?.external?.email === true,
+      dangKyMo: j?.disable_signup === false,
+      canXacNhan: j?.mailer_autoconfirm !== true,
+    };
+  } catch {
+    S.cai = null;                      // không biết ≠ biết là được
+  }
+  emit();
+  return S.cai;
+}
+
+/** Cấu hình đọc được từ máy chủ, hoặc null khi chưa hỏi được. */
+export const mayChu = () => S.cai;
+
+/** Đăng nhập bằng email + mật khẩu có đi tới nơi được không. */
+export const sanSangMatKhau = () =>
+  isConfigured() && !!S.cai && S.cai.emailBat && S.cai.dangKyMo && !S.cai.canXacNhan;
+
 export async function signUp(email, password, name) {
   S.status = "busy"; S.error = ""; emit();
   try {
@@ -166,38 +204,3 @@ export async function signOut() {
   emit();
 }
 
-/* ── đăng nhập bằng mã 6 số ────────────────────────────────────
-   Chọn mã thay vì magic link vì link mở ra trình duyệt HỆ THỐNG, còn
-   người dùng đang đứng trong PWA đã cài ra màn hình chính — phiên rơi
-   ra ngoài và họ quay lại thấy mình vẫn chưa đăng nhập.
-
-   Chọn mã thay vì mật khẩu vì không ai muốn nghĩ ra một mật khẩu mới
-   giữa chuyến đi, và mật khẩu quên được thì lại phải làm chính cái
-   luồng email này.
-
-   Cả hai hàm KHÔNG dọn phiên khi hỏng: người gõ nhầm một số phải được
-   gõ lại, không phải bắt đầu lại từ đầu. */
-
-export async function sendCode(email) {
-  S.status = "busy"; S.error = ""; emit();
-  try {
-    // create_user: true để người mới không phải qua một màn đăng ký riêng.
-    await api("otp", { body: { email, create_user: true } });
-    S.status = "idle"; emit();
-    return true;
-  } catch (e) {
-    S.status = "error"; S.error = e.message; emit();
-    throw e;
-  }
-}
-
-export async function verifyCode(email, code) {
-  S.status = "busy"; S.error = ""; emit();
-  try {
-    adopt(await api("verify", { body: { type: "email", email, token: code } }));
-    return S.user;
-  } catch (e) {
-    S.status = "error"; S.error = e.message; emit();
-    throw e;
-  }
-}

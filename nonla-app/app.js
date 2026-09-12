@@ -13,7 +13,7 @@ import * as Img from "./imgsvc.js";
 import { iconOf as sightIcon } from "./sights.js";
 import * as Auth from "./auth.js";
 import * as FoodMap from "./foodmap.js";
-import { SUPABASE_URL, SUPABASE_ANON, EMAIL_DANG_NHAP } from "./config.js";
+import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
 import * as Community from "./community.js";
 import * as Cloud from "./cloud.js";
 import * as Outbox from "./outbox.js";
@@ -3247,6 +3247,27 @@ function accountHTML() {
     </div>`;
   }
 
+  if (!Auth.sanSangMatKhau()) {
+    /* Có URL và khoá, nhưng máy chủ chưa cho luồng này đi tới nơi. Nói ra
+       ĐÚNG chỗ nghẽn thay vì hiện một form bấm vào là hỏng. */
+    const c = Auth.mayChu();
+    return `<div class="card" id="acct">
+      <p class="src">Sign-in is not available on this build yet. Scans, map and journal
+        all work without it — they live on this device.</p>
+      <div class="warnbox infobox">${I.clock}<span>${
+        !c ? "Could not reach the project server."
+           : c.canXacNhan ? "The project asks for email confirmation, and its mail service cannot send to addresses outside the project team yet."
+           : !c.dangKyMo ? "New sign-ups are closed on this project."
+           : "Email sign-in is switched off on this project."}</span></div>
+      <div class="manual" style="grid-template-columns:1fr">
+        <input id="localName" maxlength="32" placeholder="Display name"
+          value="${esc(Local.name())}">
+      </div>
+      <button class="btn sec" data-act="saveLocalName">Save this name</button>
+      <button class="btn sec" data-act="authForget">Disconnect project</button>
+    </div>`;
+  }
+
   return `<div class="card" id="acct">
     <p class="src">Optional — sign in to carry your journal and saved dishes between devices.</p>
     <div class="manual" style="grid-template-columns:1fr">
@@ -4276,10 +4297,11 @@ function busy(on, msg = "") {
    một lựa chọn hợp lệ chứ không phải một lỗi. */
 function needAuth() {
   if (Auth.signedIn()) return Promise.resolve(true);
-  /* EMAIL_DANG_NHAP tắt: máy chủ có, nhưng thư không tới được hộp thư người
-     dùng (xem config.js). Mở màn đăng nhập lúc ấy là dẫn người ta vào một
-     ngõ cụt — nhánh "lưu vào máy này" mới là đường đi được. */
-  if (!Auth.isConfigured() || !EMAIL_DANG_NHAP) {
+  /* Máy chủ có, nhưng đăng ký đóng hoặc dự án còn bắt xác nhận email (mà
+     gói free không gửi được thư ra ngoài nhóm) thì màn đăng nhập là một
+     ngõ cụt — nhánh "lưu vào máy này" mới là đường đi được. Auth.thamDo()
+     hỏi máy chủ, app không tự chép một cờ vào mã. */
+  if (!Auth.sanSangMatKhau()) {
     toast("Accounts are off in this build — it saved to this phone instead");
     return Promise.resolve(false);
   }
@@ -4333,7 +4355,7 @@ async function submitPost() {
   if (!v.ok) { const e = $("#cfErr"); e.hidden = false; e.textContent = v.errors.join(" · "); return; }
 
   /* Chưa có máy chủ thì bài KHÔNG rơi vào hư không. Trước đây nhánh này đi
-     thẳng vào needAuth() → prompt("Email…") → Auth.sendCode() → ném "chưa
+     thẳng vào needAuth() → prompt("Email…") → lời gọi đăng nhập → ném "chưa
      cấu hình dịch vụ", và người dùng vừa gõ xong nhận xét thì mất trắng.
      Nhận dữ liệu của ai đó rồi vứt đi là lỗi tệ nhất một form có thể mắc. */
   if (!Cloud.ready()) return submitPostLocally(draft);
@@ -4672,6 +4694,7 @@ document.addEventListener("click", async (ev) => {
   if (el("[data-act='authCfg']")) {
     const u = $("#sbUrl")?.value, k = $("#sbKey")?.value;
     if (!Auth.configure(u, k)) return toast("Need a project URL and an anon key");
+    Auth.thamDo().then(renderMe);
     renderMe();
     return toast("Project connected");
   }
@@ -4684,7 +4707,12 @@ document.addEventListener("click", async (ev) => {
     try {
       if (up) {
         const r = await Auth.signUp(em, pw, $("#acctName")?.value?.trim());
-        toast(r.needsEmailConfirm ? "Check your email to confirm" : "Account created");
+        /* needsEmailConfirm = tài khoản đã tạo nhưng chưa dùng được, và lá
+           thư xác nhận thì gói free không gửi ra ngoài nhóm dự án. Mời người
+           ta đi xem hộp thư là mời họ chờ một thứ không tới. */
+        toast(r.needsEmailConfirm
+          ? "Account created, but this project still requires email confirmation"
+          : "Account created");
       } else { await Auth.signIn(em, pw); toast("Signed in"); }
       /* Đăng nhập xong: KÉO VỀ trước, ĐẨY LÊN sau.
          Kéo trước để máy mới có ngay lịch sử cũ — đó là toàn bộ lý do
@@ -5173,6 +5201,10 @@ async function boot() {
      Project URL vào Settings. Ô đó giữ lại để test, nên chỉ ghi đè khi
      config.js có giá trị thật. */
   if (SUPABASE_URL && SUPABASE_ANON) Auth.configure(SUPABASE_URL, SUPABASE_ANON);
+  /* Hỏi máy chủ xem đăng nhập bằng mật khẩu có đi tới nơi được không. Không
+     chờ: mất mạng thì màn tài khoản chỉ hiện phần chạy được trên máy, và app
+     vẫn mở ra trong một nhịp. */
+  Auth.thamDo();
   /* Lịch sử: chuyển nhật ký cũ sang rồi nạp bản sao đọc nhanh. Chạy
      TRƯỚC khi giao diện vẽ lần đầu, nếu không màn Journal mở ra trống
      rồi mới đầy lên — người dùng đọc cái nháy đó là "mất dữ liệu". */

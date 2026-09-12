@@ -52,7 +52,6 @@
 
 import * as Auth from "./auth.js";
 import * as Local from "./localdb.js";
-import { EMAIL_DANG_NHAP } from "./config.js";
 
 const SEEN_KEY = "nl.seen.welcome";
 
@@ -332,10 +331,11 @@ function slideHtml(i) {
 /* Màn tài khoản. Hình dạng của nó phụ thuộc MỘT câu hỏi: phía sau có máy
    chủ không. Trả lời sai câu đó là dựng ra một form không bao giờ chạy. */
 function accountHtml() {
-  /* Có máy chủ là một chuyện, gửi được thư tới hộp thư của người dùng là
-     chuyện khác — xem EMAIL_DANG_NHAP trong config.js. Thiếu vế thứ hai thì
-     màn này chỉ được mời đặt tên, không được mời chờ một lá thư không tới. */
-  const cloudOn = Auth.isConfigured() && EMAIL_DANG_NHAP;
+  /* Có máy chủ là một chuyện, máy chủ làm nổi việc màn này mời là chuyện
+     khác — xem Auth.thamDo(). Đăng ký đóng, hoặc dự án bắt xác nhận email
+     (mà gói free không gửi được thư ra ngoài nhóm), thì màn này chỉ được
+     mời đặt tên. */
+  const cloudOn = Auth.sanSangMatKhau();
   const who = Auth.profile()?.name || Local.name();
   return `
     <div class="wc-page">
@@ -366,43 +366,53 @@ function accountHtml() {
     </div>`;
 }
 
-/* Email và mã 6 số là HAI BƯỚC, không phải hai ô cùng hiện. Hiện sẵn ô mã
-   lúc chưa gửi gì là mời người ta gõ vào một ô chưa có nội dung để gõ. */
+/* Email + MẬT KHẨU, không phải mã gửi qua thư.
+
+   Bản trước gửi mã 6 số và người dùng không bao giờ nhận được: Supabase
+   gói free "will refuse to deliver messages to addresses that are not part
+   of the project's team" (docs auth-smtp), trần 2 thư/giờ. Mật khẩu không
+   cần một lá thư nào, nên nó đi tới nơi được ngay hôm nay.
+
+   Cái giá: quên mật khẩu là mất bản đồng bộ, vì khôi phục mật khẩu cũng
+   đi bằng thư. Màn này nói thẳng điều đó chứ không giấu. */
 function cloudFields() {
   return `
     <label class="wc-fld"><span>Email <small>to sync across devices</small></span>
-      <input id="wcEmail" type="email" inputmode="email" autocomplete="email"
-        placeholder="you@example.com" value="${esc(M.email)}" ${M.sent ? "readonly" : ""}></label>
-    ${M.sent ? `
-      <label class="wc-fld"><span>6-digit code <small>sent to ${esc(M.email)}</small></span>
-        <input id="wcCode" class="code" type="text" inputmode="numeric" maxlength="6"
-          autocomplete="one-time-code" placeholder="······"></label>` : ""}`;
+      <input id="wcEmail" type="email" inputmode="email" autocomplete="username"
+        placeholder="you@example.com" value="${esc(M.email)}"></label>
+    <label class="wc-fld"><span>Password <small>6 characters or more</small></span>
+      <input id="wcPass" type="password" autocomplete="current-password"
+        placeholder="••••••"></label>`;
 }
 
 function cloudActions() {
-  if (!M.sent) {
-    return `
-      <button class="wc-cta" data-wc="send"${M.sending ? " disabled" : ""}>${
-        M.sending ? "Sending…" : "Email me a code"}<i aria-hidden="true">${SVG.arrow}</i></button>
-      <button class="wc-sec" data-wc="local">Continue without an account</button>`;
-  }
+  const cho = M.sending ? " disabled" : "";
   return `
-    <button class="wc-cta" data-wc="verify">Sign in<i aria-hidden="true">${SVG.arrow}</i></button>
-    <button class="wc-sec" data-wc="send"${M.sending ? " disabled" : ""}>${
-      M.sending ? "Sending…" : "Send a new code"}</button>
+    <button class="wc-cta" data-wc="signin"${cho}>${
+      M.sending ? "Working…" : "Sign in"}<i aria-hidden="true">${SVG.arrow}</i></button>
+    <button class="wc-sec" data-wc="signup"${cho}>Create an account</button>
     <button class="wc-sec" data-wc="local">Continue without an account</button>`;
 }
 
 /* Không có máy chủ. Nói ra sự thật, nhưng là sự thật về việc DỮ LIỆU Ở ĐÂU
    — thứ người dùng thật sự cần biết — chứ không phải về việc thiếu cấu hình. */
 function localCard() {
+  /* HAI LÝ DO KHÁC NHAU, HAI CÂU KHÁC NHAU. Bản trước nói cứng "không có
+     máy chủ nào sau bản này" — đúng khi chưa cấu hình, nhưng SAI khi có
+     máy chủ mà luồng đăng nhập chưa đi tới nơi được. Nói sai lý do thì
+     người dùng đi tìm cách sửa ở đúng chỗ không hỏng. */
+  const coMayChu = Auth.isConfigured();
   return `
     <div class="wc-card">
       <img src="assets/motifs/chim-lac-dung.webp" alt="" aria-hidden="true"
            onerror="this.hidden=true">
       <span><b>A private notebook</b>
-        There is no server behind this build, so your name and everything you write stay on
-        this phone. Turn the shared layer on any time in <em>You → Community</em>.</span>
+        ${coMayChu
+          ? `Sign-in is not switched on for this build yet, so your name and everything you
+             write stay on this phone. Nothing else changes — scans, map and journal all
+             work without an account.`
+          : `There is no server behind this build, so your name and everything you write stay
+             on this phone. Turn the shared layer on any time in <em>You → Community</em>.`}</span>
     </div>`;
 }
 
@@ -525,33 +535,33 @@ export async function handleClick(target) {
   }
   if (k === "local") { finish(); return true; }
 
-  if (k === "send") {
-    /* Lúc gửi lại mã thì ô email đang readonly — đọc từ M.email chứ không
-       từ DOM, để một lần gửi lại không phụ thuộc vào ô còn nằm đó hay không. */
-    const email = (M.sent ? M.email : ($("#wcEmail", M.host)?.value || "")).trim();
+  if (k === "signin" || k === "signup") {
+    const email = ($("#wcEmail", M.host)?.value || "").trim();
+    const pass = $("#wcPass", M.host)?.value || "";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err("That email doesn't look right"), true;
+    if (pass.length < 6) return err("Password needs 6 characters or more"), true;
     M.email = email; M.sending = true; paint();
     try {
-      await Auth.sendCode(email);
-      M.sending = false; M.sent = true; paint();
-      err("");
+      if (k === "signup") {
+        const r = await Auth.signUp(email, pass, $("#wcName", M.host)?.value?.trim());
+        /* Máy chủ vẫn bắt xác nhận email: tài khoản đã tạo nhưng KHÔNG
+           dùng được, và lá thư xác nhận thì gói free không gửi ra ngoài
+           nhóm dự án. Nói đúng chuyện đó, đừng mời người ta đi xem hộp thư. */
+        if (r.needsEmailConfirm) {
+          M.sending = false; paint();
+          return err("This project still asks for email confirmation, and it cannot send that mail yet. Continue without an account."), true;
+        }
+      } else {
+        await Auth.signIn(email, pass);
+      }
+      M.sending = false;
+      finish();
     } catch (e) {
       M.sending = false; paint();
-      err(e.message || "Could not send the code");
+      err(e.message || "Could not sign in");
     }
     return true;
   }
 
-  if (k === "verify") {
-    const code = ($("#wcCode", M.host)?.value || "").trim();
-    if (code.length < 6) return err("Enter the six digits from the email"), true;
-    try {
-      await Auth.verifyCode(M.email, code);
-      finish();
-    } catch (e) {
-      err(e.message || "That code did not work");
-    }
-    return true;
-  }
   return false;
 }
