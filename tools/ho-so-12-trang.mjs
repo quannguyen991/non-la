@@ -463,10 +463,10 @@ T.push(`<section class="trang">
 
   <div class="ba">
     <figure class="that">
-      <img src="${man("01-quet-menu")}" alt="Kết quả đọc thực đơn">
-      <figcaption><b>1 · Đọc thực đơn.</b> Món không có trong danh mục thì app
-        <b>không phán quyết</b> — nhưng vẫn nói được điều đúng: dòng này tính theo cân,
-        hãy hỏi trước khi gọi.</figcaption>
+      <img src="${man("00-doc-anh-thuc-don")}" alt="Kết quả đọc cả tấm thực đơn">
+      <figcaption><b>1 · Đọc thực đơn.</b> Sáu dòng đọc từ một tấm ảnh, ngay trên máy; ba
+        dòng ngoài danh mục thì app <b>không phán quyết</b>.
+        <i>Thực đơn trong ảnh là bản dựng để thử.</i></figcaption>
     </figure>
     <figure class="that">
       <img src="${man("03-phieu-da-xac-nhan")}" alt="Phiếu sau khi người bán xác nhận">
@@ -491,21 +491,22 @@ T.push(`<section class="trang">
         <tr><td><b>Dish</b></td><td>đây là món gì</td><td><i>cần mạng</i></td></tr>
       </table>
       <p class="nho">Dish là ngoại lệ duy nhất: không có mô hình nhận diện vật thể nào
-      đủ nhỏ để chạy trên thiết bị.</p>
+      đủ nhỏ để chạy trên thiết bị. Sửa-là-chạy cũng đúng thứ cần cho <b>phiên cải tiến
+      sản phẩm 6 giờ tại chỗ</b> ở vòng Khu vực.</p>
     </div>
     <div>
       <h3>Những gì đứng quanh tính năng lõi</h3>
       <ul>
         <li><b>Bẫy đơn vị</b> — bốn cách một dòng thực đơn nói đúng mà gây hiểu sai</li>
-        <li><b>So hai tấm thực đơn</b> — tính năng duy nhất <i>sinh ra</i> dữ kiện mới</li>
+        <li><b>So hai tấm thực đơn</b> — tính năng duy nhất <i>sinh ra</i> dữ kiện</li>
         <li><b>Đếm tiền thối</b> — hai cặp mệnh giá cùng màu là chỗ mất tiền nhiều nhất</li>
+        <li><b>Chọn ảnh từ máy</b> — camera bị chặn thì vẫn đọc được tấm ảnh có sẵn</li>
         <li><b>Bảng khai của quán</b> — quán tự khai điều kiện giá, app soát tính đầy đủ</li>
       </ul>
       <div class="hop jade">
         <span class="nhan">Một quyết định kỹ thuật có ích đúng ngày thi</span>
-        <p>Ứng dụng chạy thẳng từ mã nguồn, <b>không có bước biên dịch</b>: sửa một tệp
-          là chạy, và ${n(S.pheThu.pass)} phép thử xong trong vài giây. Vòng Khu vực có
-          <b>phiên cải tiến sản phẩm 6 giờ tại chỗ</b>.</p>
+        <p>Chạy thẳng từ mã nguồn, <b>không bước biên dịch</b>: sửa một tệp là chạy,
+          ${n(S.pheThu.pass)} phép thử xong trong vài giây.</p>
       </div>
     </div>
   </div>
@@ -627,7 +628,7 @@ T.push(`<section class="trang">
       <h3>Và đây là chỗ Nón Lá thua</h3>
       <p><b>100/100</b> lượt hỏi về món <b>ngoài</b> danh mục ${n(S.mon)} món đều được mô
       hình trả lời hữu ích. Phép đo ấy đã đổi sản phẩm: app không còn trả về một dấu gạch
-      mà nói phần nói được <i>(ảnh 1, trang 5)</i> — nhưng <b>vẫn không phán quyết</b>. Về
+      mà nói phần nói được — nhưng <b>vẫn không phán quyết</b> <i>(ảnh 1, trang 5)</i>. Về
       độ phủ thì mô hình vẫn hơn, và <b>bảng so sánh nào không ghi dòng này ra là một bảng
       không đáng tin</b>.</p>
     </div>
@@ -1035,7 +1036,7 @@ console.log(P("docs/ho-so-12-trang.html"));
 console.log(`  ${T.length} trang · ${Math.round(html.length / 1024)} KB`);
 
 const thieuVe = ["bia", "van-de", "khao-sat", "hoa-tiet"].filter((a) => !anh(a));
-const thieuMan = ["01-quet-menu", "02-phieu-chua-du-dieu-kien",
+const thieuMan = ["00-doc-anh-thuc-don", "02-phieu-chua-du-dieu-kien",
   "03-phieu-da-xac-nhan", "04-doi-chieu-hoa-don"].filter((a) => !man(a));
 if (thieuVe.length) console.log(`  *** thiếu ảnh vẽ: ${thieuVe.join(", ")}`);
 /* Thiếu ảnh MÀN HÌNH là hỏng nặng hơn thiếu ảnh vẽ: trang 4 và 5 mất đúng

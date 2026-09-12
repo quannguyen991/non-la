@@ -2282,6 +2282,32 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("chấm sai câu bẫy đơn vị", trungDapAnLlm("that comes to 100,000 VND", 800000), false);
 }
 
+/* ── ảnh chọn từ máy (app.js) ────────────────────────────────
+
+   Camera bị chặn là hoàn cảnh thật: lỡ bấm "Block", máy để bàn không có
+   camera, trang mở qua http trong lớp. Đường chọn ảnh từ máy phải còn
+   nguyên ba mảnh — nút, ô chọn tệp, và hàm xử lý — vì mất một mảnh thì
+   nút vẫn hiện mà bấm không ra gì.
+
+   Và hai đường (camera / tệp) phải dùng CÙNG một phép xám hoá. Lệch một
+   hằng số là cùng một tấm thực đơn cho ra hai kết quả đọc khác nhau, tuỳ
+   người dùng chụp hay chọn ảnh — thứ không ai nghĩ tới lúc đi tìm lỗi.  */
+{
+  const app = readFileSync("./app.js", "utf8");
+  eq("có nút chọn ảnh", app.includes(`data-act="pickfile"`), true);
+  eq("có ô chọn tệp", app.includes(`id="mFile" type="file"`), true);
+  eq("có hàm xử lý tệp ảnh", /async function quetTepAnh\(/.test(app), true);
+  eq("nghe sự kiện change ở cấp document",
+    /addEventListener\("change"[\s\S]{0,200}mFile/.test(app), true);
+
+  const loop = (ten) => {
+    const m = new RegExp("function " + ten + "\\([\\s\\S]*?\\n\\}").exec(app)?.[0] || "";
+    return (m.match(/0\.299 \* d\[i\][\s\S]*?128\)\);/) || [""])[0];
+  };
+  eq("camera và tệp dùng chung phép xám hoá",
+    loop("grabFrame") !== "" && loop("grabFrame") === loop("veVaoKhung"), true);
+}
+
 /* ── chữ tối trên nền tối (app.css) ──────────────────────────
 
    Không phải phép thử giao diện — chỉ là một luật đọc được từ tệp CSS.

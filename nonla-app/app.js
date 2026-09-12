@@ -1653,6 +1653,12 @@ const sayBlock = (vi, ph) => `<button class="say" data-say="${esc(vi)}">
   <span class="spk">${spkIcon}</span></button>`;
 
 const manualBlock = (kind = "menu") => `
+  <h2 class="sect">Use a photo you already have</h2>
+  <p class="muted">${kind === "cash" ? "Pick a photo of the notes." : "Pick a photo of the menu."}
+    It is read on this device and never uploaded.</p>
+  <button class="btn sec" data-act="pickfile">Choose a photo</button>
+  <input id="mFile" type="file" accept="image/*" hidden>
+
   <h2 class="sect">Enter by hand</h2>
   <p class="muted">${kind === "cash" ? "Type the notes you're holding, one per line." : "Type an item and its price. Nón Lá never leaves you stuck."}</p>
   <div class="manual">
@@ -1685,8 +1691,68 @@ async function doScan() {
     const t = await Tien.doc(c).catch(() => null);
     if (t) return showCashResult(String(t.menhGia), { tuHinh: t });
   }
+  return doKhung(c);
+}
+
+/* Phần xử lý SAU khi đã có một khung ảnh — dùng chung cho ảnh từ camera
+   và ảnh người dùng chọn từ máy. Tách ra vì hai đường phải cho ra đúng
+   một kết quả: một đường đọc kỹ hơn đường kia là hai sản phẩm khác nhau
+   nằm trong cùng một app. */
+async function doKhung(c) {
+  if (S.mode === "cash") {
+    const t = await Tien.doc(c).catch(() => null);
+    if (t) return showCashResult(String(t.menhGia), { tuHinh: t });
+  }
   const { text, conf } = await ocr(c);
   handleText(text, conf);
+}
+
+/* ── ẢNH CHỌN TỪ MÁY ──────────────────────────────────────────
+   VÌ SAO CẦN, NGOÀI CHUYỆN CHỤP ẢNH CHO HỒ SƠ
+   Camera hỏng là hoàn cảnh THẬT và thường: người dùng lỡ bấm "Block" ở
+   hộp xin quyền, máy để bàn không có camera, trang mở qua http trong
+   lớp học. Trước đây cả ba ca ấy chỉ còn đường gõ tay từng dòng một —
+   trong khi ảnh tấm thực đơn đã nằm sẵn trong máy họ.
+
+   Ảnh KHÔNG rời khỏi máy: nó được vẽ vào canvas rồi đọc chữ ngay tại
+   chỗ, đúng đường mà ảnh camera đi. Không có lời gọi mạng nào. */
+async function quetTepAnh(file) {
+  if (!file) return;
+  if (!/^image\//.test(file.type)) return toast("Pick an image file");
+  closeSheet();
+  const busy = $("#busy");
+  busy.classList.add("on");
+  try {
+    const bm = await createImageBitmap(file);
+    const c = veVaoKhung(bm, { colour: S.mode === "dish" });
+    bm.close?.();
+    if (S.mode === "dish") return doDishKhung(c);
+    return doKhung(c);
+  } catch (e) {
+    toast("Could not read that image");
+  } finally {
+    busy.classList.remove("on");
+  }
+}
+
+/* Vẽ một ảnh vào ĐÚNG khung mà grabFrame() dùng, với đúng phép xám hoá
+   và tăng tương phản. Viết lại phép xử lý ở đây là tự tạo ra hai kết quả
+   khác nhau cho cùng một tấm thực đơn. */
+function veVaoKhung(img, { colour = false } = {}) {
+  const c = $("#shot");
+  const W = Math.min(img.width, 1600), sc = W / img.width;
+  c.width = W; c.height = Math.round(img.height * sc);
+  const g = c.getContext("2d", { willReadFrequently: true });
+  g.drawImage(img, 0, 0, c.width, c.height);
+  if (colour) return c;
+  const im = g.getImageData(0, 0, c.width, c.height), d = im.data;
+  for (let i = 0; i < d.length; i += 4) {
+    let y = 0.299 * d[i] + 0.587 * d[i+1] + 0.114 * d[i+2];
+    y = Math.max(0, Math.min(255, (y - 128) * 1.45 + 128));
+    d[i] = d[i+1] = d[i+2] = y;
+  }
+  g.putImageData(im, 0, 0);
+  return c;
 }
 
 /* ── quét MÓN: ảnh đồ ăn → món gì → giá bao nhiêu ─────────────
@@ -1711,6 +1777,12 @@ async function doDishScan() {
       ${dishPickerHTML()}
       <button class="btn sec" data-act="close">Close</button>`);
   }
+  return doDishKhung(c);
+}
+
+/* Cùng lý do tách như doKhung(): ảnh chọn từ máy phải đi đúng đường mà
+   ảnh camera đi. */
+async function doDishKhung(c) {
   const busy = $("#busy"), txt = $("#busyTxt"), pct = $("#busyPct");
   busy.classList.add("on");
   txt.textContent = "Looking at the dish…";
@@ -4406,6 +4478,17 @@ function go(tab) {
    có gì xảy ra. */
 document.addEventListener("keydown", (ev) => { SurveyUI.handleKey(ev); });
 
+/* Ô chọn tệp nằm trong tấm sheet, mà sheet bị dựng lại bằng innerHTML
+   sau mỗi lần mở — một listener gắn thẳng vào ô sẽ chết ở lần mở thứ
+   hai. Nên nghe ở cấp document, đúng lối của mọi sự kiện khác trong tệp
+   này. */
+document.addEventListener("change", (ev) => {
+  if (ev.target?.id !== "mFile") return;
+  const f = ev.target.files?.[0];
+  ev.target.value = "";        // chọn lại đúng tấm ảnh vừa chọn vẫn phải chạy
+  quetTepAnh(f);
+});
+
 document.addEventListener("click", async (ev) => {
   const el = (s) => ev.target.closest(s);
 
@@ -4816,6 +4899,11 @@ document.addEventListener("click", async (ev) => {
 
   if (el("[data-act='save']")) return toast("Saved to this device");
   if (el("[data-act='notif']")) return toast("No alerts right now");
+
+  /* Nút bấm mở hộp chọn tệp. Không đặt <label for> vì cùng một khối
+     manualBlock() được chèn ở nhiều chỗ, và hai id trùng nhau thì nhãn
+     luôn mở ô ĐẦU TIÊN trong trang — tức là ô của tấm sheet đã đóng. */
+  if (el("[data-act='pickfile']")) { $("#mFile")?.click(); return; }
 
   const mn = el("[data-act='manual']");
   if (mn) {

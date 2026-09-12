@@ -76,11 +76,27 @@ const dat = `(sel,v)=>{const el=document.querySelector(sel);if(!el)throw new Err
   const s=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;s.call(el,v);
   el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}`;
 
+const ANH_THUC_DON = join(GOC, "docs/anh-thu/thuc-don-thu.png");
+
 const BUOC = [
+  {
+    ten: "00-doc-anh-thuc-don",
+    ghi: "Đọc cả tấm thực đơn từ một tệp ảnh trong máy (không cần camera)",
+    /* Đặt tệp thẳng vào ô chọn tệp qua DOM.setFileInputFiles: bấm vào ô ấy
+       trong Chrome sẽ mở hộp thoại của hệ điều hành, thứ không có ở chế độ
+       headless và cũng không phải thứ cần đo. */
+    tep: { sel: "#mFile", duong: ANH_THUC_DON },
+    js: `document.querySelector('#scanBtn').click(); await w(900);`,
+    /* Đọc chữ bằng Tesseract mất vài giây và phải tải gói "vie" lần đầu. */
+    cho: `!!document.querySelector('#sheetBody')?.innerText.match(/item(s)? read/)`,
+    han: 120000,
+    doc: `/item(s)? read/.test(document.querySelector('#sheetBody').innerText)`,
+  },
   {
     ten: "01-quet-menu",
     ghi: "Kết quả đọc một dòng thực đơn app KHÔNG có trong danh mục",
-    js: `document.querySelector('#scanBtn').click(); await w(700);
+    js: `document.querySelector('[data-act="close"]')?.click(); await w(500);
+      document.querySelector('#scanBtn').click(); await w(700);
       dat('#mName','Cá song hấp /100g'); dat('#mPrice','100000');
       document.querySelector('[data-act="manual"]').click(); await w(900);`,
     doc: `document.body.innerText.includes('no verdict')`,
@@ -156,6 +172,19 @@ try {
   await doi(`!!document.querySelector('#scanBtn')`, "màn quét");
   await sleep(1500);
 
+  await S("DOM.enable");
+
+  /* Đặt một tệp vào ô <input type=file>. Phải đi qua DOM.setFileInputFiles
+     chứ không dựng File trong trang: trình duyệt không cho JS tự tạo một
+     tệp "đến từ máy người dùng", và mọi cách giả đều đo một đường khác với
+     đường người dùng thật đi. */
+  const datTep = async (sel, duong) => {
+    const { root } = await S("DOM.getDocument", { depth: 1 });
+    const { nodeId } = await S("DOM.querySelector", { nodeId: root.nodeId, selector: sel });
+    if (!nodeId) throw new Error(`không thấy ô chọn tệp ${sel}`);
+    await S("DOM.setFileInputFiles", { nodeId, files: [duong] });
+  };
+
   for (const b of BUOC) {
     const { result, exceptionDetails } = await S("Runtime.evaluate", {
       expression: `(async()=>{const w=ms=>new Promise(r=>setTimeout(r,ms));const dat=${dat};
@@ -172,6 +201,12 @@ try {
       throw new Error(`${b.ten}: ${exceptionDetails.exception?.description || exceptionDetails.text}`);
     }
     void result;
+
+    if (b.tep) {
+      await datTep(b.tep.sel, b.tep.duong);
+      await doi(b.cho, `${b.ten}: kết quả đọc ảnh`, b.han || 60000);
+      await sleep(900);
+    }
 
     /* ĐỌC LẠI MÀN TRƯỚC KHI CHỤP. Một bước hỏng vẫn chụp ra được một tấm
        ảnh trông bình thường — của màn TRƯỚC đó. Không có phép đọc này thì
