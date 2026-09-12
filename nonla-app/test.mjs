@@ -2282,6 +2282,23 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("chấm sai câu bẫy đơn vị", trungDapAnLlm("that comes to 100,000 VND", 800000), false);
 }
 
+/* ── không mời chờ một lá thư không tới (config.js) ──────────
+
+   Supabase gói free từ chối gửi thư cho địa chỉ ngoài nhóm dự án và chỉ
+   cho 2 thư/giờ. Nút "Email me a code" vẫn trả về 200, app vẫn hiện ô
+   nhập mã, còn hộp thư thì không bao giờ có gì. Nên màn đăng nhập chỉ
+   được mở khi CẢ HAI đúng: có cấu hình máy chủ, và cờ EMAIL_DANG_NHAP
+   bật — tức là đã dựng SMTP riêng và đã thử gửi thật.  */
+{
+  const cfg = readFileSync("./config.js", "utf8");
+  const wc = readFileSync("./welcome.js", "utf8");
+  const app = readFileSync("./app.js", "utf8");
+  eq("có cờ email đăng nhập", /export const EMAIL_DANG_NHAP\s*=\s*(true|false)/.test(cfg), true);
+  eq("màn mở đầu hỏi cờ ấy trước khi mời nhập email",
+    /cloudOn\s*=\s*Auth\.isConfigured\(\)\s*&&\s*EMAIL_DANG_NHAP/.test(wc), true);
+  eq("needAuth cũng hỏi cờ ấy", /isConfigured\(\)\s*\|\|\s*!EMAIL_DANG_NHAP/.test(app), true);
+}
+
 /* ── ảnh chọn từ máy (app.js) ────────────────────────────────
 
    Camera bị chặn là hoàn cảnh thật: lỡ bấm "Block", máy để bàn không có

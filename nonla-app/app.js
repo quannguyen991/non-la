@@ -13,7 +13,7 @@ import * as Img from "./imgsvc.js";
 import { iconOf as sightIcon } from "./sights.js";
 import * as Auth from "./auth.js";
 import * as FoodMap from "./foodmap.js";
-import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
+import { SUPABASE_URL, SUPABASE_ANON, EMAIL_DANG_NHAP } from "./config.js";
 import * as Community from "./community.js";
 import * as Cloud from "./cloud.js";
 import * as Outbox from "./outbox.js";
@@ -4276,7 +4276,10 @@ function busy(on, msg = "") {
    một lựa chọn hợp lệ chứ không phải một lỗi. */
 function needAuth() {
   if (Auth.signedIn()) return Promise.resolve(true);
-  if (!Auth.isConfigured()) {
+  /* EMAIL_DANG_NHAP tắt: máy chủ có, nhưng thư không tới được hộp thư người
+     dùng (xem config.js). Mở màn đăng nhập lúc ấy là dẫn người ta vào một
+     ngõ cụt — nhánh "lưu vào máy này" mới là đường đi được. */
+  if (!Auth.isConfigured() || !EMAIL_DANG_NHAP) {
     toast("Accounts are off in this build — it saved to this phone instead");
     return Promise.resolve(false);
   }

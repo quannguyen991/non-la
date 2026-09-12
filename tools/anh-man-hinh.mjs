@@ -161,13 +161,16 @@ try {
   };
   /* Cờ "đã xem" bỏ được phần giới thiệu nhưng KHÔNG bỏ bước đặt tên: bấm
      "Continue without an account" mà chưa có tên thì app báo "Add a name so
-     your notes have an author" và đứng nguyên đó. Đặt tên rồi mới đi tiếp. */
+     your notes have an author" và đứng nguyên đó. Đặt tên rồi mới đi tiếp.
+
+     Nút ấy đổi lớp theo cấu hình: có đăng nhập email thì nó là .wc-sec, không
+     có thì chính nó là nút chính .wc-cta. Chọn theo data-wc, đừng theo lớp. */
   await doi(`!!document.querySelector('#wcName')`, "bước đặt tên");
   await S("Runtime.evaluate", {
     expression: `(()=>{const el=document.querySelector('#wcName');
       const s=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set;
       s.call(el,'Khách');el.dispatchEvent(new Event('input',{bubbles:true}));
-      document.querySelector('.wc-sec[data-wc="local"]').click()})()`,
+      document.querySelector('[data-wc="local"]').click()})()`,
   });
   await doi(`!!document.querySelector('#scanBtn')`, "màn quét");
   await sleep(1500);

@@ -52,6 +52,7 @@
 
 import * as Auth from "./auth.js";
 import * as Local from "./localdb.js";
+import { EMAIL_DANG_NHAP } from "./config.js";
 
 const SEEN_KEY = "nl.seen.welcome";
 
@@ -331,7 +332,10 @@ function slideHtml(i) {
 /* Màn tài khoản. Hình dạng của nó phụ thuộc MỘT câu hỏi: phía sau có máy
    chủ không. Trả lời sai câu đó là dựng ra một form không bao giờ chạy. */
 function accountHtml() {
-  const cloudOn = Auth.isConfigured();
+  /* Có máy chủ là một chuyện, gửi được thư tới hộp thư của người dùng là
+     chuyện khác — xem EMAIL_DANG_NHAP trong config.js. Thiếu vế thứ hai thì
+     màn này chỉ được mời đặt tên, không được mời chờ một lá thư không tới. */
+  const cloudOn = Auth.isConfigured() && EMAIL_DANG_NHAP;
   const who = Auth.profile()?.name || Local.name();
   return `
     <div class="wc-page">
