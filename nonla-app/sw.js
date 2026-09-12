@@ -33,6 +33,10 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v53: KHÔNG thêm tệp — đổi số để đẩy config.js/welcome.js/app.js mới xuống.
+//      Cờ EMAIL_DANG_NHAP tắt màn đăng nhập bằng email; máy đã cài app mà vẫn
+//      giữ vỏ cũ thì vẫn thấy nút "Email me a code" và vẫn chờ một lá thư
+//      không tới. Sửa mã trong SHELL mà quên dòng này là sửa cho mỗi máy mới.
 // v52: KHÔNG thêm tệp — chỉ đổi số để đẩy CSS mới xuống máy đã cài app.
 //      app.css sửa hai chỗ: huy hiệu OFFLINE READY hết đè lên nút "Dish", và
 //      nút phụ trên tấm phiếu hết chữ tối trên nền tối. Vỏ app được cache
@@ -108,7 +112,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v52";
+const CACHE = "nonla-v53";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
