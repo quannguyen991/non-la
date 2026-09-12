@@ -243,7 +243,7 @@ T.push(`<section class="trang bia">
     </div>
     <p class="met"><span><b>${n(S.mon)} món · ${n(S.vung)} khu phố</b></span>
       <span><b>${S.ngonNgu} thứ tiếng</b>, chạy khi tắt mạng</span>
-      <span><b>quannguyen991.github.io/non-la</b></span></p>
+      <span><b>nonla-app.vercel.app</b></span></p>
   </div>
   ${BANG}
 </section>`);
@@ -1014,7 +1014,8 @@ T.push(`<section class="trang">
           chấp có cơ hội xảy ra</b> thì không.</p>
       </div>
 
-      <p class="nho">Bản đang chạy: <b>quannguyen991.github.io/non-la</b> · mã nguồn,
+      <p class="nho">Bản đang chạy: <b>nonla-app.vercel.app</b> (bản dự phòng:
+      quannguyen991.github.io/non-la) · mã nguồn,
       protocol khảo sát, bộ tình huống thử nghiệm, bản kê khai công cụ AI và lịch sử câu
       lệnh đều nộp kèm. Mọi con số trong mười hai trang này được sinh ra từ dữ liệu và
       từ đầu ra thật của bộ kiểm thử tại commit ${n(S.commit)}, ngày ${esc(S.taoLuc)}.</p>

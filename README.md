@@ -2,7 +2,9 @@
 
 **Thước đo giá đường phố Việt Nam.** Đo bằng chân, đọc bằng camera, chạy khi tắt mạng.
 
-> ### → [quannguyen991.github.io/non-la](https://quannguyen991.github.io/non-la/)
+> ### → [nonla-app.vercel.app](https://nonla-app.vercel.app/)
+>
+> Bản dự phòng trên GitHub Pages: [quannguyen991.github.io/non-la](https://quannguyen991.github.io/non-la/)
 >
 > Mở trên điện thoại được ngay. Không cần cài, không cần tài khoản.
 > Bản bố cục máy tính: [`/non-la/web/`](https://quannguyen991.github.io/non-la/web/)
