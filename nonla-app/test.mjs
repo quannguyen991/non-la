@@ -2282,6 +2282,26 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("chấm sai câu bẫy đơn vị", trungDapAnLlm("that comes to 100,000 VND", 800000), false);
 }
 
+/* ── chữ tối trên nền tối (app.css) ──────────────────────────
+
+   Không phải phép thử giao diện — chỉ là một luật đọc được từ tệp CSS.
+   Tấm phiếu là màn duy nhất có nền SẪM mà vẫn dùng `.btn.sec`, và mặc
+   định của lớp ấy là màu mực của nền GIẤY. Nút vẫn bấm được nên thử tay
+   không ai thấy; ảnh chụp màn hình cho hồ sơ dự thi mới lộ ra. */
+{
+  const css = readFileSync("./app.css", "utf8");
+  const khoi = /#v-phieu\s+\.btn\.sec\{([^}]*)\}/.exec(css);
+  eq("tấm phiếu có luật riêng cho nút phụ", !!khoi, true);
+  eq("và luật ấy đặt lại màu chữ cho nền sẫm",
+    /color:\s*var\(--diep\)/.test(khoi?.[1] || ""), true);
+
+  /* Huy hiệu OFFLINE READY phải nằm DƯỚI hàng chế độ: đặt cùng một mốc
+     `top` với .modes là nó đè lên viên "Dish" ở khổ 390px. */
+  const top = (re) => Number(re.exec(css)?.[1] ?? -1);
+  eq("huy hiệu offline không cùng dòng với hàng chế độ",
+    top(/\.offline\{[^}]*top:calc\((\d+)px/) > top(/\.modes\{[^}]*top:calc\((\d+)px/), true);
+}
+
 console.log("\n════════════════════════════════════════════");
 console.log(`${pass} pass · ${fail} fail\n`);
 process.exit(fail ? 1 : 0);

@@ -1,8 +1,8 @@
 {
- "taoLuc": "2026-09-11",
- "commit": 95,
+ "taoLuc": "2026-09-12",
+ "commit": 98,
  "pheThu": {
-  "pass": 770,
+  "pass": 773,
   "fail": 0
  },
  "vung": 6,
@@ -10,6 +10,7 @@
  "oGia": 219,
  "seed": 219,
  "doThat": 0,
+ "sourced": 66,
  "monNgoaiDanhMuc": 187,
  "monCoChuyen": 22,
  "quanOSM": 2481,
@@ -29,6 +30,9 @@
    "claude-haiku-4-5-20251001"
   ],
   "luotCoSo": 357,
+  "luotGui": 360,
+  "luotHong": 3,
+  "raoDon": 111,
   "tuChoi": 0,
   "coDai": 12,
   "duoiDai": 6,

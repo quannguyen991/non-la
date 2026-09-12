@@ -40,6 +40,10 @@ const seed = Object.values(pr).reduce((s, z) =>
   s + Object.values(z.items).filter((i) => i.seed).length, 0);
 const doThat = Object.values(pr).reduce((s, z) =>
   s + Object.values(z.items).filter((i) => i.surveyedAt).length, 0);
+/* Ô nạp được từ thực đơn công bố. Bản 12 trang từng gõ tay con số này (53) và
+   bộ soát hồ sơ bắt được lúc dữ liệu đã lên 66. */
+const sourced = Object.values(pr).reduce((s, z) =>
+  s + Object.values(z.items).filter((i) => i.sourced).length, 0);
 
 /* ── mã nguồn ───────────────────────────────────────────────── */
 const jsFiles = readdirSync(join(GOC, "nonla-app")).filter((f) => f.endsWith(".js"));
@@ -69,6 +73,12 @@ const duoiDai = coDai.filter((c) => c.viTriSoVoiDai === "duoi").length;
 const trenDai = coDai.filter((c) => c.viTriSoVoiDai === "tren").length;
 const tuChoi = cau.reduce((s, c) => s + (c.soLanTuChoi || 0), 0);
 const luotCoSo = cau.reduce((s, c) => s + (c.soLuot || 0), 0);
+/* Lượt GỬI ĐI và lượt ĐỌC ĐƯỢC là hai con số khác nhau, và hồ sơ phải in cả
+   hai. Bản trước chỉ in "357 lượt" trong khi phép đo là 36 câu × 10 lượt =
+   360 — giám khảo nhân ra 360 rồi không hiểu ba lượt kia đi đâu. Ba lượt ấy
+   là lỗi cổng API, không phải mô hình im lặng. */
+const luotHong = cau.reduce((s, c) => s + (c.soLuotHong || 0), 0);
+const raoDon = cau.reduce((s, c) => s + (c.soLanRaoDon || 0), 0);
 const daoDong = coDai.map((c) => c.daoDong?.ratio).filter((x) => x > 0);
 
 /* ── quán cào từ sitemap giao hàng ─────────────────────────── */
@@ -85,7 +95,7 @@ const S = {
 
   vung: Object.keys(pr).length,
   mon: di.length,
-  oGia, seed, doThat,
+  oGia, seed, doThat, sourced,
   monNgoaiDanhMuc: Object.keys(mr).length,
   monCoChuyen: di.filter((d) => d.story).length,
   quanOSM: ea.length,
@@ -103,6 +113,9 @@ const S = {
     soLuot: dc.luot,
     models: dc.models,
     luotCoSo,
+    luotGui: luotCoSo + luotHong,
+    luotHong,
+    raoDon,
     tuChoi,
     coDai: coDai.length,
     duoiDai, trenDai,
@@ -134,12 +147,14 @@ const in1 = (k, v) => console.log(`  ${String(k).padEnd(26)} ${v}`);
 console.log("── số liệu cho hồ sơ 12 trang ──────────────");
 in1("vùng · món · ô giá", `${S.vung} · ${S.mon} · ${S.oGia}`);
 in1("ô còn cờ seed / đã đo", `${S.seed} / ${S.doThat}`);
+in1("ô nạp từ thực đơn công bố", S.sourced);
 in1("quán OSM · sitemap", `${S.quanOSM} · ${S.quanSitemap}`);
 in1("mô-đun JS · dòng", `${S.moDun} · ${S.dongJS.toLocaleString("vi-VN")}`);
 in1("vỏ offline", `${S.shell} tệp`);
 in1("phép thử", S.pheThu ? `${S.pheThu.pass} pass · ${S.pheThu.fail} fail` : "KHÔNG ĐỌC ĐƯỢC");
 in1("commit", S.commit);
 in1("đối chứng LLM", `${S.llm.soCau} câu · ${S.llm.soLuot} lượt · từ chối ${S.llm.tuChoi}/${S.llm.luotCoSo}`);
+in1("  gửi / đọc được / hỏng", `${S.llm.luotGui} / ${S.llm.luotCoSo} / ${S.llm.luotHong}`);
 in1("  dưới dải / trên dải", `${S.llm.duoiDai} / ${S.llm.trenDai} trên ${S.llm.coDai} cặp`);
 in1("  độ dao động", `${S.llm.daoDongMin}× – ${S.llm.daoDongMax}×`);
 in1("model tiền", `${S.tien.soAnhTrain} ảnh / ${S.tien.soNguonTrain} nguồn · khó ${S.tien.soAnhKho}`);
