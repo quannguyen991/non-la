@@ -525,9 +525,9 @@ function placeEateries() {
    vào tham số thứ hai và giá trị mặc định không bao giờ chạy. */
 function pinFor(p, ctx = M) {
   const I = ctx.icons;
-  const lvl = p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown";
-  const svg = p.fair === false ? I.mapPinAlert("#B0201A")
-    : p.fair === true ? I.mapPin("#0E4A3C") : I.mapPinUnknown("#8A7A66");
+  const lvl = lvlTu(mucOf(p, ctx));
+  const svg = lvl === "bad" ? I.mapPinAlert("#B0201A")
+    : lvl === "ok" ? I.mapPin("#0E4A3C") : I.mapPinUnknown("#8A7A66");
   const d = ctx.me ? fmtDistance(distance(ctx.me, p.at)) : "";
   return `<button class="bm-pin ${ctx.sel === p.id ? "sel" : ""}" data-pin="${esc(p.id)}"
     data-lvl="${lvl}" aria-label="${esc(p.name)}${d ? `, ${d} away` : ""}">
@@ -554,10 +554,18 @@ export const FILTERS = [
   { k: "gem", label: "Hidden Gems", lvl: "" },
 ];
 
+/* Mức giá của một cơ sở ĐỌC TỪ app.js (dgOf → coso.js, suy từ lượt quét
+   thật), không đọc trường `fair` trong places.json. Trường ấy đã bị gỡ ngày
+   09/09 cùng 61 nhãn gán tay; tệp này vẫn đọc nó, nên mọi ghim thành "chưa
+   rõ", bộ lọc Fair Price / Above range luôn rỗng, và bản đồ xem trước ở tab
+   Nearby — mặc định lọc Fair Price — ẩn SẠCH ghim. */
+const mucOf = (p, ctx = M) => (ctx.lvlOf ? ctx.lvlOf(p) : null);
+const lvlTu = (muc) => (muc === "fair" ? "ok" : muc === "high" ? "bad" : "unknown");
+
 const KEEP_PLACE = {
   all: () => true,
-  fair: (p) => p.fair === true,
-  over: (p) => p.fair === false,
+  fair: (p) => mucOf(p) === "fair",
+  over: (p) => mucOf(p) === "high",
   food: () => true,
   cafe: isCafe,
   culture: () => false,
@@ -601,6 +609,28 @@ function placePins() {
     // ẩn ghim ra ngoài khung thay vì để trình duyệt vẽ rồi cắt
     el.style.visibility =
       (s.x < -60 || s.x > M.vp.w + 60 || s.y < -60 || s.y > M.vp.h + 60) ? "hidden" : "";
+  }
+
+  /* NHÃN KHÔNG ĐƯỢC ĐÈ NHAU. Ở phố cổ tám quán nằm trong vài trăm mét, và
+     mỗi nhãn là một viên chữ rộng cả trăm pixel: "Bà Bé · Cao lầu" đè lên
+     "Chè Mót", "Gánh xí mà buổi chiều" nằm dưới hai nhãn khác — đọc không ra
+     tên nào. Ghim vẫn hiện đủ; chỉ NHÃN của ghim đến sau bị giấu nếu nó chồng
+     lên một nhãn đã đặt. Ghim đang chọn luôn giữ nhãn và được đặt trước.
+     Đọc vị trí SAU khi đã ghi hết transform, để trình duyệt tính bố cục một
+     lần chứ không phải một lần mỗi ghim. */
+  const hien = [...layer.children]
+    .filter((el) => !el.hidden && el.style.visibility !== "hidden")
+    .sort((a, b) => Number(b.classList.contains("sel")) - Number(a.classList.contains("sel")));
+  for (const el of hien) el.classList.remove("nolbl");
+  const daDat = [];
+  for (const el of hien) {
+    const lb = el.querySelector(".lbl");
+    if (!lb) continue;
+    const r = lb.getBoundingClientRect();
+    const de = daDat.some((b) => r.left < b.right + 4 && b.left < r.right + 4
+      && r.top < b.bottom + 2 && b.top < r.bottom + 2);
+    if (de && !el.classList.contains("sel")) el.classList.add("nolbl");
+    else daDat.push(r);
   }
   const me = $("#bmMe");
   if (me && M.me) {
@@ -857,8 +887,8 @@ function attachGestures(canvas) {
 
 /* ── API ─────────────────────────────────────────────────────── */
 export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark,
-                       onOpenEat, eateries = [], iconOf }) {
-  Object.assign(M, { zone, geo, icons, onOpenPlace, onOpenMark, onOpenEat, iconOf, sel: null });
+                       onOpenEat, eateries = [], iconOf, lvlOf = null }) {
+  Object.assign(M, { zone, geo, icons, onOpenPlace, onOpenMark, onOpenEat, iconOf, lvlOf, sel: null });
   // Khung nen la mot the <svg> hoan toan moi, chua co gi ben trong.
   M._hasBase = false; M._dx = 0; M._dy = 0; M._dirty = false; M.dragging = false;
   /* Mở lại bản đồ thì về mặc định. ISO_MIN_SCALE chỉ được ép bên trong
@@ -967,8 +997,8 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
    cùng phép chiếu, cùng nét vẽ, cùng cách kéo phóng. Dựng một màn hình
    bản đồ thứ hai là cách chắc chắn để hai bên trôi khỏi nhau sau vài lần
    sửa, và để một lỗi phải vá hai chỗ.                                    */
-export function openRoute({ zoneId, zone, geo, places, icons, route, iconOf, onOpenStop }) {
-  Object.assign(M, { zoneId, zone, geo, icons, iconOf, route, at: 0, onOpenStop, sel: null });
+export function openRoute({ zoneId, zone, geo, places, icons, route, iconOf, onOpenStop, lvlOf = null }) {
+  Object.assign(M, { zoneId, zone, geo, icons, iconOf, lvlOf, route, at: 0, onOpenStop, sel: null });
   M._hasBase = false; M._dx = 0; M._dy = 0; M._dirty = false; M.dragging = false;
   M.places = [];                       // màn hình này nói về tuyến, không về giá
   // (lớp nhà giả đã bỏ — nhà thật nằm trong geo.buildings)
@@ -1285,11 +1315,11 @@ export function locate() {
 
    Ghim ở đây mang `data-place` chứ không phải `data-pin`: chạm vào
    mở thẳng thẻ cơ sở, không cần mở bản đồ chi tiết trước.          */
-export function preview({ host, geo, places, icons, me = null, padPx = 30 }) {
+export function preview({ host, geo, places, icons, me = null, padPx = 30, lvlOf = null }) {
   if (!host || !geo) return null;
 
   const P = {
-    vp: null, cam: null, places: places.filter((p) => p.at), me, icons, obs: null,
+    vp: null, cam: null, places: places.filter((p) => p.at), me, icons, obs: null, lvlOf,
     tf: null, fit: null, flat: false,
     // null = chua biet tranh co tai duoc khong; false = da hong; true = dung duoc.
     // Dung false lam gia tri dau thi paintPreview() coi nhu tranh hong ngay
@@ -1314,9 +1344,9 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30 }) {
 
   const pin = (p) => {
     const I = P.icons;
-    const g = p.fair === false ? I.mapPinAlert("#B0201A")
-      : p.fair === true ? I.mapPin("#0E4A3C") : I.mapPinUnknown("#8A7A66");
-    const lvl = p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown";
+    const lvl = lvlTu(mucOf(p, P));
+    const g = lvl === "bad" ? I.mapPinAlert("#B0201A")
+      : lvl === "ok" ? I.mapPin("#0E4A3C") : I.mapPinUnknown("#8A7A66");
     const d = P.me ? fmtDistance(distance(P.me, p.at)) : "";
     /* Nhãn cơ bản giữ lại trong data-label: place() có thể phải nối thêm
        "beyond the edge of this map", và nối vào chính aria-label thì mỗi
@@ -1500,11 +1530,18 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30 }) {
   }
 
   return {
-    /** Chỉ hiện những cơ sở thoả `keep` — ghim khác chỉ ẩn đi, không vẽ lại. */
+    /** Chỉ hiện những cơ sở thoả `keep` — ghim khác chỉ ẩn đi, không vẽ lại.
+     *
+     *  KHÔNG CÓ CƠ SỞ NÀO KHỚP thì giữ nguyên mọi ghim. Bộ lọc mặc định của
+     *  tab là Fair Price, và khi chưa cơ sở nào đủ lượt quét thật thì ẩn theo
+     *  bộ lọc là xoá sạch bản đồ: người dùng thấy một tấm tranh không một ghim
+     *  nào và nghĩ bản đồ hỏng. Khay bên dưới đã nói "chưa có nhãn nào"; bản
+     *  đồ vẫn phải làm việc định hướng của nó. */
     filter(keep) {
+      const coKhop = P.places.some((p) => keep(p));
       for (const el of layer.children) {
         const p = P.places.find((x) => x.id === el.dataset.place);
-        el.hidden = !(p && keep(p));
+        el.hidden = coKhop && !(p && keep(p));
       }
     },
     setMe(at) { P.me = at; layer.innerHTML = P.places.map(pin).join(""); paintPreview(); },

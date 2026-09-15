@@ -2306,6 +2306,34 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("app hỏi máy chủ lúc khởi động", /Auth\.thamDo\(\);/.test(app), true);
 }
 
+/* ── bản đồ đọc nhãn từ lượt quét thật (bigmap.js) ──────────
+
+   Trường `fair` bị gỡ khỏi places.json ngày 09/09, nhưng bigmap.js vẫn đọc
+   nó thêm một tuần: mọi ghim thành "chưa rõ", bộ lọc Fair Price luôn rỗng,
+   và bản đồ xem trước — mặc định lọc Fair Price — ẩn SẠCH ghim. Không phép
+   thử nào đỏ, vì đọc một trường không tồn tại chỉ ra undefined chứ không ném.
+   Nên canh thẳng: bản đồ lấy mức giá qua lvlOf mà app.js truyền vào.  */
+{
+  const bm = readFileSync("./bigmap.js", "utf8");
+  const app = readFileSync("./app.js", "utf8");
+  eq("bigmap.js không đọc trường fair đã gỡ", /\bp\.fair\b|\.fair\s*===/.test(bm), false);
+  eq("app.js truyền lvlOf cho cả ba lối vào bản đồ",
+    (app.match(/lvlOf:\s*\(p\)\s*=>\s*dgOf\(p\)\.muc/g) || []).length, 3);
+  eq("bộ lọc không khớp ai thì bản đồ xem trước không bị xoá sạch",
+    /const coKhop = P\.places\.some/.test(bm), true);
+  eq("nhãn quán có bước tránh đè", /classList\.add\("nolbl"\)/.test(bm), true);
+
+  const pj = JSON.parse(readFileSync("./data/places.json", "utf8")).places;
+  eq("không còn quán giữ chỗ trên bản đồ",
+    pj.filter((x) => /chưa đủ dữ liệu/i.test(x.name)).length, 0);
+
+  const P = JSON.parse(readFileSync("./data/prices.json", "utf8")).zones;
+  const Mz = JSON.parse(readFileSync("./data/maps.json", "utf8")).zones;
+  const lech = Object.keys(P).filter((k) => Mz[k] &&
+    (Math.abs(P[k].center[0] - Mz[k].center[0]) > 0.0005 || Math.abs(P[k].center[1] - Mz[k].center[1]) > 0.0005));
+  eq("tâm vùng prices.json khớp maps.json", lech.join(","), "");
+}
+
 /* ── ảnh chọn từ máy (app.js) ────────────────────────────────
 
    Camera bị chặn là hoàn cảnh thật: lỡ bấm "Block", máy để bàn không có

@@ -938,6 +938,10 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
   color:var(--muc-nhat);font-variant-numeric:tabular-nums}
 .bm-pin.sel .glyph{filter:drop-shadow(0 0 0 3px var(--dong)) drop-shadow(0 4px 8px rgba(0,0,0,.4))}
 .bm-pin.sel .lbl{border-color:var(--dong);background:#fff}
+/* placePins() gắn .nolbl cho ghim có nhãn chồng lên một nhãn đã đặt. Ghim
+   vẫn hiện và vẫn bấm được; chỉ viên chữ bị giấu. Ghim đang chọn không bao
+   giờ bị giấu nhãn. */
+.bm-pin.nolbl:not(.sel) .lbl{display:none}
 .bm-pin:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:12px}
 
 /* ── ghim điểm tham quan ────────────────────────────────

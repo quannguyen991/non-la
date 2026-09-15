@@ -79,21 +79,6 @@
    ]
   },
   {
-   "id": "chua-xet",
-   "name": "Quán chưa đủ dữ liệu",
-   "zone": "hoian-oldtown",
-   "tier": "casual",
-   "street": "Nguyễn Thái Học",
-   "known": [
-    "cao-lau",
-    "banh-xeo"
-   ],
-   "at": [
-    15.87665,
-    108.3272
-   ]
-  },
-  {
    "id": "pho-suong",
    "name": "Phở Sướng",
    "zone": "hanoi-hoankiem",
@@ -380,21 +365,6 @@
    "at": [
     16.07,
     108.216
-   ]
-  },
-  {
-   "id": "dn-chua-du",
-   "name": "Quán mới chưa đủ dữ liệu",
-   "zone": "danang-hanriver",
-   "tier": "casual",
-   "street": "Nguyễn Chí Thanh",
-   "known": [
-    "mi-quang",
-    "banh-xeo"
-   ],
-   "at": [
-    16.069,
-    108.2205
    ]
   },
   {

@@ -33,6 +33,9 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v56: KHÔNG thêm tệp — bigmap.js hết đọc trường `fair` đã gỡ (bản đồ xem
+//      trước ẩn sạch ghim), nhãn quán tránh đè nhau; prices.json đặt lại tâm
+//      bốn vùng; places.json bỏ hai quán giữ chỗ.
 // v55: KHÔNG thêm tệp — sights.js vẽ lại icon đền: bản cũ thu nhỏ thành ghim
 //      trông như một người đang quỳ lạy. sights.js nằm trong SHELL, không đổi
 //      số thì máy đã cài app vẫn giữ hình cũ.
@@ -119,7 +122,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v55";
+const CACHE = "nonla-v56";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn

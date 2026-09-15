@@ -1,8 +1,8 @@
 {
- "taoLuc": "2026-09-12",
- "commit": 102,
+ "taoLuc": "2026-09-15",
+ "commit": 108,
  "pheThu": {
-  "pass": 785,
+  "pass": 791,
   "fail": 0
  },
  "vung": 6,
@@ -14,12 +14,12 @@
  "monNgoaiDanhMuc": 187,
  "monCoChuyen": 22,
  "quanOSM": 2481,
- "coSo": 77,
+ "coSo": 75,
  "quanSitemap": 4228,
  "trangQuet": 135125,
  "leCoDinh": 9,
  "moDun": 53,
- "dongJS": 19475,
+ "dongJS": 19561,
  "shell": 71,
  "ngonNgu": 5,
  "llm": {

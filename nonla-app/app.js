@@ -2694,6 +2694,8 @@ function renderMap() {
   if (geo) {
     S.exMap = BigMap.preview({
       host: $("#exCanvas"), geo, places: list, icons: I, me: S.me || null,
+      // Màu ghim theo nhãn suy từ lượt quét thật, cùng nguồn với khay và ô số.
+      lvlOf: (p) => dgOf(p).muc,
     });
     // Ghim vẫn vẽ hết rồi mới ẩn: giữ nguyên khung khít cho cả vùng nên
     // đổi bộ lọc không làm bản đồ nhảy sang một khung nhìn khác.
@@ -4044,7 +4046,7 @@ function openBigMap() {
   $(".tabbar").hidden = true;
   BigMap.open({
     zoneId: S.zone, zone: zone(), geo, places: S.places, icons: I,
-    iconOf: markIcon,
+    iconOf: markIcon, lvlOf: (p) => dgOf(p).muc,
     /* Lọc theo TRƯỜNG `zone` của từng bản ghi, không theo một id ghi cứng.
        Bản trước khoá vào "hoian-oldtown" vì tệp quán ăn chỉ có Hội An; giờ
        nó có cả sáu vùng, và một điều kiện ghi cứng như thế khiến mọi vùng
@@ -4197,6 +4199,7 @@ function openWalk() {
   $(".tabbar").hidden = true;
   BigMap.openRoute({
     zoneId: S.zone, zone: zone(), geo, places: S.places, icons: I, route, iconOf: markIcon,
+    lvlOf: (p) => dgOf(p).muc,
     onOpenStop: null,
   });
 }
