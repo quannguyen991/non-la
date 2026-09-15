@@ -77,6 +77,11 @@ CHE = [
     # nên in địa chỉ cổng ra là mời mọi lượt gọi lạ đổ về đó — cùng lý do
     # đã bỏ nó khỏi web/chat.js.
     (re.compile(r"https?://codex\.[A-Za-z0-9.\-]+(?:/[A-Za-z0-9./\-]*)?"), "cổng AI riêng"),
+    # Tên máy chủ TRẦN, không có https:// phía trước. Mẫu trên chỉ bắt dạng
+    # URL, và bản log 15/09 lọt đúng một lần tên cổng riêng nằm trong một câu
+    # trích từ ghi chú ("Do not advertise the personal proxy codex.…"). Log
+    # này đi lên thư mục Drive mở link — lọt một lần là công khai.
+    (re.compile(r"\bcodex\.[A-Za-z0-9\-]+\.[A-Za-z]{2,}\b"), "cổng AI riêng"),
 ]
 
 

@@ -39,3 +39,10 @@ docs/_sitemap-*.json
 /docs/prompt-log.html
 /docs/prompt-log.md
 /docs/prompt-log.pdf
+
+# Hồ sơ theo mẫu BTC: thông tin đội (ngày sinh, SĐT, email học sinh) KHÔNG lên
+# repo công khai. Chỉ mẫu trống doi-thi.mau.json được commit; bản PDF/HTML dựng
+# ra sẽ chứa thông tin ấy ngay khi docs/doi-thi.json được điền.
+/docs/doi-thi.json
+/docs/ho-so-du-thi-bang-b.html
+/docs/ho-so-du-thi-bang-b.pdf

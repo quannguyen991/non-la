@@ -1,0 +1,13 @@
+{
+  "_note": "MẪU. Chép thành docs/doi-thi.json rồi điền. docs/doi-thi.json bị gitignore vì chứa ngày sinh, số điện thoại và email của học sinh — repo này công khai. Để null thì bản PDF in dòng chấm để điền tay.",
+  "tenDuAn": "Nón Lá",
+  "soThiSinh": null,
+  "thiSinh": [
+    { "hoTen": null, "ngaySinh": null, "lopTruong": null, "xaPhuong": null, "tinhThanh": null, "dienThoai": null, "email": null },
+    { "hoTen": null, "ngaySinh": null, "lopTruong": null, "xaPhuong": null, "tinhThanh": null, "dienThoai": null, "email": null },
+    { "hoTen": null, "ngaySinh": null, "lopTruong": null, "xaPhuong": null, "tinhThanh": null, "dienThoai": null, "email": null }
+  ],
+  "giaoVien": { "hoTen": null, "donVi": null, "chucVu": null, "dienThoai": null, "email": null },
+  "driveLink": null,
+  "noiKy": null
+}

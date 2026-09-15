@@ -1,0 +1,35 @@
+{
+ "luc": "13:26:27 15/9/2026",
+ "commit": {
+  "hash": "f979edc",
+  "dem": "104",
+  "nhanh": "community-v1",
+  "ngay": "2026-09-12 18:47:18 +0700",
+  "sach": false
+ },
+ "url": "http://localhost:3000",
+ "test": {
+  "pass": 785,
+  "fail": 0
+ },
+ "audit": {
+  "total": 229,
+  "passed": 229,
+  "failed": []
+ },
+ "soat": [
+  {
+   "ten": "Hồ sơ ↔ mã nguồn",
+   "ok": true
+  },
+  {
+   "ten": "Bản kê khai công cụ AI ↔ mã nguồn",
+   "ok": true
+  },
+  {
+   "ten": "Bản PDF 12 trang không mất chữ",
+   "ok": true
+  }
+ ],
+ "anh": 5
+}

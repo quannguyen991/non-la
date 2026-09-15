@@ -213,22 +213,35 @@ export async function run({ verbose = true } = {}) {
   ck("đổi tab thì đóng thẻ", !sheetOpen(), "thẻ còn mở đè lên tab mới");
   ck("đổi tab thì tắt viền", edgeLevel() === null, "viền còn: " + edgeLevel());
 
-  /* ── tab Eat: khối tiến cử + danh sách món ──────────── */
-  ck("Eat có khối tiến cử", !!$("#v-eat .eat-hero"));
-  ck("khối tiến cử có dấu Đúng Giá", !!$("#v-eat .eat-hero .seal"));
-  ck("có 3 ô dữ kiện", $$("#v-eat .fact").length === 3);
-  ck("có thanh so giá", !!$("#v-eat .pricecheck"));
-  ck("thanh so giá có nhãn kết luận",
-    !!$("#v-eat .pricecheck .verdict")?.querySelector("svg"));
+  /* ── tab Eat: khối tiến cử + danh sách món ──────────────
+     Khối tiến cử chỉ hiện khi có một cơ sở ĐỦ lượt quét thật (coso.js). Bản
+     trước đòi khối ấy luôn có mặt — tức là đòi đúng thứ dữ liệu bịa đã gỡ
+     ngày 09/09 — và đỏ sáu điểm trên một app đang làm đúng. Nay kiểm HAI
+     nhánh: có cơ sở đạt thì kiểm khối; chưa có thì kiểm màn trống nói ra lý
+     do, và kiểm là KHÔNG có dấu Đúng Giá nào bị dựng lên. */
+  const coTienCu = A.S.places.some((p) => A.dgOf(p).muc === "fair");
+  if (coTienCu) {
+    ck("Eat có khối tiến cử", !!$("#v-eat .eat-hero"));
+    ck("khối tiến cử có dấu Đúng Giá", !!$("#v-eat .eat-hero .seal"));
+    ck("có 3 ô dữ kiện", $$("#v-eat .fact").length === 3);
+    ck("có thanh so giá", !!$("#v-eat .pricecheck"));
+    ck("thanh so giá có nhãn kết luận",
+      !!$("#v-eat .pricecheck .verdict")?.querySelector("svg"));
+    ck("hàng Signature dùng .dish-card", $$("#v-eat .dish-rail .dish-card").length > 0);
+    ck("nút lưu tồn tại", !!$("#v-eat .btn.save"));
+  } else {
+    ck("chưa cơ sở nào đủ lượt quét thì không dựng khối tiến cử", !$("#v-eat .eat-hero"));
+    ck("và không có dấu Đúng Giá nào bị gắn", !$("#v-eat .seal"));
+    ck("màn trống nói ra lý do", /needs \d+ independent scans/.test($("#v-eat").textContent),
+      "thiếu câu giải thích vì sao chưa tiến cử");
+  }
   // Vạch đánh dấu phải nằm trong dải, nếu không thì biểu đồ nói dối.
   const mark = $("#v-eat .pcbar .mark");
   if (mark) {
     const pct = parseFloat(mark.style.left);
     ck("vạch giá nằm trong dải 0–100%", pct >= 0 && pct <= 100, mark.style.left);
   }
-  ck("hàng Signature dùng .dish-card", $$("#v-eat .dish-rail .dish-card").length > 0);
   ck("danh sách dưới dùng CÙNG .dish-card", $$("#v-eat .dish-list .dish-card").length > 0);
-  ck("nút lưu tồn tại", !!$("#v-eat .btn.save"));
 
   const total = $$("#v-eat .dish-list .dish-card").length;
   const dish = $("#v-eat .dish-card[data-dish]");
@@ -349,8 +362,15 @@ export async function run({ verbose = true } = {}) {
   ck("nền bản đồ có vẽ hình", artOn || exVec > 5,
      artOn ? "tranh vẽ tay" : `${exVec} nút vector`);
   ck("bản đồ có ghim", $$("#v-map .ex-pin").length > 0);
-  ck("có thẻ trong khay dưới", $$("#v-map .ex-card").length > 0);
-  ck("có thẻ cảnh báo vượt khoảng", $$("#v-map .alert-card").length > 0);
+  /* Khay mặc định lọc Fair Price. Chưa cơ sở nào đủ lượt quét thật thì khay
+     TRỐNG là đúng — nhưng phải nói ra vì sao, và không được dựng thẻ cảnh báo
+     khi chưa có số đo. Bản trước đòi luôn có thẻ, tức là đòi dữ liệu bịa. */
+  const coFair = A.S.places.some((p) => p.zone === A.S.zone && A.dgOf(p).muc === "fair");
+  const coHigh = A.S.places.some((p) => p.zone === A.S.zone && A.dgOf(p).muc === "high");
+  if (coFair) ck("có thẻ trong khay dưới", $$("#v-map .ex-card").length > 0);
+  else ck("khay trống nói ra lý do", /No fair-price badge/.test($("#v-map .ex-sheet")?.textContent || ""));
+  if (coHigh) ck("có thẻ cảnh báo vượt khoảng", $$("#v-map .alert-card").length > 0);
+  else ck("không dựng thẻ cảnh báo khi chưa có số đo", $$("#v-map .alert-card").length === 0);
 
   // Con số trên thẻ số liệu phải đếm từ chính dữ liệu đang vẽ trên bản đồ.
   // Ghi cứng một con số cho đẹp mockup là biến ô này thành đồ trang trí.
@@ -380,7 +400,7 @@ export async function run({ verbose = true } = {}) {
   // Không được truyền trạng thái chỉ bằng màu: mỗi nhãn phải có icon VÀ chữ.
   const pills = $$("#v-map .pill");
   ck("mọi nhãn trạng thái có icon + chữ",
-    pills.length > 0 && pills.every((p) => p.querySelector("svg") && p.textContent.trim().length > 2),
+    (pills.length > 0 || !coFair) && pills.every((p) => p.querySelector("svg") && p.textContent.trim().length > 2),
     "có nhãn thiếu icon hoặc thiếu chữ");
 
   const seeAll = $("#v-map .act");
@@ -946,8 +966,19 @@ export async function run({ verbose = true } = {}) {
      trình duyệt không tự bấm được, và một phép thử treo ở đó sẽ chặn cả
      lượt chạy. */
   {
-    const bad = A.S.places.find((p) => p.fair === false && p.at && p.zone === A.S.zone);
-    ck("vùng này có chỗ vượt khoảng để cảnh báo", !!bad);
+    const bad = A.S.places.find((p) => A.dgOf(p).muc === "high" && p.at && p.zone === A.S.zone);
+    /* Trước 09/09 đoạn này đọc p.fair — trường gán tay đã gỡ khỏi places.json.
+       Nhãn giờ suy từ lượt quét THẬT (coso.js). Chưa cơ sở nào vượt khoảng thì
+       không có gì để cảnh báo, và phép thử phải kiểm điều NGƯỢC lại: đi ngang
+       qua một quán chưa có số đo thì không bị báo động. */
+    if (!bad) {
+      const cu = A.S.me;
+      const moi = A.S.places.find((p) => p.at && p.zone === A.S.zone);
+      A.S.warned = new Set(); A.S.me = moi?.at || null;
+      A.checkNearby(); await wait(200);
+      ck("chưa có số đo thì đi ngang qua không bị báo động", A.S.warned.size === 0);
+      A.S.me = cu;
+    }
     if (bad) {
       A.S.warned = new Set();
       A.S.me = [bad.at[0] + 0.00035, bad.at[1]];        // ~39 m
