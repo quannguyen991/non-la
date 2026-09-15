@@ -37,8 +37,17 @@ const THU = process.argv.includes("--thu");
    ENOENT, và thông báo lỗi ấy trông y như "chưa cài Vercel CLI". */
 const VERCEL = process.platform === "win32" ? "vercel.cmd" : "vercel";
 
+/* `shell` BẬT cho tệp .cmd trên Windows. Từ bản vá bảo mật của Node (2024),
+   execFileSync gọi thẳng một .cmd/.bat mà không qua shell là ném EINVAL —
+   với stdout/stderr RỖNG. Bản đầu của tệp này mắc đúng chỗ đó: ba cửa in
+   xanh, dòng "đẩy lên Vercel" hiện ra, rồi thoát lặng lẽ không một chữ lỗi,
+   và chưa từng đẩy được lần nào — mọi bản trên Vercel tới lúc ấy đều do gõ
+   tay `vercel deploy`. */
 const chay = (lenh, args, cwd) =>
-  execFileSync(lenh, args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+  execFileSync(lenh, args, {
+    cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
+    shell: /\.cmd$/i.test(lenh),
+  });
 
 const CUA = [
   { ten: "bộ phép thử lõi", lenh: process.execPath, args: ["test.mjs"], cwd: APP },
@@ -72,7 +81,11 @@ let ra = "";
 try {
   ra = chay(VERCEL, ["deploy", "--prod", "--yes"], APP);
 } catch (e) {
-  console.log(`${e.stdout || ""}${e.stderr || ""}`.trim().split("\n").slice(-8).join("\n"));
+  /* Lỗi không kèm đầu ra thì in CHÍNH mã lỗi. In một chuỗi rỗng là đúng
+     cách bản đầu giấu mất lỗi EINVAL ở trên. */
+  const loi = `${e.stdout || ""}${e.stderr || ""}`.trim();
+  console.log(loi ? loi.split("\n").slice(-8).join("\n")
+    : `  *** lệnh vercel hỏng mà không in gì: ${e.code || e.message}`);
   process.exit(1);
 }
 const ban = (/https:\/\/[a-z0-9-]+\.vercel\.app/i.exec(ra) || [])[0];
