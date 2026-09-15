@@ -779,8 +779,14 @@ console.log("\n── artmap: neo tranh vào toạ độ ───────�
   {
     const geo = JSON.parse(readFileSync("./data/maps.json", "utf8")).zones["hoian-oldtown"];
     const tfThat = artTransform(geo.art.anchors, geo.center);
+    /* Bản đồ xem trước ghim 12 quán gần tâm vùng nhất (app.js ganTam) — places.json
+       giờ là hàng trăm quán thật OSM, không phải tám cơ sở dựng sẵn. */
+    const c = geo.center, kx = Math.cos(c[0] * Math.PI / 180);
     const pl = JSON.parse(readFileSync("./data/places.json", "utf8")).places
-      .filter((p) => p.zone === "hoian-oldtown" && p.at).map((p) => p.at);
+      .filter((p) => p.zone === "hoian-oldtown" && p.at)
+      .sort((a, b) => ((a.at[0] - c[0]) ** 2 + ((a.at[1] - c[1]) * kx) ** 2)
+                    - ((b.at[0] - c[0]) ** 2 + ((b.at[1] - c[1]) * kx) ** 2))
+      .slice(0, 12).map((p) => p.at);
     const W = 352, H = 302;
     const cam = [{ l: 288, t: 174, r: 340, b: 288 }, { l: 12, t: 250, r: 128, b: 288 }];
     const art = { w: geo.art.w, h: geo.art.h };
@@ -2336,6 +2342,27 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("app hỏi máy chủ lúc khởi động", /Auth\.thamDo\(\);/.test(app), true);
 }
 
+/* ── quán trên bản đồ là quán THẬT từ OpenStreetMap (places.json) ──
+
+   Từ lúc khởi tạo repo, places.json chứa 77 cơ sở DỰNG SẴN — tên đặt ra,
+   toạ độ chọn tay, món bán gõ tay — cắm lên nền OpenStreetMap thật. Người
+   dùng nhìn bản đồ thấy "không đúng" và chốt: gỡ hết, dùng quán thật. Tệp
+   giờ sinh bằng tools/quan-that-osm.mjs; phép thử này chặn dữ liệu dựng sẵn
+   quay lại, và chặn món bán bị gõ tay thành id không có trong danh mục.  */
+{
+  const pj = JSON.parse(readFileSync("./data/places.json", "utf8")).places;
+  const osmIds = new Set(eateries.map((e) => e.id));
+  eq("mọi quán mang nguồn osm", pj.every((p) => p.src === "osm"), true);
+  eq("mọi quán có trong eateries.json", pj.filter((p) => !osmIds.has(p.id)).length, 0);
+  eq("số quán bằng số quán OSM", pj.length, eateries.length);
+  eq("không còn cơ sở dựng sẵn nào",
+    pj.filter((p) => ["ba-be", "banh-mi-goc", "ben-thanh-stall", "chua-xet", "dn-chua-du"].includes(p.id)).length, 0);
+  const dishIds = new Set(dishes.map((d) => d.id));
+  eq("món suy ra đều có trong danh mục", pj.flatMap((p) => p.known || []).filter((k) => !dishIds.has(k)).length, 0);
+  const idx = JSON.parse(readFileSync("./assets/index.json", "utf8"));
+  eq("không còn ảnh của cơ sở dựng sẵn", (idx.photos || []).length, 0);
+}
+
 /* ── bản đồ đọc nhãn từ lượt quét thật (bigmap.js) ──────────
 
    Trường `fair` bị gỡ khỏi places.json ngày 09/09, nhưng bigmap.js vẫn đọc
@@ -2347,11 +2374,19 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   const bm = readFileSync("./bigmap.js", "utf8");
   const app = readFileSync("./app.js", "utf8");
   eq("bigmap.js không đọc trường fair đã gỡ", /\bp\.fair\b|\.fair\s*===/.test(bm), false);
-  eq("app.js truyền lvlOf cho cả ba lối vào bản đồ",
-    (app.match(/lvlOf:\s*\(p\)\s*=>\s*dgOf\(p\)\.muc/g) || []).length, 3);
+  eq("app.js truyền lvlOf cho cả bốn lối vào bản đồ",
+    (app.match(/lvlOf:\s*\(p\)\s*=>\s*dgOf\(p\)\.muc/g) || []).length, 4);
+  eq("foodmap.js không đọc hai trường fair/scans đã gỡ",
+    /p\.(fair|scans)/.test(readFileSync("./foodmap.js", "utf8")), false);
   eq("bộ lọc không khớp ai thì bản đồ xem trước không bị xoá sạch",
     /const coKhop = P\.places\.some/.test(bm), true);
   eq("nhãn quán có bước tránh đè", /classList\.add\("nolbl"\)/.test(bm), true);
+  /* Quán thật OSM chưa có lượt quét vẽ thành chấm, không phải ghim "?" to —
+     40 dấu hỏi chồng nhau ở phố cổ là thứ người dùng thấy "sao sao". Và ghim
+     quán dựng theo cửa sổ có trần, không dựng cả 562 quán Hoàn Kiếm. */
+  eq("quán chưa có nhãn vẽ thành chấm", /lvl === "unknown" && ctx\.sel !== p\.id/.test(bm), true);
+  eq("chấm có luật CSS riêng", /\.bm-pin\.dot::before\{/.test(readFileSync("./app.css", "utf8")), true);
+  eq("ghim quán có trần dựng", /const PIN_CAP = \d+;/.test(bm) && /ung\.slice\(0, PIN_CAP\)/.test(bm), true);
   eq("nhãn quán né cả hình ghim của quán khác", /hinhGhim\.some\(\(g\) => g\.el !== el/.test(bm), true);
   eq("ghim bị kéo về viền bản đồ xem trước né các nút nổi",
     /querySelectorAll\("\.ex-fabs, \.ex-openlabel"\)/.test(bm) && /s = neCam\(\{/.test(bm), true);

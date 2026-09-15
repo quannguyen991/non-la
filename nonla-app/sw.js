@@ -33,6 +33,9 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v59: places.json giờ là 2.481 QUÁN THẬT từ OpenStreetMap (tools/quan-that-osm.mjs),
+//      77 cơ sở dựng sẵn và 154 ảnh của chúng đã gỡ; bigmap.js dựng ghim quán
+//      theo cửa sổ, foodmap.js hết đọc hai trường đã gỡ.
 // v58: KHÔNG thêm tệp — artmap.js fitArt nhận vùng cấm để ghim không lọt
 //      dưới nút nổi; bigmap.js chừa cột nút phóng to/thu nhỏ khi căn khung.
 // v57: KHÔNG thêm tệp — bigmap.js: nhãn quán né cả hình ghim của quán bên
@@ -126,7 +129,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v58";
+const CACHE = "nonla-v59";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn

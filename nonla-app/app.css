@@ -942,6 +942,13 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
    vẫn hiện và vẫn bấm được; chỉ viên chữ bị giấu. Ghim đang chọn không bao
    giờ bị giấu nhãn. */
 .bm-pin.nolbl:not(.sel) .lbl{display:none}
+/* Quán thật chưa có lượt quét: chấm nhỏ neo ĐÚNG toạ độ (tâm chấm, không
+   phải mũi ghim), vùng chạm vẫn 44px, không nhãn — tên hiện khi chọn. */
+.bm-pin.dot{margin-top:-22px;align-content:center}
+.bm-pin.dot .glyph{display:none}
+.bm-pin.dot::before{content:"";width:12px;height:12px;border-radius:50%;
+  background:#8A7A66;border:2px solid #FBF7EC;box-shadow:0 1px 3px rgba(14,43,36,.45)}
+.bm-pin.dot .lbl{display:none}
 .bm-pin:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:12px}
 
 /* ── ghim điểm tham quan ────────────────────────────────

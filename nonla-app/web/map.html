@@ -62,7 +62,7 @@ const zone = prices.zones[zid];
 const mine = places.places.filter((p) => p.zone === zid && p.at);
 
 document.getElementById("mapLede").textContent =
-  `${mine.length} places tracked in ${(zone.en || zone.name).replace(" · ", ", ")}. `
+  `${mine.length} eateries from OpenStreetMap in ${(zone.en || zone.name).replace(" · ", ", ")}. `
   + "This page shows where they are and what they are known for — not a verdict on their prices.";
 
 /* Chú giải phải khớp với số màu ghim THẬT SỰ vẽ ra. Bản trước liệt kê ba
@@ -130,7 +130,10 @@ function paint() {
 
   stage.querySelectorAll(".mappin").forEach((el) => el.remove());
   if (toImg && geo.art) {
-    for (const p of list) {
+    /* Quán thật OSM có hàng trăm mỗi vùng: ghim tối đa 80 quán, ưu tiên quán
+       suy ra được món — số còn lại vẫn nằm trong danh sách bên dưới. */
+    const ghim = [...list].sort((a, b) => (b.known || []).length - (a.known || []).length).slice(0, 80);
+    for (const p of ghim) {
       const q = toImg(p.at);
       const x = (q.x / geo.art.w) * 100, y = (q.y / geo.art.h) * 100;
       if (x < -2 || x > 102 || y < -2 || y > 102) continue;   // ngoài mép tranh thì bỏ
@@ -146,7 +149,7 @@ function paint() {
     }
   }
 
-  document.getElementById("list").innerHTML = list.map((p) => {
+  document.getElementById("list").innerHTML = list.slice(0, 60).map((p) => {
     /* Tên món viết ra bằng tiếng Việt, không phải id trong tệp: "cao-lau"
        là khoá dữ liệu, người đọc cần thấy "Cao lầu". */
     const named = (p.known || []).map((k) => dishName(k)).filter(Boolean).slice(0, 3);

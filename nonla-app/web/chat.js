@@ -54,7 +54,10 @@ async function buildContext() {
      nhận vào chuỗi "undefined scans" rồi nói lại nó cho khách. Một con số
      hỏng đi qua một mô hình ngôn ngữ thì ra một câu trôi chảy, và đó là
      kiểu sai khó bắt nhất. */
-  const placeLines = places.places.filter((p) => p.zone === zid).map((p) =>
+  /* Hàng trăm quán thật OSM mỗi vùng: đưa hết vào lời hệ thống là tốn token
+     mà không giúp gì. Lấy 40 quán, ưu tiên quán suy ra được món. */
+  const placeLines = places.places.filter((p) => p.zone === zid)
+    .sort((a, b) => (b.known || []).length - (a.known || []).length).slice(0, 40).map((p) =>
     `${p.name} — ${p.street}, ${p.tier}`
     + `${(p.known || []).length ? `, known for ${(p.known || []).map((k) => dishOf(k)?.vi || k).join(", ")}` : ""}`
   ).join("\n");

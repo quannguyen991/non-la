@@ -123,7 +123,7 @@ const zone = prices.zones[zid];
 const sights = (maps.zones[zid]?.landmarks || []).filter((l) => l.note).length;
 document.getElementById("heroZone").textContent = (zone.en || zone.name).split(" · ")[0];
 document.getElementById("statLine").innerHTML =
-  `<b>${mine.length}</b> tracked places · <b>${Object.keys(zone.items).length}</b> dishes priced ·
+  `<b>${mine.length}</b> eateries mapped · <b>${Object.keys(zone.items).length}</b> dishes priced ·
    <b>${sights}</b> sights · updated ${esc(zone.updated || "")}`;
 
 /* Ba chỗ đứng đầu = nhiều lượt quét nhất, không phải "được chọn". */

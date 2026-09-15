@@ -27,6 +27,16 @@ const M = {
   filter: "all", dish: "all", trail: true, mine: false,
   vp: null, tf: null, fit: null, artOK: false, obs: null, rz: 0,
   saved: new Set(),
+  lvlOf: null,
+};
+
+/* Mức giá của quán ĐỌC TỪ app.js (dgOf → coso.js, suy từ lượt quét thật).
+   Bản trước đọc `p.fair` và `p.scans` — hai trường đã gỡ khỏi places.json
+   ngày 09/09 — nên mọi thẻ ghi "0 scans on record" và bộ lọc Fair Price luôn
+   rỗng mà không có dòng lỗi nào. */
+const mucQuan = (p) => {
+  const m = M.lvlOf ? M.lvlOf(p) : null;
+  return m === "fair" ? "ok" : m === "high" ? "bad" : "unknown";
 };
 
 const SAVE_KEY = "nl.food.saved";
@@ -89,8 +99,8 @@ function capability(eateries) {
 function match(p) {
   if (M.dish !== "all" && !(p.known || []).includes(M.dish)) return false;
   switch (M.filter) {
-    case "fair": return p.fair === true;
-    case "local": return M.saved.has(p.id) || p.scans >= 25;
+    case "fair": return mucQuan(p) === "ok";
+    case "local": return M.saved.has(p.id);
     case "river": return !!p.at && nearWater(M.geo, p.at);
     case "night": case "veg": return false;   // chip mờ, không bao giờ chọn được
     default: return true;
@@ -109,9 +119,9 @@ function dishOf(p) {
 
 function pinHTML(p, i) {
   const img = dishOf(p);
-  const lvl = p.fair === true ? "ok" : p.fair === false ? "bad" : "unknown";
-  const badge = p.fair === true ? M.icons.check
-    : p.fair === false ? M.icons.trendUp : M.icons.question;
+  const lvl = mucQuan(p);
+  const badge = lvl === "ok" ? M.icons.check
+    : lvl === "bad" ? M.icons.trendUp : M.icons.question;
   return `<button class="fm-pin" data-fmpin="${esc(p.id)}" data-l="${lvl}"
     aria-label="${esc(p.name)} — ${lvl === "ok" ? "Fair Price" : lvl === "bad" ? "above local range" : "no price data yet"}">
     <span class="disc">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : ""}</span>
@@ -126,9 +136,10 @@ function pinHTML(p, i) {
 function cardHTML(p) {
   const img = dishOf(p);
   const known = (p.known || []).map((k) => M.dishes.find((d) => d.id === k)?.vi || k).join(" · ");
-  const state = p.fair === true
+  const lvl = mucQuan(p);
+  const state = lvl === "ok"
     ? { cls: "ok", icon: M.icons.shield, text: "Fair Price" }
-    : p.fair === false
+    : lvl === "bad"
       ? { cls: "bad", icon: M.icons.trendUp, text: "Above local range" }
       : { cls: "unknown", icon: M.icons.question, text: "No price data yet" };
   return `<button class="fm-card" data-fmpin="${esc(p.id)}">
@@ -136,7 +147,6 @@ function cardHTML(p) {
     <span class="nm">${esc(p.name)}</span>
     <span class="meta">${esc(p.street || "")}${known ? ` · ${esc(known)}` : ""}</span>
     <span class="pill ${state.cls}">${state.icon}${esc(state.text)}</span>
-    <span class="scans">${p.scans || 0} scan${p.scans === 1 ? "" : "s"} on record</span>
   </button>`;
 }
 
@@ -207,9 +217,15 @@ function renderChips() {
 
 /* ── API ─────────────────────────────────────────────────── */
 export function open({ host, geo, places, dishes, eateries = [], assets, icons, zoneId,
-                       zoneName = "", onOpenPlace, onClose }) {
-  Object.assign(M, { host, geo, dishes, icons, onOpenPlace, onClose, assets });
-  M.places = places.filter((p) => p.zone === zoneId && p.at);
+                       zoneName = "", onOpenPlace, onClose, lvlOf = null }) {
+  Object.assign(M, { host, geo, dishes, icons, onOpenPlace, onClose, assets, lvlOf });
+  /* Bản đồ MÓN: chỉ quán suy ra được món (tên quán hoặc thẻ cuisine của OSM),
+     và tối đa 60 quán gần tâm vùng. Quán thật OSM có hàng trăm mỗi vùng;
+     dựng hết thành ghim ảnh món trên một tấm tranh là không đọc được. */
+  const tam = geo?.center || null;
+  M.places = places.filter((p) => p.zone === zoneId && p.at && (p.known || []).length)
+    .map((p) => [tam ? distance(tam, p.at) : 0, p])
+    .sort((a, b) => a[0] - b[0]).slice(0, 60).map((x) => x[1]);
   /* Tên vùng đi vào tiêu đề và alt của tranh. Trước đây cả hai ghi cứng
      "Hội An" — đúng khi app chỉ có một vùng có tranh, nhưng mở màn hình
      này ở Huế thì tiêu đề vẫn khoe hương vị Hội An, và trình đọc màn hình

@@ -2589,6 +2589,17 @@ function showTrip(id) {
     <button class="btn sec" data-act="close">Close</button>`);
 }
 
+/* Quán giờ là quán THẬT từ OpenStreetMap — hàng trăm mỗi vùng. Khay và bản đồ
+   xem trước không được dựng hết: 370 thẻ trong một khay cuộn ngang là không
+   đọc được, 370 ghim trên một khung 350px là một vệt màu. */
+const RAIL_CAP = 12;         // thẻ trong khay Nearby
+const REST_CAP = 24;         // thẻ trong "Everything else nearby"
+const PREVIEW_PINS = 12;     // ghim trên bản đồ xem trước
+/** n quán gần `tam` nhất. Không phải "quán hay nhất": đo khoảng cách, không xếp hạng. */
+const ganTam = (ds, tam, n) => ds.filter((x) => x.at)
+  .map((x) => [tam ? distance(tam, x.at) : 0, x])
+  .sort((a, b) => a[0] - b[0]).slice(0, n).map((x) => x[1]);
+
 function renderMap() {
   S.exMap?.destroy();
   S.exMap = null;
@@ -2663,9 +2674,10 @@ function renderMap() {
           ${S.showAll ? "Show less" : "See all"}${I.chevron}</button>
       </div>
       ${matched.length
-        ? `<div class="ex-rail" id="trustRail">${matched.map(exCardHTML).join("")}</div>
+        ? `<div class="ex-rail" id="trustRail">${matched.slice(0, RAIL_CAP).map(exCardHTML).join("")}</div>
            <div class="rail-dots" id="railDots" aria-hidden="true">
-             ${matched.map((_, i) => `<i class="${i === 0 ? "on" : ""}"></i>`).join("")}</div>`
+             ${matched.slice(0, RAIL_CAP).map((_, i) => `<i class="${i === 0 ? "on" : ""}"></i>`).join("")}</div>
+           ${matched.length > RAIL_CAP ? `<p class="ex-empty">${I.clock}Showing ${RAIL_CAP} of ${matched.length} — open the full map for the rest.</p>` : ""}`
         : `<p class="ex-empty">${I.clock}${esc(F.empty)}</p>`}
       ${walkTeaserHTML()}
     </div>
@@ -2679,7 +2691,8 @@ function renderMap() {
       <span class="rule" aria-hidden="true"></span>
       <span class="note">${I.clock}Still checking…</span>
     </div>
-    <div class="mini-grid">${rest.map(miniCardHTML).join("")}</div>` : ""}
+    <div class="mini-grid">${rest.slice(0, REST_CAP).map(miniCardHTML).join("")}</div>
+    ${rest.length > REST_CAP ? `<p class="ex-empty">${I.clock}${rest.length - REST_CAP} more OpenStreetMap eateries here — open the full map to see them.</p>` : ""}` : ""}
 
     ${premiumSectionHTML()}
 
@@ -2693,7 +2706,9 @@ function renderMap() {
   const geo = S.maps[S.zone];
   if (geo) {
     S.exMap = BigMap.preview({
-      host: $("#exCanvas"), geo, places: list, icons: I, me: S.me || null,
+      /* 12 quán gần tâm vùng nhất — không phải cả 370. Bản đồ chi tiết mới là
+         nơi xem hết, theo cửa sổ. */
+      host: $("#exCanvas"), geo, places: ganTam(list, geo.center, PREVIEW_PINS), icons: I, me: S.me || null,
       // Màu ghim theo nhãn suy từ lượt quét thật, cùng nguồn với khay và ô số.
       lvlOf: (p) => dgOf(p).muc,
     });
@@ -4028,7 +4043,7 @@ function openFoodMap() {
   $(".tabbar").hidden = true;
   FoodMap.open({
     host: $("#v-foodmap"), geo, zoneId: S.zone, zoneName: zoneEn().replace(" · ", " "),
-    places: S.places, dishes: S.dishes,
+    places: S.places, dishes: S.dishes, lvlOf: (p) => dgOf(p).muc,
     // Chỉ quán của vùng đang mở. Trước đây truyền cả tệp — đúng khi tệp
     // chỉ có Hội An, nhưng giờ nó có sáu vùng, và bộ lọc "mở buổi tối"
     // sẽ bật lên nhờ giờ mở cửa của một quán ở Hà Nội.
@@ -4052,7 +4067,8 @@ function openBigMap() {
        nó có cả sáu vùng, và một điều kiện ghi cứng như thế khiến mọi vùng
        thêm sau im lặng mất lớp này mà không có gì báo lên. Vùng nào chưa
        có quán nào thì mảng rỗng, chip Eateries tự không hiện. */
-    eateries: (S.eateries || []).filter((e) => e.zone === S.zone),
+    // Lớp quán ăn OSM riêng đã trùng với lớp quán (places.json sinh từ OSM).
+    eateries: [],
     onOpenPlace: (id, m) => showPlace(id, m),
     onOpenMark: (lm, m) => showMark(lm, m),
     onOpenEat: (e, m) => showEatery(e, m),
@@ -4326,7 +4342,10 @@ function needAuth() {
 }
 
 function openComposer(placeId = "") {
-  openSheet(Community.composer({ places: S.places, dishes: S.dishes, place: placeId }));
+  openSheet(Community.composer({
+    // Hàng trăm quán thật mỗi vùng: chỉ liệt kê vùng đang mở (và quán đang chọn).
+    places: S.places.filter((p) => p.zone === S.zone || p.id === placeId),
+    dishes: S.dishes, place: placeId }));
   /* composer() chỉ dựng #cfDish MỘT LẦN lúc mở, theo đúng placeId truyền vào lúc
      đó. Đường vào từ tab Community luôn mở với placeId="", nên nếu không nghe
      sự kiện đổi Place thì #cfDish đứng yên ở "—" mãi mãi — đúng cái làm mất hẳn
@@ -5183,18 +5202,11 @@ async function boot() {
       key: d.id, group: "food", label: d.vi,
       subject: `a Vietnamese dish of ${d.en || d.vi}${d.desc ? `, ${d.desc}` : ""}`,
     })),
-    /* Ảnh cơ sở: KHÔNG đưa tên quán vào prompt. Mô hình sẽ vẽ tên đó lên
-       biển hiệu, và một tấm ảnh có biển tên giả là nói dối người dùng về
-       nơi họ sắp bước vào. Chỉ tả loại hình và con phố. */
-    /* Mọi vùng, không chỉ vùng đang mở: đăng ký chạy đúng một lần lúc
-       khởi động, nên lọc theo S.zone ở đây nghĩa là đổi sang Hà Nội thì
-       cơ sở bên đó vĩnh viễn không có mục ảnh nào. */
-    ...S.places.map((p) => ({
-      key: `place:${p.id}`, group: "photo", label: p.name,
-      subject: `a ${p.tier === "street" ? "street-side food stall" : "small casual eatery"}`
-        + ` on ${p.street} in the Hoi An old town, serving `
-        + p.known.map((k) => S.dishes.find((d) => d.id === k)?.en || k).join(" and "),
-    })),
+    /* KHÔNG đăng ký ảnh sinh cho từng quán nữa. places.json giờ là QUÁN THẬT
+       từ OpenStreetMap: sinh một tấm ảnh "quán ăn nhỏ trên phố X" rồi gắn lên
+       một quán có tên thật là cho người dùng xem một mặt tiền không có thật
+       của nơi họ sắp bước vào. Bản trước còn ghi cứng "in the Hoi An old town"
+       cho cả quán ở Hà Nội. Thẻ quán dùng khung giấy trống khi không có ảnh. */
   ]);
   // Ảnh của những lần chạy trước — người dùng đã trả tiền rồi, không sinh lại.
   // onChange bên trong restore() đã tự vẽ lại Icon Studio nếu đang mở.

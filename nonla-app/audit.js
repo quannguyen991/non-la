@@ -540,14 +540,23 @@ export async function run({ verbose = true } = {}) {
     ck("mở được bản đồ chi tiết", !$("#v-bigmap").hidden);
     ck("thanh nav nhường chỗ cho bản đồ", $(".tabbar").hidden);
     ck("nền bản đồ có vẽ hình", ($("#bmBase")?.children.length || 0) > 5);
+    /* Quán giờ là quán thật OSM, hàng trăm mỗi vùng: ở mức thu xa bản đồ chỉ
+       vẽ quán có nhãn giá và dòng đếm ghi "— zoom in". Phóng tới khi ghim
+       quán hiện ra rồi mới kiểm lớp ghim — tối đa bốn nấc. */
+    ck("mức thu xa thì dòng đếm nói ra phần bị giấu",
+      $$("#bmPins .bm-pin").length > 0 || /zoom in/.test($("#bmCount")?.textContent || ""),
+      $("#bmCount")?.textContent);
+    for (let n = 0; n < 4 && !$$("#bmPins .bm-pin").length; n++) {
+      click('[data-act="bmIn"]'); await wait(260);
+    }
     ck("bản đồ có ghim", $$("#bmPins .bm-pin").length > 0);
     ck("có thanh tỉ lệ", !!$("#bmScale i")?.textContent);
     ck("có ghi chú nguồn bản đồ", !!$(".bm-attr"));
 
     // Phóng phải thực sự đổi hình chiếu, không chỉ đổi con số.
-    const p0 = $("#bmPins .bm-pin").style.transform;
+    const p0 = $("#bmPins .bm-pin")?.style.transform;
     click('[data-act="bmIn"]'); await wait(220);
-    ck("phóng to đổi vị trí ghim", $("#bmPins .bm-pin").style.transform !== p0);
+    ck("phóng to đổi vị trí ghim", !!p0 && $("#bmPins .bm-pin")?.style.transform !== p0);
     click('[data-act="bmOut"]'); await wait(220);
 
     const all = $$("#bmPins .bm-pin").filter((e) => !e.hidden).length;

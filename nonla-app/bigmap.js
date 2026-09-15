@@ -529,7 +529,12 @@ function pinFor(p, ctx = M) {
   const svg = lvl === "bad" ? I.mapPinAlert("#B0201A")
     : lvl === "ok" ? I.mapPin("#0E4A3C") : I.mapPinUnknown("#8A7A66");
   const d = ctx.me ? fmtDistance(distance(ctx.me, p.at)) : "";
-  return `<button class="bm-pin ${ctx.sel === p.id ? "sel" : ""}" data-pin="${esc(p.id)}"
+  /* Quán thật OSM chưa có lượt quét nào thì KHÔNG có gì để nói về giá: vẽ ghim
+     "?" to cho từng quán thì phố cổ thành một đống dấu hỏi chồng lên nhau.
+     Nên quán chưa có nhãn là một chấm nhỏ (vẫn chạm được, vùng chạm 44px);
+     ghim to dành cho quán có nhãn sinh từ lượt quét thật và quán đang chọn. */
+  const cham = lvl === "unknown" && ctx.sel !== p.id;
+  return `<button class="bm-pin ${ctx.sel === p.id ? "sel" : ""}${cham ? " dot" : ""}" data-pin="${esc(p.id)}"
     data-lvl="${lvl}" aria-label="${esc(p.name)}${d ? `, ${d} away` : ""}">
     <span class="glyph">${svg}</span>
     <span class="lbl">${esc(p.name)}${d ? `<i>${esc(d)}</i>` : ""}</span>
@@ -598,17 +603,49 @@ function visibleMarks() {
   return (M.geo?.landmarks || []).map((lm, i) => (keep(lm) ? i : -1)).filter((i) => i >= 0);
 }
 
+/* Trần ghim quán dựng cùng lúc — cùng lý do và cùng con số với lớp quán ăn
+   OSM ở trên. */
+const PIN_CAP = 40;
+
 function placePins() {
   const layer = $("#bmPins");
-  if (!layer) return;
+  if (!layer || !M.vp) return;
+
+  /* GHIM QUÁN VẼ THEO CỬA SỔ. places.json giờ là QUÁN THẬT từ OpenStreetMap
+     — 370 quán ở phố cổ Hội An, 562 ở Hoàn Kiếm — chứ không còn tám cơ sở
+     dựng sẵn. Dựng hết thành nút DOM thì bản đồ là một vệt ghim và giật khi
+     kéo. Nên chỉ dựng quán đang nằm trong khung, tối đa PIN_CAP, và quán
+     CHƯA có nhãn giá chỉ hiện khi đã phóng đủ gần (cùng ngưỡng với lớp quán
+     ăn). Quán có nhãn — sinh từ lượt quét thật — và quán đang chọn thì luôn
+     hiện. Dòng đếm nói ra phần bị giấu, xem updateCount(). */
+  /* Không chặn theo mức phóng: scale là pixel/mét, 1,15 là cỡ một con phố
+     trên cả màn hình — chặn ở đó thì mở bản đồ không thấy quán nào. Thay vào
+     đó lấy quán trong khung, ưu tiên quán có nhãn, quán đang chọn, rồi quán
+     gần tâm màn hình nhất, cắt ở PIN_CAP. */
+  const keep = MARK_ONLY.has(M.filter) ? [] : visible();
+  const cx = M.vp.w / 2, cy = M.vp.h / 2;
+  const ung = [];
+  for (const p of keep) {
+    const q = proj(p.at, PIN_LIFT);
+    if (q.x < -60 || q.x > M.vp.w + 60 || q.y < -60 || q.y > M.vp.h + 60) continue;
+    const uu = p.id === M.sel ? -2e9 : mucOf(p) != null ? -1e9 : 0;
+    ung.push([uu + (q.x - cx) ** 2 + (q.y - cy) ** 2, p]);
+  }
+  ung.sort((a, b) => a[0] - b[0]);
+  const vis = ung.slice(0, PIN_CAP).map((x) => x[1]);
+  M._pinShown = vis.length;
+  M._pinCapped = ung.length > PIN_CAP;
+  const key = `${vis.map((p) => p.id).join(",")}|${M.sel || ""}`;
+  if (key !== M._pinKey) {
+    M._pinKey = key;
+    layer.innerHTML = vis.map((p) => pinFor(p)).join("");
+  }
   for (const el of layer.children) {
     const p = M.places.find((x) => x.id === el.dataset.pin);
     if (!p) continue;
     const s = proj(p.at, PIN_LIFT);
     el.style.transform = `translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)`;
-    // ẩn ghim ra ngoài khung thay vì để trình duyệt vẽ rồi cắt
-    el.style.visibility =
-      (s.x < -60 || s.x > M.vp.w + 60 || s.y < -60 || s.y > M.vp.h + 60) ? "hidden" : "";
+    el.style.visibility = "";
   }
 
   /* NHÃN KHÔNG ĐƯỢC ĐÈ NHAU. Ở phố cổ tám quán nằm trong vài trăm mét, và
@@ -765,7 +802,7 @@ function paint() {
   placeStops();
   // Số quán hiện được đổi theo từng lần kéo/phóng, nên dòng đếm phải cập
   // nhật ở đây chứ không chỉ lúc đổi bộ lọc.
-  if (M.showEat) updateCount();
+  if (M.showEat || !!M._pinCapped !== M._pinCappedShown) updateCount();
   const sb = M.vp.scaleBar(110);
   const bar = $("#bmScale");
   if (bar) {
@@ -913,11 +950,19 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
   // vào chẳng ra gì.
   M.eateries = eateries;
   M._eatKey = "";
+  M._pinKey = ""; M._pinShown = 0;
   // Nhà thật nạp SAU, không chặn lần vẽ đầu — xem ensureBuildings().
   ensureBuildings(geo, zoneId, () => { if (M.geo === geo) paint(); });
 
   const view = $("#v-bigmap");
-  const pts = M.places.map((p) => p.at);
+  /* Khít theo 12 quán GẦN TÂM VÙNG nhất, không phải mọi quán. places.json giờ
+     là quán thật OSM trải khắp vùng (370 quán ở Hội An, rải tới tận An Bàng):
+     khít theo cả cụm thì bản đồ mở ở mức thu rất xa, dưới ngưỡng hiện ghim
+     quán, và bốn lần bấm "+" vẫn không thấy ghim nào. */
+  const tam = geo.center, kx = Math.cos(tam[0] * Math.PI / 180);
+  const d2 = (a) => (a[0] - tam[0]) ** 2 + ((a[1] - tam[1]) * kx) ** 2;
+  const pts = M.places.filter((p) => p.at && (!zoneId || p.zone === zoneId))
+    .map((p) => p.at).sort((a, b) => d2(a) - d2(b)).slice(0, 12);
   const bounds = boundsOf(pts.length ? pts : [geo.center]);
 
   view.innerHTML = `
@@ -928,7 +973,7 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
         role="group" aria-label="Sights and landmarks"
         >${(geo.landmarks || []).map(markFor).join("")}</div>
       <div class="bm-eat" id="bmEat" role="group" aria-label="Eateries" hidden></div>
-      <div class="bm-pins" id="bmPins">${M.places.map((p) => pinFor(p)).join("")}</div>
+      <div class="bm-pins" id="bmPins"></div>
       <div class="bm-me" id="bmMe" hidden aria-hidden="true"><i></i></div>
     </div>
 
@@ -1181,9 +1226,14 @@ export function close() {
    và lớp quán ăn có TRẦN HIỂN THỊ — cắt bớt mà không nói ra thì người
    dùng đọc "90 eateries" rồi tưởng phố cổ chỉ có 90 quán. */
 function updateCount() {
+  M._pinCappedShown = !!M._pinCapped;
   const el = $("#bmCount");
   if (!el) return;
-  const bits = [`${M._keep ?? M.places.length} place${(M._keep ?? M.places.length) === 1 ? "" : "s"}`];
+  /* Ở mức thu xa, quán chưa có nhãn không được vẽ (placePins). Dòng đếm phải
+     nói ra, không thì người dùng thấy "370 places" mà bản đồ trống ghim. */
+  const nKeep = M._keep ?? M.places.length;
+  const xa = !!M._pinCapped;
+  const bits = [`${nKeep} place${nKeep === 1 ? "" : "s"}${xa ? " — zoom in" : ""}`];
   const sights = M._keepMark ?? (M.geo?.landmarks || []).length;
   if (sights) bits.push(`${sights} sight${sights === 1 ? "" : "s"}`);
   if (M.showEat) {
@@ -1197,7 +1247,9 @@ function updateCount() {
 export function setFilter(k) {
   M.filter = k;
   const keep = MARK_ONLY.has(k) ? new Set() : new Set(visible().map((p) => p.id));
-  for (const el of $("#bmPins").children) el.hidden = !keep.has(el.dataset.pin);
+  // Ghim quán dựng theo cửa sổ nên không ẩn/hiện từng nút sẵn có: xoá khoá
+  // để placePins() ở cuối hàm dựng lại đúng tập đang lọc.
+  M._pinKey = "";
   /* Bộ lọc giờ lọc CẢ mốc tham quan. Trước đây nó chỉ đụng tới ghim giá,
      nên chọn "Cultural Sights" mà ghim quán vẫn nằm nguyên — lọc mà không lọc. */
   const keepMark = new Set(visibleMarks());
@@ -1303,7 +1355,7 @@ export function locate() {
         const far = distance(M.me, M.zone.center) > 20000;
         if (!far) M.vp.centerOn(M.me);
         // Vẽ lại cả hai lớp: có vị trí rồi thì mỗi ghim mọc thêm khoảng cách.
-        $("#bmPins").innerHTML = M.places.map((p) => pinFor(p)).join("");
+        M._pinKey = "";   // dựng lại ghim để dòng "cách X m" theo vị trí mới
         $("#bmMarks").innerHTML = (M.geo?.landmarks || []).map(markFor).join("");
         setFilter(M.filter);
         paint();
