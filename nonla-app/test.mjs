@@ -766,6 +766,36 @@ console.log("\n── artmap: neo tranh vào toạ độ ───────�
   ok("cụm ghim lệch vẫn nằm trọn trong khung",
     on.every((p) => p.x >= 22 && p.x <= 354 - 22 && p.y >= 22 && p.y <= 304 - 22),
     on.map((p) => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" · "));
+
+  /* VÙNG CẤM. Ở bản đồ xem trước, hến Cồn Cẩm Nam — một quán thật nằm trong
+     tranh — rơi đúng vào dưới nút định vị: thấy một mẩu dấu hỏi, bấm không
+     tới. Dời ghim thì nói sai chỗ quán, nên fitArt phải chọn mức phóng và vị
+     trí tranh sao cho ghim tránh được cột nút. Khung và cột nút lấy đúng số
+     đo thật: 354×304, nút cách mép phải 12px, cách đáy 14px, 52px × 114px. */
+  /* Bản đầu của phép thử này dựng phép chiếu từ bộ mốc của bài thử phía
+     trên, không phải từ maps.json — nên nó ĐẠT trong khi trang thật vẫn để
+     ghim nằm dưới nút. Giờ dùng đúng tranh, đúng mốc, đúng khung 352×302 và
+     hai vùng cấm đo trên trang (cột nút nổi, nhãn "Open full map"). */
+  {
+    const geo = JSON.parse(readFileSync("./data/maps.json", "utf8")).zones["hoian-oldtown"];
+    const tfThat = artTransform(geo.art.anchors, geo.center);
+    const pl = JSON.parse(readFileSync("./data/places.json", "utf8")).places
+      .filter((p) => p.zone === "hoian-oldtown" && p.at).map((p) => p.at);
+    const W = 352, H = 302;
+    const cam = [{ l: 288, t: 174, r: 340, b: 288 }, { l: 12, t: 250, r: 128, b: 288 }];
+    const art = { w: geo.art.w, h: geo.art.h };
+    const f3 = fitArt({ tf: tfThat, art, points: pl, view: { w: W, h: H }, pad: 26, avoid: cam });
+    const tren = pl.filter((ll) => f3.onArt(tfThat.toImage(ll))).map((ll) => f3.toScreen(tfThat.toImage(ll)));
+    const lot = tren.filter((p) => cam.some((v) => p.x + 22 > v.l && p.x - 22 < v.r && p.y > v.t && p.y - 52 < v.b));
+    ok("không ghim nào trong tranh nằm dưới nút nổi hay nhãn mở bản đồ", lot.length === 0,
+      lot.map((p) => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" · "));
+    ok("và mọi ghim vẫn nằm trong khung",
+      tren.every((p) => p.x >= 0 && p.x <= W && p.y >= 0 && p.y <= H),
+      tren.map((p) => `${p.x.toFixed(0)},${p.y.toFixed(0)}`).join(" · "));
+    const cu = fitArt({ tf: tfThat, art, points: pl, view: { w: W, h: H }, pad: 26 });
+    ok("không truyền vùng cấm thì tranh vẫn phủ kín khung như cũ",
+      art.w * cu.k + cu.ox >= W - 1e-6 && art.h * cu.k + cu.oy >= H - 1e-6 && cu.ox <= 1e-6 && cu.oy <= 1e-6);
+  }
 }
 
 console.log("\n── citymap: kết cấu bản đồ chi tiết ─────────");
@@ -2322,6 +2352,9 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("bộ lọc không khớp ai thì bản đồ xem trước không bị xoá sạch",
     /const coKhop = P\.places\.some/.test(bm), true);
   eq("nhãn quán có bước tránh đè", /classList\.add\("nolbl"\)/.test(bm), true);
+  eq("nhãn quán né cả hình ghim của quán khác", /hinhGhim\.some\(\(g\) => g\.el !== el/.test(bm), true);
+  eq("ghim bị kéo về viền bản đồ xem trước né các nút nổi",
+    /querySelectorAll\("\.ex-fabs, \.ex-openlabel"\)/.test(bm) && /s = neCam\(\{/.test(bm), true);
 
   const pj = JSON.parse(readFileSync("./data/places.json", "utf8")).places;
   eq("không còn quán giữ chỗ trên bản đồ",

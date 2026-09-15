@@ -78,7 +78,11 @@ export function artTransform(anchors, center) {
  * sát mép và làm mờ đi, kèm nhãn nói rõ nó nằm ngoài tranh. Người dùng
  * vẫn đếm đủ, và không màn hình nào trông như hỏng.
  */
-export function fitArt({ tf, art, points, view, pad = 34, maxUpscale = 2.2 }) {
+/* `avoid`: những hộp {l,t,r,b} theo toạ độ khung mà ghim KHÔNG được rơi vào
+   — nút nổi, nhãn đè lên bản đồ. Ghim đúng toạ độ mà nằm dưới nút định vị thì
+   nhìn thấy một mẩu, bấm không tới; dời ghim đi thì nói sai chỗ quán. Nên cách
+   duy nhất đúng là chọn mức phóng và vị trí tranh sao cho ghim tránh được. */
+export function fitArt({ tf, art, points, view, pad = 34, maxUpscale = 2.2, avoid = [] }) {
   if (!tf || !art) return null;
   const w = view.w, h = view.h;
   const all = points.map((ll) => tf.toImage(ll));
@@ -108,9 +112,13 @@ export function fitArt({ tf, art, points, view, pad = 34, maxUpscale = 2.2 }) {
     oy = Math.min(0, Math.max(h - art.h * k, oy));
     return { k, ox, oy };
   };
-  const fits = ({ k, ox, oy }) => imgPts.every((p) =>
+  const fitsKhung = ({ k, ox, oy }) => imgPts.every((p) =>
     p.x * k + ox >= pad * 0.6 && p.x * k + ox <= w - pad * 0.6
     && p.y * k + oy >= pad * 0.6 && p.y * k + oy <= h - pad * 0.6);
+  // Hộp ghim 44×52 neo ở mũi nhọn: [x−22, y−52] → [x+22, y].
+  const trungCam = (x, y) => avoid.some((v) => x + 22 > v.l && x - 22 < v.r && y > v.t && y - 52 < v.b);
+  const fits = (c) => fitsKhung(c)
+    && imgPts.every((p) => !trungCam(p.x * c.k + c.ox, p.y * c.k + c.oy));
 
   /* Mức phóng không tăng đơn điệu về phía "vừa": phóng to vừa tạo thêm
      khoảng trượt để kéo cụm ghim về giữa, vừa làm chính cụm ấy to ra. Hai
@@ -132,10 +140,35 @@ export function fitArt({ tf, art, points, view, pad = 34, maxUpscale = 2.2 }) {
     const miss = imgPts.reduce((s, p) => {
       const x = p.x * k + cand.ox, y = p.y * k + cand.oy;
       return s + Math.max(0, pad * 0.6 - x) + Math.max(0, x - (w - pad * 0.6))
-        + Math.max(0, pad * 0.6 - y) + Math.max(0, y - (h - pad * 0.6));
+        + Math.max(0, pad * 0.6 - y) + Math.max(0, y - (h - pad * 0.6))
+        + (trungCam(x, y) ? 40 : 0);
     }, 0);
     if (miss < bestMiss) { bestMiss = miss; out = cand; }
     if (k >= maxUpscale) break;
+  }
+
+  /* NÉ VÙNG CẤM BẰNG CÁCH NHƯỜNG PHẦN PHỦ KÍN. Đo thật ở Hội An: hến Cồn Cẩm
+     Nam nằm ở góc dưới phải của tranh. Phép kẹp giữ tranh phủ kín khung nên
+     góc ấy luôn dính vào góc khung — đúng chỗ nút định vị; phóng to thêm chỉ
+     đẩy ghim ra ngoài. Không mức phóng nào vừa phủ kín vừa né được nút.
+     Vậy khi mép khung đã ổn mà chỉ còn vướng vùng cấm: thu nhỏ dần dưới mức
+     phủ kín và trượt tranh ra khỏi phép kẹp, lấy phương án ĐẦU TIÊN né được.
+     Mép hở lộ ra lớp lót mờ của chính tấm tranh (xem paintArt), và ghim vẫn
+     nằm đúng toạ độ trên tranh — không ghim nào bị dời. */
+  if (avoid.length && fitsKhung(out) && !fits(out)) {
+    let ne = null;
+    for (let i = 0; i <= 10 && !ne; i++) {
+      const k = out.k * (1 - i * 0.03);
+      const ox0 = w / 2 - cx * k, oy0 = h / 2 - cy * k;
+      for (const d of [0, 12, 24, 36, 48, 64, 80]) {
+        for (const [dx, dy] of [[-d, 0], [0, -d], [-d, -d], [d, 0], [0, d]]) {
+          const c = { k, ox: ox0 + dx, oy: oy0 + dy };
+          if (fits(c)) { ne = { ...c, uncovered: true }; break; }
+        }
+        if (ne) break;
+      }
+    }
+    if (ne) out = ne;
   }
 
   /* Cụm ghim NẰM TRÊN TRANH mà vẫn không có mức phóng nào vừa phủ kín
@@ -148,7 +181,9 @@ export function fitArt({ tf, art, points, view, pad = 34, maxUpscale = 2.2 }) {
      Khác hẳn trường hợp ghim NGOÀI mép giấy: cái đó đã bị loại khỏi
      imgPts ở trên, vì không mức phóng nào kéo nó vào được và để nó ở lại
      thì cả tấm tranh bị thu nhỏ lại vô ích. */
-  if (imgPts.length >= 2 && !fits(out)) {
+  /* Chỉ xét MÉP KHUNG ở đây, không xét vùng cấm: né được nút nổi là điều nên
+     có, còn nhường phần phủ kín tranh chỉ đáng khi ghim thật sự lòi ra ngoài. */
+  if (imgPts.length >= 2 && !fitsKhung(out)) {
     const k = Math.min(maxUpscale, want);
     out = { k, ox: w / 2 - cx * k, oy: h / 2 - cy * k, uncovered: true };
   }

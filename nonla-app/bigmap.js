@@ -622,13 +622,21 @@ function placePins() {
     .filter((el) => !el.hidden && el.style.visibility !== "hidden")
     .sort((a, b) => Number(b.classList.contains("sel")) - Number(a.classList.contains("sel")));
   for (const el of hien) el.classList.remove("nolbl");
+  /* Nhãn cũng không được nằm dưới HÌNH GHIM của một quán khác. Tránh đè giữa
+     các nhãn thôi là chưa đủ: ở phố cổ "Cô Thảo · Cơm gà" vẫn bị hình ghim
+     của quán bên cạnh — cùng lớp, vẽ sau — cắt mất nửa chữ. Lớp mốc tham quan
+     thì nằm DƯỚI lớp ghim nên không che được nhãn, không cần tính. */
+  const hinhGhim = hien.map((el) => ({ el, r: el.querySelector(".glyph")?.getBoundingClientRect() }))
+    .filter((g) => g.r);
+  const cham = (r, b, px = 4, py = 2) =>
+    r.left < b.right + px && b.left < r.right + px && r.top < b.bottom + py && b.top < r.bottom + py;
   const daDat = [];
   for (const el of hien) {
     const lb = el.querySelector(".lbl");
     if (!lb) continue;
     const r = lb.getBoundingClientRect();
-    const de = daDat.some((b) => r.left < b.right + 4 && b.left < r.right + 4
-      && r.top < b.bottom + 2 && b.top < r.bottom + 2);
+    const de = daDat.some((b) => cham(r, b))
+      || hinhGhim.some((g) => g.el !== el && cham(r, g.r, 0, 0));
     if (de && !el.classList.contains("sel")) el.classList.add("nolbl");
     else daDat.push(r);
   }
@@ -977,7 +985,11 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
     const mid = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
     M.vp.centerOn(mid);
     const box = M.vp.toScreenBox(bounds);
-    const k = Math.min((M.vp.w - 70) / (box.w || 1), (M.vp.h - 360) / (box.h || 1));
+    /* Bề ngang chừa 160 chứ không phải 70: cột nút phóng to/thu nhỏ đứng giữa
+       mép phải (44px, cách mép 12px). Chừa 70 thì quán ở rìa đông — hến Cồn
+       Cẩm Nam — rơi đúng vào dưới nút "−". Khung vẫn căn giữa, nên cần chừa
+       gấp đôi bề rộng cột nút cộng nửa bề ngang ghim. */
+    const k = Math.min((M.vp.w - 160) / (box.w || 1), (M.vp.h - 360) / (box.h || 1));
     if (Number.isFinite(k) && k > 0) M.vp.zoomAt(k, M.vp.w / 2, M.vp.h / 2);
     M.vp.centerOn(mid);
   }
@@ -1407,6 +1419,24 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30, lvlOf
     const bw = r.width || 340, bh = r.height || 240;
     const EDGE = 20;                       // chừa đủ cho nửa bề ngang ghim
 
+    /* Vùng CẤM của ghim bị kéo về viền: hai nút nổi góc phải dưới và nhãn
+       "Open full map" góc trái dưới nằm TRÊN bản đồ. Ghim Cồn Cẩm Nam — ngoài
+       mép tranh — bị kẹp đúng vào góc phải dưới và lọt xuống dưới nút định vị:
+       nhìn thấy một mẩu dấu hỏi, bấm không tới. Đo trong trang, theo toạ độ
+       của khung bản đồ, vì hai phần tử ấy không nằm trong `host`. */
+    const vungCam = [...(host.parentElement?.querySelectorAll(".ex-fabs, .ex-openlabel") || [])]
+      .map((e) => e.getBoundingClientRect())
+      .filter((b) => b.width && b.height)
+      .map((b) => ({ l: b.left - r.left, t: b.top - r.top, r: b.right - r.left, b: b.bottom - r.top }));
+    // Hộp ghim 44×52 neo ở mũi nhọn: [x−22, y−52] → [x+22, y].
+    const neCam = (s) => {
+      for (const v of vungCam) {
+        if (s.x + 22 <= v.l || s.x - 22 >= v.r || s.y <= v.t || s.y - 52 >= v.b) continue;
+        s = { x: s.x, y: Math.max(EDGE + 32, v.t - 4) };   // nhấc lên trên vùng cấm
+      }
+      return s;
+    };
+
     for (const el of layer.children) {
       const p = P.places.find((x) => x.id === el.dataset.place);
       if (!p) continue;
@@ -1421,10 +1451,10 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30, lvlOf
          vẫn bấm được, nhưng không giả vờ đang chỉ vào một mái nhà nào. */
       const off = P.fit && !P.fit.onArt(P.tf.toImage(p.at));
       if (off) {
-        s = {
+        s = neCam({
           x: Math.max(EDGE, Math.min(bw - EDGE, s.x)),
           y: Math.max(EDGE + 32, Math.min(bh - EDGE, s.y)),
-        };
+        });
         el.dataset.off = "1";
         el.setAttribute("aria-label", `${el.dataset.label}, beyond the edge of this map`);
       } else if (el.dataset.off) {
@@ -1456,7 +1486,13 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30, lvlOf
        sông Hàn ở lề 34 thì hở 71px bên trái, ở lề 26 thì khít. Khối xem
        trước nhỏ hơn bản đồ toàn khung nên nó cũng cần lề nhỏ hơn — 34 là
        con số hợp cho khung to, không phải cho khung này. */
-    P.fit = fitArt({ tf: P.tf, art: A, points: pts, view, pad: 26 });
+    /* Vùng cấm: hai nút nổi góc phải dưới và nhãn "Open full map" góc trái
+       dưới. Chúng nằm TRÊN bản đồ, ngoài `host`, nên đo theo toạ độ khung. */
+    const avoid = [...(host.parentElement?.querySelectorAll(".ex-fabs, .ex-openlabel") || [])]
+      .map((e) => e.getBoundingClientRect())
+      .filter((b) => b.width && b.height)
+      .map((b) => ({ l: b.left - r.left, t: b.top - r.top, r: b.right - r.left, b: b.bottom - r.top }));
+    P.fit = fitArt({ tf: P.tf, art: A, points: pts, view, pad: 26, avoid });
     if (!P.fit) return false;
     art.style.width = `${(A.w * P.fit.k).toFixed(1)}px`;
     art.style.height = `${(A.h * P.fit.k).toFixed(1)}px`;
