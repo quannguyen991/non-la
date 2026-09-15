@@ -24,7 +24,7 @@
    tưởng bản đẩy hỏng.
    ═══════════════════════════════════════════════════════════════ */
 
-import { execFileSync } from "child_process";
+import { spawnSync } from "child_process";
 import { existsSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -33,21 +33,37 @@ const GOC = join(dirname(fileURLToPath(import.meta.url)), "..");
 const APP = join(GOC, "nonla-app");
 const THU = process.argv.includes("--thu");
 
-/* Trên Windows `vercel` là .cmd — spawn thẳng tên không có đuôi thì
-   ENOENT, và thông báo lỗi ấy trông y như "chưa cài Vercel CLI". */
-const VERCEL = process.platform === "win32" ? "vercel.cmd" : "vercel";
+/* GỌI THẲNG vc.js BẰNG NODE, không qua vercel.cmd. Hai lần hỏng dẫn tới đây:
 
-/* `shell` BẬT cho tệp .cmd trên Windows. Từ bản vá bảo mật của Node (2024),
-   execFileSync gọi thẳng một .cmd/.bat mà không qua shell là ném EINVAL —
-   với stdout/stderr RỖNG. Bản đầu của tệp này mắc đúng chỗ đó: ba cửa in
-   xanh, dòng "đẩy lên Vercel" hiện ra, rồi thoát lặng lẽ không một chữ lỗi,
-   và chưa từng đẩy được lần nào — mọi bản trên Vercel tới lúc ấy đều do gõ
-   tay `vercel deploy`. */
-const chay = (lenh, args, cwd) =>
-  execFileSync(lenh, args, {
-    cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
-    shell: /\.cmd$/i.test(lenh),
-  });
+   · gọi vercel.cmd KHÔNG có shell → Node (bản vá bảo mật 2024) ném EINVAL
+     với stdout/stderr RỖNG. Tệp này từng thoát lặng lẽ và chưa đẩy được lần
+     nào; mọi bản trên Vercel khi ấy đều do gõ tay.
+   · BẬT shell:true thì chạy được nhưng Node cảnh báo DEP0190: đối số bị NỐI
+     vào dòng lệnh chứ không được thoát.
+
+   vercel.cmd tự nó cũng chỉ làm một việc là `node …/vercel/dist/vc.js`, nên
+   gọi thẳng tệp ấy: không shell, đối số đi nguyên vẹn, không cảnh báo. */
+const VERCEL_JS = process.env.VERCEL_JS || (process.platform === "win32"
+  ? join(process.env.APPDATA || "", "npm", "node_modules", "vercel", "dist", "vc.js")
+  : join(dirname(dirname(process.execPath)), "lib", "node_modules", "vercel", "dist", "vc.js"));
+
+const chay = (lenh, args, cwd) => {
+  const r = spawnSync(lenh, args, { cwd, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (r.error || r.status !== 0) {
+    throw Object.assign(r.error || new Error(`mã thoát ${r.status}`), { stdout: r.stdout, stderr: r.stderr });
+  }
+  return r.stdout || "";
+};
+
+/* Lệnh vercel in phần lớn thông tin — kể cả danh sách alias của `inspect` —
+   ra STDERR, không phải stdout. Bản trước chỉ đọc stdout nên dòng "địa chỉ
+   cố định" không bao giờ hiện. Với vercel thì đọc cả hai luồng. */
+const vc = (args) => {
+  const r = spawnSync(process.execPath, [VERCEL_JS, ...args], { cwd: APP, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  const ra = `${r.stdout || ""}\n${r.stderr || ""}`;
+  if (r.error || r.status !== 0) throw Object.assign(r.error || new Error(`mã thoát ${r.status}`), { stdout: ra, stderr: "" });
+  return ra;
+};
 
 const CUA = [
   { ten: "bộ phép thử lõi", lenh: process.execPath, args: ["test.mjs"], cwd: APP },
@@ -76,10 +92,15 @@ if (!existsSync(join(APP, ".vercel", "project.json"))) {
 
 if (THU) { console.log("\n(--thu: dừng ở đây, không đẩy)"); process.exit(0); }
 
+if (!existsSync(VERCEL_JS)) {
+  console.log(`\nKhông thấy Vercel CLI ở ${VERCEL_JS}\n  cài: npm i -g vercel   (hoặc đặt biến VERCEL_JS trỏ tới vercel/dist/vc.js)`);
+  process.exit(1);
+}
+
 console.log("\n── đẩy lên Vercel ───────────────────────────");
 let ra = "";
 try {
-  ra = chay(VERCEL, ["deploy", "--prod", "--yes"], APP);
+  ra = vc(["deploy", "--prod", "--yes"]);
 } catch (e) {
   /* Lỗi không kèm đầu ra thì in CHÍNH mã lỗi. In một chuỗi rỗng là đúng
      cách bản đầu giấu mất lỗi EINVAL ở trên. */
@@ -95,7 +116,7 @@ console.log(`  bản vừa đẩy: ${ban || "(không đọc được URL)"}`);
    deploy in ra là URL theo từng lần đẩy, đổi mỗi lần. */
 if (ban) {
   try {
-    const ins = chay(VERCEL, ["inspect", ban.replace(/^https:\/\//, "")], APP);
+    const ins = vc(["inspect", ban.replace(/^https:\/\//, "")]);
     const alias = [...ins.matchAll(/https:\/\/[a-z0-9-]+\.vercel\.app/gi)].map((m) => m[0]);
     const codinh = alias.find((a) => !a.includes(ban.split("//")[1])) || alias[0];
     if (codinh) console.log(`  địa chỉ cố định: ${codinh}`);
