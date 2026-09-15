@@ -72,14 +72,23 @@ const house = svg(`
   <rect x="42" y="38" width="8" height="12" fill="${THEN}" opacity=".6"/>`);
 
 /* ── Chùa ─── mái cong hai tầng, lư hương trước sân */
+/* Bản trước vẽ một cửa vòm tối có nét cong vàng đặt trên một đế oval —
+   thu nhỏ thành ghim trên bản đồ thì trông như một NGƯỜI ĐANG QUỲ LẠY.
+   Một ứng dụng soi giá không có lý do gì gắn hình người thờ cúng lên nơi
+   thờ tự của người khác. Vẽ lại bằng thứ ai nhìn cũng nhận ra là đền mà
+   không có hình người: hai lớp mái, cửa son, lư hương ba chân trước sân —
+   khớp với tranh assets/icons/temple.webp mà bản đồ dùng khi có ảnh. */
 const temple = svg(`
   ${roof(8, 4, 48, 10, SON)}
   ${roof(4, 18, 56, 10)}
-  <rect x="12" y="28" width="40" height="24" fill="${GIAY}" stroke="${GO}" stroke-width="2"/>
-  <path d="M27 52 v-13 a5 5 0 0 1 10 0 v13Z" fill="${THEN}"/>
-  <ellipse cx="32" cy="57" rx="11" ry="4" fill="${GO}"/>
-  <rect x="29" y="52" width="6" height="5" fill="${GO}"/>
-  <path d="M28 50 q4 -6 8 0" fill="none" stroke="${GOLD}" stroke-width="1.6"/>`);
+  <rect x="12" y="28" width="40" height="22" fill="${GIAY}" stroke="${GO}" stroke-width="2"/>
+  <rect x="26" y="34" width="12" height="16" fill="${SON}"/>
+  <rect x="15" y="34" width="7" height="10" fill="${GOLD}" opacity=".55"/>
+  <rect x="42" y="34" width="7" height="10" fill="${GOLD}" opacity=".55"/>
+  <rect x="8" y="50" width="48" height="3" fill="${GO}"/>
+  <path d="M24 54 h16 l-2.5 5.5 h-11Z" fill="${GO}"/>
+  <path d="M25.5 59.5 l-1.5 3 M32 59.5 v3 M38.5 59.5 l1.5 3" stroke="${GO}" stroke-width="1.6" stroke-linecap="round"/>
+  <rect x="23" y="52.6" width="18" height="1.8" rx=".9" fill="${GOLD}"/>`);
 
 /* ── Chợ ─── mái tôn dài, sạp và quang gánh */
 const market = svg(`
