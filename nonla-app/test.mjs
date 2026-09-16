@@ -2389,22 +2389,54 @@ console.log("\n── đọc câu trả lời của mô hình ──────
      vector tự vẽ MÀ KHÔNG NÓI GÌ; người dùng thấy bản đồ thô và lệch rồi
      tưởng dữ liệu sai. Nền mặc định vì thế phải là nguồn tile tải được, và
      câu ghi nguồn phải đổi theo nền đang hiện chứ không đứng im. */
-  eq("nền mặc định là bản đồ phố Esri, không phải tile của OSMF",
+  eq("nền mặc định là bản đồ phố MapTiler, không phải tile của OSMF",
     bm.includes('const TILE_ORDER = ["pho", "vetinh", "osm"]')
-    && bm.includes("/World_Street_Map/MapServer/tile/{z}/{y}/{x}"), true);
+    && bm.includes('url: MT("streets-v2", "png"'), true);
+  /* Hết hạn mức tháng hay khoá bị thu là chuyện của HOÁ ĐƠN, không được biến
+     thành bản đồ trắng. Mỗi nền cần khoá phải có nền dự phòng KHÔNG cần khoá,
+     và lớp tile phải thật sự thử nền ấy khi ảnh lỗi. */
+  eq("nền cần khoá đều có nền dự phòng không cần khoá",
+    (bm.match(/duPhong: `\$\{ESRI\}/g) || []).length, 2);
+  eq("tile lỗi thì thử nền dự phòng trước khi bỏ ô",
+    bm.includes("img.dataset.dp") && bm.includes("tileSrc(dp, tz, tx, ty)"), true);
+  /* Khoá bản đồ là khoá CÔNG KHAI như anon key, nhưng phải có thật và phải
+     được nói rõ là chặn theo tên miền — không để người sau tưởng nó bí mật. */
+  {
+    const cfg = readFileSync("./config.js", "utf8");
+    const k = (cfg.match(/MAPTILER_KEY = "([^"]*)"/) || [])[1] || "";
+    /* REPO KHÔNG ĐƯỢC CHỨA KHOÁ. Khoá MapTiler bị chép là hạn mức tháng của
+       người khác tiêu vào hoá đơn của mình — khác anon key Supabase, thứ mà
+       RLS chặn phía máy chủ. Khoá thật nằm ở .secrets và chỉ được chèn lúc
+       đẩy (tools/len-vercel.mjs), nên dòng trong repo phải TRỐNG. */
+    eq("config.js trong repo không mang khoá bản đồ", k, "");
+    eq("khoá bản đồ nói rõ cách chặn", cfg.includes("Allowed origins"), true);
+    const dayTool = readFileSync("../tools/len-vercel.mjs", "utf8");
+    eq("công cụ đẩy chèn khoá rồi hoàn lại",
+      dayTool.includes("maptiler.key") && dayTool.includes("} finally {")
+      && dayTool.includes("writeFileSync(CFG, cfgGoc"), true);
+    /* Không có khoá thì bản đồ phải chạy bằng nền Esri, không được trắng:
+       đó chính là bản GitHub Pages và bản ai đó tự clone. */
+    eq("không có khoá thì nền chính là Esri", bm.includes("const coKhoa =")
+      && bm.includes("? `https://api.maptiler.com") && bm.includes(": duPhong)"), true);
+    // Soi GIÁ TRỊ được xuất ra, không soi lời chú thích: chính chú thích ở
+    // đầu config.js có chữ service_role để cấm đặt nó vào đây.
+    const giaTri = [...cfg.matchAll(/^export const \w+\s*=\s*"([^"]*)"/gm)].map((m) => m[1]);
+    eq("không giá trị nào trong config.js là khoá bí mật",
+      giaTri.filter((v) => /sb_secret|service_role|^sk-|^eyJ.*service/.test(v)).length, 0);
+  }
   eq("có ba kiểu nền", ["pho:", "vetinh:", "osm:"].every((k) => bm.includes(k)), true);
   /* CARTO đóng dấu "API KEY REQUIRED" lên tile khi không có khoá — đúng thứ
      người dùng nhìn thấy khi thử bản trước. Không được quay lại. */
   eq("không dùng tile CARTO khi chưa có khoá", bm.includes("cartocdn.com"), false);
   eq("ghi nguồn dựng theo nền đang hiện",
     bm.includes("const attrHTML = () =>") && bm.includes("${attrHTML()}"), true);
-  eq("ghi nguồn nói tên người vẽ tile", bm.includes("<b>Esri</b>") && bm.includes("openstreetmap.org"), true);
+  eq("ghi nguồn nói tên người vẽ tile", bm.includes("<b>MapTiler</b>") && bm.includes("openstreetmap.org"), true);
   eq("ảnh vệ tinh vẫn ghi nguồn dữ liệu OpenStreetMap",
-    bm.includes("Geographics; place data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL"), true);
+    bm.includes("Maxar; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL"), true);
   eq("có nút đổi nền và app nối vào", /data-act='bmTile'/.test(app) && /BigMap\.nextTile\(\)/.test(app), true);
-  eq("service worker cache tile của cả hai nhà phát",
+  eq("service worker cache tile của cả ba nhà phát",
     // sw.js viết ba tên miền trong MỘT regex, nên bỏ dấu thoát ra trước khi so.
-    ["server.arcgisonline.com", "tile.openstreetmap.org"]
+    ["api.maptiler.com", "server.arcgisonline.com", "tile.openstreetmap.org"]
       .every((h) => readFileSync("./sw.js", "utf8").replace(/\\/g, "").includes(h)), true);
   eq("quán chưa có nhãn vẽ thành chấm", /lvl === "unknown" && ctx\.sel !== p\.id/.test(bm), true);
   eq("chấm có luật CSS riêng", /\.bm-pin\.dot::before\{/.test(readFileSync("./app.css", "utf8")), true);

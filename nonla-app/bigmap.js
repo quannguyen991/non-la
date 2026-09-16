@@ -24,6 +24,7 @@ import { artTransform, fitArt } from "./artmap.js";
    (geo.buildings, xem tools/fetch-fabric.py), nên lớp sinh giả không còn
    lý do tồn tại — kể cả nếu có ai nối dây lại cho nó. */
 import { progressAt, legLabel } from "./route.js";
+import { MAPTILER_KEY } from "./config.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g,
@@ -126,19 +127,39 @@ function bboxOfLine(line) {
    ĐÃ THỬ VÀ LOẠI: CARTO Positron/Voyager đóng dấu "API KEY REQUIRED" lên
    khắp tile khi không có khoá; Esri Light Gray hết dữ liệu từ mức z17;
    tile.openstreetmap.de trả nhãn chữ lặp; CyclOSM là bản đồ đi xe đạp,
-   quá rối cho màn điện thoại. Nếu sau này có khoá MapTiler hay CARTO thì
-   chỉ cần thêm một mục vào bảng này. */
+   quá rối cho màn điện thoại.
+
+   Nền chính nay là MapTiler (có khoá, xem config.js), nền Esri giữ lại làm
+   DỰ PHÒNG tự động cho lúc hết hạn mức. */
 const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services";
+/* KHÔNG CÓ KHOÁ VẪN PHẢI CÓ BẢN ĐỒ. config.js trong repo để khoá TRỐNG —
+   khoá chỉ được chèn lúc đẩy lên Vercel — nên bản chạy từ repo (GitHub
+   Pages, hay ai đó tự clone) rơi thẳng về nền Esri không cần khoá. Sai ở
+   đây mà không lường thì người clone repo mở app ra thấy bản đồ trắng. */
+const coKhoa = typeof MAPTILER_KEY === "string" && MAPTILER_KEY.length >= 16;
+const MT = (kieu, duoi, duPhong) => (coKhoa
+  ? `https://api.maptiler.com/maps/${kieu}/{z}/{x}/{y}@2x.${duoi}?key=${MAPTILER_KEY}`
+  : duPhong);
+/* `duPhong` là nền vẽ thay khi tile chính lỗi — hết hạn mức tháng, khoá bị
+   thu, hay mạng chặn api.maptiler.com. Nền dự phòng KHÔNG cần khoá, nên bản
+   đồ không bao giờ trắng vì một chuyện thuộc về hoá đơn. */
 const TILE_STYLES = {
   pho: {
     nhan: "Map",
-    url: `${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`,
-    ghi: 'Tiles ©&nbsp;<b>Esri</b> — Esri, HERE, Garmin, ©&nbsp;<b>OpenStreetMap</b> contributors; place data ODbL.',
+    url: MT("streets-v2", "png", `${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`),
+    duPhong: `${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`,
+    ghi: coKhoa
+      ? 'Tiles ©&nbsp;<b>MapTiler</b>, map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.'
+      : 'Tiles ©&nbsp;<b>Esri</b> — Esri, HERE, Garmin, ©&nbsp;<b>OpenStreetMap</b> contributors; ODbL.',
   },
   vetinh: {
     nhan: "Satellite",
-    url: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
-    ghi: 'Imagery ©&nbsp;<b>Esri</b>, Maxar, Earthstar Geographics; place data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
+    /* hybrid, không phải satellite trần: ảnh vệ tinh CÓ tên đường chồng lên.
+       Người đứng giữa phố cổ cần cả hai — nhận ra mái nhà, và đọc được tên
+       phố để hỏi đường. */
+    url: MT("hybrid", "jpg", `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`),
+    duPhong: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
+    ghi: 'Imagery ©&nbsp;<b>MapTiler</b>, ©&nbsp;<b>Esri</b>, Maxar; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
   },
   osm: {
     nhan: "OSM",
@@ -147,6 +168,7 @@ const TILE_STYLES = {
   },
 };
 const TILE_ORDER = ["pho", "vetinh", "osm"];
+const tileSrc = (u, z, x, y) => u.replace("{z}", z).replace("{x}", x).replace("{y}", y);
 const TILE_KEY = "nonla.bando.nen";
 const tileStyle = () => TILE_STYLES[M.tile] || TILE_STYLES.pho;
 /* Ghi nguồn phải nói đúng thứ đang hiện, nên dựng bằng hàm: đổi nền là
@@ -218,10 +240,20 @@ function paintTiles() {
     img.decoding = "async";
     img.alt = "";
     img.onload = () => { M._tilesOK = true; syncBaseVisibility(); };
-    img.onerror = () => img.remove();
+    /* Tile lỗi thì thử nền dự phòng ĐÚNG MỘT LẦN rồi mới bỏ ô. Bỏ ngay là
+       bản đồ rỗ lỗ chỗ mà không ai biết vì sao. */
+    img.onerror = () => {
+      const dp = tileStyle().duPhong;
+      if (dp && !img.dataset.dp) {
+        img.dataset.dp = "1";
+        img.src = tileSrc(dp, tz, tx, ty);
+        return;
+      }
+      img.remove();
+    };
     place(img, box);
     layer.appendChild(img);
-    img.src = tileStyle().url.replace("{z}", tz).replace("{x}", tx).replace("{y}", ty);
+    img.src = tileSrc(tileStyle().url, tz, tx, ty);
   }
 
   function place(el, { a, b }) {

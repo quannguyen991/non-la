@@ -2,7 +2,7 @@
 
 **Thước đo giá đường phố Việt Nam**
 
-Bản dựng ngày 12/09/2026 · nhánh `community-v1` · 98 commit · 814 phép thử xanh
+Bản dựng ngày 12/09/2026 · nhánh `community-v1` · 98 commit · 821 phép thử xanh
 
 ---
 
@@ -1337,7 +1337,7 @@ cả cho những quán không liên quan.**
 
 ## 16. Kiểm chứng: máy, hồ sơ, và ngoài đường
 
-### 16.1 `test.mjs` — 814 phép thử, 0 hỏng
+### 16.1 `test.mjs` — 821 phép thử, 0 hỏng
 
 Kiểm lõi thuần: khớp món, bách phân vị, phán quyết, phép chiếu bản đồ, tuyến đi
 bộ, âm lịch, đơn vị, so thực đơn, tiền thối, tin cậy, nguồn giá, chấm điểm đối
@@ -1379,7 +1379,7 @@ là 612). Đây là thứ giám khảo đếm lại được trong ba mươi gi�
 Ngày 09/09 nó hở một chỗ khác và đã bịt: luật trên chỉ bắt hồ sơ khai **nhiều**
 con số, nên nó vẫn xanh khi cả cuốn khai thống nhất một con số **đã cũ**. Giờ
 bộ soát **chạy thật** `node test.mjs` rồi so — bắt được đúng lúc hồ sơ còn ghi
-612 trong khi bộ thử đã lên 645 (nay là 814).
+612 trong khi bộ thử đã lên 645 (nay là 821).
 
 Nó chỉ soát những con số **đếm được**, không cố hiểu văn xuôi: một bộ soát đoán
 mò sẽ kêu oan, và một bộ soát hay kêu oan là một bộ soát người ta tắt đi.

@@ -33,6 +33,9 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v61: nền chính là MapTiler streets-v2 và hybrid (khoá công khai trong
+//      config.js, chặn theo tên miền ở dashboard); Esri thành nền dự phòng
+//      tự động khi tile lỗi.
 // v60: nền bản đồ đổi sang CARTO Voyager @2x (tile.openstreetmap.org bị chặn
 //      ở nhiều mạng nên app âm thầm rơi về lớp vector tự vẽ), thêm nền nhạt và
 //      ảnh vệ tinh Esri; ghi nguồn đổi theo nền đang hiện.
@@ -132,7 +135,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v60";
+const CACHE = "nonla-v61";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -221,7 +224,7 @@ self.addEventListener("fetch", (e) => {
      yêu cầu ứng dụng cache lại và không hỏi lại cùng một ô. Ba tên miền:
      CARTO (nền phố và nền nhạt), Esri (ảnh vệ tinh), và openstreetmap.org
      giữ lại cho bản cũ đã cài còn đang chạy. */
-  const isCDN = /fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr\.net|tessdata|basemaps\.cartocdn\.com|server\.arcgisonline\.com|tile\.openstreetmap\.org/
+  const isCDN = /fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr\.net|tessdata|api\.maptiler\.com|server\.arcgisonline\.com|tile\.openstreetmap\.org/
     .test(req.url);
 
   /* Ảnh minh hoạ sinh sẵn: cache-first, KHÔNG nhét vào SHELL.

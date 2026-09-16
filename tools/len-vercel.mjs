@@ -25,7 +25,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 import { spawnSync } from "child_process";
-import { existsSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
@@ -97,6 +97,29 @@ if (!existsSync(VERCEL_JS)) {
   process.exit(1);
 }
 
+/* ── KHOÁ BẢN ĐỒ: CHÈN LÚC ĐẨY, KHÔNG BAO GIỜ VÀO REPO ──────────────
+   config.js trong repo để MAPTILER_KEY trống. Ở đây đọc khoá thật từ
+   .secrets, ghi vào config.js, đẩy, rồi HOÀN LẠI trong finally — kể cả khi
+   đẩy hỏng giữa đường — để không lần nào khoá nằm lại trong thư mục làm
+   việc rồi lọt vào commit sau.
+   Không có tệp khoá cũng đẩy được: bản đẩy rơi về nền Esri không cần khoá. */
+const KHOA_F = join(GOC, "..", ".secrets", "maptiler.key");
+const CFG = join(APP, "config.js");
+const cfgGoc = readFileSync(CFG, "utf8");
+let coChen = false;
+if (existsSync(KHOA_F)) {
+  const k = readFileSync(KHOA_F, "utf8").trim();
+  const moi = cfgGoc.replace('export const MAPTILER_KEY = "";',
+    `export const MAPTILER_KEY = "${k}";`);
+  if (k && moi !== cfgGoc) {
+    writeFileSync(CFG, moi, "utf8");
+    coChen = true;
+    console.log(`  đã chèn khoá bản đồ (${k.length} ký tự) vào config.js cho bản đẩy`);
+  }
+} else {
+  console.log("  không có .secrets/maptiler.key — bản đẩy dùng nền Esri");
+}
+
 console.log("\n── đẩy lên Vercel ───────────────────────────");
 let ra = "";
 try {
@@ -108,6 +131,13 @@ try {
   console.log(loi ? loi.split("\n").slice(-8).join("\n")
     : `  *** lệnh vercel hỏng mà không in gì: ${e.code || e.message}`);
   process.exit(1);
+} finally {
+  /* Hoàn lại trong MỌI đường ra: đẩy xong, đẩy hỏng, hay process.exit ở
+     nhánh catch phía trên cũng chạy qua đây. */
+  if (coChen) {
+    writeFileSync(CFG, cfgGoc, "utf8");
+    console.log("  đã hoàn config.js về bản không khoá");
+  }
 }
 const ban = (/https:\/\/[a-z0-9-]+\.vercel\.app/i.exec(ra) || [])[0];
 console.log(`  bản vừa đẩy: ${ban || "(không đọc được URL)"}`);

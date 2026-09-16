@@ -27,3 +27,20 @@ export const SUPABASE_ANON = "sb_publishable_ExBVmw2ApfMSMvNhkd8drg_McdX_Vye";
    khoản chỉ hiện khi máy chủ nói là đi tới nơi được. Đăng nhập bằng EMAIL
    + MẬT KHẨU, không gửi thư — vì gói free từ chối gửi thư cho địa chỉ
    ngoài nhóm dự án. */
+
+/* ── KHOÁ BẢN ĐỒ (MapTiler) ───────────────────────────────────────────
+   ĐỂ TRỐNG TRONG REPO. Khoá thật nằm ở D:/Claude/.secrets/maptiler.key và
+   được tools/len-vercel.mjs chèn vào đúng dòng dưới ngay trước khi đẩy, rồi
+   hoàn lại. Vì sao không commit như anon key của Supabase: anon key vô hại
+   khi bị chép (RLS chặn phía máy chủ), còn khoá bản đồ bị chép là hạn mức
+   tháng của người khác tiêu vào hoá đơn của mình. Repo này công khai, và bot
+   quét khoá trên GitHub nhanh hơn người.
+
+   Khoá vẫn đọc được từ bản app đã đẩy — không có cách nào giấu khoá trong
+   app chạy trên máy người dùng. Chốt thật nằm ở dashboard MapTiler:
+     · Allowed origins: chỉ nonla-app.vercel.app và quannguyen991.github.io;
+     · hạn mức tháng của gói free.
+
+   TRỐNG thì bản đồ KHÔNG hỏng: bigmap.js dùng nền Esri (không cần khoá),
+   rồi tới lớp vector tự vẽ. Bản GitHub Pages chạy đúng như vậy. */
+export const MAPTILER_KEY = "";

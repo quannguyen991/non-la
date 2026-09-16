@@ -31,17 +31,17 @@ Tệp này được sinh bằng <code>tools/minh-chung-kiem-thu.mjs</code>: mọ
 được <b>chạy thật lúc dựng tệp</b> và đầu ra được in lại nguyên trạng — bộ nào đỏ
 thì hiện đỏ ở đúng chỗ ấy.</p>
 <table>
-  <tr><th style="width:28%">Chạy lúc</th><td>10:00:49 16/9/2026 (giờ Việt Nam)</td></tr>
-  <tr><th>Mã nguồn</th><td>nhánh <code>community-v1</code> · commit <code>6281e73</code>
-    (thứ 111, 2026-09-15 20:40:56 +0700) · <b>có thay đổi chưa commit</b></td></tr>
+  <tr><th style="width:28%">Chạy lúc</th><td>12:09:12 16/9/2026 (giờ Việt Nam)</td></tr>
+  <tr><th>Mã nguồn</th><td>nhánh <code>community-v1</code> · commit <code>1883fa1</code>
+    (thứ 112, 2026-09-16 10:02:26 +0700) · <b>có thay đổi chưa commit</b></td></tr>
   <tr><th>Bản giao diện được kiểm</th><td>http://localhost:3000</td></tr>
   <tr><th>Môi trường</th><td>Node v24.18.0 · Chrome headless, khổ 375×812 @2x</td></tr>
 </table>
 
 <div class="tong">
-  <div><b>814</b>phép thử lõi · 0 trượt</div>
+  <div><b>819</b>phép thử lõi · 0 trượt</div>
   <div><b>235/235</b>điểm kiểm giao diện</div>
-  <div><b>2/3</b>bộ soát xanh</div>
+  <div><b>3/3</b>bộ soát xanh</div>
   <div><b>5</b>màn hình chụp tự động</div>
 </div>
 
@@ -113,33 +113,22 @@ phụ thu, phiếu xác nhận, đối chiếu hoá đơn, mức tin cậy dữ 
     <td class="n">6</td><td class="n">0</td></tr><tr><td>trang hành trình</td>
     <td class="n">16</td><td class="n">0</td></tr><tr><td>giá app giao hàng</td>
     <td class="n">19</td><td class="n">0</td></tr><tr><td>đọc câu trả lời của mô hình</td>
-    <td class="n">64</td><td class="n">0</td></tr>
-  <tr><th>Tổng</th><th class="n">814</th><th class="n">0</th></tr>
+    <td class="n">69</td><td class="n">0</td></tr>
+  <tr><th>Tổng</th><th class="n">819</th><th class="n">0</th></tr>
 </table>
 
 <h2>2. Đường tương tác giao diện — audit.js <span class="x">XANH</span></h2>
 <p>Chạy trong trình duyệt thật ở khổ điện thoại: bấm từng nút, mở từng thẻ, đổi tab, quét
 thử, đo vùng chạm tối thiểu 44px và độ tương phản chữ. Bắt được những lỗi mà lõi logic
 không thấy — ví dụ chạm một món lại mở thẻ bên trong một khối đang ẩn.</p>
-<p><b>235/235</b> điểm đạt, trong 50 giây.</p>
+<p><b>235/235</b> điểm đạt, trong 49 giây.</p>
      
 
 <h2>3. Ba bộ soát tài liệu</h2>
-<p><b>Hồ sơ ↔ mã nguồn</b> <span class="d">ĐỎ</span><br><span class="nho">Mọi con số đếm được trong tài liệu phải bằng con số đếm lại từ dữ liệu và từ bộ thử thật.</span></p>
-<pre>  ok   ô giá                              thật = 219
-  ok   món trong danh mục                 thật = 77
-  ok   quán OpenStreetMap                 thật = 2481
-  ok   cơ sở theo dõi                     thật = 2481
-  ok   tệp trong vỏ offline               thật = 71
-  ok   món có chuyện                      thật = 22
-  ok   ô nạp từ menu công bố              thật = 66
-  ok   số phép thử chỉ có MỘT giá trị    = 806
-  SAI  số phép thử khớp bộ thử THẬT      chạy thật = 814 pass · 0 fail, hồ sơ viết = 806
-── luật riêng ──────────────────────────────
-  ok   số mục danh mục                   thật = 40, hồ sơ viết = 40
-  ok   chương 6 dùng dải hiện tại        thật = 60.000₫ – 120.000₫
+<p><b>Hồ sơ ↔ mã nguồn</b> <span class="x">XANH</span><br><span class="nho">Mọi con số đếm được trong tài liệu phải bằng con số đếm lại từ dữ liệu và từ bộ thử thật.</span></p>
+<pre>  ok   chương 6 dùng dải hiện tại        thật = 60.000₫ – 120.000₫
   ok   không sót số của bản dữ liệu cũ   
-1 chỗ lệch — sửa hồ sơ, đừng sửa bộ soát</pre><p><b>Bản kê khai công cụ AI ↔ mã nguồn</b> <span class="x">XANH</span><br><span class="nho">Đối chiếu hai chiều: mã dùng mà chưa khai, và khai mà mã không còn dùng.</span></p>
+hồ sơ khớp với mã</pre><p><b>Bản kê khai công cụ AI ↔ mã nguồn</b> <span class="x">XANH</span><br><span class="nho">Đối chiếu hai chiều: mã dùng mà chưa khai, và khai mà mã không còn dùng.</span></p>
 <pre>D:\Claude\nón lá\docs\ke-khai.html
   20 mục · 10 nhóm
   đối chiếu với mã: khớp</pre><p><b>Bản PDF 12 trang không mất chữ</b> <span class="x">XANH</span><br><span class="nho">In hai bản (cắt / không cắt), so chữ từng trang, đo chữ lấn chân trang.</span></p>

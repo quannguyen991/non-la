@@ -46,3 +46,6 @@ docs/_sitemap-*.json
 /docs/doi-thi.json
 /docs/ho-so-du-thi-bang-b.html
 /docs/ho-so-du-thi-bang-b.pdf
+
+# khoá bản đồ: chèn lúc đẩy, không bao giờ vào repo
+/nonla-app/config.khoa.js
