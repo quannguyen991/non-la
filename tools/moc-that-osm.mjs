@@ -29,6 +29,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
+import { apDung } from "./moc-chot-tay.mjs";
 
 const GOC = join(dirname(fileURLToPath(import.meta.url)), "..");
 const APP = join(GOC, "nonla-app");
@@ -114,7 +115,7 @@ function diem(tenApp, tenOsm) {
    nhà ở, cửa hàng không bao giờ là đích đến của một mốc tham quan. */
 const CHO_O = new Set(["hotel", "guest_house", "hostel", "motel", "apartment", "chalet",
   "camp_site", "caravan_site", "information"]);
-const TEN_CHO_O = /homestay|hotel|hostel|resort|villa|motel|apartment|chung cu|khach san|nha nghi|spa|boutique/;
+const TEN_CHO_O = /homestay|hotel|hostel|resort|villa|motel|apartment|chung cu|khach san|nha nghi|spa\b|boutique/;
 function khongPhaiMoc(c) {
   const t = c.tags;
   if (CHO_O.has(t.tourism)) return true;
@@ -273,6 +274,12 @@ for (const [zid, z] of Object.entries(zones)) {
   }
   console.log(`${zid.padEnd(16)} ${String(lm.length).padStart(3)} mốc · ${ung.length} ứng viên OSM · ${zDoi} mốc dời chỗ`);
 }
+
+/* Mốc khớp tự động không được thì áp QUYẾT ĐỊNH TỪNG MỐC đã tra tay
+   (tools/moc-chot-tay.mjs) — có lý do và nguồn cho từng mốc. */
+const baoChot = await apDung(zones);
+console.log(`── áp bảng chốt: ${baoChot.length} mốc ──`);
+for (const d of baoChot) console.log(d);
 
 console.log(`\ntổng ${tong} mốc: ${doi} dời về toạ độ OSM, ${giu} giữ nguyên`);
 if (xa) console.log(`${xa} lần khớp tên nhưng quá xa, đã bỏ (đúng: cùng tên, khác chỗ)`);

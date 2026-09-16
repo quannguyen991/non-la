@@ -62,7 +62,7 @@ async function buildContext() {
     + `${(p.known || []).length ? `, known for ${(p.known || []).map((k) => dishOf(k)?.vi || k).join(", ")}` : ""}`
   ).join("\n");
 
-  const sightLines = (maps.zones[zid]?.landmarks || []).filter((l) => l.note)
+  const sightLines = (maps.zones[zid]?.landmarks || []).filter((l) => l.note && !l.an)
     .map((l) => `${l.n}${l.en ? ` (${l.en})` : ""}: ${l.note}`).join("\n");
 
   return `You are the Nón Lá helper — a calm, concrete local-price assistant embedded in a

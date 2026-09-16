@@ -596,7 +596,9 @@ export async function run({ verbose = true } = {}) {
     try {
       const maps = await (await fetch("data/maps.json", { cache: "no-cache" })).json();
       const zoneId = $("#bmMarks")?.dataset.zone;
-      const want = (maps.zones[zoneId]?.landmarks || []).length;
+      // Mốc ẩn (`an`) giữ chỗ trong mảng cho route.js nhưng cố ý không dựng —
+      // đếm nó vào là bắt render dựng lại đúng cái mốc đã quyết định giấu.
+      const want = (maps.zones[zoneId]?.landmarks || []).filter((l) => !l.an).length;
       ck("số ghim khớp dữ liệu maps.json", marks.length === want, `${marks.length}/${want}`);
     } catch (e) { ck("đọc được maps.json để đối chiếu", false, String(e.message)); }
 

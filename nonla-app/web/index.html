@@ -120,7 +120,7 @@ const zid = zoneId();
 const [places, prices, maps] = await Promise.all([load("places"), load("prices"), load("maps")]);
 const mine = places.places.filter((p) => p.zone === zid);
 const zone = prices.zones[zid];
-const sights = (maps.zones[zid]?.landmarks || []).filter((l) => l.note).length;
+const sights = (maps.zones[zid]?.landmarks || []).filter((l) => l.note && !l.an).length;
 document.getElementById("heroZone").textContent = (zone.en || zone.name).split(" · ")[0];
 document.getElementById("statLine").innerHTML =
   `<b>${mine.length}</b> eateries mapped · <b>${Object.keys(zone.items).length}</b> dishes priced ·

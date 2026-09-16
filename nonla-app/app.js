@@ -2361,7 +2361,7 @@ function zoneRowHTML() {
       ${ids.map((id) => {
         const z = S.prices[id];
         const [main, sub] = String(z.en || z.name).split(" · ");
-        const sights = (S.maps[id]?.landmarks || []).length;
+        const sights = (S.maps[id]?.landmarks || []).filter((l) => !l.an).length;
         const on = id === S.zone;
         return `<button class="zone-chip" data-act="gotoZone" data-zone="${esc(id)}"
           aria-pressed="${on}">
@@ -2382,7 +2382,7 @@ function zoneRowHTML() {
    phải thứ để mời người ta đi xem. */
 function sightsRailHTML() {
   const all = (S.maps[S.zone]?.landmarks || []);
-  const list = all.map((lm, i) => ({ lm, i })).filter(({ lm }) => lm.note);
+  const list = all.map((lm, i) => ({ lm, i })).filter(({ lm }) => lm.note && !lm.an);
   if (!list.length) return "";
   list.sort((a, b) => (b.lm.star ? 1 : 0) - (a.lm.star ? 1 : 0));
   return `
@@ -4200,9 +4200,11 @@ function showMark(lm, metres = null) {
       data-sub="${esc(lm.en || kind)}" data-tags="${esc([lm.n, lm.en || ""].join("|"))}">
       ${I.share}Share this sight</button>
     <p class="seedwarn">Nón Lá does not rank sights or recommend restaurants. ${
-      lm.src === "osm"
-        ? `This position comes from <b>OpenStreetMap</b> (${esc(lm.osm || "")})`
-        : "This position is a <b>hand-placed estimate</b>, not a survey"
+      lm.src === "osm" && lm.neo
+        ? `OpenStreetMap has no separate point for this, so it is anchored to ${esc(lm.neo)} (<b>OpenStreetMap</b> ${esc(lm.osm || "")})`
+        : lm.src === "osm"
+          ? `This position comes from <b>OpenStreetMap</b> (${esc(lm.osm || "")})`
+          : "This position is a <b>hand-placed estimate</b>, not a survey"
     } — good enough to orient by, not to navigate by.</p>
     <button class="btn sec" data-act="close">Close</button>`);
 }

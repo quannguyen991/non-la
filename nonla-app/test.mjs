@@ -50,7 +50,8 @@ import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
          MIN_QUAN_SAT, TI_LE_DUNG } from "./coso.js";
 import { phanKhuc, nhomMon, nhomCuaDanhMuc, daiNhom, mucQuan,
          MIN_MON_NHOM, MIN_DONG_QUAN } from "./monla.js";
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
+import { join } from "path";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
 const prices = JSON.parse(readFileSync("./data/prices.json", "utf8")).zones;
@@ -2058,8 +2059,8 @@ console.log("\n── lịch Việt ──────────────�
     moiMuc.every((m) => m.nhan && m.nhan.length > 8),
     JSON.stringify(moiMuc.find((m) => !m.nhan)?.id || null));
   ok("nhãn ngắn không mở đầu bằng chữ Today",
-    moiMuc.every((m) => !/^\s*(today|tonight)/i.test(m.nhan || "")),
-    JSON.stringify(moiMuc.find((m) => /^\s*(today|tonight)/i.test(m.nhan || ""))?.id || null));
+    moiMuc.every((m) => !/^\s*(today|tonight)\b/i.test(m.nhan || "")),
+    JSON.stringify(moiMuc.find((m) => /^\s*(today|tonight)\b/i.test(m.nhan || ""))?.id || null));
   ok("nhãn ngắn đủ ngắn cho một dòng danh sách",
     moiMuc.every((m) => (m.nhan || "").length <= 62),
     JSON.stringify(moiMuc.filter((m) => (m.nhan || "").length > 62).map((m) => m.id)));
@@ -2342,6 +2343,20 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("app hỏi máy chủ lúc khởi động", /Auth\.thamDo\(\);/.test(app), true);
 }
 
+/* ── KHÔNG CÓ KÝ TỰ BACKSPACE TRONG MÃ ─────────────────────────
+
+   Sửa tệp bằng heredoc làm dấu thoát \b trong regex biến thành ký tự
+   backspace (0x08). Regex chứa ký tự ấy không bao giờ khớp, nên một phép
+   thử kiểu "mã KHÔNG chứa X" luôn báo đúng mà không kiểm gì. Đã bắt được
+   ba phép thử hỏng lặng lẽ như thế — một trong số đó che đúng cái lỗi nó
+   được viết ra để canh. Quét mọi tệp mã, không chỉ tệp vừa sửa.  */
+{
+  const quet = (thu) => readdirSync(thu).filter((f) => /\.(m?js|html|css)$/.test(f)).map((f) => join(thu, f));
+  const tep = [...quet("."), ...quet("./web"), ...quet("../tools")];
+  const co = tep.filter((f) => readFileSync(f, "utf8").includes(String.fromCharCode(8)));
+  eq("không tệp mã nào chứa ký tự backspace", co.join(", "), "");
+}
+
 /* ── toạ độ MỐC THAM QUAN lấy từ OpenStreetMap (maps.json) ──
 
    182 mốc vốn có toạ độ chọn tay. Nền bản đồ còn là lớp vector tự vẽ thì
@@ -2355,12 +2370,19 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   const zs = Object.entries(mapsMoc).filter(([k]) => !k.startsWith("_"));
   const all = zs.flatMap(([, z]) => z.landmarks || []);
   eq("mọi mốc khai nguồn toạ độ",
-    all.filter((l) => l.src !== "osm" && l.src !== "tay").length, 0);
+    all.filter((l) => !["osm", "tay", "an"].includes(l.src)).length, 0);
   eq("mốc khai osm đều có id tra lại được",
     all.filter((l) => l.src === "osm" && !/^(node|way|relation)\/\d+$/.test(l.osm || "")).length, 0);
-  const osm = all.filter((l) => l.src === "osm").length;
-  ok(`phần lớn mốc đã có toạ độ OSM (${osm}/${all.length})`, osm >= all.length * 0.6,
-    `${all.length - osm} mốc còn ước lượng tay`);
+  /* Sau bảng chốt từng mốc (tools/moc-chot-tay.mjs) không còn mốc HIỆN nào là
+     ước lượng tay. Mốc nào quay lại "tay" là có người thêm mốc mới mà chưa
+     tra nguồn — phép thử đỏ để bắt đúng lúc ấy. */
+  const hien = all.filter((l) => !l.an);
+  eq("không mốc hiện nào còn là ước lượng tay",
+    hien.filter((l) => l.src !== "osm").map((l) => l.n).join(", "), "");
+  eq("mốc ẩn khai src an và không mang id OSM",
+    all.filter((l) => l.an && (l.src !== "an" || l.osm)).length, 0);
+  eq("mốc neo nói rõ neo vào đâu và có id OSM",
+    all.filter((l) => l.neo && (!/^(node|way|relation)\/\d+$/.test(l.osm || "") || l.neo.length < 8)).length, 0);
   /* Khớp sai tên là mốc nhảy sang một chỗ cùng tên ở nơi khác — chuyện
      xảy ra thật với "Chợ Hội An". Canh bằng khoảng cách tới tâm vùng. */
   const xa = [];
@@ -2370,15 +2392,34 @@ console.log("\n── đọc câu trả lời của mô hình ──────
     const kx = Math.cos(c[0] * Math.PI / 180);
     for (const l of z.landmarks || []) {
       const km = Math.hypot(l.at[0] - c[0], (l.at[1] - c[1]) * kx) * 111.32;
-      if (km > 4) xa.push(`${zid}/${l.n} ${km.toFixed(1)}km`);
+      /* Bãi Sơn Thủy là ngoại lệ CÓ LÝ DO: nó là đầu nam của dải biển Mỹ Khê,
+         cách tâm vùng ~6 km. Toạ độ tay cũ nằm gọn trong vùng chính vì nó đặt
+         nhầm Sơn Thủy lên giữa bãi Mỹ Khê. */
+      const tran = l.n === "Bãi biển Sơn Thuỷ" ? 8 : 4;
+      if (km > tran) xa.push(`${zid}/${l.n} ${km.toFixed(1)}km`);
     }
   }
   eq("không mốc nào nhảy ra ngoài vùng", xa.join(", "), "");
   const bm2 = readFileSync("./bigmap.js", "utf8");
   eq("ghi nguồn nói rõ còn bao nhiêu mốc là ước lượng tay",
     bm2.includes("const ghiMoc = ()") && bm2.includes("hand-placed estimates"), true);
-  eq("thẻ mốc khai nguồn theo từng mốc",
-    readFileSync("./app.js", "utf8").includes('lm.src === "osm"'), true);
+  const appSrc = readFileSync("./app.js", "utf8");
+  eq("thẻ mốc khai nguồn theo từng mốc", appSrc.includes('lm.src === "osm"'), true);
+  eq("thẻ mốc nói ra khi mốc được neo", appSrc.includes('lm.src === "osm" && lm.neo'), true);
+  eq("ghi nguồn bản đồ đếm mốc neo", bm2.includes("const neo = lm.filter((l) => l.neo)"), true);
+  /* Mốc ẩn giữ chỗ trong mảng (route.js trỏ theo chỉ số) nhưng KHÔNG được
+     dựng thành nút, không được đếm, không vào khay "Worth seeing". */
+  eq("mốc ẩn không dựng thành nút trên bản đồ", /function markFor\(lm, i\) \{[\s\S]{0,260}if \(lm\.an\) return "";/.test(bm2), true);
+  eq("mốc ẩn không được đếm", bm2.includes("const soMoc = (geo) =>") && !bm2.includes("(geo.landmarks || []).length} sights"), true);
+  eq("khay điểm tham quan bỏ mốc ẩn", appSrc.includes("lm.note && !lm.an"), true);
+  for (const f of ["./web/index.html", "./web/place.html", "./web/chat.js", "./web/web.js"]) {
+    eq(`${f} bỏ mốc ẩn`, readFileSync(f, "utf8").includes("!l.an"), true);
+  }
+  /* Mỗi quyết định tra tay phải ghi LÝ DO — không có lý do thì lần sau không
+     ai biết vì sao một mốc bị dời 4 km hay bị ẩn. */
+  const chot = readFileSync("../tools/moc-chot-tay.mjs", "utf8");
+  const soChot = (chot.match(/^\s{2}"[a-z0-9-]+\/\d+": \{/gm) || []).length;
+  eq("mọi quyết định tra tay đều ghi lý do", (chot.match(/\bly: "/g) || []).length, soChot);
 }
 
 /* ── quán trên bản đồ là quán THẬT từ OpenStreetMap (places.json) ──
@@ -2416,7 +2457,9 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("app.js truyền lvlOf cho cả bốn lối vào bản đồ",
     (app.match(/lvlOf:\s*\(p\)\s*=>\s*dgOf\(p\)\.muc/g) || []).length, 4);
   eq("foodmap.js không đọc hai trường fair/scans đã gỡ",
-    /p\.(fair|scans)/.test(readFileSync("./foodmap.js", "utf8")), false);
+    /\bp\.(fair|scans)\b/.test(readFileSync("./foodmap.js", "utf8")
+      // Soi MÃ, không soi chú thích: chú thích giải thích bản sửa có nhắc tên hai trường ấy.
+      .replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "")), false);
   eq("bộ lọc không khớp ai thì bản đồ xem trước không bị xoá sạch",
     /const coKhop = P\.places\.some/.test(bm), true);
   eq("nhãn quán có bước tránh đè", /classList\.add\("nolbl"\)/.test(bm), true);

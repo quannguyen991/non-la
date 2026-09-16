@@ -84,7 +84,7 @@ if (!p) {
     .sort((a, b) => a.m - b.m).slice(0, 4);
 
   const sights = (geo?.landmarks || [])
-    .filter((l) => l.at && l.note && p.at && distance(p.at, l.at) < 400)
+    .filter((l) => l.at && l.note && !l.an && p.at && distance(p.at, l.at) < 400)
     .slice(0, 3);
 
   page.innerHTML = `

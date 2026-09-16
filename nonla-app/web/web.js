@@ -242,7 +242,7 @@ export async function paintZoneName() {
   menu.innerHTML = Object.entries(zones).map(([id, z]) => {
     const [main, sub] = String(z.en || z.name).split(" · ");
     const n = places.places.filter((p) => p.zone === id).length;
-    const s = (maps.zones[id]?.landmarks || []).filter((l) => l.note).length;
+    const s = (maps.zones[id]?.landmarks || []).filter((l) => l.note && !l.an).length;
     return `<button role="option" aria-selected="${id === cur}" data-zone="${esc(id)}">
       <span class="tick">${id === cur ? I.shield : ""}</span>
       <span><b>${esc(main)}</b><i>${esc(sub || "")}</i></span>

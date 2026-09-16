@@ -164,7 +164,10 @@ const TILE_STYLES = {
        hơn ba lần. Nền phố giữ @2x: PNG vector chỉ ~78KB và chữ cần nét. */
     url: MT("hybrid", "jpg", `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`, false),
     duPhong: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
-    ghi: 'Imagery ©&nbsp;<b>MapTiler</b>, ©&nbsp;<b>Esri</b>, Maxar; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
+    /* Không có khoá thì ảnh vệ tinh là của Esri, không phải MapTiler — ghi đúng người vẽ. */
+    ghi: coKhoa
+      ? 'Imagery ©&nbsp;<b>MapTiler</b>, ©&nbsp;<b>Esri</b>, Maxar; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.'
+      : 'Imagery ©&nbsp;<b>Esri</b>, Maxar, Earthstar Geographics; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
   },
   osm: {
     nhan: "OSM",
@@ -181,13 +184,20 @@ const tileStyle = () => TILE_STYLES[M.tile] || TILE_STYLES.pho;
    tools/moc-that-osm.mjs lấy toạ độ OSM thì lời khai ấy tự hạ thấp dữ liệu
    đã đúng, và làm người dùng không biết mốc nào mới đáng nghi. */
 const ghiMoc = () => {
-  const lm = M.geo?.landmarks || [];
+  const lm = (M.geo?.landmarks || []).filter((l) => !l.an);
   if (!lm.length) return "";
   const tay = lm.filter((l) => l.src === "tay").length;
-  return tay
-    ? `Sight positions from <b>OpenStreetMap</b>; ${tay} of ${lm.length} here are still <b>hand-placed estimates</b> and can be tens of metres off.`
+  /* Mốc NEO — bến thuyền, đoạn tắm đêm, phố ẩm thực — không có điểm riêng
+     trong OSM nên được neo vào con phố, bến hay bờ biển có thật gần nhất.
+     Nói ra số ấy: "toạ độ từ OSM" mà không kèm câu này là nói quá. */
+  const neo = lm.filter((l) => l.neo).length;
+  if (tay) return `Sight positions from <b>OpenStreetMap</b>; ${tay} of ${lm.length} here are still <b>hand-placed estimates</b> and can be tens of metres off.`;
+  return neo
+    ? `Sight positions from <b>OpenStreetMap</b>; ${neo} of ${lm.length} here are anchored to a nearby street, pier or shoreline because OpenStreetMap has no separate point for them.`
     : "Sight positions from <b>OpenStreetMap</b>.";
 };
+/** Số mốc HIỆN — mốc ẩn (`an`) giữ chỗ trong mảng cho route.js nhưng không đếm. */
+const soMoc = (geo) => (geo?.landmarks || []).filter((l) => !l.an).length;
 
 /* Ghi nguồn phải nói đúng thứ đang hiện, nên dựng bằng hàm: đổi nền là
    đổi luôn câu ghi nguồn, không phải chắp vá chuỗi đã in ra. */
@@ -450,6 +460,7 @@ function drawBase(vp = M.vp, geo = M.geo) {
   }).join("");
 
   const marks = vp.scale > 0.5 ? (geo.landmarks || []).map((lm) => {
+    if (lm.an) return "";
     const p = vp.toScreen(lm.at);
     if (p.x < -30 || p.x > vp.w + 30 || p.y < -30 || p.y > vp.h + 30) return "";
     return `<g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})">
@@ -483,6 +494,9 @@ const MARK_STAR = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="tru
   <path d="M12 2.5l2.9 5.9 6.6 1-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-1Z"/></svg>`;
 
 function markFor(lm, i) {
+  /* Mốc ẩn: không dựng nút. placeMarks() tra ngược mốc bằng data-mark chứ
+     không bằng thứ tự phần tử, nên bỏ một nút không làm lệch các nút sau. */
+  if (lm.an) return "";
   const must = !!lm.star;
   const url = M.iconOf?.(lm.t);
   const d = M.me ? fmtDistance(distance(M.me, lm.at)) : "";
@@ -698,7 +712,7 @@ function visible() {
 }
 function visibleMarks() {
   const keep = KEEP_MARK[M.filter] || KEEP_MARK.all;
-  return (M.geo?.landmarks || []).map((lm, i) => (keep(lm) ? i : -1)).filter((i) => i >= 0);
+  return (M.geo?.landmarks || []).map((lm, i) => (!lm.an && keep(lm) ? i : -1)).filter((i) => i >= 0);
 }
 
 /* Trần ghim quán dựng cùng lúc — cùng lý do và cùng con số với lớp quán ăn
@@ -1088,7 +1102,7 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
       <button class="iconbtn" data-act="bmClose" aria-label="Close map">${icons.back}</button>
       <span class="bm-title">
         <b>${esc(zone.name)}</b>
-        <small id="bmCount">${M.places.length} places · ${(geo.landmarks || []).length} sights</small>
+        <small id="bmCount">${M.places.length} places · ${soMoc(geo)} sights</small>
       </span>
       <button class="iconbtn" data-act="bmLocate" aria-label="Find my location">${icons.crosshair}</button>
     </div>
@@ -1346,7 +1360,7 @@ function updateCount() {
   const nKeep = M._keep ?? M.places.length;
   const xa = !!M._pinCapped;
   const bits = [`${nKeep} place${nKeep === 1 ? "" : "s"}${xa ? " — zoom in" : ""}`];
-  const sights = M._keepMark ?? (M.geo?.landmarks || []).length;
+  const sights = M._keepMark ?? soMoc(M.geo);
   if (sights) bits.push(`${sights} sight${sights === 1 ? "" : "s"}`);
   if (M.showEat) {
     bits.push(M.vp.scale >= EAT_MIN_SCALE
