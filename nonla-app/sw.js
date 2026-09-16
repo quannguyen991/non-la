@@ -33,6 +33,9 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v60: nền bản đồ đổi sang CARTO Voyager @2x (tile.openstreetmap.org bị chặn
+//      ở nhiều mạng nên app âm thầm rơi về lớp vector tự vẽ), thêm nền nhạt và
+//      ảnh vệ tinh Esri; ghi nguồn đổi theo nền đang hiện.
 // v59: places.json giờ là 2.481 QUÁN THẬT từ OpenStreetMap (tools/quan-that-osm.mjs),
 //      77 cơ sở dựng sẵn và 154 ảnh của chúng đã gỡ; bigmap.js dựng ghim quán
 //      theo cửa sổ, foodmap.js hết đọc hai trường đã gỡ.
@@ -129,7 +132,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v59";
+const CACHE = "nonla-v60";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -214,10 +217,11 @@ self.addEventListener("fetch", (e) => {
 
   // Fonts, Tesseract runtime và traineddata: cache-first rồi mới ra mạng.
   // Nhờ đó lần chạy thứ hai không cần mạng nữa.
-  /* tile.openstreetmap.org nằm trong nhóm này KHÔNG chỉ vì tốc độ: chính
-     sách dùng tile của OSMF yêu cầu ứng dụng phải cache lại và không hỏi
-     lại cùng một ô. Họ trả tiền cho hạ tầng đó bằng quyên góp. */
-  const isCDN = /fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr\.net|tessdata|tile\.openstreetmap\.org/
+  /* Tile nằm trong nhóm này KHÔNG chỉ vì tốc độ: mọi nhà phát tile đều
+     yêu cầu ứng dụng cache lại và không hỏi lại cùng một ô. Ba tên miền:
+     CARTO (nền phố và nền nhạt), Esri (ảnh vệ tinh), và openstreetmap.org
+     giữ lại cho bản cũ đã cài còn đang chạy. */
+  const isCDN = /fonts\.(googleapis|gstatic)\.com|cdn\.jsdelivr\.net|tessdata|basemaps\.cartocdn\.com|server\.arcgisonline\.com|tile\.openstreetmap\.org/
     .test(req.url);
 
   /* Ảnh minh hoạ sinh sẵn: cache-first, KHÔNG nhét vào SHELL.

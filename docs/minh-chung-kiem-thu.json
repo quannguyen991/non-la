@@ -1,15 +1,15 @@
 {
- "luc": "20:39:07 15/9/2026",
+ "luc": "10:00:49 16/9/2026",
  "commit": {
-  "hash": "66d125d",
-  "dem": "110",
+  "hash": "6281e73",
+  "dem": "111",
   "nhanh": "community-v1",
-  "ngay": "2026-09-15 20:05:19 +0700",
+  "ngay": "2026-09-15 20:40:56 +0700",
   "sach": false
  },
  "url": "http://localhost:3000",
  "test": {
-  "pass": 806,
+  "pass": 814,
   "fail": 0
  },
  "audit": {
@@ -20,7 +20,7 @@
  "soat": [
   {
    "ten": "Hồ sơ ↔ mã nguồn",
-   "ok": true
+   "ok": false
   },
   {
    "ten": "Bản kê khai công cụ AI ↔ mã nguồn",

@@ -109,7 +109,55 @@ function bboxOfLine(line) {
    được. Mất mạng giữa phố cổ là đúng lúc người dùng cần màn hình này
    nhất, và "không cần offline" là một yêu cầu về tính năng, không phải
    một lời hứa rằng mạng luôn có. */
-const TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+/* KIỂU NỀN. Bản trước chỉ có MỘT nguồn: tile.openstreetmap.org. Hai chỗ
+   sai với nó:
+
+   1. Mạng nào chặn tên miền ấy thì tile KHÔNG BAO GIỜ về — máy dựng bản
+      này phân giải nó về 127.0.0.1 — và app lặng lẽ rơi về lớp vector tự
+      vẽ. Người dùng nhìn thấy một bản đồ thô, lệch, rồi kết luận "bản đồ
+      sai". Họ đúng, nhưng chỗ sai không phải OpenStreetMap.
+   2. Chính sách dùng tile của OSMF chỉ dành cho lưu lượng nhẹ, không cho
+      một app phát cho khách du lịch.
+
+   Nên có ba nền, đổi bằng một nút: bản đồ phố, ẢNH VỆ TINH — thứ người
+   đứng giữa phố cổ nhận ra nhanh nhất — và OSM giữ lại cho mạng nào vào
+   được. Lớp vector vẫn nằm dưới cho lúc mất mạng.
+
+   ĐÃ THỬ VÀ LOẠI: CARTO Positron/Voyager đóng dấu "API KEY REQUIRED" lên
+   khắp tile khi không có khoá; Esri Light Gray hết dữ liệu từ mức z17;
+   tile.openstreetmap.de trả nhãn chữ lặp; CyclOSM là bản đồ đi xe đạp,
+   quá rối cho màn điện thoại. Nếu sau này có khoá MapTiler hay CARTO thì
+   chỉ cần thêm một mục vào bảng này. */
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services";
+const TILE_STYLES = {
+  pho: {
+    nhan: "Map",
+    url: `${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`,
+    ghi: 'Tiles ©&nbsp;<b>Esri</b> — Esri, HERE, Garmin, ©&nbsp;<b>OpenStreetMap</b> contributors; place data ODbL.',
+  },
+  vetinh: {
+    nhan: "Satellite",
+    url: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
+    ghi: 'Imagery ©&nbsp;<b>Esri</b>, Maxar, Earthstar Geographics; place data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
+  },
+  osm: {
+    nhan: "OSM",
+    url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    ghi: 'Tiles from <b>openstreetmap.org</b>, map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
+  },
+};
+const TILE_ORDER = ["pho", "vetinh", "osm"];
+const TILE_KEY = "nonla.bando.nen";
+const tileStyle = () => TILE_STYLES[M.tile] || TILE_STYLES.pho;
+/* Ghi nguồn phải nói đúng thứ đang hiện, nên dựng bằng hàm: đổi nền là
+   đổi luôn câu ghi nguồn, không phải chắp vá chuỗi đã in ra. */
+const attrHTML = () => `${tileStyle().ghi}
+  A simplified offline copy is drawn when tiles cannot load.
+  Sight positions are <b>unsurveyed seed data</b> and can be tens of metres off.
+  ${M.eateries?.length ? "Eateries carry <b>no price data</b> — Nón Lá has never scanned them." : ""}
+  Orientation only; tap anything, then <b>Open in maps</b> for turn-by-turn.`;
+/* Tile @2x là ảnh 512px phủ ĐÚNG vùng đất của ô 256px: chỉ độ nét đổi,
+   hình học không đổi, nên phép chọn mức phóng vẫn tính theo 256. */
 const TILE_PX = 256;
 
 const lng2tile = (lng, z) => ((lng + 180) / 360) * 2 ** z;
@@ -173,7 +221,7 @@ function paintTiles() {
     img.onerror = () => img.remove();
     place(img, box);
     layer.appendChild(img);
-    img.src = TILE_URL.replace("{z}", tz).replace("{x}", tx).replace("{y}", ty);
+    img.src = tileStyle().url.replace("{z}", tz).replace("{x}", tx).replace("{y}", ty);
   }
 
   function place(el, { a, b }) {
@@ -941,6 +989,10 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
      ở mức thu xa hơn ngưỡng dùng được. Và giữ M.filter thì chip đang sáng
      nói một đằng còn bản đồ hiện một nẻo. */
   M.mode = "flat"; M.cam = null; M.filter = "all"; M.showEat = false; M._eatKey = "";
+  /* Chọn nền nào thì lần mở sau giữ nền ấy: đó là lựa chọn về cách đọc bản
+     đồ, không phải trạng thái tạm của một lần mở. */
+  try { M.tile = TILE_STYLES[localStorage.getItem(TILE_KEY)] ? localStorage.getItem(TILE_KEY) : "pho"; }
+  catch { M.tile = "pho"; }
   // Mỗi lần mở lại phải hỏi lại mạng: bản trước có tile không nói gì về
   // bản này, và giữ cờ cũ là ẩn nền vector đi khi tile không bao giờ tới.
   M._tilesOK = false;
@@ -999,15 +1051,12 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
             offline use" — đúng khi nền là lớp vector tự dựng, sai từ lúc
             bản đồ vẽ bằng tile thật của OpenStreetMap. Giấy phép của họ
             buộc ghi nguồn, và ghi sai nguồn thì tệ hơn không ghi. */""}
-      <p class="bm-attr">Base map and data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.
-        Tiles from openstreetmap.org; a simplified offline copy is drawn when they
-        cannot load. Sight positions are <b>unsurveyed seed data</b> and can be tens of
-        metres off.
-        ${M.eateries.length ? "Eateries carry <b>no price data</b> — Nón Lá has never scanned them." : ""}
-        Orientation only; tap anything, then <b>Open in maps</b> for turn-by-turn.</p>
+      <p class="bm-attr" id="bmAttr">${attrHTML()}</p>
     </div>
 
     <div class="bm-zoom">
+      <button class="iconbtn viewmode" data-act="bmTile"
+        aria-label="Change map background"><span class="txt">${esc(tileStyle().nhan)}</span></button>
       <button class="iconbtn viewmode" data-act="bmMode" aria-pressed="${M.mode === "3d"}"
         aria-label="Switch between flat and 3D view"><span class="txt">${
           M.mode === "3d" ? "3D" : "Flat"}</span></button>
@@ -1272,6 +1321,26 @@ export function setFilter(k) {
    phố và tìm địa chỉ, 3D để nhận ra mình đang đứng ở đâu bằng dáng nhà.
    Giữ nguyên tâm và mức phóng — đổi chế độ mà bản đồ nhảy đi chỗ khác là
    người dùng mất dấu vị trí đang xem. */
+/** Đổi nền: phố → nhạt → ảnh vệ tinh → phố.
+ *  Xoá sạch lớp tile và HẠ cờ _tilesOK, để lớp vector hiện lại ngay trong
+ *  lúc nền mới chưa vẽ được ô nào — không để bản đồ trống trơn. */
+export function nextTile() {
+  const i = TILE_ORDER.indexOf(M.tile);
+  M.tile = TILE_ORDER[(i + 1) % TILE_ORDER.length] || "pho";
+  try { localStorage.setItem(TILE_KEY, M.tile); } catch { /* cửa sổ riêng tư */ }
+  const layer = $("#bmTiles");
+  if (layer) layer.innerHTML = "";
+  M._tilesOK = false;
+  syncBaseVisibility();
+  const t = document.querySelector("[data-act='bmTile'] .txt");
+  if (t) t.textContent = tileStyle().nhan;
+  const a = $("#bmAttr");
+  if (a) a.innerHTML = attrHTML();
+  $("#v-bigmap")?.classList.toggle("anh-ve-tinh", M.tile === "vetinh");
+  paint();
+  return { tile: M.tile, nhan: tileStyle().nhan };
+}
+
 export function toggleMode() {
   M.mode = M.mode === "3d" ? "flat" : "3d";
   /* Vào 3D ở mức thu xa thì phải phóng tới ngưỡng dùng được — TỰ phóng

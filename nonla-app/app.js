@@ -4866,6 +4866,14 @@ document.addEventListener("click", async (ev) => {
     const id = $("#dishPick")?.value;
     if (id) return showDish(id);
   }
+  if (el("[data-act='bmTile']")) {
+    /* Đổi nền là việc thấy ngay bằng mắt, nhưng nền mới phải tải tile nên
+       có một nhịp trống: nói tên nền để người dùng biết nút đã ăn. */
+    const r = BigMap.nextTile();
+    return toast(r.tile === "vetinh" ? "Satellite imagery — Esri"
+      : r.tile === "nhat" ? "Quiet background — app pins stand out"
+      : "Street map — CARTO");
+  }
   if (el("[data-act='bmMode']")) {
     const r = BigMap.toggleMode();
     if (r.mode !== "3d") return toast("Flat view — best for reading street names");
