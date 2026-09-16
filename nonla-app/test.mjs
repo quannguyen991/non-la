@@ -2431,6 +2431,17 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("ghi nguồn dựng theo nền đang hiện",
     bm.includes("const attrHTML = () =>") && bm.includes("${attrHTML()}"), true);
   eq("ghi nguồn nói tên người vẽ tile", bm.includes("<b>MapTiler</b>") && bm.includes("openstreetmap.org"), true);
+  /* Ảnh vệ tinh KHÔNG dùng @2x: ~24 ô JPEG 1024px là ~3MB cho một khung nhìn,
+     trên 3G ở phố cổ đó là dữ liệu người dùng phải trả. */
+  eq("ảnh vệ tinh không tải bản @2x", bm.includes('MT("hybrid", "jpg"') && bm.includes(", false)"), true);
+  eq("nhãn nút nền vừa nút tròn 44px",
+    [...bm.matchAll(/nhan: "([^"]+)"/g)].every((m) => m[1].length <= 4), true);
+  /* Chấm quán trên ảnh vệ tinh phải đảo màu, và lớp .anh-ve-tinh phải được
+     gắn CẢ khi mở lại bản đồ ở nền đã chọn, không chỉ khi bấm đổi nền. */
+  eq("chấm quán có luật riêng trên ảnh vệ tinh",
+    readFileSync("./app.css", "utf8").includes(".anh-ve-tinh .bm-pin.dot::before{"), true);
+  eq("lớp ảnh vệ tinh gắn cả lúc mở bản đồ",
+    (bm.match(/classList\.toggle\("anh-ve-tinh"/g) || []).length >= 3, true);
   eq("ảnh vệ tinh vẫn ghi nguồn dữ liệu OpenStreetMap",
     bm.includes("Maxar; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL"), true);
   eq("có nút đổi nền và app nối vào", /data-act='bmTile'/.test(app) && /BigMap\.nextTile\(\)/.test(app), true);

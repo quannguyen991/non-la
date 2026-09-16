@@ -949,6 +949,11 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 .bm-pin.dot::before{content:"";width:12px;height:12px;border-radius:50%;
   background:#8A7A66;border:2px solid #FBF7EC;box-shadow:0 1px 3px rgba(14,43,36,.45)}
 .bm-pin.dot .lbl{display:none}
+/* Trên ẢNH VỆ TINH thì chấm nâu viền kem biến thành đốm trắng lẫn vào mái
+   nhà: đảo lại — lõi sáng, viền sẫm — để chấm còn đọc được trên nền nhiều
+   chi tiết. bigmap.js gắn .anh-ve-tinh khi nền là ảnh vệ tinh. */
+.anh-ve-tinh .bm-pin.dot::before{background:#F6F2E6;border-color:rgba(16,28,24,.78);
+  box-shadow:0 1px 4px rgba(0,0,0,.55)}
 .bm-pin:focus-visible{outline:2px solid var(--dong);outline-offset:2px;border-radius:12px}
 
 /* ── ghim điểm tham quan ────────────────────────────────

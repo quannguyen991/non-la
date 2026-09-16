@@ -137,8 +137,8 @@ const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services";
    Pages, hay ai đó tự clone) rơi thẳng về nền Esri không cần khoá. Sai ở
    đây mà không lường thì người clone repo mở app ra thấy bản đồ trắng. */
 const coKhoa = typeof MAPTILER_KEY === "string" && MAPTILER_KEY.length >= 16;
-const MT = (kieu, duoi, duPhong) => (coKhoa
-  ? `https://api.maptiler.com/maps/${kieu}/{z}/{x}/{y}@2x.${duoi}?key=${MAPTILER_KEY}`
+const MT = (kieu, duoi, duPhong, hai = true) => (coKhoa
+  ? `https://api.maptiler.com/maps/${kieu}/{z}/{x}/{y}${hai ? "@2x" : ""}.${duoi}?key=${MAPTILER_KEY}`
   : duPhong);
 /* `duPhong` là nền vẽ thay khi tile chính lỗi — hết hạn mức tháng, khoá bị
    thu, hay mạng chặn api.maptiler.com. Nền dự phòng KHÔNG cần khoá, nên bản
@@ -153,11 +153,16 @@ const TILE_STYLES = {
       : 'Tiles ©&nbsp;<b>Esri</b> — Esri, HERE, Garmin, ©&nbsp;<b>OpenStreetMap</b> contributors; ODbL.',
   },
   vetinh: {
-    nhan: "Satellite",
+    nhan: "Sat",
     /* hybrid, không phải satellite trần: ảnh vệ tinh CÓ tên đường chồng lên.
        Người đứng giữa phố cổ cần cả hai — nhận ra mái nhà, và đọc được tên
        phố để hỏi đường. */
-    url: MT("hybrid", "jpg", `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`),
+    /* KHÔNG @2x cho ảnh vệ tinh. Một khung nhìn là ~24 ô; bản @2x là ảnh
+       1024px ~140KB mỗi ô, tức ~3MB cho MỘT lần nhìn bản đồ — trên 3G ở phố
+       cổ đó là nửa phút chờ và một khoản dữ liệu người dùng phải trả. Bản
+       256px ~50KB nhìn mềm hơn một chút nhưng vẫn nhận ra mái nhà, mà nhẹ
+       hơn ba lần. Nền phố giữ @2x: PNG vector chỉ ~78KB và chữ cần nét. */
+    url: MT("hybrid", "jpg", `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`, false),
     duPhong: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
     ghi: 'Imagery ©&nbsp;<b>MapTiler</b>, ©&nbsp;<b>Esri</b>, Maxar; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
   },
@@ -1119,6 +1124,10 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
     if (Number.isFinite(k) && k > 0) M.vp.zoomAt(k, M.vp.w / 2, M.vp.h / 2);
     M.vp.centerOn(mid);
   }
+  /* Nền đã chọn từ lần trước cũng phải gắn lớp này, không chỉ lúc bấm đổi:
+     mở lại bản đồ ở chế độ ảnh vệ tinh mà thiếu lớp là chấm quán lại thành
+     đốm trắng lẫn vào mái nhà. */
+  $("#v-bigmap")?.classList.toggle("anh-ve-tinh", M.tile === "vetinh");
   attachGestures(canvas);
   paint();
 
@@ -1203,6 +1212,10 @@ export function openRoute({ zoneId, zone, geo, places, icons, route, iconOf, onO
     if (Number.isFinite(k) && k > 0) M.vp.zoomAt(k, M.vp.w / 2, M.vp.h / 2);
     M.vp.centerOn(mid);
   }
+  /* Nền đã chọn từ lần trước cũng phải gắn lớp này, không chỉ lúc bấm đổi:
+     mở lại bản đồ ở chế độ ảnh vệ tinh mà thiếu lớp là chấm quán lại thành
+     đốm trắng lẫn vào mái nhà. */
+  $("#v-bigmap")?.classList.toggle("anh-ve-tinh", M.tile === "vetinh");
   attachGestures(canvas);
   paint();
   renderRouteChrome();
