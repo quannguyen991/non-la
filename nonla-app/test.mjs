@@ -2342,6 +2342,45 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("app hỏi máy chủ lúc khởi động", /Auth\.thamDo\(\);/.test(app), true);
 }
 
+/* ── toạ độ MỐC THAM QUAN lấy từ OpenStreetMap (maps.json) ──
+
+   182 mốc vốn có toạ độ chọn tay. Nền bản đồ còn là lớp vector tự vẽ thì
+   không ai thấy; từ lúc nền là tile thật, Chùa Cầu hiện ra lùi vào trong phố
+   thay vì trên cây cầu (lệch 62 m). tools/moc-that-osm.mjs khớp theo tên và
+   chốt theo khoảng cách để lấy toạ độ thật; phép thử dưới canh ba chuyện:
+   mọi mốc phải KHAI nguồn, mốc khai osm phải có id để tra lại, và không mốc
+   nào được nhảy ra khỏi vùng của nó.  */
+{
+  const mapsMoc = JSON.parse(readFileSync("./data/maps.json", "utf8")).zones;
+  const zs = Object.entries(mapsMoc).filter(([k]) => !k.startsWith("_"));
+  const all = zs.flatMap(([, z]) => z.landmarks || []);
+  eq("mọi mốc khai nguồn toạ độ",
+    all.filter((l) => l.src !== "osm" && l.src !== "tay").length, 0);
+  eq("mốc khai osm đều có id tra lại được",
+    all.filter((l) => l.src === "osm" && !/^(node|way|relation)\/\d+$/.test(l.osm || "")).length, 0);
+  const osm = all.filter((l) => l.src === "osm").length;
+  ok(`phần lớn mốc đã có toạ độ OSM (${osm}/${all.length})`, osm >= all.length * 0.6,
+    `${all.length - osm} mốc còn ước lượng tay`);
+  /* Khớp sai tên là mốc nhảy sang một chỗ cùng tên ở nơi khác — chuyện
+     xảy ra thật với "Chợ Hội An". Canh bằng khoảng cách tới tâm vùng. */
+  const xa = [];
+  for (const [zid, z] of zs) {
+    const c = prices[zid]?.center || z.art?.center;
+    if (!c) continue;
+    const kx = Math.cos(c[0] * Math.PI / 180);
+    for (const l of z.landmarks || []) {
+      const km = Math.hypot(l.at[0] - c[0], (l.at[1] - c[1]) * kx) * 111.32;
+      if (km > 4) xa.push(`${zid}/${l.n} ${km.toFixed(1)}km`);
+    }
+  }
+  eq("không mốc nào nhảy ra ngoài vùng", xa.join(", "), "");
+  const bm2 = readFileSync("./bigmap.js", "utf8");
+  eq("ghi nguồn nói rõ còn bao nhiêu mốc là ước lượng tay",
+    bm2.includes("const ghiMoc = ()") && bm2.includes("hand-placed estimates"), true);
+  eq("thẻ mốc khai nguồn theo từng mốc",
+    readFileSync("./app.js", "utf8").includes('lm.src === "osm"'), true);
+}
+
 /* ── quán trên bản đồ là quán THẬT từ OpenStreetMap (places.json) ──
 
    Từ lúc khởi tạo repo, places.json chứa 77 cơ sở DỰNG SẴN — tên đặt ra,

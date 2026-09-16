@@ -49,3 +49,6 @@ docs/_sitemap-*.json
 
 # khoá bản đồ: chèn lúc đẩy, không bao giờ vào repo
 /nonla-app/config.khoa.js
+
+# bộ đệm trả lời Overpass của tools/moc-that-osm.mjs
+/.tmp-moc-osm/

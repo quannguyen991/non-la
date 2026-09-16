@@ -4199,8 +4199,11 @@ function showMark(lm, metres = null) {
     <button class="btn sec" data-act="shareThing" data-name="${esc(lm.n)}"
       data-sub="${esc(lm.en || kind)}" data-tags="${esc([lm.n, lm.en || ""].join("|"))}">
       ${I.share}Share this sight</button>
-    <p class="seedwarn">Nón Lá does not rank sights or recommend restaurants. This position is
-      unsurveyed seed data — good enough to orient by, not to navigate by.</p>
+    <p class="seedwarn">Nón Lá does not rank sights or recommend restaurants. ${
+      lm.src === "osm"
+        ? `This position comes from <b>OpenStreetMap</b> (${esc(lm.osm || "")})`
+        : "This position is a <b>hand-placed estimate</b>, not a survey"
+    } — good enough to orient by, not to navigate by.</p>
     <button class="btn sec" data-act="close">Close</button>`);
 }
 /* Mở tuyến đi bộ của vùng đang chọn. Vùng nào chưa có tuyến thì nói thẳng,

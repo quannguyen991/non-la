@@ -619,10 +619,15 @@ export async function run({ verbose = true } = {}) {
        đủ bốn loại ghim của bản đồ, nên `pointer-events:none` quay lại là
        mọi ghim trong khung cùng đỏ — vẫn bắt được đúng lỗi cũ. */
     const MARKER = ".bm-mark, .bm-pin, .bm-eat, .bm-stop";
+    /* "Trong khung" nghĩa là TÂM ghim nằm trong màn hình — đúng điểm mà
+       elementFromPoint hỏi. Bản trước nhận cả ghim chỉ lấn một mép vào: Chợ
+       Hội An có tâm ở x=388 trên màn 375px, elementFromPoint trả null, và
+       phép thử đỏ vì một điểm nằm ngoài màn hình chứ không vì ghim bị che.
+       pointer-events:none quay lại vẫn làm đỏ mọi ghim có tâm trong khung. */
     const onScreen = marks.filter((e) => {
       const r = e.getBoundingClientRect();
-      return r.width > 0 && r.bottom > 0 && r.top < innerHeight
-        && r.right > 0 && r.left < innerWidth;
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      return r.width > 0 && cx >= 0 && cx < innerWidth && cy >= 0 && cy < innerHeight;
     });
     const stolen = onScreen.filter((m) => {
       const r = m.getBoundingClientRect();
@@ -651,8 +656,13 @@ export async function run({ verbose = true } = {}) {
       // Đọc HẾT các khối tự khai trong thẻ, không chỉ khối đầu: thẻ giờ có
       // nhiều hơn một, và bám vào khối đầu là phép thử đỏ lên mỗi lần ai đó
       // chèn thêm một dòng phía trên, dù lời tự khai vẫn còn nguyên đó.
-      ck("thẻ tham quan tự khai dữ liệu hạt giống",
-        /unsurveyed|seed/i.test($$("#sheetBody .seedwarn").map((e) => e.textContent).join(" ")));
+      /* Lời tự khai giờ có HAI dạng: mốc lấy toạ độ từ OpenStreetMap thì nói
+         nguồn ấy, mốc còn ước lượng tay thì phải nói là ước lượng. Phép thử
+         đòi CÓ tự khai nguồn, không đòi đúng một câu chữ — bám vào một câu là
+         phép thử đỏ lên ngay khi dữ liệu tốt lên. */
+      ck("thẻ tham quan tự khai nguồn toạ độ",
+        /unsurveyed|seed|OpenStreetMap|hand-placed/i
+          .test($$("#sheetBody .seedwarn").map((e) => e.textContent).join(" ")));
       click("[data-act='close']"); await wait(320);
     }
 

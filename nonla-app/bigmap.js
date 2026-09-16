@@ -176,11 +176,24 @@ const TILE_ORDER = ["pho", "vetinh", "osm"];
 const tileSrc = (u, z, x, y) => u.replace("{z}", z).replace("{x}", x).replace("{y}", y);
 const TILE_KEY = "nonla.bando.nen";
 const tileStyle = () => TILE_STYLES[M.tile] || TILE_STYLES.pho;
+/* Toạ độ mốc: nói ĐÚNG phần nào đã có toạ độ thật. Câu cũ khai TẤT CẢ mốc
+   là "unsurveyed seed data" — đúng khi mọi toạ độ đều chọn tay, nhưng sau khi
+   tools/moc-that-osm.mjs lấy toạ độ OSM thì lời khai ấy tự hạ thấp dữ liệu
+   đã đúng, và làm người dùng không biết mốc nào mới đáng nghi. */
+const ghiMoc = () => {
+  const lm = M.geo?.landmarks || [];
+  if (!lm.length) return "";
+  const tay = lm.filter((l) => l.src === "tay").length;
+  return tay
+    ? `Sight positions from <b>OpenStreetMap</b>; ${tay} of ${lm.length} here are still <b>hand-placed estimates</b> and can be tens of metres off.`
+    : "Sight positions from <b>OpenStreetMap</b>.";
+};
+
 /* Ghi nguồn phải nói đúng thứ đang hiện, nên dựng bằng hàm: đổi nền là
    đổi luôn câu ghi nguồn, không phải chắp vá chuỗi đã in ra. */
 const attrHTML = () => `${tileStyle().ghi}
   A simplified offline copy is drawn when tiles cannot load.
-  Sight positions are <b>unsurveyed seed data</b> and can be tens of metres off.
+  ${ghiMoc()}
   ${M.eateries?.length ? "Eateries carry <b>no price data</b> — Nón Lá has never scanned them." : ""}
   Orientation only; tap anything, then <b>Open in maps</b> for turn-by-turn.`;
 /* Tile @2x là ảnh 512px phủ ĐÚNG vùng đất của ô 256px: chỉ độ nét đổi,
@@ -1052,6 +1065,11 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
   const d2 = (a) => (a[0] - tam[0]) ** 2 + ((a[1] - tam[1]) * kx) ** 2;
   const pts = M.places.filter((p) => p.at && (!zoneId || p.zone === zoneId))
     .map((p) => p.at).sort((a, b) => d2(a) - d2(b)).slice(0, 12);
+  /* Và các mốc GẮN SAO — Chùa Cầu, Tấn Ký, Phúc Kiến, chợ. Từ lúc toạ độ mốc
+     lấy từ OpenStreetMap, khung khít theo quán đã để Chùa Cầu nằm sát mép
+     trái và chợ lọt ra ngoài mép phải: người dùng mở bản đồ lên không thấy
+     đúng những chỗ họ tới phố cổ để xem. */
+  for (const lm of geo.landmarks || []) if (lm.star && lm.at) pts.push(lm.at);
   const bounds = boundsOf(pts.length ? pts : [geo.center]);
 
   view.innerHTML = `

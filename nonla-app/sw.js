@@ -33,6 +33,8 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v62: toạ độ 158/182 mốc tham quan lấy từ OpenStreetMap (tools/moc-that-osm.mjs);
+//      Chùa Cầu lệch 62 m, Chùa Ông 117 m. Thẻ mốc và ghi nguồn khai theo từng mốc.
 // v61: nền chính là MapTiler streets-v2 và hybrid (khoá công khai trong
 //      config.js, chặn theo tên miền ở dashboard); Esri thành nền dự phòng
 //      tự động khi tile lỗi.
@@ -135,7 +137,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v61";
+const CACHE = "nonla-v62";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
