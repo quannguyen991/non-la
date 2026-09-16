@@ -31,16 +31,16 @@ Tệp này được sinh bằng <code>tools/minh-chung-kiem-thu.mjs</code>: mọ
 được <b>chạy thật lúc dựng tệp</b> và đầu ra được in lại nguyên trạng — bộ nào đỏ
 thì hiện đỏ ở đúng chỗ ấy.</p>
 <table>
-  <tr><th style="width:28%">Chạy lúc</th><td>22:31:50 16/9/2026 (giờ Việt Nam)</td></tr>
-  <tr><th>Mã nguồn</th><td>nhánh <code>community-v1</code> · commit <code>ca0e178</code>
-    (thứ 113, 2026-09-16 12:14:29 +0700) · <b>có thay đổi chưa commit</b></td></tr>
+  <tr><th style="width:28%">Chạy lúc</th><td>22:33:26 16/9/2026 (giờ Việt Nam)</td></tr>
+  <tr><th>Mã nguồn</th><td>nhánh <code>community-v1</code> · commit <code>8922ec9</code>
+    (thứ 114, 2026-09-16 22:32:38 +0700) · <b>có thay đổi chưa commit</b></td></tr>
   <tr><th>Bản giao diện được kiểm</th><td>http://localhost:3000</td></tr>
   <tr><th>Môi trường</th><td>Node v24.18.0 · Chrome headless, khổ 375×812 @2x</td></tr>
 </table>
 
 <div class="tong">
   <div><b>825</b>phép thử lõi · 0 trượt</div>
-  <div><b>lỗi</b>điểm kiểm giao diện</div>
+  <div><b>235/235</b>điểm kiểm giao diện</div>
   <div><b>3/3</b>bộ soát xanh</div>
   <div><b>5</b>màn hình chụp tự động</div>
 </div>
@@ -49,7 +49,7 @@ thì hiện đỏ ở đúng chỗ ấy.</p>
 <p>Kiểm các hàm thuần không cần trình duyệt: đọc giá, khớp món, phán quyết, đơn vị tính,
 phụ thu, phiếu xác nhận, đối chiếu hoá đơn, mức tin cậy dữ liệu, và các luật an toàn
 (ví dụ: lời khai của người bán không bao giờ vào khoảng giá tham chiếu). Chạy hết trong
-3.6 giây.</p>
+3.1 giây.</p>
 <table>
   <tr><th>Nhóm</th><th style="width:14%">Đạt</th><th style="width:14%">Trượt</th></tr>
   <tr><td>normalize</td>
@@ -117,11 +117,12 @@ phụ thu, phiếu xác nhận, đối chiếu hoá đơn, mức tin cậy dữ 
   <tr><th>Tổng</th><th class="n">825</th><th class="n">0</th></tr>
 </table>
 
-<h2>2. Đường tương tác giao diện — audit.js <span class="d">ĐỎ</span></h2>
+<h2>2. Đường tương tác giao diện — audit.js <span class="x">XANH</span></h2>
 <p>Chạy trong trình duyệt thật ở khổ điện thoại: bấm từng nút, mở từng thẻ, đổi tab, quét
 thử, đo vùng chạm tối thiểu 44px và độ tương phản chữ. Bắt được những lỗi mà lõi logic
 không thấy — ví dụ chạm một món lại mở thẻ bên trong một khối đang ẩn.</p>
-<pre>Không chạy được audit.js: TypeError: Failed to fetch dynamically imported module: chrome-error://chromewebdata/audit.js</pre>
+<p><b>235/235</b> điểm đạt, trong 49 giây.</p>
+     
 
 <h2>3. Ba bộ soát tài liệu</h2>
 <p><b>Hồ sơ ↔ mã nguồn</b> <span class="x">XANH</span><br><span class="nho">Mọi con số đếm được trong tài liệu phải bằng con số đếm lại từ dữ liệu và từ bộ thử thật.</span></p>
