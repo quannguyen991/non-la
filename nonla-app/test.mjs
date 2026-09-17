@@ -2614,8 +2614,9 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   /* Hết hạn mức tháng hay khoá bị thu là chuyện của HOÁ ĐƠN, không được biến
      thành bản đồ trắng. Mỗi nền cần khoá phải có nền dự phòng KHÔNG cần khoá,
      và lớp tile phải thật sự thử nền ấy khi ảnh lỗi. */
+  /* Chỉ còn nền phố cần khoá (MapTiler); ảnh vệ tinh dùng thẳng Esri không khoá. */
   eq("nền cần khoá đều có nền dự phòng không cần khoá",
-    (bm.match(/duPhong: `\$\{ESRI\}/g) || []).length, 2);
+    (bm.match(/duPhong: `\$\{ESRI\}/g) || []).length, (bm.match(/url: MT\(/g) || []).length);
   eq("tile lỗi thì thử nền dự phòng trước khi bỏ ô",
     bm.includes("img.dataset.dp") && bm.includes("tileSrc(dp, tz, tx, ty)"), true);
   /* Khoá bản đồ là khoá CÔNG KHAI như anon key, nhưng phải có thật và phải
@@ -2659,7 +2660,15 @@ console.log("\n── đọc câu trả lời của mô hình ──────
     bm.includes("const LE = { l: 20, r: 80, t: 140, b: 190 };") && bm.includes("Math.max(M.vp.scale * k, 0.7)"), true);
   /* Ảnh vệ tinh KHÔNG dùng @2x: ~24 ô JPEG 1024px là ~3MB cho một khung nhìn,
      trên 3G ở phố cổ đó là dữ liệu người dùng phải trả. */
-  eq("ảnh vệ tinh không tải bản @2x", bm.includes('MT("hybrid", "jpg"') && bm.includes(", false)"), true);
+  /* Ảnh vệ tinh MapTiler ở phố cổ là ảnh phân giải thấp phóng lên (@2x cũng mờ
+     y hệt); ảnh Esri thấy rõ từng mái ngói. Người dùng chê "mờ tịt" — không quay
+     lại MapTiler cho nền vệ tinh, và phải có lớp phủ tên đường. */
+  eq("ảnh vệ tinh dùng Esri kèm lớp phủ tên đường",
+    bm.includes("url: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`")
+    && bm.includes("phu: `${ESRI}/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`")
+    && !bm.includes('MT("hybrid"'), true);
+  eq("ảnh vệ tinh không bị bộ lọc ngả nâu làm mềm",
+    readFileSync("./app.css", "utf8").includes(".anh-ve-tinh .bm-tiles img{filter:none}"), true);
   eq("nhãn nút nền vừa nút tròn 44px",
     [...bm.matchAll(/nhan: "([^"]+)"/g)].every((m) => m[1].length <= 4), true);
   /* Chấm quán trên ảnh vệ tinh phải đảo màu, và lớp .anh-ve-tinh phải được
@@ -2669,7 +2678,7 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("lớp ảnh vệ tinh gắn cả lúc mở bản đồ",
     (bm.match(/classList\.toggle\("anh-ve-tinh"/g) || []).length >= 3, true);
   eq("ảnh vệ tinh vẫn ghi nguồn dữ liệu OpenStreetMap",
-    bm.includes("Maxar; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL"), true);
+    bm.includes("Maxar, Earthstar Geographics; labels © Esri, HERE, Garmin; place data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL"), true);
   eq("có nút đổi nền và app nối vào", /data-act='bmTile'/.test(app) && /BigMap\.nextTile\(\)/.test(app), true);
   eq("service worker cache tile của cả ba nhà phát",
     // sw.js viết ba tên miền trong MỘT regex, nên bỏ dấu thoát ra trước khi so.

@@ -1,5 +1,5 @@
 {
- "_note": "Danh mục món chuẩn. aliases dùng cho khớp OCR (đã bỏ dấu, chữ thường).",
+ "_note": "Danh mục món chuẩn. aliases dùng cho khớp OCR (đã bỏ dấu, chữ thường). Trường `nhin`: dấu hiệu NHÌN THẤY của món, chỉ dùng trong lời nhắc nhận diện món từ ảnh (nhan-mon.js) cho các món dễ nhầm — không hiện ra giao diện.",
  "dishes": [
   {
    "id": "cao-lau",
@@ -26,7 +26,8 @@
     "vi": "Sợi mì làm bằng nước một cái giếng cổ trong phố và tro củi Cù Lao Chàm — nên món này không đi đâu được. Thịt xíu, rau sống, mấy miếng bánh giòn, và gần như không có nước dùng. Trên một cái tô có dấu vết của một thương cảng: sợi mì trông như của người Nhật, thịt xíu làm theo lối người Hoa.",
     "why": "well-water",
     "src": "Giếng Bá Lễ và tro Cù Lao Chàm trong cách làm sợi cao lầu Hội An."
-   }
+   },
+   "nhin": "thick chewy yellow-brown noodles with almost no broth, slices of char siu pork, fresh greens, square crispy fried noodle croutons."
   },
   {
    "id": "mi-quang",
@@ -53,7 +54,8 @@
     "vi": "Món của xứ Quảng, mang tên một vùng đất chứ không phải một thành phố — nên gặp nó suốt từ Hội An ra Đà Nẵng, và hiếm khi xa hơn. Sợi mì vàng nghệ, nước lèo chỉ đủ xâm xấp, đậu phộng, và cái bánh tráng mè bẻ vụn lên trên.",
     "why": "province",
     "src": "Mì Quảng, món đặc trưng của tỉnh Quảng Nam và Đà Nẵng."
-   }
+   },
+   "nhin": "wide yellow or white flat noodles with only a little turmeric-tinted broth at the bottom, prawns, pork, quail egg, crushed peanuts and a large sesame rice cracker on top."
   },
   {
    "id": "com-ga-hoi-an",
@@ -170,7 +172,8 @@
    ],
    "say": "Cho tôi phở bò",
    "ph": "chaw toy fuh baw",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "FLAT white rice noodles IN clear light-brown beef broth, thin slices of beef (pink/rare or brown), spring onion; no crab, no tomato, no chilli oil slick."
   },
   {
    "id": "bun-cha",
@@ -195,7 +198,8 @@
     "vi": "Chả viên và thịt ba chỉ nướng than, thả thẳng vào bát nước mắm chua ngọt có su hào ngâm, ăn với bún nguội và một đĩa rau sống. Món của buổi trưa — cứ theo làn khói tạt ngang vỉa hè lúc giữa trưa là thấy.",
     "why": "midday",
     "src": "Bún chả Hà Nội, món ăn trưa truyền thống."
-   }
+   },
+   "nhin": "noodles are NOT in the bowl: plain white vermicelli on a separate plate; a smaller bowl of thin amber-orange dipping sauce holds charred grilled pork patties and pork belly, often with floating slices of pickled green papaya/carrot, garlic and chilli; big plate of lettuce and herbs. No crab, no tofu, no tomato wedges."
   },
   {
    "id": "cha-ca",
@@ -222,7 +226,8 @@
     "vi": "Cá ướp nghệ và riềng, nướng ngay trên bàn trong chảo nhỏ, phủ đầy thì là và hành lá. Một nhà ở Hà Nội làm món này nổi tới mức cả con phố mang tên món ăn.",
     "why": "one-house",
     "src": "Chả cá, phố Chả Cá trong khu phố cổ Hà Nội mang tên món ăn."
-   }
+   },
+   "nhin": "yellow turmeric fish pieces sizzling in a pan with lots of dill and spring onion, eaten with vermicelli, peanuts and shrimp paste."
   },
   {
    "id": "bun-dau",
@@ -243,7 +248,8 @@
    ],
    "say": "Cho tôi bún đậu",
    "ph": "chaw toy boon dow",
-   "unit": "per tray"
+   "unit": "per tray",
+   "nhin": "a flat tray or bamboo leaf with blocks of fried golden tofu, vermicelli cakes, boiled pork slices, herbs and a small bowl of purple shrimp paste."
   },
   {
    "id": "ca-phe-trung",
@@ -297,7 +303,8 @@
     "vi": "Cơm tấm là hạt gạo gãy trong lúc xay, không bán nguyên hạt được. Trước là cơm của người làm ruộng vì nó rẻ. Giờ là đĩa cơm chuẩn của Sài Gòn — sườn nướng, bì, chả trứng, đồ chua.",
     "why": "scarcity",
     "src": "Cơm tấm, nguồn gốc từ gạo tấm là phần hạt gãy khi xay xát."
-   }
+   },
+   "nhin": "broken rice on a plate with a grilled pork chop, often a shredded pork skin, a steamed egg-meatloaf slice and a fried egg, with pickles and a cup of fish sauce."
   },
   {
    "id": "hu-tieu",
@@ -324,7 +331,8 @@
     "vi": "Theo người Tiều và người Khmer vào Nam, rồi không bao giờ đứng lại ở một công thức. Nước dùng heo trong, sợi dai, và cả chục phiên bản kèm một địa danh — Nam Vang, Mỹ Tho — cộng thêm bản khô, nước để riêng một chén.",
     "why": "migration",
     "src": "Hủ tiếu, món của cộng đồng người Hoa Triều Châu và Khmer ở Nam Bộ."
-   }
+   },
+   "nhin": "clear pork broth with translucent chewy noodles, prawns, sliced pork, minced pork, sometimes quail eggs and liver; garlic chives."
   },
   {
    "id": "bun-thit-nuong",
@@ -344,7 +352,8 @@
    ],
    "say": "Cho tôi bún thịt nướng",
    "ph": "chaw toy boon tit nuong",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "a bowl WITHOUT broth: cold vermicelli topped with grilled pork slices, crushed peanuts, fried shallots, pickled carrot/daikon, herbs; fish sauce poured on top or in a small cup; sometimes a cut spring roll."
   },
   {
    "id": "bot-chien",
@@ -429,7 +438,8 @@
    ],
    "say": "Cho tôi bánh xèo",
    "ph": "chaw toy bahn say-oh",
-   "unit": "each"
+   "unit": "each",
+   "nhin": "large thin crispy yellow crepe folded in half with prawns, pork and bean sprouts inside, served with lettuce and herbs for wrapping."
   },
   {
    "id": "bun-bo-hue",
@@ -456,7 +466,8 @@
     "vi": "Huế là kinh đô hơn một thế kỷ, và bếp cung đình để lại cách nêm: sả, ớt màu, ruốc. Thứ từng nấu cho cung điện giờ bán ở gánh vỉa hè trước bảy giờ sáng.",
     "why": "court-cuisine",
     "src": "Bún bò Huế, gia vị đặc trưng sả và ruốc của vùng kinh đô cũ."
-   }
+   },
+   "nhin": "thick ROUND noodles IN red chilli-oil broth with lemongrass; beef shank slices, a pork knuckle, dark cubes of congealed blood, crab-and-pork balls."
   },
   {
    "id": "che",
@@ -734,7 +745,8 @@
    ],
    "say": "Cho tôi bún chả cá",
    "ph": "chaw toy boon chah kah",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "noodles IN clear pale broth with orange pumpkin chunks and bamboo shoot, topped with slices of golden fried fish cake and white steamed fish cake."
   },
   {
    "id": "mi-quang-ech",
@@ -1124,7 +1136,8 @@
    ],
    "say": "Cho tôi bánh canh cá lóc",
    "ph": "chaw toy bahn kanh kah lock",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "very thick chewy round tapioca noodles in a slightly thick broth with chunks of snakehead fish, spring onion, fried shallots."
   },
   {
    "id": "ca-phe-muoi",
@@ -1309,7 +1322,8 @@
    ],
    "say": "Cho tôi phở gà",
    "ph": "chaw toy fuh gah",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "FLAT rice noodles IN clear golden chicken broth with shredded or sliced chicken, lime leaf strips, spring onion."
   },
   {
    "id": "bun-bo-nam-bo",
@@ -1330,7 +1344,8 @@
    ],
    "say": "Cho tôi bún bò Nam Bộ",
    "ph": "chaw toy boon baw nahm baw",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "a bowl WITHOUT broth: vermicelli with stir-fried beef, bean sprouts, crushed peanuts, fried shallots, herbs, a little sauce at the bottom."
   },
   {
    "id": "banh-tom",
@@ -1430,7 +1445,8 @@
    ],
    "say": "Cho tôi bún mắm",
    "ph": "chaw toy boon mahm",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "noodles IN a murky dark-brown fermented fish broth; squid, prawns, roast pork belly with crackling, purple aubergine chunks."
   },
   {
    "id": "banh-khot",
@@ -1450,7 +1466,8 @@
    ],
    "say": "Cho tôi bánh khọt",
    "ph": "chaw toy bahn kot",
-   "unit": "per plate"
+   "unit": "per plate",
+   "nhin": "small round bite-size golden crispy cakes cooked in a mould, each topped with a prawn, served in a group with herbs."
   },
   {
    "id": "bo-kho",
@@ -1469,7 +1486,8 @@
    ],
    "say": "Cho tôi bò kho bánh mì",
    "ph": "chaw toy baw kaw bahn mee",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "reddish-orange beef stew with carrot chunks and lemongrass, served with a baguette or noodles."
   },
   {
    "id": "nuoc-sam",
@@ -1510,7 +1528,8 @@
    ],
    "say": "Cho tôi bún riêu",
    "ph": "chaw toy boon ree-oh",
-   "unit": "per bowl"
+   "unit": "per bowl",
+   "nhin": "noodles sit IN a big bowl of red-orange tomato broth; fluffy brown crab-paste clumps float on top, tomato wedges, fried tofu cubes, sometimes blood cubes or snails. No grilled meat patties."
   },
   {
    "id": "chao-long",

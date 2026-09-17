@@ -526,6 +526,9 @@ h1,h2,h3,h4{font-family:var(--disp);font-weight:600;letter-spacing:-.015em;line-
   height:min(600px, calc(100vh - 120px));display:flex;flex-direction:column;
   background:var(--tam);border:1px solid var(--vien);border-radius:22px;overflow:hidden;
   box-shadow:0 20px 60px rgba(31,26,10,.22)}
+/* `display:flex` ở trên ĐÈ thuộc tính hidden của trình duyệt: bấm nút thu nhỏ
+   thì hidden bật mà hộp chat vẫn nằm nguyên — người dùng báo "không đóng được". */
+.chatbox[hidden]{display:none}
 .chatbox header{display:flex;align-items:center;gap:11px;padding:14px 16px;
   border-bottom:1px solid var(--line);background:rgba(201,162,39,.08)}
 .chatbox header .ava{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;

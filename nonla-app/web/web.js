@@ -143,7 +143,7 @@ export const verdictPill = () =>
    tay mười lần cùng một đoạn — sửa một chỗ là cả bộ theo. */
 const NAV = [
   ["index.html", "Explore", "compass"],
-  ["scan.html", "Scan Menu", "scan"],
+  ["scan.html", "Scan", "scan"],
   ["community.html", "Community", "chat"],
   ["journal.html", "Journal", "book"],
   ["helpers.html", "Helpers", "heart"],
@@ -320,8 +320,14 @@ export function artTransform(anchors, center) {
 
 /* Mọi đường dẫn ảnh đi qua ba hàm này. Trang web nằm trong /web/ còn kho
    ảnh nằm ở gốc, nên thiếu ".." là cả trang mất ảnh mà không có gì báo. */
-export const placePhoto = (p, square = false) =>
-  `../assets/places/${typeof p === "string" ? p : p.id}${square ? ".thumb" : ""}.jpg`;
+/* Quán thật OSM không có ảnh chụp, và assets/places/ đã gỡ cùng các cơ sở dựng
+   sẵn — bản trước trỏ vào đó nên mọi thẻ quán trên web là một vòng tròn trống.
+   Dùng tranh minh hoạ theo LOẠI quán, cùng bộ với app; tên tham số `square`
+   giữ lại vì các trang đang gọi placePhoto(p, true). */
+export const placePhoto = (p, _square = false) => {
+  const tier = typeof p === "string" ? "restaurant" : p.tier;
+  return `../assets/illus/quan-${["cafe", "street", "restaurant"].includes(tier) ? tier : "restaurant"}.jpg`;
+};
 export const dishPhoto = (d) => `../assets/dishes/${d}.jpg`;
 export const sightPhoto = (lm) => (lm.img ? `../assets/sights/${lm.img}.jpg` : null);
 export const webArt = (name, ext = "jpg") => `../assets/web/${name}.${ext}`;

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Scan a menu or a dish — Nón Lá</title>
+<title>Scan — Nón Lá</title>
 <link rel="icon" href="../icon.svg">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 <main class="wrap" id="main">
   <div style="display:flex;align-items:flex-end;gap:22px;padding:34px 0 20px;flex-wrap:wrap">
     <div>
-      <h1 style="font-size:46px">Scan a menu or a dish</h1>
+      <h1 style="font-size:46px">Scan</h1>
       <p class="muted" style="margin-top:10px;max-width:56ch">Drop in a menu photo and every
         priced line is compared with what this neighbourhood actually pays. Photographed the
         food instead? Nón Lá works out which dish it is and shows the local price.</p>
@@ -178,10 +178,17 @@ async function nhanMon(file) {
         <span class="amt tnum" style="font-size:15px">${it ? `${money(it.p25)} – ${money(it.p75)}` : "not priced here"}</span>
       </button>`;
     }).join("")}
-    <p class="small muted" style="margin-top:12px">Tap the right one to compare a price. The guess
-      comes from an AI model and can be wrong — similar dishes look alike.</p>
+    <button class="btn" id="khongPhai" style="margin-top:12px">None of these — pick the dish myself</button>
+    <p class="small muted" style="margin-top:10px">An AI guess — similar dishes look alike.</p>
   </div>`;
   out.querySelectorAll("[data-chon]").forEach((b) => b.onclick = () => chonMon(b.dataset.chon));
+  /* Đoán sai thì người dùng không được bị kẹt với ba lựa chọn sai: đưa thẳng tới
+     ô chọn món bằng tay và mở nó ra. */
+  document.getElementById("khongPhai").onclick = () => {
+    sel.scrollIntoView({ behavior: "smooth", block: "center" });
+    sel.focus();
+    sel.showPicker?.();
+  };
 }
 
 function chonMon(id) {

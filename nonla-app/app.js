@@ -697,6 +697,10 @@ function openSheet(html) {
   const top = $("#sheet .cloudtop");
   if (top && !top.style.backgroundImage) top.style.backgroundImage = dataURI(cloudBand(GOLD, GIAY, 8));
   $("#sheetBody").innerHTML = html; $("#sheet").classList.add("open");
+  /* Về ĐẦU thẻ mỗi lần mở. Chỉ thay nội dung thì vị trí cuộn của thẻ trước còn
+     nguyên: bấm Chùa Cầu sau khi vừa cuộn hết một thẻ quán là thẻ mới mở ra
+     ngay ở đáy, người dùng tưởng bị kéo xuống. */
+  $("#sheetBody").scrollTop = 0;
 }
 function closeSheet() { $("#sheet").classList.remove("open"); setEdge(null); }
 
@@ -2898,10 +2902,9 @@ function outsideHTML({ name, at = null, tags = [], web = null, kind = "place", a
         `${I[PLATFORM_ICON[n.id]] || I.globe}<span><b>${esc(n.label)}</b><i>${esc(n.note)}</i></span>`)).join("")}
     </div>
     ${web ? `<div class="outrow">${ext(web, "btn sec out", `${I.external}Their own website`)}</div>` : ""}
-    <p class="seedwarn">These open a <strong>search</strong> on each platform, not a verified
-      account. Nón Lá does not know which page belongs to this ${esc(kind)} and will not guess —
-      check the address and the photos before you trust a result.${
-      L.exact ? "" : " No coordinates on record, so the map link searches by name too."}</p>`;
+    ${/* Người dùng chê thẻ "nhiều chữ nhỏ quá". Giữ đúng ý cốt lõi — đây là
+          TÌM KIẾM, không phải trang chính thức — trong một dòng. */""}
+    <p class="seedwarn">A <strong>search</strong> on each platform, not their official page.</p>`;
 }
 
 /* Nút chia sẻ. Web Share API là đường chính vì nó mở đúng bộ ứng dụng
@@ -2955,7 +2958,7 @@ function chiTietOSM(p) {
   if (p.cuisine) rows.push(["Cuisine", esc(String(p.cuisine).replace(/_/g, " ").replace(/;/g, ", "))]);
   if (!rows.length) return "";
   return `<dl class="osminfo">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
-    <p class="seedwarn">From OpenStreetMap contributors — hours and numbers change, check before you go.</p>`;
+    <p class="seedwarn">Source: OpenStreetMap.</p>`;
 }
 
 /* GIÁ THƯỜNG GẶP TRONG VÙNG cho quán chưa suy ra được món. Đây là dải giá của
@@ -2978,7 +2981,7 @@ function giaVungHTML(p) {
         <span><span class="nm">${esc(d.vi)}</span><span class="note">${esc(d.en)}</span></span>
         <span class="amt">${money(st.p50)}<small>typical</small></span>
       </button>`).join("")}
-    <p class="seedwarn">Local ranges for this kind of place in ${esc(z.en || z.name || "this area")} — not this place's own menu.</p>`;
+    <p class="seedwarn">Area prices — not this place's own menu.</p>`;
 }
 
 function showPlace(id, metres = null) {
@@ -3006,10 +3009,8 @@ function showPlace(id, metres = null) {
     ${dg.muc === "high" ? `<div class="warnbox">${I.alert}<span>Worth checking a few
       items against the menu before you order — and this says nothing about the food.</span></div>` : ""}
     ${dg.muc === null ? `<div class="warnbox infobox">${I.clock}<span>${
-      dg.n ? `Only ${dg.n} scan${dg.n === 1 ? "" : "s"} here so far.`
-           : "Nobody has scanned a menu here yet."} Nón Lá needs ${
-      CoSo.MIN_QUAN_SAT} before it says anything about this place, and it only counts
-      scans made on this phone.</span></div>` : ""}
+      dg.n ? `${dg.n}/${CoSo.MIN_QUAN_SAT} scans here so far.`
+           : `No menu scans here yet — ${CoSo.MIN_QUAN_SAT} needed for a price badge.`}</span></div>` : ""}
     <button class="btn sec" data-act="hcOpen" data-place="${esc(p.id)}">${
       esc(T("Price conditions this place declared"))}</button>
     ${priceBreakdown(p)}
@@ -3032,9 +3033,6 @@ function showPlace(id, metres = null) {
       data-sub="${esc(p.street || "")}"
       data-tags="${esc((p.known || []).map((k) => dishById(k)?.vi || k).join("|"))}">
       ${I.share}Share this place</button>
-    <p class="seedwarn">Badge status comes from accumulated scans, never assigned by hand.
-      A place loses it automatically when prices drift outside the local range.
-      ${p.at ? "Coordinates are approximate placements on the named street, not surveyed addresses." : ""}</p>
     <div id="placeCommunity"></div>
     <button class="btn sec" data-act="review" data-place="${esc(p.id)}">Write a review</button>
     <button class="btn sec" data-act="close">Close</button>`);
@@ -3114,7 +3112,7 @@ async function paintPlaceCommunity(place) {
           <span class="note">${esc((p.body || "No note").slice(0, 90))}</span></span>
         <span class="amt">${p.commentCount == null ? "" : `${p.commentCount}<small>comment${p.commentCount === 1 ? "" : "s"}</small>`}</span>
       </button>`).join("")
-      : `<p class="seedwarn">Nobody has posted about this place yet. Post what you ate and paid — other travellers can reply underneath.</p>`}
+      : `<p class="muted" style="font-size:13px">No posts yet.</p>`}
     <button class="btn sec" data-cact="compose" data-place="${esc(place.id)}">Post about this place</button>`;
 
   // Giá cộng đồng hiện SONG SONG với giá hạt giống, không thay nó. Một người

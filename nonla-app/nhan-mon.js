@@ -10,10 +10,17 @@
    ═══════════════════════════════════════════════════════════════ */
 
 export function loiNhacNhanMon(dishes) {
+  /* `nhin` là dấu hiệu NHÌN THẤY của món dễ nhầm (dishes.json). Mô tả `desc` viết
+     cho người đọc thực đơn, nói vị và cách ăn — model nhìn ảnh không thấy vị.
+     Đo thật: ảnh bún chả (bát nước chấm màu cam, bún để đĩa riêng) bị đọc thành
+     bún riêu 85% vì không chỗ nào nói bún chả trông ra sao. */
   const list = dishes
-    .map((d) => `${d.id}=${d.vi} (${d.en || ""}): ${d.desc || ""}`)
+    .map((d) => `${d.id}=${d.vi} (${d.en || ""}): ${d.desc || ""}${d.nhin ? ` LOOKS LIKE: ${d.nhin}` : ""}`)
     .join("\n");
   return "Identify the Vietnamese dish in this photo.\n\n"
+    + "Look before you choose: are the noodles IN the broth or served separately? Is there broth at "
+    + "all? What colour is it? Which toppings are visible (grilled patties, crab paste, tofu, blood "
+    + "cubes, peanuts, fish cake)? Compare those with the LOOKS LIKE notes.\n\n"
     + "Only identify food that is physically present in the photo as prepared food — on a "
     + "plate, in a bowl, in a glass, on a grill, or in someone's hand. If the photo shows a "
     + "shopfront, a signboard, a banner, a printed menu, packaging, or an empty table, "
@@ -24,7 +31,8 @@ export function loiNhacNhanMon(dishes) {
     + "\n\nSeveral of these look alike — read the descriptions before choosing between "
     + "them. If nothing in the list matches what is actually served in the photo, return "
     + "an empty list rather than guessing.\n\n"
-    + "Reply with JSON only: {\"top\":[{\"id\":\"<id>\",\"confidence\":0-100}]}, at most 3, "
+    + "Reply with JSON only: {\"seen\":\"<one short sentence of what is visibly on the table>\","
+    + "\"top\":[{\"id\":\"<id>\",\"confidence\":0-100}]}, at most 3, "
     + "ordered by confidence. Whenever you return any candidate at all, return AT LEAST 2 — "
     + "the person will confirm which one is right, so always give them the next most "
     + "plausible dish from the list even when you are confident. Only an empty list may be "

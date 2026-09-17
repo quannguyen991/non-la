@@ -738,7 +738,7 @@ export async function run({ verbose = true } = {}) {
       // câu, nên textContent mang cả xuống dòng lẫn thụt đầu dòng.
       const flat = sb.textContent.replace(/\s+/g, " ");
       ck("khối nền tảng tự khai là tìm kiếm",
-        /search/i.test(flat) && /not a verified account/i.test(flat));
+        /search/i.test(flat) && /not their official page/i.test(flat));
       const small = chips.filter((e) => e.getBoundingClientRect().height < MIN_TAP);
       ck("chip nền tảng đạt vùng chạm", small.length === 0, String(small.length));
       click("[data-act='close']"); await wait(300);

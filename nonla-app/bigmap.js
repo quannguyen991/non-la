@@ -157,20 +157,16 @@ const TILE_STYLES = {
   },
   vetinh: {
     nhan: "Sat",
-    /* hybrid, không phải satellite trần: ảnh vệ tinh CÓ tên đường chồng lên.
-       Người đứng giữa phố cổ cần cả hai — nhận ra mái nhà, và đọc được tên
-       phố để hỏi đường. */
-    /* KHÔNG @2x cho ảnh vệ tinh. Một khung nhìn là ~24 ô; bản @2x là ảnh
-       1024px ~140KB mỗi ô, tức ~3MB cho MỘT lần nhìn bản đồ — trên 3G ở phố
-       cổ đó là nửa phút chờ và một khoản dữ liệu người dùng phải trả. Bản
-       256px ~50KB nhìn mềm hơn một chút nhưng vẫn nhận ra mái nhà, mà nhẹ
-       hơn ba lần. Nền phố giữ @2x: PNG vector chỉ ~78KB và chữ cần nét. */
-    url: MT("hybrid", "jpg", `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`, false),
-    duPhong: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
-    /* Không có khoá thì ảnh vệ tinh là của Esri, không phải MapTiler — ghi đúng người vẽ. */
-    ghi: coKhoa
-      ? 'Imagery ©&nbsp;<b>MapTiler</b>, ©&nbsp;<b>Esri</b>, Maxar; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.'
-      : 'Imagery ©&nbsp;<b>Esri</b>, Maxar, Earthstar Geographics; map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
+    /* ẢNH ESRI, KHÔNG PHẢI MAPTILER. So cùng một ô z19 ở phố cổ Hội An: ảnh
+       vệ tinh MapTiler là ảnh phân giải thấp phóng lên — bản @2x cũng mờ y
+       hệt — còn ảnh Esri (Maxar) thấy rõ từng mái ngói, bể bơi, lối đi. Người
+       dùng chê bản đồ vệ tinh "mờ tịt" đúng vì chỗ này.
+       Ảnh Esri không kèm chữ, nên chồng thêm LỚP PHỦ giao thông trong suốt của
+       Esri: tên đường tiếng Việt và số nhà — người đứng giữa phố cần đọc được
+       tên phố để hỏi đường. Cả hai không cần khoá. */
+    url: `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
+    phu: `${ESRI}/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`,
+    ghi: 'Imagery ©&nbsp;<b>Esri</b>, Maxar, Earthstar Geographics; labels © Esri, HERE, Garmin; place data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.',
   },
   osm: {
     nhan: "OSM",
@@ -251,6 +247,8 @@ function paintTiles() {
       const a = M.vp.toScreen([tile2lat(y, z), tile2lng(x, z)]);
       const b = M.vp.toScreen([tile2lat(y + 1, z), tile2lng(x + 1, z)]);
       want.set(`${z}/${x}/${y}`, { a, b });
+      // Lớp phủ chữ (ảnh vệ tinh): một ảnh trong suốt chồng đúng lên ô nền.
+      if (tileStyle().phu) want.set(`${z}/${x}/${y}#phu`, { a, b });
     }
   }
 
@@ -264,12 +262,23 @@ function paintTiles() {
     want.delete(el.dataset.k);
   }
   for (const [k, box] of want) {
-    const [tz, tx, ty] = k.split("/");
+    const laPhu = k.endsWith("#phu");
+    const [tz, tx, ty] = k.replace("#phu", "").split("/");
     const img = new Image();
     img.dataset.k = k;
     img.loading = "eager";
     img.decoding = "async";
     img.alt = "";
+    if (laPhu) {
+      /* Lớp phủ KHÔNG bật cờ _tilesOK: chữ tải được mà ảnh nền hỏng thì vẫn
+         phải hiện lớp vector bên dưới, không để lại một nền trống chỉ có chữ. */
+      img.className = "phu";
+      img.onerror = () => img.remove();
+      place(img, box);
+      layer.appendChild(img);
+      img.src = tileSrc(tileStyle().phu, tz, tx, ty);
+      continue;
+    }
     img.onload = () => { M._tilesOK = true; syncBaseVisibility(); };
     /* Tile lỗi thì thử nền dự phòng ĐÚNG MỘT LẦN rồi mới bỏ ô. Bỏ ngay là
        bản đồ rỗ lỗ chỗ mà không ai biết vì sao. */
@@ -1725,7 +1734,12 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30, lvlOf
       .map((e) => e.getBoundingClientRect())
       .filter((b) => b.width && b.height)
       .map((b) => ({ l: b.left - r.left, t: b.top - r.top, r: b.right - r.left, b: b.bottom - r.top }));
-    P.fit = fitArt({ tf: P.tf, art: A, points: pts, view, pad: 26, avoid });
+    /* maxUpscale 0,6 chứ không phải mặc định 2,2. Tranh ~1,3 px/m; khít theo cụm
+       12 quán gần nhất thì khung phóng tới 2,2 lần, tức trên màn 3× mỗi điểm ảnh
+       tranh kéo ra ~6–7 điểm ảnh thật — người dùng chê "mờ tịt, như bị crop".
+       Ở 0,6 khung hiện rộng hơn (~400 m), tranh gần đúng độ nét gốc, cụm quán
+       vẫn lọt khung. */
+    P.fit = fitArt({ tf: P.tf, art: A, points: pts, view, pad: 26, avoid, maxUpscale: 0.6 });
     if (!P.fit) return false;
     art.style.width = `${(A.w * P.fit.k).toFixed(1)}px`;
     art.style.height = `${(A.h * P.fit.k).toFixed(1)}px`;
