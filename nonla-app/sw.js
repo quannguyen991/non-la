@@ -33,6 +33,8 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v66: trợ lý hỏi giá trong app (trolychat.js) và trên web gọi hàm máy chủ api/tro-ly;
+//      tro-ly.js ghép ngữ cảnh vùng phía máy chủ.
 // v65: nhan-mon.js (lời nhắc nhận diện món dùng chung) vào SHELL — imgsvc.js import nó,
 //      thiếu là app offline hỏng import. Bình luận dưới bài đăng; quét món không cần khoá riêng.
 // v64: tranh nền xem trước DỰNG TỪ DỮ LIỆU OSM (tools/tranh-ban-do.mjs) thay tranh vẽ theo
@@ -146,7 +148,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v65";
+const CACHE = "nonla-v66";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -158,7 +160,7 @@ const VERSIONLESS_CACHES = [IMG_CACHE, "nonla-icons-v1"];
 
 const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css", "./community.css", "./welcome.css", "./you.css",
-  "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./nhan-mon.js", "./route.js",
+  "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./nhan-mon.js", "./tro-ly.js", "./trolychat.js", "./route.js",
   "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
   "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js", "./units.js", "./predict.js", "./eaterydish.js", "./pricesync.js", "./menuref.js", "./premium.js", "./amlich.js", "./lich.js", "./hanhtrinh.js", "./monla.js", "./pricesrc.js", "./coso.js", "./uutien.js", "./thoathuan.js", "./phieuui.js", "./tien.js", "./hochieu.js", "./hochieuui.js",
   "./manifest.json", "./icon.svg",

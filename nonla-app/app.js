@@ -50,6 +50,7 @@ import { bachPhanVi } from "./pricesrc.js";
 import { inferDishes } from "./eaterydish.js";
 import * as Lich from "./lich.js";
 import * as HanhTrinh from "./hanhtrinh.js";
+import * as TroLy from "./trolychat.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
    dùng bản vẽ tay trong sights.js. Trước đây truyền thẳng Img.iconOf —
@@ -4679,6 +4680,7 @@ function go(tab) {
   S.tab = tab;
   for (const t of ["scan", "eat", "map", "journal", "community", "me"]) $("#v-" + t).hidden = t !== tab;
   renderTabs();
+  TroLy.syncTab(tab);
   if (tab === "scan") {
     startCam();                            // không await: xin quyền có thể treo
     /* Nạp trước máy đọc chữ. Người dùng báo "ấn chụp xong chờ lâu" — cái
@@ -5463,6 +5465,15 @@ async function boot() {
   });
   if (!S.prices[S.zone]) S.zone = Object.keys(S.prices)[0];
   S.ready = true;
+
+  /* Trợ lý hỏi giá: nút nổi trên thanh tab. Gắn SAU khi có bảng giá — nó đọc
+     tên vùng đang mở, và hỏi trước khi có dữ liệu là hỏi một vùng rỗng. */
+  TroLy.mount({
+    host: $("#app"),
+    zone: () => S.zone,
+    zoneName: () => { const z = S.prices[S.zone]; return z ? (z.en || z.name) : ""; },
+  });
+  TroLy.syncTab(S.tab);
 
   $("#reticle").innerHTML = reticleSVG();
   $("#lantern").innerHTML = lanternSVG;

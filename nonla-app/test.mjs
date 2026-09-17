@@ -2388,7 +2388,8 @@ console.log("\n── đọc câu trả lời của mô hình ──────
    Origin, cỡ ảnh, tần suất, lời nhắc cố định. Và lời nhắc chỉ có MỘT bản. */
 {
   const api = readFileSync("./api/nhan-mon.js", "utf8");
-  eq("hàm nhận diện đọc khoá từ biến môi trường", api.includes("process.env.NHAN_MON_KEY"), true);
+  eq("hàm nhận diện đọc khoá từ biến môi trường",
+    api.includes('cauHinh("NHAN_MON_MODEL")') && readFileSync("./api/_chan.js", "utf8").includes("process.env.NHAN_MON_KEY"), true);
   eq("hàm nhận diện không chứa khoá nào", /sk-[A-Za-z0-9]{16,}/.test(api), false);
   eq("hàm nhận diện chặn Origin lạ", api.includes('if (!NGUON.test(origin)) return res.status(403)'), true);
   eq("hàm nhận diện giới hạn cỡ ảnh và tần suất",
@@ -2414,6 +2415,40 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("đọc kết quả bỏ id bịa và kẹp độ tin cậy",
     JSON.stringify(docKetQuaNhanMon('```json {"top":[{"id":"banh-xeo","confidence":140},{"id":"mon-bia","confidence":50}]}```', dsMon)),
     JSON.stringify([{ id: "banh-xeo", confidence: 100 }]));
+}
+
+/* ── TRỢ LÝ HỎI GIÁ ───────────────────────────────────────────
+   Khoá ở máy chủ; người gọi chỉ gửi mã vùng và lượt hội thoại, KHÔNG gửi
+   được lời hệ thống; ngữ cảnh ghép phía máy chủ từ dữ liệu của app; chốt
+   chặn dùng chung với nhận diện món. */
+{
+  const api = readFileSync("./api/tro-ly.js", "utf8");
+  const chan = readFileSync("./api/_chan.js", "utf8");
+  eq("trợ lý và nhận diện món dùng chung chốt chặn",
+    api.includes('from "./_chan.js"') && readFileSync("./api/nhan-mon.js", "utf8").includes('from "./_chan.js"'), true);
+  eq("chốt chặn đọc khoá từ biến môi trường, không chứa khoá",
+    chan.includes("process.env.NHAN_MON_KEY") && !/sk-[A-Za-z0-9]{16,}/.test(chan + api), true);
+  eq("trợ lý chặn Origin lạ và giới hạn tần suất",
+    api.includes('if (!NGUON.test(req.headers.origin || "")) return res.status(403)') && api.includes('quaTai(req, "tro-ly", 20)'), true);
+  eq("người gọi chỉ gửi được lượt user/assistant, không gửi được lời hệ thống",
+    api.includes('m?.role === "user" || m?.role === "assistant"') && !/role: "system"/.test(api), true);
+  eq("mỗi lượt bị cắt 800 ký tự, tối đa 10 lượt",
+    api.includes(".slice(0, 800)") && api.includes(".slice(-10)"), true);
+  const { nguCanhTroLy } = await import("./tro-ly.js");
+  const doc = (p) => JSON.parse(readFileSync(`./data/${p}.json`, "utf8"));
+  const nc = nguCanhTroLy("hoian-oldtown", { prices: doc("prices"), places: doc("places"), dishes: doc("dishes"), maps: doc("maps") });
+  eq("ngữ cảnh có bảng giá của vùng", /Cao lầu[\s\S]{0,60}typical \d+k/.test(nc), true);
+  eq("ngữ cảnh cấm phán giá từng quán", nc.includes("never say a specific place is cheap, fair or overpriced"), true);
+  eq("ngữ cảnh không còn nói quán là tên mô tả", nc.includes("descriptive, not real business names"), false);
+  eq("vùng không có thì không dựng ngữ cảnh", nguCanhTroLy("khong-co", { prices: doc("prices"), places: doc("places"), dishes: doc("dishes"), maps: doc("maps") }), null);
+  const web = readFileSync("./web/chat.js", "utf8");
+  eq("hộp chat web không còn xin khoá API của khách",
+    /KEY_STORE|chatKey|type="password"/.test(web.replace(/\/\*[\s\S]*?\*\//g, "")), false);
+  const app = readFileSync("./app.js", "utf8");
+  eq("app điện thoại có trợ lý", app.includes('import * as TroLy from "./trolychat.js"') && app.includes("TroLy.mount({"), true);
+  eq("trợ lý không ghi lịch sử xuống máy", /localStorage|indexedDB/.test(readFileSync("./trolychat.js", "utf8").replace(/\/\*[\s\S]*?\*\//g, "")), false);
+  eq("trợ lý và module chung nằm trong vỏ offline",
+    ['"./trolychat.js"', '"./tro-ly.js"'].every((f) => readFileSync("./sw.js", "utf8").includes(f)), true);
 }
 
 /* ── thẻ quán: dữ liệu OSM thật, tranh minh hoạ có lời khai ─────── */
@@ -2504,7 +2539,7 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("mốc ẩn không dựng thành nút trên bản đồ", /function markFor\(lm, i\) \{[\s\S]{0,260}if \(lm\.an\) return "";/.test(bm2), true);
   eq("mốc ẩn không được đếm", bm2.includes("const soMoc = (geo) =>") && !bm2.includes("(geo.landmarks || []).length} sights"), true);
   eq("khay điểm tham quan bỏ mốc ẩn", appSrc.includes("lm.note && !lm.an"), true);
-  for (const f of ["./web/index.html", "./web/place.html", "./web/chat.js", "./web/web.js"]) {
+  for (const f of ["./web/index.html", "./web/place.html", "./tro-ly.js", "./web/web.js"]) {
     eq(`${f} bỏ mốc ẩn`, readFileSync(f, "utf8").includes("!l.an"), true);
   }
   /* Mỗi quyết định tra tay phải ghi LÝ DO — không có lý do thì lần sau không
