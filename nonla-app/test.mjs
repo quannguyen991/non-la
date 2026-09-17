@@ -50,7 +50,7 @@ import { danhGia as dgCoSo, danhGiaTatCa, nhan as nhanCoSo, dong as dongCoSo,
          MIN_QUAN_SAT, TI_LE_DUNG } from "./coso.js";
 import { phanKhuc, nhomMon, nhomCuaDanhMuc, daiNhom, mucQuan,
          MIN_MON_NHOM, MIN_DONG_QUAN } from "./monla.js";
-import { readFileSync, readdirSync } from "fs";
+import { readFileSync, readdirSync, existsSync } from "fs";
 import { join } from "path";
 
 const dishes = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
@@ -2343,6 +2343,64 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("app hỏi máy chủ lúc khởi động", /Auth\.thamDo\(\);/.test(app), true);
 }
 
+/* ── BÌNH LUẬN DƯỚI BÀI ĐĂNG ──────────────────────────────────
+   Mỗi bài gắn một quán; bình luận dưới bài là chỗ bàn về quán đó. Canh bốn
+   chuyện: máy chủ chặn đúng (RLS, rate limit, không sửa, báo cáo tự ẩn); feed
+   KHÔNG hỏng khi bảng chưa được tạo; bài mẫu không nói thay quán có thật; và
+   nâng cấp IndexedDB không xoá sổ tay của người dùng. */
+{
+  const sql = readFileSync("../supabase/schema.sql", "utf8");
+  eq("máy chủ có bảng bình luận bật RLS",
+    sql.includes("create table if not exists comments") && sql.includes("alter table comments        enable row level security"), true);
+  eq("chỉ bình luận vào bài đang hiện, có giới hạn tần suất",
+    /comments_insert[\s\S]{0,400}p\.status = 'visible'[\s\S]{0,300}interval '1 hour'\) < 20/.test(sql), true);
+  eq("bình luận không có policy sửa", /on comments for update/.test(sql), false);
+  eq("ba báo cáo thì bình luận tự ẩn", sql.includes("create trigger comment_reports_hide"), true);
+
+  const cl = readFileSync("./cloud.js", "utf8");
+  eq("feed tự lùi về truy vấn cũ khi máy chủ chưa có bảng bình luận",
+    cl.includes("comments(count)") && cl.includes("coBinhLuan = false") && cl.includes('q.set("select", "*,profiles(name,country)")'), true);
+
+  const cj = JSON.parse(readFileSync("./data/community.json", "utf8"));
+  const baiMau = Object.values(cj.posts).flat();
+  eq("bài mẫu không gắn quán nào", baiMau.filter((p) => p.placeId).length, 0);
+  eq("bài mẫu không nhắc tên quán có thật", baiMau.filter((p) => /Chè Mót/.test(p.body)).length, 0);
+  const idMau = new Set(baiMau.map((p) => p.id));
+  eq("bình luận mẫu đều thuộc một bài mẫu có thật", Object.keys(cj.comments || {}).filter((k) => !idMau.has(k)).length, 0);
+
+  const ldb = readFileSync("./localdb.js", "utf8");
+  eq("sổ tay nâng lên bản 2 và chỉ THÊM kho bình luận",
+    ldb.includes("VERSION = 2") && ldb.includes("if (!db.objectStoreNames.contains(CSTORE))")
+    && ldb.includes("if (!db.objectStoreNames.contains(STORE))"), true);
+
+  const cm = readFileSync("./community.js", "utf8");
+  eq("bình luận mẫu không có ô trả lời", cm.includes('const viet = t.mode === "cloud" || t.mode === "local";'), true);
+  eq("bài không còn quán thì không in mã quán thô", !cm.includes("${esc(place?.name || p.placeId)}"), true);
+  const ap = readFileSync("./app.js", "utf8");
+  eq("nút luồng bàn luận được bắt trước định tuyến theo tab",
+    ap.indexOf('const th = el("[data-cthread]");') > 0
+    && ap.indexOf('const th = el("[data-cthread]");') < ap.indexOf('if (S.tab === "community" && Community.handleClick(ev.target)) return;'), true);
+}
+
+/* ── thẻ quán: dữ liệu OSM thật, tranh minh hoạ có lời khai ─────── */
+{
+  const pj = JSON.parse(readFileSync("./data/places.json", "utf8")).places;
+  ok("phần lớn quán có địa chỉ hoặc tên phố gần nhất", pj.filter((p) => p.street || p.ganPho).length >= pj.length * 0.95);
+  eq("không quán nào có cả địa chỉ OSM lẫn phố suy ra", pj.filter((p) => p.street && p.ganPho).length, 0);
+  const ap = readFileSync("./app.js", "utf8");
+  eq("tranh minh hoạ quán ghi rõ không phải ảnh của quán", ap.includes("Illustration · not a photo of"), true);
+  eq("địa chỉ suy ra ghi chữ near", ap.includes('p.street || (p.ganPho ? `near ${p.ganPho}` : "")'), true);
+  eq("giá vùng nói rõ không phải thực đơn của quán", ap.includes("not this place's own menu"), true);
+  eq("liên kết website chỉ nhận http(s)", ap.includes("/^https?:$/.test(x.protocol)"), true);
+  for (const k of ["cafe", "street", "restaurant"]) {
+    ok(`có tranh minh hoạ loại quán ${k}`, existsSync(`./assets/illus/quan-${k}.jpg`));
+  }
+  const mj = JSON.parse(readFileSync("./data/maps.json", "utf8")).zones;
+  for (const [zid, z] of Object.entries(mj)) {
+    ok(`${zid}: tranh nền dựng từ OSM có tệp thật`, z.art?.src?.endsWith("-osm.jpg") && existsSync(`./${z.art.src}`), z.art?.src);
+  }
+}
+
 /* ── KHÔNG CÓ KÝ TỰ BACKSPACE TRONG MÃ ─────────────────────────
 
    Sửa tệp bằng heredoc làm dấu thoát \b trong regex biến thành ký tự
@@ -2473,7 +2531,7 @@ console.log("\n── đọc câu trả lời của mô hình ──────
      câu ghi nguồn phải đổi theo nền đang hiện chứ không đứng im. */
   eq("nền mặc định là bản đồ phố MapTiler, không phải tile của OSMF",
     bm.includes('const TILE_ORDER = ["pho", "vetinh", "osm"]')
-    && bm.includes('url: MT("streets-v2", "png"'), true);
+    && bm.includes('url: MT("basic-v2", "png"'), true);
   /* Hết hạn mức tháng hay khoá bị thu là chuyện của HOÁ ĐƠN, không được biến
      thành bản đồ trắng. Mỗi nền cần khoá phải có nền dự phòng KHÔNG cần khoá,
      và lớp tile phải thật sự thử nền ấy khi ảnh lỗi. */
@@ -2513,6 +2571,13 @@ console.log("\n── đọc câu trả lời của mô hình ──────
   eq("ghi nguồn dựng theo nền đang hiện",
     bm.includes("const attrHTML = () =>") && bm.includes("${attrHTML()}"), true);
   eq("ghi nguồn nói tên người vẽ tile", bm.includes("<b>MapTiler</b>") && bm.includes("openstreetmap.org"), true);
+  /* Nền phố không được là kiểu tự vẽ biểu tượng quán (streets-v2): chúng chen
+     lẫn và trùng với chấm quán của app. */
+  eq("nền Map là kiểu ít biểu tượng", bm.includes('url: MT("basic-v2", "png"') && !bm.includes('MT("streets-v2"'), true);
+  eq("ghim xem trước của quán chưa có nhãn là chấm",
+    bm.includes('class="ex-pin dot"') && readFileSync("./app.css", "utf8").includes(".ex-pin.dot::before{"), true);
+  eq("khung mở đầu chừa lề cho cột nút và có sàn độ phóng",
+    bm.includes("const LE = { l: 20, r: 80, t: 140, b: 190 };") && bm.includes("Math.max(M.vp.scale * k, 0.7)"), true);
   /* Ảnh vệ tinh KHÔNG dùng @2x: ~24 ô JPEG 1024px là ~3MB cho một khung nhìn,
      trên 3G ở phố cổ đó là dữ liệu người dùng phải trả. */
   eq("ảnh vệ tinh không tải bản @2x", bm.includes('MT("hybrid", "jpg"') && bm.includes(", false)"), true);

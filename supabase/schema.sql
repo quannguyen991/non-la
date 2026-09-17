@@ -101,6 +101,76 @@ drop trigger if exists reports_hide on reports;
 create trigger reports_hide after insert on reports
   for each row execute function hide_reported();
 
+-- ── bình luận dưới bài đăng ───────────────────────────────────
+-- Mỗi bài gắn MỘT quán (posts.place_id), nên luồng bình luận dưới bài chính
+-- là chỗ bàn về quán đó: hỏi lại giá, bổ sung giờ mở cửa, cảnh báo đổi món.
+-- Cùng khuôn với posts: đọc công khai phần đang hiện, viết phải đăng nhập,
+-- rate limit nằm trong policy, KHÔNG có update (sửa lời sau khi người khác đã
+-- trả lời là đổi nghĩa cả cuộc bàn luận), báo cáo đủ 3 người thì tự ẩn.
+create table if not exists comments (
+  id         uuid primary key default gen_random_uuid(),
+  post_id    uuid not null references posts    on delete cascade,
+  author     uuid not null references profiles on delete cascade,
+  body       text not null check (char_length(btrim(body)) between 1 and 500),
+  status     text not null default 'visible'
+             check (status in ('visible', 'hidden')),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists comments_post_idx on comments (post_id, created_at);
+
+create table if not exists comment_reports (
+  id         uuid primary key default gen_random_uuid(),
+  comment_id uuid not null references comments on delete cascade,
+  reporter   uuid not null references profiles on delete cascade,
+  reason     text not null
+             check (reason in ('spam','offensive','wrong-place','fake-price','other')),
+  created_at timestamptz not null default now(),
+  unique (comment_id, reporter)
+);
+
+alter table comments        enable row level security;
+alter table comment_reports enable row level security;
+
+drop policy if exists comments_read   on comments;
+drop policy if exists comments_insert on comments;
+drop policy if exists comments_delete on comments;
+
+create policy comments_read on comments for select
+  using (status = 'visible' or auth.uid() = author);
+
+-- Chỉ bình luận vào bài ĐANG HIỆN: bài đã bị ẩn vì báo cáo không được thành
+-- chỗ tụ tập mới. 20 bình luận một giờ — rộng hơn bài đăng (5) vì bàn luận
+-- là hỏi qua đáp lại, nhưng vẫn đủ chặn một người xả rác cả luồng.
+create policy comments_insert on comments for insert with check (
+  auth.uid() = author
+  and not coalesce((select banned from profiles where id = auth.uid()), true)
+  and exists (select 1 from posts p where p.id = post_id and p.status = 'visible')
+  and (select count(*) from comments c
+       where c.author = auth.uid()
+         and c.created_at > now() - interval '1 hour') < 20
+);
+
+create policy comments_delete on comments for delete using (auth.uid() = author);
+
+drop policy if exists comment_reports_insert on comment_reports;
+create policy comment_reports_insert on comment_reports for insert
+  with check (auth.uid() = reporter);
+-- Cố ý KHÔNG có policy select cho comment_reports, giống reports.
+
+create or replace function hide_reported_comment() returns trigger
+language plpgsql security definer as $$
+begin
+  if (select count(*) from comment_reports where comment_id = new.comment_id) >= 3 then
+    update comments set status = 'hidden' where id = new.comment_id;
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists comment_reports_hide on comment_reports;
+create trigger comment_reports_hide after insert on comment_reports
+  for each row execute function hide_reported_comment();
+
 -- ── Storage ───────────────────────────────────────────────────
 -- Bucket `posts` phải được tạo ở tab Storage trước khi chạy phần này.
 drop policy if exists posts_upload on storage.objects;

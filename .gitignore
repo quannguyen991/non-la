@@ -52,3 +52,6 @@ docs/_sitemap-*.json
 
 # bộ đệm trả lời Overpass của tools/moc-that-osm.mjs
 /.tmp-moc-osm/
+
+# bản phác và tranh nháp của tools/tranh-ban-do.mjs
+/.tmp-tranh/

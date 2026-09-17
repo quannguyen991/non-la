@@ -25,7 +25,10 @@
    như thế, và `cloud.js` không bao giờ đọc tệp này.
    ═══════════════════════════════════════════════════════════════ */
 
-const DB = "nl-local", STORE = "posts", VERSION = 1;
+/* VERSION 2 thêm kho `comments` cho luồng bàn luận dưới bài. Nâng cấp CHỈ THÊM:
+   onupgradeneeded kiểm từng kho trước khi tạo, nên máy đang ở bản 1 giữ nguyên
+   mọi bài đã ghi — mất sổ tay của người dùng vì một lần nâng cấp là không được. */
+const DB = "nl-local", STORE = "posts", CSTORE = "comments", VERSION = 2;
 const NAME_KEY = "nl.local.name";
 
 /* Trần số bài giữ lại. Ảnh đã nén còn ~150KB, nên 60 bài là ~9MB — vừa
@@ -43,6 +46,10 @@ function open() {
         const s = db.createObjectStore(STORE, { keyPath: "id", autoIncrement: true });
         s.createIndex("createdAt", "createdAt");
       }
+      if (!db.objectStoreNames.contains(CSTORE)) {
+        const c = db.createObjectStore(CSTORE, { keyPath: "id", autoIncrement: true });
+        c.createIndex("postId", "postId");
+      }
     };
     rq.onsuccess = () => res(rq.result);
     rq.onerror = () => rej(rq.error);
@@ -50,12 +57,13 @@ function open() {
   });
 }
 
-const tx = async (mode, fn) => {
+const tx = (mode, fn) => txOn(STORE, mode, fn);
+const txOn = async (store, mode, fn) => {
   const db = await open();
   return new Promise((res, rej) => {
-    const t = db.transaction(STORE, mode);
+    const t = db.transaction(store, mode);
     let rq;
-    try { rq = fn(t.objectStore(STORE)); }
+    try { rq = fn(t.objectStore(store)); }
     catch (e) { db.close(); rej(e); return; }
     t.oncomplete = () => { db.close(); res(rq?.result); };
     t.onerror = () => { db.close(); rej(t.error); };
@@ -128,7 +136,47 @@ export async function listPosts({ zone = null, placeId = null, limit = 20 } = {}
     .slice(0, limit);
 }
 
-export const removePost = (id) => tx("readwrite", (s) => s.delete(id));
+/* Xoá bài thì xoá luôn bình luận của nó: để lại bình luận mồ côi là để sổ tay
+   phình ra bằng những dòng không còn chỗ nào hiện. */
+export async function removePost(id) {
+  await tx("readwrite", (s) => s.delete(id));
+  const con = await listComments(id).catch(() => []);
+  for (const c of con) await removeComment(c.id).catch(() => {});
+}
+
+/* ── bình luận trong sổ tay ───────────────────────────────────
+   Cùng hình dạng với cloud.listComments(): community.js không phải biết
+   luồng bàn luận đang ở máy chủ hay ở máy. `postId` là id SỐ của bài trên
+   máy, đúng loại khoá của kho posts. */
+export async function saveComment(postId, body) {
+  const rec = {
+    local: true,
+    postId: Number(postId),
+    body: String(body || "").trim().slice(0, 500),
+    authorName: name() || "You",
+    authorCountry: "",
+    createdAt: new Date().toISOString(),
+    mine: true,
+  };
+  const id = await txOn(CSTORE, "readwrite", (s) => s.add(rec));
+  return { ...rec, id };
+}
+
+export async function listComments(postId) {
+  const all = await txOn(CSTORE, "readonly", (s) => s.index("postId").getAll(Number(postId))).catch(() => []);
+  return (all || []).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+}
+
+export const removeComment = (id) => txOn(CSTORE, "readwrite", (s) => s.delete(Number(id)));
+
+/** Số bình luận theo từng bài, một lượt đọc cho cả feed. */
+export async function commentCounts(postIds) {
+  const all = await txOn(CSTORE, "readonly", (s) => s.getAll()).catch(() => []);
+  const out = {};
+  for (const id of postIds) out[id] = 0;
+  for (const c of all || []) if (c.postId in out) out[c.postId]++;
+  return out;
+}
 export const count = () => tx("readonly", (s) => s.count()).catch(() => 0);
 
 /* ── URL ảnh ──────────────────────────────────────────────────

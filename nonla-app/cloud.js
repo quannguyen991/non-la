@@ -51,18 +51,78 @@ const toPost = (r) => ({
   createdAt: r.created_at,
   authorName: r.profiles?.name || "Traveller",
   authorCountry: r.profiles?.country || "",
+  // PostgREST trả phép đếm nhúng dạng [{count: n}]; không nhúng thì null —
+  // null nghĩa là "máy chủ chưa có bình luận", KHÁC với 0.
+  commentCount: Array.isArray(r.comments) ? (r.comments[0]?.count ?? 0) : null,
 });
+
+/* ── BÌNH LUẬN CÓ BẬT TRÊN MÁY CHỦ KHÔNG ─────────────────────────
+   Bảng `comments` chỉ tồn tại sau khi chạy phần SQL mới trong
+   supabase/schema.sql. Nhúng `comments(count)` vào truy vấn feed khi bảng
+   chưa có thì PostgREST trả lỗi quan hệ — và CẢ FEED hỏng theo, không riêng
+   phần bình luận. Nên thử một lần, lỗi thì nhớ lại và quay về truy vấn cũ. */
+let coBinhLuan = null;                   // null = chưa biết, true/false = đã thử
+export const commentsOn = () => coBinhLuan === true;
+const loiThieuBang = (e) => /comments|relationship|schema cache|PGRST20/i.test(`${e?.message} ${e?.code}`);
 
 export async function listPosts({ zone, placeId, limit = 20, before } = {}) {
   const q = new URLSearchParams();
-  q.set("select", "*,profiles(name,country)");
   q.set("order", "created_at.desc");
   q.set("limit", String(limit));
   if (zone)    q.set("zone", `eq.${zone}`);
   if (placeId) q.set("place_id", `eq.${placeId}`);
   if (before)  q.set("created_at", `lt.${before}`);
+  if (coBinhLuan !== false) {
+    q.set("select", "*,profiles(name,country),comments(count)");
+    try {
+      const rows = (await rest(`posts?${q}`) || []).map(toPost);
+      coBinhLuan = true;
+      return rows;
+    } catch (e) {
+      if (!loiThieuBang(e)) throw e;
+      coBinhLuan = false;
+    }
+  }
+  q.set("select", "*,profiles(name,country)");
   return (await rest(`posts?${q}`) || []).map(toPost);
 }
+
+const toComment = (r) => ({
+  id: r.id, postId: r.post_id, author: r.author, body: r.body,
+  createdAt: r.created_at,
+  authorName: r.profiles?.name || "Traveller",
+  authorCountry: r.profiles?.country || "",
+  mine: !!Auth.user()?.id && r.author === Auth.user()?.id,
+});
+
+/** Bình luận của một bài, cũ nhất trước — đọc như một cuộc trò chuyện. */
+export async function listComments(postId, { limit = 100 } = {}) {
+  try {
+    const rows = await rest(`comments?select=*,profiles(name,country)&post_id=eq.${encodeURIComponent(postId)}`
+      + `&order=created_at.asc&limit=${limit}`);
+    coBinhLuan = true;
+    return (rows || []).map(toComment);
+  } catch (e) {
+    if (loiThieuBang(e)) { coBinhLuan = false; throw Object.assign(new Error("Comments are not switched on on the server yet"), { code: "no-comments" }); }
+    throw e;
+  }
+}
+
+export async function createComment(postId, body) {
+  const rows = await rest("comments", {
+    method: "POST",
+    prefer: "return=representation",
+    body: [{ post_id: postId, author: Auth.user()?.id, body: String(body).trim().slice(0, 500) }],
+  });
+  return toComment(rows[0]);
+}
+
+export const deleteComment = (id) =>
+  rest(`comments?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" }).then(() => undefined);
+
+export const reportComment = (commentId, reason) =>
+  rest("comment_reports", { method: "POST", body: [{ comment_id: commentId, reporter: Auth.user()?.id, reason }] })
+    .then(() => undefined);
 
 export async function createPost(draft, { photoPath = null, photoHash = null, far = false } = {}) {
   const rows = await rest("posts", {

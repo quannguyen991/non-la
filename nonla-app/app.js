@@ -230,9 +230,17 @@ const placePhoto = (p, ratio = "16/10") => {
          <figcaption>${esc(p.name)}</figcaption>
        </figure>`;
   }
-  const square = String(ratio).replace(/\s/g, "") === "1/1";
-  // photo() tự lo phần nền giấy dó khi cả hai đường đều không có ảnh.
-  return photo(`assets/places/${p.id}${square ? ".thumb" : ""}.jpg`, p.name, ratio);
+  /* Quán thật OSM KHÔNG có ảnh chụp, và ảnh sinh ra mang tên một quán có thật
+     là bịa. Nên dùng TRANH MINH HOẠ theo LOẠI quán (cà phê / hàng rong / nhà
+     hàng), ghi rõ ngay trên ảnh rằng đó không phải ảnh của quán này. Bản trước
+     gọi assets/places/<id>.jpg — tệp đã gỡ — nên mỗi thẻ là một request 404
+     rồi rơi về khung giấy trống có chiếc nón. */
+  const loai = ["cafe", "street", "restaurant"].includes(p.tier) ? p.tier : "restaurant";
+  return `<figure class="ph minhhoa" style="aspect-ratio:${ratio}">
+      <img src="assets/illus/quan-${loai}.jpg" alt="" loading="lazy" decoding="async">
+      <figcaption>${String(ratio).replace(/\s/g, "") === "1/1"
+        ? "Illustration" : `Illustration · not a photo of ${esc(p.name)}`}</figcaption>
+    </figure>`;
 };
 const wave = (kind = "batTrang", c = CHAM) =>
   `<div class="frieze" style="background-image:${dataURI(FRIEZE[kind](c))}" aria-hidden="true"></div>`;
@@ -2916,6 +2924,52 @@ async function shareThing({ name, sub = "", tags = [] }) {
     <button class="btn sec" data-act="close">Close</button>`);
 }
 
+/* ── thẻ quán: dữ liệu CÓ THẬT, không có thì nói không có ──────────── */
+const TIER_EN = { street: "street food", cafe: "café", restaurant: "restaurant" };
+/** Địa chỉ OSM; không có thì con phố OSM gần nhất, ghi rõ chữ "near". */
+const diaChi = (p) => p.street || (p.ganPho ? `near ${p.ganPho}` : "");
+/** Chỉ nhận liên kết http(s): trường web của OSM là chữ người đóng góp gõ. */
+const webAnToan = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x : null; } catch { return null; } };
+
+function chiTietOSM(p) {
+  const rows = [];
+  if (p.hours) rows.push(["Hours", esc(p.hours)]);
+  if (p.phone) {
+    const so = String(p.phone).split(/[;,]/)[0].trim();
+    rows.push(["Phone", `<a href="tel:${esc(so.replace(/[^\d+]/g, ""))}">${esc(so)}</a>`]);
+  }
+  const w = p.web && webAnToan(p.web);
+  if (w) rows.push(["Website", `<a href="${esc(w.href)}" target="_blank" rel="noopener noreferrer">${esc(w.hostname.replace(/^www\./, ""))}</a>`]);
+  if (p.veg) rows.push(["Vegetarian", "Has vegetarian options"]);
+  if (p.cuisine) rows.push(["Cuisine", esc(String(p.cuisine).replace(/_/g, " ").replace(/;/g, ", "))]);
+  if (!rows.length) return "";
+  return `<dl class="osminfo">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
+    <p class="seedwarn">From OpenStreetMap contributors — hours and numbers change, check before you go.</p>`;
+}
+
+/* GIÁ THƯỜNG GẶP TRONG VÙNG cho quán chưa suy ra được món. Đây là dải giá của
+   VÙNG theo loại quán (quán cà phê → đồ uống), lấy từ prices.json — KHÔNG phải
+   thực đơn của quán này, và thẻ nói đúng như thế. Thiếu khối này thì 1.800 quán
+   mở ra chỉ có một tiêu đề "Known for" trống trơn. */
+function giaVungHTML(p) {
+  const z = S.prices?.[p.zone];
+  if (!z?.items) return "";
+  const uong = (d) => /glass|cup|bottle|can/i.test(d.unit || "");
+  let ds = Object.entries(z.items).map(([id, st]) => ({ id, st, d: dishById(id) })).filter((x) => x.d && x.st?.p50);
+  if (p.tier === "cafe") ds = ds.filter((x) => uong(x.d)).sort((a, b) => /ca-phe/.test(b.id) - /ca-phe/.test(a.id));
+  else if (p.tier === "street") ds = ds.filter((x) => !uong(x.d) && x.st.p50 <= 60000);
+  else ds = ds.filter((x) => !uong(x.d)).sort((a, b) => b.st.p50 - a.st.p50);
+  ds = ds.slice(0, 5);
+  if (!ds.length) return "";
+  return `<h2 class="sect">Typical prices for a ${esc(TIER_EN[p.tier] || "place")} here</h2>
+    ${ds.map(({ id, st, d }) => `<button class="row" data-dish="${esc(id)}">
+        <span class="dot" data-l="ok"></span>
+        <span><span class="nm">${esc(d.vi)}</span><span class="note">${esc(d.en)}</span></span>
+        <span class="amt">${money(st.p50)}<small>typical</small></span>
+      </button>`).join("")}
+    <p class="seedwarn">Local ranges for this kind of place in ${esc(z.en || z.name || "this area")} — not this place's own menu.</p>`;
+}
+
 function showPlace(id, metres = null) {
   const p = S.places.find((x) => x.id === id);
   if (!p) return;
@@ -2933,8 +2987,10 @@ function showPlace(id, metres = null) {
   openSheet(`
     ${placePhoto(p, "16/10")}
     <h3>${esc(p.name)}</h3>
-    <p class="src">${esc(p.street)} · ${esc(p.tier)} · ${esc(CoSo.dong(dg))}${metres != null ? ` · ${fmtDistance(metres)} away` : ""}</p>
+    <p class="src">${[diaChi(p), TIER_EN[p.tier] || p.tier, CoSo.dong(dg),
+      metres != null ? `${fmtDistance(metres)} away` : ""].filter(Boolean).map(esc).join(" · ")}</p>
     <div style="margin-top:9px">${pill}</div>
+    ${chiTietOSM(p)}
     ${wave()}
     ${dg.muc === "high" ? `<div class="warnbox">${I.alert}<span>Worth checking a few
       items against the menu before you order — and this says nothing about the food.</span></div>` : ""}
@@ -2947,7 +3003,7 @@ function showPlace(id, metres = null) {
       esc(T("Price conditions this place declared"))}</button>
     ${priceBreakdown(p)}
     ${whatToDo(p)}
-    <h2 class="sect">Known for</h2>
+    ${p.known.length ? `<h2 class="sect">Known for</h2>` : giaVungHTML(p)}
     ${p.known.map((k) => {
       const d = dishById(k), st = stat(k);
       return `<button class="row" data-dish="${esc(k)}">
@@ -2959,7 +3015,7 @@ function showPlace(id, metres = null) {
     }).join("")}
     ${/* Hashtag lấy từ MÓN trước, tên quán sau: người ta gắn #caolau vào
           video chứ gần như không ai gắn tên một hàng quán nhỏ. */""}
-    ${outsideHTML({ name: p.name, at: p.at, kind: "place", addr: p.street || "",
+    ${outsideHTML({ name: p.name, at: p.at, kind: "place", addr: diaChi(p),
       tags: [...(p.known || []).map((k) => dishById(k)?.vi || k), p.name] })}
     <button class="btn sec" data-act="shareThing" data-name="${esc(p.name)}"
       data-sub="${esc(p.street || "")}"
@@ -3012,6 +3068,7 @@ async function paintPlaceCommunity(place) {
      là biến việc ghi lại thành công cốc: người ta ghi giá mình đã trả
      đúng để lần sau mở ra xem lại. */
   if (!Cloud.ready()) {
+    THREAD_EXTRA.splice(0, THREAD_EXTRA.length, ...posts);
     host.innerHTML = posts.length ? `
       <h2 class="sect">Your notes here</h2>
       ${posts.map((p) => `<div class="cnote-mine">
@@ -3021,6 +3078,7 @@ async function paintPlaceCommunity(place) {
             p.paidVnd ? ` · paid ${fmtVND(p.paidVnd)}` : ""}${
             Number.isFinite(p.stars) ? ` · ${"★".repeat(p.stars)}` : ""}</span>
           ${p.body ? `<p class="muted" style="font-size:13px">${esc(p.body)}</p>` : ""}
+          <button class="ccomments" data-cthread="${esc(String(p.id))}"><span>Add a note underneath</span></button>
         </div>
       </div>`).join("")}
       <p class="seedwarn">Kept on this phone only. Nothing here has been sent anywhere,
@@ -3030,10 +3088,23 @@ async function paintPlaceCommunity(place) {
   }
 
   const s = summarise(posts);
+  /* BÀN LUẬN VỀ QUÁN NÀY: mỗi bài về quán là một luồng bình luận. Thẻ quán
+     liệt kê chúng kèm số bình luận, bấm vào là vào đúng luồng — đây là chỗ
+     người ta hỏi "giá còn thế không", "tối nay có mở không". */
+  THREAD_EXTRA.splice(0, THREAD_EXTRA.length, ...posts);
+  const luong = posts.slice(0, 6);
   host.innerHTML = `
     ${s.show ? `<p class="src">${s.avg.toFixed(1)} ★ · ${s.count} ratings from travellers</p>` : ""}
     ${shots.length ? `<div class="cshots">${shots.map((p) =>
-      `<img src="${img(p)}" alt="" loading="lazy">`).join("")}</div>` : ""}`;
+      `<img src="${img(p)}" alt="" loading="lazy">`).join("")}</div>` : ""}
+    <h2 class="sect">Discussion about this place</h2>
+    ${luong.length ? luong.map((p) => `<button class="row" data-cthread="${esc(String(p.id))}">
+        <span><span class="nm">${esc(p.authorName)}${p.paidVnd ? ` · paid ${fmtVND(p.paidVnd)}` : ""}</span>
+          <span class="note">${esc((p.body || "No note").slice(0, 90))}</span></span>
+        <span class="amt">${p.commentCount == null ? "" : `${p.commentCount}<small>comment${p.commentCount === 1 ? "" : "s"}</small>`}</span>
+      </button>`).join("")
+      : `<p class="seedwarn">Nobody has posted about this place yet. Post what you ate and paid — other travellers can reply underneath.</p>`}
+    <button class="btn sec" data-cact="compose" data-place="${esc(place.id)}">Post about this place</button>`;
 
   // Giá cộng đồng hiện SONG SONG với giá hạt giống, không thay nó. Một người
   // gõ nhầm một số không không được phép kéo lệch phán quyết của cả app.
@@ -4263,8 +4334,10 @@ function renderCommunity() {
     host: $("#communityBody"),
     zone: S.zone,
     places: S.places,
+    dishes: S.dishes,
     onOpenPlace: (id) => showPlace(id),
     onReport: (id) => reportPost(id),
+    onThread: (id) => openThread(id),
     /* Đưa thẳng tới thẻ Account và cuộn tới nó, không chỉ đổi tab: tab You
        dài hơn một màn hình, và bỏ người dùng ở đầu trang với lời dặn "tìm
        mục Account" là bắt họ làm nốt việc mà mình vừa hứa sẽ làm hộ. */
@@ -4346,11 +4419,104 @@ function needAuth() {
   });
 }
 
+/* ── luồng bàn luận dưới bài ─────────────────────────────────
+   Bài trên thẻ quán được nạp riêng (paintPlaceCommunity), không nằm trong
+   feed của community.js — nên giữ chúng ở đây để openThread() tìm ra. */
+const THREAD_EXTRA = [];
+
+async function openThread(id) {
+  const post = Community.findPost(id, THREAD_EXTRA);
+  if (!post) return toast("That post is no longer here");
+  openSheet(`<h3>Discussion</h3><p class="src">Loading…</p>`);
+  const t = await Community.loadThread(post);
+  openSheet(Community.threadHtml(post, t));
+}
+
+async function sendComment(postId) {
+  const body = $("#ccBody")?.value?.trim() || "";
+  const err = $("#ccErr");
+  const bao = (m) => { if (err) { err.hidden = false; err.textContent = m; } };
+  if (body.length < 2) return bao("Write a little more before posting.");
+  if (body.length > 500) return bao("Keep it under 500 characters.");
+  const post = Community.findPost(postId, THREAD_EXTRA);
+  if (!post || post.seed) return;
+  if (post.local) {
+    await Local.saveComment(post.id, body);
+  } else {
+    /* Hỏi đăng nhập ĐÚNG lúc cần, sau khi đã gõ xong — cùng lẽ với đăng bài.
+       needAuth() đóng sheet để mở màn tài khoản, nên giữ lời vừa gõ lại và
+       mở lại luồng sau khi đăng nhập, không bắt người ta gõ lại từ đầu. */
+    if (!(await needAuth())) return;
+    busy(true, "Posting…");
+    try {
+      await Cloud.createComment(post.id, body);
+    } catch (e) {
+      busy(false);
+      if (e.status === 403 && e.code === "42501") return toast("You've commented 20 times this hour. Try again later.");
+      return toast("Could not post that comment — please try again.");
+    }
+    busy(false);
+  }
+  post.commentCount = (Number(post.commentCount) || 0) + 1;
+  toast("Comment posted");
+  await openThread(post.id);
+  if (S.tab === "community") Community.refresh();
+}
+
+async function deleteComment(id, local) {
+  try {
+    if (local) await Local.removeComment(id);
+    else await Cloud.deleteComment(id);
+  } catch { return toast("Could not delete that comment"); }
+  const postId = $("[data-cact='csend']")?.dataset.post;
+  toast("Comment deleted");
+  if (postId) {
+    const post = Community.findPost(postId, THREAD_EXTRA);
+    if (post) post.commentCount = Math.max(0, (Number(post.commentCount) || 1) - 1);
+    await openThread(postId);
+  }
+  if (S.tab === "community") Community.refresh();
+}
+
+async function reportComment(id) {
+  if (!(await needAuth())) return;
+  openSheet(`
+    <h3>Report this comment</h3>
+    <p class="src">Reports are private. Three reports from different people hide a comment.</p>
+    ${REASONS.map(([v, label]) =>
+      `<button class="row" data-ccid="${esc(id)}" data-ccreason="${esc(v)}">
+        <span><span class="nm">${esc(label)}</span></span></button>`).join("")}
+    <button class="btn sec" data-act="close">Cancel</button>`);
+}
+
+async function sendCommentReport(id, reason) {
+  closeSheet();
+  try {
+    await Cloud.reportComment(id, reason);
+    toast("Reported — thank you");
+  } catch (e) {
+    toast(e.status === 409 ? "You already reported this comment" : "Could not send the report");
+  }
+}
+
 function openComposer(placeId = "") {
+  const cho = S.places.filter((p) => p.zone === S.zone || p.id === placeId);
   openSheet(Community.composer({
     // Hàng trăm quán thật mỗi vùng: chỉ liệt kê vùng đang mở (và quán đang chọn).
-    places: S.places.filter((p) => p.zone === S.zone || p.id === placeId),
+    places: cho,
     dishes: S.dishes, place: placeId }));
+  /* Ô tìm quán: lọc lại danh sách theo tên và địa chỉ mỗi lần gõ. Giữ quán
+     đang chọn trong danh sách để gõ tiếp không làm mất lựa chọn đã có. */
+  const q = $("#cfPlaceQ");
+  if (q) q.oninput = () => {
+    const sel = $("#cfPlace");
+    const cu = sel?.value || "";
+    sel.innerHTML = Community.placeOptions(cho, q.value, cu);
+    if (!cu && q.value.trim() && sel.options.length === 2) {
+      sel.selectedIndex = 1;                    // một kết quả thì chọn luôn
+      sel.onchange?.();
+    }
+  };
   /* composer() chỉ dựng #cfDish MỘT LẦN lúc mở, theo đúng placeId truyền vào lúc
      đó. Đường vào từ tab Community luôn mở với placeId="", nên nếu không nghe
      sự kiện đổi Place thì #cfDish đứng yên ở "—" mãi mãi — đúng cái làm mất hẳn
@@ -4552,6 +4718,18 @@ document.addEventListener("click", async (ev) => {
      và mọi nhánh phụ thuộc tab sẽ im lặng nuốt cú chạm. */
   if (await SurveyUI.handleClick(ev.target)) return;
 
+  /* LUỒNG BÀN LUẬN mở được từ HAI chỗ — feed Community và thẻ quán (tab
+     `map`) — và bản thân luồng nằm trong sheet cấp #app. Nên các nút của nó
+     được bắt TRƯỚC mọi định tuyến theo tab, giống form đăng bài bên dưới. */
+  const th = el("[data-cthread]");
+  if (th) return openThread(th.dataset.cthread);
+  const ccd = el("[data-ccdel]");
+  if (ccd) return deleteComment(ccd.dataset.ccdel, ccd.dataset.local === "1");
+  const ccr = el("[data-ccreport]");
+  if (ccr) return reportComment(ccr.dataset.ccreport);
+  const ccrr = el("[data-ccreason]");
+  if (ccrr) return sendCommentReport(ccrr.dataset.ccid, ccrr.dataset.ccreason);
+
   // Phần tử của feed đi qua community.js…
   if (S.tab === "community" && Community.handleClick(ev.target)) return;
   // …còn nút của form đăng bài thì KHÔNG phụ thuộc tab nào đang mở, vì form
@@ -4560,7 +4738,8 @@ document.addEventListener("click", async (ev) => {
   if (ca) {
     if (ca.dataset.cact === "flush") return flushOutbox();
     if (ca.dataset.cact === "submit") return submitPost();
-    return openComposer();
+    if (ca.dataset.cact === "csend") return sendComment(ca.dataset.post);
+    return openComposer(ca.dataset.place || "");
   }
 
   if (el("#scanBtn")) {

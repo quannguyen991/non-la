@@ -146,7 +146,10 @@ const MT = (kieu, duoi, duPhong, hai = true) => (coKhoa
 const TILE_STYLES = {
   pho: {
     nhan: "Map",
-    url: MT("streets-v2", "png", `${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`),
+    /* basic-v2 chứ không phải streets-v2: streets-v2 tự vẽ biểu tượng và tên hàng
+       trăm quán, nhà thuốc, công ty du lịch — chen lẫn với ghim của app và trùng
+       với chính các chấm quán. App đã có ghim riêng; nền chỉ cần phố, sông, tên đường. */
+    url: MT("basic-v2", "png", `${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`),
     duPhong: `${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`,
     ghi: coKhoa
       ? 'Tiles ©&nbsp;<b>MapTiler</b>, map data ©&nbsp;<b>OpenStreetMap</b> contributors, ODbL.'
@@ -1083,7 +1086,9 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
      lấy từ OpenStreetMap, khung khít theo quán đã để Chùa Cầu nằm sát mép
      trái và chợ lọt ra ngoài mép phải: người dùng mở bản đồ lên không thấy
      đúng những chỗ họ tới phố cổ để xem. */
-  for (const lm of geo.landmarks || []) if (lm.star && lm.at) pts.push(lm.at);
+  for (const lm of geo.landmarks || []) {
+    if (lm.star && !lm.an && lm.at && Math.sqrt(d2(lm.at)) * 111320 <= 350) pts.push(lm.at);
+  }
   const bounds = boundsOf(pts.length ? pts : [geo.center]);
 
   view.innerHTML = `
@@ -1152,9 +1157,32 @@ export function open({ zoneId, zone, geo, places, icons, onOpenPlace, onOpenMark
        mép phải (44px, cách mép 12px). Chừa 70 thì quán ở rìa đông — hến Cồn
        Cẩm Nam — rơi đúng vào dưới nút "−". Khung vẫn căn giữa, nên cần chừa
        gấp đôi bề rộng cột nút cộng nửa bề ngang ghim. */
-    const k = Math.min((M.vp.w - 160) / (box.w || 1), (M.vp.h - 360) / (box.h || 1));
-    if (Number.isFinite(k) && k > 0) M.vp.zoomAt(k, M.vp.w / 2, M.vp.h / 2);
+    /* LỀ KHÔNG ĐỀU, vì thứ đè lên bản đồ không đều: cột nút Map/Flat/+/− ở mép
+       PHẢI, thanh tên vùng và hàng lọc ở TRÊN, dòng ghi nguồn ở DƯỚI. Bản trước
+       chừa đều hai bên rồi căn giữa, nên phóng lên là Phúc Kiến và chợ dạt vào
+       dưới cột nút. Giờ khít vào vùng trống thật rồi dời tâm sang đó. */
+    const LE = { l: 20, r: 80, t: 140, b: 190 };
+    const k = Math.min((M.vp.w - LE.l - LE.r) / (box.w || 1), (M.vp.h - LE.t - LE.b) / (box.h || 1));
+    if (Number.isFinite(k) && k > 0) {
+      /* SÀN ĐỘ PHÓNG 0,7 px/m (thước ~100 m). Khít đủ mọi mốc gắn sao thì mở ở
+         mức 200 m: bốn mươi chấm quán co thành một cục không đọc được. Lõi phố
+         phải đọc được ngay; mốc xa hơn nằm sát mép thì người dùng kéo. */
+      const dich = Math.min(Math.max(M.vp.scale * k, 0.7), 1.6);
+      M.vp.zoomAt(dich / M.vp.scale, M.vp.w / 2, M.vp.h / 2);
+    }
     M.vp.centerOn(mid);
+    M.vp.panBy((LE.l - LE.r) / 2, (LE.t - LE.b) / 2);
+    /* Sàn độ phóng có thể làm dải mốc RỘNG hơn vùng trống: ở Hội An, Chùa Cầu
+       tới chợ ~580 m, ở 0,7 px/m là 406 px trên màn 375 px — và chợ rơi đúng
+       dưới cột nút, thấy mà không bấm được (phép thử chạm bắt được đúng ca
+       này). Mép TRÁI không có nút nào, nên ưu tiên đẩy mọi điểm ra khỏi cột
+       nút bên phải và thanh lọc bên trên; điểm tràn mép trái vẫn bấm và kéo
+       vào được. Chừa thêm 24 px vì ghim dựng cao hơn toạ độ của nó. */
+    const q = pts.map((p) => M.vp.toScreen(p));
+    const phaiMax = Math.max(...q.map((s) => s.x)), tranPhai = M.vp.w - LE.r - 24;
+    if (phaiMax > tranPhai) M.vp.panBy(tranPhai - phaiMax, 0);
+    const trenMin = Math.min(...q.map((s) => s.y)), tranTren = LE.t + 24;
+    if (trenMin < tranTren) M.vp.panBy(0, tranTren - trenMin);
   }
   /* Nền đã chọn từ lần trước cũng phải gắn lớp này, không chỉ lúc bấm đổi:
      mở lại bản đồ ở chế độ ảnh vệ tinh mà thiếu lớp là chấm quán lại thành
@@ -1562,6 +1590,13 @@ export function preview({ host, geo, places, icons, me = null, padPx = 30, lvlOf
        "beyond the edge of this map", và nối vào chính aria-label thì mỗi
        lần vẽ lại nó dài thêm một đoạn nữa. */
     const lab = `${esc(p.name)}${d ? `, ${d} away` : ""}`;
+    /* Quán chưa có lượt quét là CHẤM, không phải ghim "?" to: mười hai dấu hỏi
+       xám chồng lên nhau trên khung xem trước là thứ người dùng chê, và bản đồ
+       đầy đủ đã vẽ chấm từ trước — hai màn phải nói cùng một thứ. */
+    if (lvl === "unknown") {
+      return `<button class="ex-pin dot" data-place="${esc(p.id)}" data-lvl="${lvl}"
+      data-label="${lab}" aria-label="${lab}"></button>`;
+    }
     return `<button class="ex-pin" data-place="${esc(p.id)}" data-lvl="${lvl}"
       data-label="${lab}" aria-label="${lab}">${g}</button>`;
   };

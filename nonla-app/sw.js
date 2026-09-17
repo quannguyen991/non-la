@@ -33,6 +33,10 @@
 // phải mất một màn hình mà mất cả app. Cùng loại lỗi với v22.
 // v41: pricesync.js — đường đưa giá đã quan sát lên máy chủ. Thiếu nó thì
 //      surveyui.js nạp hỏng và cả màn khảo sát chết khi offline.
+// v64: tranh nền xem trước DỰNG TỪ DỮ LIỆU OSM (tools/tranh-ban-do.mjs) thay tranh vẽ theo
+//      ấn tượng; ghim xem trước của quán chưa có nhãn là chấm; nền Map là basic-v2;
+//      thẻ quán có giờ/điện thoại/website/món chay từ OSM, giá thường gặp trong vùng
+//      và tranh minh hoạ theo loại quán (assets/illus).
 // v63: 23 mốc còn ước lượng tay được chốt từng mốc (tools/moc-chot-tay.mjs): 181/182 mốc
 //      có toạ độ OSM (7 neo vào phố, bến hay bờ biển), 1 mốc ẩn; ghi nguồn ảnh vệ tinh
 //      đúng người vẽ khi không có khoá.
@@ -140,7 +144,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v63";
+const CACHE = "nonla-v64";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -166,7 +170,7 @@ const SHELL = [
   "./assets/index.json",
   // Tranh nền tab Nearby. Nằm trong vỏ app chứ không để tải sau: mất mạng
   // giữa phố cổ là đúng lúc người dùng cần màn hình này nhất.
-  "./assets/maps/hoian-oldtown.jpg",
+  "./assets/maps/hoian-oldtown-osm.jpg",
 ];
 
 /* addAll() fail nguyên khối: một URL hỏng là mất sạch cache và app mất
@@ -248,7 +252,7 @@ self.addEventListener("fetch", (e) => {
      đủ phố, đủ sông, đủ ghim. Nhét vào SHELL là bắt mọi lần cài đầu tiên
      tải ngần ấy trước khi app dùng được; để network-first như maps.json là
      mỗi lần mở bản đồ lại hỏi lại máy chủ về một tệp không bao giờ đổi. */
-  const isArt = /\/assets\/(icons|places|motifs|intro|sights)\//.test(req.url)
+  const isArt = /\/assets\/(icons|places|motifs|intro|sights|maps|illus)\//.test(req.url)
     || /\/data\/buildings\.json$/.test(req.url);
 
   if (isCDN || isArt) {

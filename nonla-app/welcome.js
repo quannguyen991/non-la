@@ -249,7 +249,7 @@ const SLIDES = [
     deco: decoPrice,
   },
   {
-    art: "assets/maps/hoian-oldtown.jpg", alt: "Hand-painted map of Hội An old town",
+    art: "assets/maps/hoian-oldtown-osm.jpg", alt: "Illustrated map of Hội An old town, drawn from OpenStreetMap",
     title: "Find trusted local spots",
     text: "Hand-drawn maps of Hội An, Đà Nẵng, Huế, Hà Nội and Sài Gòn — the streets, the "
       + "walking routes, and 77 dishes worth trying.",

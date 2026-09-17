@@ -39,6 +39,25 @@ const dishes = doc("data/dishes.json").dishes;
 const prices = doc("data/prices.json").zones;
 const TIER = { street: "street", cafe: "cafe", restaurant: "restaurant" };
 
+const maps = doc("data/maps.json").zones;
+/** Tên con phố OSM gần nhất trong `tran` mét, hoặc null. */
+function phoGan(zid, at, tran = 60) {
+  const kx = Math.cos(at[0] * Math.PI / 180) * 111320, ky = 111320;
+  let tot = null;
+  for (const s of maps[zid]?.streets || []) {
+    if (!s.n || !s.l) continue;
+    for (let i = 0; i + 1 < s.l.length; i++) {
+      const ax = (s.l[i][1] - at[1]) * kx, ay = (s.l[i][0] - at[0]) * ky;
+      const bx = (s.l[i + 1][1] - at[1]) * kx, by = (s.l[i + 1][0] - at[0]) * ky;
+      const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy;
+      const t = L ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / L)) : 0;
+      const d = Math.hypot(ax + t * dx, ay + t * dy);
+      if (d <= tran && (!tot || d < tot.d)) tot = { d, n: s.n };
+    }
+  }
+  return tot?.n || null;
+}
+
 const places = [];
 for (const e of ea.eateries) {
   if (!e.id || !e.name || !e.at || !e.zone) continue;
@@ -60,6 +79,20 @@ for (const e of ea.eateries) {
     src: "osm",
   };
   if (e.cuisine) p.cuisine = e.cuisine;
+  /* Bản đầu tệp này BỎ RƠI bốn trường OSM có thật: giờ mở cửa (492 quán),
+     điện thoại (345), website (211), món chay (162). Thẻ quán vì thế trống
+     trơn dù dữ liệu nằm sẵn trong eateries.json. Chép nguyên văn, không sửa. */
+  if (e.hours) p.hours = e.hours;
+  if (e.phone) p.phone = e.phone;
+  if (e.web) p.web = e.web;
+  if (e.veg) p.veg = true;
+  /* Không có địa chỉ trong OSM thì nói "gần phố X" — X là con phố OSM có tên
+     GẦN NHẤT trong 60 m. Đây là suy ra từ hình học, không phải địa chỉ, nên
+     để ở trường riêng và thẻ quán ghi rõ chữ "near". */
+  if (!p.street) {
+    const g = phoGan(e.zone, e.at);
+    if (g) p.ganPho = g;
+  }
   places.push(p);
 }
 

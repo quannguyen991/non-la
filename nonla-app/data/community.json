@@ -1,192 +1,387 @@
 {
-  "_note": "BÀI MẪU, KHÔNG PHẢI BÀI CỦA NGƯỜI DÙNG THẬT. Đây là nội dung ship kèm app để màn Community có gì đó đọc được ngay từ lần mở đầu tiên — cùng lẽ với giá seed trong prices.json. Mỗi bài mang cờ seed:true và giao diện gắn nhãn 'sample' lên từng bài; community.js KHÔNG bao giờ trộn chúng vào cùng một khối với bài thật, và người dùng không báo cáo hay xoá được chúng. Bịa ra một lời phàn nàn rồi gán cho một quán có tên thật là điều tuyệt đối không làm ở đây: mọi bài dưới đây chỉ nói mẹo đi lại, giờ giấc, món nên gọi và số tiền ĐÃ TRẢ — và mọi số tiền đều nằm trong khoảng p25–p75 của chính vùng đó trong prices.json, để feed không bao giờ mâu thuẫn với phán quyết giá của app.",
-  "_updated": "2026-08",
-  "posts": {
-    "hoian-oldtown": [
-      {
-        "id": "s-ha-1", "authorName": "Anna", "authorCountry": "Sweden",
-        "placeId": "ba-be", "dishId": "cao-lau", "paidVnd": 45000, "stars": 5,
-        "hoursAgo": 3,
-        "body": "Cao lầu here still 45k and the noodles have that chew you only get in Hội An. Cash only, and it gets busy right around noon."
-      },
-      {
-        "id": "s-ha-2", "authorName": "Minh", "authorCountry": "Hội An",
-        "placeId": "che-mot", "dishId": "che", "paidVnd": 15000, "stars": 5,
-        "hoursAgo": 9,
-        "body": "Local here. Chè Mót is the one on Trần Phú with the queue — order the lotus one, sit on the low stools, done in ten minutes."
-      },
-      {
-        "id": "s-ha-3", "authorName": "Sophie", "authorCountry": "Australia",
-        "placeId": "banh-mi-goc", "dishId": "banh-mi", "paidVnd": 25000, "stars": 4,
-        "hoursAgo": 26,
-        "body": "25k for a bánh mì that took two hands to hold. They shut when the bread runs out, so go before 10am."
-      },
-      {
-        "id": "s-ha-4", "authorName": "Hoà", "authorCountry": "Hội An",
-        "placeId": "hoian-cam-nam", "dishId": "hen-tron", "paidVnd": 30000, "stars": 5,
-        "hoursAgo": 34,
-        "body": "Worth crossing the bridge to Cẩm Nam for. Hến trộn with the sesame crackers, then chè bắp after. Quiet side of the river."
-      },
-      {
-        "id": "s-ha-5", "authorName": "David", "authorCountry": "Canada",
-        "placeId": "co-thao", "dishId": "com-ga-hoi-an", "paidVnd": 45000, "stars": 4,
-        "hoursAgo": 52,
-        "body": "Cơm gà at 45k, exactly what the app said to expect. Ask for the extra herbs, they bring a whole plate."
-      },
-      {
-        "id": "s-ha-6", "authorName": "Linh", "authorCountry": "Đà Nẵng",
-        "placeId": "hoian-xi-ma", "dishId": "xi-ma", "paidVnd": 15000, "stars": 5,
-        "hoursAgo": 74,
-        "body": "The xí mà cart only comes out late afternoon. Sesame, warm, slightly bitter — one of the last people still selling it here."
-      }
-    ],
-    "danang-hanriver": [
-      {
-        "id": "s-dn-1", "authorName": "Quang", "authorCountry": "Đà Nẵng",
-        "placeId": "dn-mi-quang-pho", "dishId": "mi-quang", "paidVnd": 40000, "stars": 5,
-        "hoursAgo": 5,
-        "body": "Mì Quảng 40k. Locals eat it for breakfast, not lunch — by 1pm the good broth is gone."
-      },
-      {
-        "id": "s-dn-2", "authorName": "Emma", "authorCountry": "United Kingdom",
-        "placeId": "dn-banh-mi-que", "dishId": "banh-mi-que", "paidVnd": 5000, "stars": 5,
-        "hoursAgo": 14,
-        "body": "5k each. Five thousand đồng. We ate four standing on the pavement and still spent less than a coffee."
-      },
-      {
-        "id": "s-dn-3", "authorName": "Tuấn", "authorCountry": "Đà Nẵng",
-        "placeId": "dn-cuon-thit-heo", "dishId": "banh-trang-cuon-thit-heo", "paidVnd": 95000, "stars": 5,
-        "hoursAgo": 30,
-        "body": "One portion of bánh tráng cuốn thịt heo feeds two. The price is per plate, not per person — worth knowing before you order two."
-      },
-      {
-        "id": "s-dn-4", "authorName": "Mai", "authorCountry": "Huế",
-        "placeId": "dn-che-hem", "dishId": "che-xoa-xoa-hat-luu", "paidVnd": 15000, "stars": 4,
-        "hoursAgo": 48,
-        "body": "Down the alley, not on the main road. Chè xoa xoa hạt lựu 15k, and the kem bơ is the reason to come back."
-      },
-      {
-        "id": "s-dn-5", "authorName": "Jonas", "authorCountry": "Germany",
-        "placeId": "dn-cha-ca-som", "dishId": "bun-cha-ca", "paidVnd": 35000, "stars": 4,
-        "hoursAgo": 70,
-        "body": "Opens at 6am and sells out mid-morning. 35k, and they'll top up the broth for free if you ask."
-      }
-    ],
-    "danang-mykhe": [
-      {
-        "id": "s-mk-1", "authorName": "Hà", "authorCountry": "Đà Nẵng",
-        "placeId": "mk-cha-ca-sang", "dishId": "bun-cha-ca", "paidVnd": 40000, "stars": 5,
-        "hoursAgo": 7,
-        "body": "Breakfast bún chả cá two streets back from the beach — 40k instead of the seafront price, same fish."
-      },
-      {
-        "id": "s-mk-2", "authorName": "Chloé", "authorCountry": "France",
-        "placeId": "mk-an-thuong", "dishId": "ca-phe-muoi", "paidVnd": 35000, "stars": 5,
-        "hoursAgo": 20,
-        "body": "Salt coffee at 35k, taken on the pavement in An Thượng. Stronger than it looks — one is plenty."
-      },
-      {
-        "id": "s-mk-3", "authorName": "Bảo", "authorCountry": "Đà Nẵng",
-        "placeId": "mk-hai-san-hem", "dishId": "oc-hut", "paidVnd": 70000, "stars": 4,
-        "hoursAgo": 41,
-        "body": "Seafood in the alley rather than on the front. Ask for the price per kilo before they weigh anything — that's normal here, not rude."
-      },
-      {
-        "id": "s-mk-4", "authorName": "Ryan", "authorCountry": "United States",
-        "placeId": "mk-kem-bo-bien", "dishId": "kem-bo", "paidVnd": 35000, "stars": 5,
-        "hoursAgo": 63,
-        "body": "Avocado ice cream, 35k, eaten on the sea wall at sunset. Not a tourist invention — it's a Đà Nẵng thing."
-      }
-    ],
-    "hue-citadel": [
-      {
-        "id": "s-hue-1", "authorName": "Trang", "authorCountry": "Huế",
-        "placeId": "hue-bun-bo-som", "dishId": "bun-bo-hue", "paidVnd": 35000, "stars": 5,
-        "hoursAgo": 4,
-        "body": "The gánh sets up before 6am and is gone by nine. 35k, and it is spicier than the version you get further south."
-      },
-      {
-        "id": "s-hue-2", "authorName": "Marta", "authorCountry": "Spain",
-        "placeId": "hue-banh-loc", "dishId": "banh-beo", "paidVnd": 25000, "stars": 5,
-        "hoursAgo": 16,
-        "body": "Order the mixed plate — bánh bèo, nậm and lọc together. Comes to about 25k a set, and it's the best value sit-down meal we had in Huế."
-      },
-      {
-        "id": "s-hue-3", "authorName": "Đức", "authorCountry": "Huế",
-        "placeId": "hue-com-hen-con", "dishId": "com-hen", "paidVnd": 20000, "stars": 5,
-        "hoursAgo": 33,
-        "body": "Cơm hến on the islet, 20k. Say 'ít ớt' if you don't want it fully spiced — they'll still look at you funny, kindly."
-      },
-      {
-        "id": "s-hue-4", "authorName": "Nina", "authorCountry": "Netherlands",
-        "placeId": "hue-nem-lui", "dishId": "nem-lui", "paidVnd": 10000, "stars": 4,
-        "hoursAgo": 55,
-        "body": "10k a skewer, you roll them yourself in the rice paper. We ordered six and that was lunch."
-      },
-      {
-        "id": "s-hue-5", "authorName": "Khánh", "authorCountry": "Huế",
-        "placeId": "hue-ca-phe-muoi", "dishId": "ca-phe-muoi", "paidVnd": 22000, "stars": 5,
-        "hoursAgo": 78,
-        "body": "Salt coffee started in Huế, and 22k near the citadel is the ordinary local price. Stir it before the first sip."
-      }
-    ],
-    "hanoi-hoankiem": [
-      {
-        "id": "s-hn-1", "authorName": "Sơn", "authorCountry": "Hà Nội",
-        "placeId": "bun-cha-hd", "dishId": "bun-cha", "paidVnd": 45000, "stars": 5,
-        "hoursAgo": 6,
-        "body": "Bún chả is a lunch food here — most of the good places stop serving by 2pm. 45k with the nem."
-      },
-      {
-        "id": "s-hn-2", "authorName": "Isabelle", "authorCountry": "Belgium",
-        "placeId": "ca-phe-giang", "dishId": "ca-phe-trung", "paidVnd": 35000, "stars": 5,
-        "hoursAgo": 18,
-        "body": "Egg coffee 35k. It arrives in a bowl of hot water to keep it warm — don't drink that part."
-      },
-      {
-        "id": "s-hn-3", "authorName": "Hương", "authorCountry": "Hà Nội",
-        "placeId": "hn-pho-ga-pho-co", "dishId": "pho-ga", "paidVnd": 45000, "stars": 4,
-        "hoursAgo": 37,
-        "body": "Phở gà rather than bò, which is what the old quarter actually eats in the morning. 45k, quẩy on the side costs extra."
-      },
-      {
-        "id": "s-hn-4", "authorName": "Tom", "authorCountry": "Ireland",
-        "placeId": "bia-hoi-corner", "dishId": "bia-hoi", "paidVnd": 8000, "stars": 4,
-        "hoursAgo": 58,
-        "body": "8k a glass. It's brewed daily and doesn't keep, which is why it's cheap and why you drink it before 9pm."
-      },
-      {
-        "id": "s-hn-5", "authorName": "Phúc", "authorCountry": "Hà Nội",
-        "placeId": "hn-nom-bo-ho", "dishId": "nom-bo-kho", "paidVnd": 35000, "stars": 5,
-        "hoursAgo": 81,
-        "body": "Nộm bò khô by the lake, 35k. Eat it in the evening when the street closes to traffic."
-      }
-    ],
-    "hcmc-district1": [
-      {
-        "id": "s-sg-1", "authorName": "Nam", "authorCountry": "Sài Gòn",
-        "placeId": "com-tam-ba", "dishId": "com-tam", "paidVnd": 50000, "stars": 5,
-        "hoursAgo": 8,
-        "body": "Cơm tấm 50k with the grilled rib. It's a breakfast dish here as much as a dinner one."
-      },
-      {
-        "id": "s-sg-2", "authorName": "Laura", "authorCountry": "Italy",
-        "placeId": "ben-thanh-stall", "dishId": "goi-cuon", "paidVnd": 40000, "stars": 4,
-        "hoursAgo": 22,
-        "body": "Gỏi cuốn 40k a plate at the market stalls. Sit at the counter rather than the tables out front — same food, less noise."
-      },
-      {
-        "id": "s-sg-3", "authorName": "Trí", "authorCountry": "Sài Gòn",
-        "placeId": "sg-oc-hem", "dishId": "oc-hut", "paidVnd": 65000, "stars": 5,
-        "hoursAgo": 45,
-        "body": "Ốc places open late and price per dish, not per kilo. 65k for a plate of ốc hút and it's a whole evening out."
-      },
-      {
-        "id": "s-sg-4", "authorName": "Yuki", "authorCountry": "Japan",
-        "placeId": "hu-tieu-nam", "dishId": "hu-tieu", "paidVnd": 45000, "stars": 4,
-        "hoursAgo": 68,
-        "body": "Hủ tiếu 45k. Ask for it khô — dry, with the broth in a separate bowl. That's how the regulars order."
-      }
-    ]
-  }
+ "_note": "BÀI MẪU, KHÔNG PHẢI BÀI CỦA NGƯỜI DÙNG THẬT. Đây là nội dung ship kèm app để màn Community có gì đó đọc được ngay từ lần mở đầu tiên — cùng lẽ với giá seed trong prices.json. Mỗi bài mang cờ seed:true và giao diện gắn nhãn 'sample' lên từng bài; community.js KHÔNG bao giờ trộn chúng vào cùng một khối với bài thật, và người dùng không báo cáo hay xoá được chúng. Bịa ra một lời phàn nàn rồi gán cho một quán có tên thật là điều tuyệt đối không làm ở đây: mọi bài dưới đây chỉ nói mẹo đi lại, giờ giấc, món nên gọi và số tiền ĐÃ TRẢ — và mọi số tiền đều nằm trong khoảng p25–p75 của chính vùng đó trong prices.json, để feed không bao giờ mâu thuẫn với phán quyết giá của app. Bài mẫu KHÔNG gắn quán nào (bỏ placeId ngày 17/09/2026): quán trên bản đồ giờ là quán thật từ OpenStreetMap, và gắn một lời nhận xét viết sẵn vào một cơ sở có thật là nói thay họ mà không hỏi. Bài mẫu hiện theo tên món. `comments` là bình luận mẫu, cùng ràng buộc: nhãn sample, không nhắc tên quán, chỉ mẹo và giá.",
+ "_updated": "2026-08",
+ "posts": {
+  "hoian-oldtown": [
+   {
+    "id": "s-ha-1",
+    "authorName": "Anna",
+    "authorCountry": "Sweden",
+    "dishId": "cao-lau",
+    "paidVnd": 45000,
+    "stars": 5,
+    "hoursAgo": 3,
+    "body": "Cao lầu here still 45k and the noodles have that chew you only get in Hội An. Cash only, and it gets busy right around noon."
+   },
+   {
+    "id": "s-ha-2",
+    "authorName": "Minh",
+    "authorCountry": "Hội An",
+    "dishId": "che",
+    "paidVnd": 15000,
+    "stars": 5,
+    "hoursAgo": 9,
+    "body": "Chè is a street thing here — look for the stall with a queue, order the lotus-seed one, sit on the low stools, done in ten minutes."
+   },
+   {
+    "id": "s-ha-3",
+    "authorName": "Sophie",
+    "authorCountry": "Australia",
+    "dishId": "banh-mi",
+    "paidVnd": 25000,
+    "stars": 4,
+    "hoursAgo": 26,
+    "body": "25k for a bánh mì that took two hands to hold. They shut when the bread runs out, so go before 10am."
+   },
+   {
+    "id": "s-ha-4",
+    "authorName": "Hoà",
+    "authorCountry": "Hội An",
+    "dishId": "hen-tron",
+    "paidVnd": 30000,
+    "stars": 5,
+    "hoursAgo": 34,
+    "body": "Worth crossing the bridge to Cẩm Nam for. Hến trộn with the sesame crackers, then chè bắp after. Quiet side of the river."
+   },
+   {
+    "id": "s-ha-5",
+    "authorName": "David",
+    "authorCountry": "Canada",
+    "dishId": "com-ga-hoi-an",
+    "paidVnd": 45000,
+    "stars": 4,
+    "hoursAgo": 52,
+    "body": "Cơm gà at 45k, exactly what the app said to expect. Ask for the extra herbs, they bring a whole plate."
+   },
+   {
+    "id": "s-ha-6",
+    "authorName": "Linh",
+    "authorCountry": "Đà Nẵng",
+    "dishId": "xi-ma",
+    "paidVnd": 15000,
+    "stars": 5,
+    "hoursAgo": 74,
+    "body": "The xí mà cart only comes out late afternoon. Sesame, warm, slightly bitter — one of the last people still selling it here."
+   }
+  ],
+  "danang-hanriver": [
+   {
+    "id": "s-dn-1",
+    "authorName": "Quang",
+    "authorCountry": "Đà Nẵng",
+    "dishId": "mi-quang",
+    "paidVnd": 40000,
+    "stars": 5,
+    "hoursAgo": 5,
+    "body": "Mì Quảng 40k. Locals eat it for breakfast, not lunch — by 1pm the good broth is gone."
+   },
+   {
+    "id": "s-dn-2",
+    "authorName": "Emma",
+    "authorCountry": "United Kingdom",
+    "dishId": "banh-mi-que",
+    "paidVnd": 5000,
+    "stars": 5,
+    "hoursAgo": 14,
+    "body": "5k each. Five thousand đồng. We ate four standing on the pavement and still spent less than a coffee."
+   },
+   {
+    "id": "s-dn-3",
+    "authorName": "Tuấn",
+    "authorCountry": "Đà Nẵng",
+    "dishId": "banh-trang-cuon-thit-heo",
+    "paidVnd": 95000,
+    "stars": 5,
+    "hoursAgo": 30,
+    "body": "One portion of bánh tráng cuốn thịt heo feeds two. The price is per plate, not per person — worth knowing before you order two."
+   },
+   {
+    "id": "s-dn-4",
+    "authorName": "Mai",
+    "authorCountry": "Huế",
+    "dishId": "che-xoa-xoa-hat-luu",
+    "paidVnd": 15000,
+    "stars": 4,
+    "hoursAgo": 48,
+    "body": "Down the alley, not on the main road. Chè xoa xoa hạt lựu 15k, and the kem bơ is the reason to come back."
+   },
+   {
+    "id": "s-dn-5",
+    "authorName": "Jonas",
+    "authorCountry": "Germany",
+    "dishId": "bun-cha-ca",
+    "paidVnd": 35000,
+    "stars": 4,
+    "hoursAgo": 70,
+    "body": "Opens at 6am and sells out mid-morning. 35k, and they'll top up the broth for free if you ask."
+   }
+  ],
+  "danang-mykhe": [
+   {
+    "id": "s-mk-1",
+    "authorName": "Hà",
+    "authorCountry": "Đà Nẵng",
+    "dishId": "bun-cha-ca",
+    "paidVnd": 40000,
+    "stars": 5,
+    "hoursAgo": 7,
+    "body": "Breakfast bún chả cá two streets back from the beach — 40k instead of the seafront price, same fish."
+   },
+   {
+    "id": "s-mk-2",
+    "authorName": "Chloé",
+    "authorCountry": "France",
+    "dishId": "ca-phe-muoi",
+    "paidVnd": 35000,
+    "stars": 5,
+    "hoursAgo": 20,
+    "body": "Salt coffee at 35k, taken on the pavement in An Thượng. Stronger than it looks — one is plenty."
+   },
+   {
+    "id": "s-mk-3",
+    "authorName": "Bảo",
+    "authorCountry": "Đà Nẵng",
+    "dishId": "oc-hut",
+    "paidVnd": 70000,
+    "stars": 4,
+    "hoursAgo": 41,
+    "body": "Seafood in the alley rather than on the front. Ask for the price per kilo before they weigh anything — that's normal here, not rude."
+   },
+   {
+    "id": "s-mk-4",
+    "authorName": "Ryan",
+    "authorCountry": "United States",
+    "dishId": "kem-bo",
+    "paidVnd": 35000,
+    "stars": 5,
+    "hoursAgo": 63,
+    "body": "Avocado ice cream, 35k, eaten on the sea wall at sunset. Not a tourist invention — it's a Đà Nẵng thing."
+   }
+  ],
+  "hue-citadel": [
+   {
+    "id": "s-hue-1",
+    "authorName": "Trang",
+    "authorCountry": "Huế",
+    "dishId": "bun-bo-hue",
+    "paidVnd": 35000,
+    "stars": 5,
+    "hoursAgo": 4,
+    "body": "The gánh sets up before 6am and is gone by nine. 35k, and it is spicier than the version you get further south."
+   },
+   {
+    "id": "s-hue-2",
+    "authorName": "Marta",
+    "authorCountry": "Spain",
+    "dishId": "banh-beo",
+    "paidVnd": 25000,
+    "stars": 5,
+    "hoursAgo": 16,
+    "body": "Order the mixed plate — bánh bèo, nậm and lọc together. Comes to about 25k a set, and it's the best value sit-down meal we had in Huế."
+   },
+   {
+    "id": "s-hue-3",
+    "authorName": "Đức",
+    "authorCountry": "Huế",
+    "dishId": "com-hen",
+    "paidVnd": 20000,
+    "stars": 5,
+    "hoursAgo": 33,
+    "body": "Cơm hến on the islet, 20k. Say 'ít ớt' if you don't want it fully spiced — they'll still look at you funny, kindly."
+   },
+   {
+    "id": "s-hue-4",
+    "authorName": "Nina",
+    "authorCountry": "Netherlands",
+    "dishId": "nem-lui",
+    "paidVnd": 10000,
+    "stars": 4,
+    "hoursAgo": 55,
+    "body": "10k a skewer, you roll them yourself in the rice paper. We ordered six and that was lunch."
+   },
+   {
+    "id": "s-hue-5",
+    "authorName": "Khánh",
+    "authorCountry": "Huế",
+    "dishId": "ca-phe-muoi",
+    "paidVnd": 22000,
+    "stars": 5,
+    "hoursAgo": 78,
+    "body": "Salt coffee started in Huế, and 22k near the citadel is the ordinary local price. Stir it before the first sip."
+   }
+  ],
+  "hanoi-hoankiem": [
+   {
+    "id": "s-hn-1",
+    "authorName": "Sơn",
+    "authorCountry": "Hà Nội",
+    "dishId": "bun-cha",
+    "paidVnd": 45000,
+    "stars": 5,
+    "hoursAgo": 6,
+    "body": "Bún chả is a lunch food here — most of the good places stop serving by 2pm. 45k with the nem."
+   },
+   {
+    "id": "s-hn-2",
+    "authorName": "Isabelle",
+    "authorCountry": "Belgium",
+    "dishId": "ca-phe-trung",
+    "paidVnd": 35000,
+    "stars": 5,
+    "hoursAgo": 18,
+    "body": "Egg coffee 35k. It arrives in a bowl of hot water to keep it warm — don't drink that part."
+   },
+   {
+    "id": "s-hn-3",
+    "authorName": "Hương",
+    "authorCountry": "Hà Nội",
+    "dishId": "pho-ga",
+    "paidVnd": 45000,
+    "stars": 4,
+    "hoursAgo": 37,
+    "body": "Phở gà rather than bò, which is what the old quarter actually eats in the morning. 45k, quẩy on the side costs extra."
+   },
+   {
+    "id": "s-hn-4",
+    "authorName": "Tom",
+    "authorCountry": "Ireland",
+    "dishId": "bia-hoi",
+    "paidVnd": 8000,
+    "stars": 4,
+    "hoursAgo": 58,
+    "body": "8k a glass. It's brewed daily and doesn't keep, which is why it's cheap and why you drink it before 9pm."
+   },
+   {
+    "id": "s-hn-5",
+    "authorName": "Phúc",
+    "authorCountry": "Hà Nội",
+    "dishId": "nom-bo-kho",
+    "paidVnd": 35000,
+    "stars": 5,
+    "hoursAgo": 81,
+    "body": "Nộm bò khô by the lake, 35k. Eat it in the evening when the street closes to traffic."
+   }
+  ],
+  "hcmc-district1": [
+   {
+    "id": "s-sg-1",
+    "authorName": "Nam",
+    "authorCountry": "Sài Gòn",
+    "dishId": "com-tam",
+    "paidVnd": 50000,
+    "stars": 5,
+    "hoursAgo": 8,
+    "body": "Cơm tấm 50k with the grilled rib. It's a breakfast dish here as much as a dinner one."
+   },
+   {
+    "id": "s-sg-2",
+    "authorName": "Laura",
+    "authorCountry": "Italy",
+    "dishId": "goi-cuon",
+    "paidVnd": 40000,
+    "stars": 4,
+    "hoursAgo": 22,
+    "body": "Gỏi cuốn 40k a plate at the market stalls. Sit at the counter rather than the tables out front — same food, less noise."
+   },
+   {
+    "id": "s-sg-3",
+    "authorName": "Trí",
+    "authorCountry": "Sài Gòn",
+    "dishId": "oc-hut",
+    "paidVnd": 65000,
+    "stars": 5,
+    "hoursAgo": 45,
+    "body": "Ốc places open late and price per dish, not per kilo. 65k for a plate of ốc hút and it's a whole evening out."
+   },
+   {
+    "id": "s-sg-4",
+    "authorName": "Yuki",
+    "authorCountry": "Japan",
+    "dishId": "hu-tieu",
+    "paidVnd": 45000,
+    "stars": 4,
+    "hoursAgo": 68,
+    "body": "Hủ tiếu 45k. Ask for it khô — dry, with the broth in a separate bowl. That's how the regulars order."
+   }
+  ]
+ },
+ "comments": {
+  "s-ha-1": [
+   {
+    "id": "sc-ha-1a",
+    "authorName": "Minh",
+    "authorCountry": "Hội An",
+    "hoursAgo": 2,
+    "body": "45k is right for a bowl in the old town. Across the river it's closer to 35k."
+   },
+   {
+    "id": "sc-ha-1b",
+    "authorName": "Jonas",
+    "authorCountry": "Germany",
+    "hoursAgo": 1,
+    "body": "Went at 11:30 on this tip — no queue yet. Thanks!"
+   }
+  ],
+  "s-ha-4": [
+   {
+    "id": "sc-ha-4a",
+    "authorName": "Linh",
+    "authorCountry": "Đà Nẵng",
+    "hoursAgo": 20,
+    "body": "Hến trộn is spicy by default. Ask for the chilli on the side if you're not sure."
+   }
+  ],
+  "s-dn-2": [
+   {
+    "id": "sc-dn-2a",
+    "authorName": "Tom",
+    "authorCountry": "UK",
+    "hoursAgo": 3,
+    "body": "Still 5k last week. Ask for the chilli sauce, it makes it."
+   }
+  ],
+  "s-mk-3": [
+   {
+    "id": "sc-mk-3a",
+    "authorName": "Hà",
+    "authorCountry": "Đà Nẵng",
+    "hoursAgo": 5,
+    "body": "Also check whether the price on the board is per 100g or per kilo — both are common."
+   },
+   {
+    "id": "sc-mk-3b",
+    "authorName": "Priya",
+    "authorCountry": "India",
+    "hoursAgo": 4,
+    "body": "We asked first and it was completely fine. They wrote the weight down for us."
+   }
+  ],
+  "s-hue-1": [
+   {
+    "id": "sc-hue-1a",
+    "authorName": "Trang",
+    "authorCountry": "Huế",
+    "hoursAgo": 2,
+    "body": "If you miss the morning stalls, most sit-down places serve it until lunch — just less spicy."
+   }
+  ],
+  "s-hn-2": [
+   {
+    "id": "sc-hn-2a",
+    "authorName": "Sơn",
+    "authorCountry": "Hà Nội",
+    "hoursAgo": 4,
+    "body": "The cold version is good in summer too. Same price."
+   }
+  ],
+  "s-sg-3": [
+   {
+    "id": "sc-sg-3a",
+    "authorName": "Nam",
+    "authorCountry": "Sài Gòn",
+    "hoursAgo": 6,
+    "body": "Order two or three different dishes and share — that's the normal way to eat ốc."
+   }
+  ]
+ }
 }

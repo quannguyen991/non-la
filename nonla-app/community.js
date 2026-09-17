@@ -10,14 +10,14 @@
    chắc chắn nhất để không ai xem cả.
    ═══════════════════════════════════════════════════════════════ */
 
-import { listPosts, photoUrl, ready } from "./cloud.js";
+import { listPosts, listComments, photoUrl, ready, commentsOn } from "./cloud.js";
 import { pending, drop, MAX_TRIES } from "./outbox.js";
 import * as Local from "./localdb.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-const M = { host: null, posts: [], seed: [], seedAll: null, places: [], zone: "", cb: {} };
+const M = { host: null, posts: [], seed: [], seedAll: null, seedComments: {}, places: [], dishes: [], zone: "", cb: {} };
 
 /* ── bài mẫu ship kèm app ─────────────────────────────────────
    VÌ SAO CÓ CHÚNG
@@ -48,8 +48,10 @@ async function loadSeed() {
   if (M.seedAll) return M.seedAll;
   try {
     const res = await fetch("data/community.json");
-    M.seedAll = (await res.json()).posts || {};
-  } catch { M.seedAll = {}; }
+    const j = await res.json();
+    M.seedAll = j.posts || {};
+    M.seedComments = j.comments || {};
+  } catch { M.seedAll = {}; M.seedComments = {}; }
   return M.seedAll;
 }
 
@@ -59,6 +61,7 @@ function seedFor(all, zone) {
     ...p, seed: true,
     createdAt: new Date(now - (p.hoursAgo || 1) * 3600e3).toISOString(),
     photo: p.dishId ? `assets/dishes/${p.dishId}.jpg` : "",
+    commentCount: (M.seedComments[p.id] || []).length,
   }));
 }
 
@@ -76,6 +79,33 @@ function ago(iso) {
 const stars = (n) => Number.isFinite(n)
   ? `<span class="cstars">${"★".repeat(n)}<span data-empty="1">${"★".repeat(5 - n)}</span></span>`
   : "";
+
+/* TIÊU ĐỀ BÀI. Bài thật gắn một quán: tên quán kèm địa chỉ, bấm mở thẻ quán.
+   Bài mẫu KHÔNG gắn quán nào — quán trên bản đồ là quán thật OSM, và gắn một
+   lời nhận xét viết sẵn vào một cơ sở có thật là nói thay họ — nên hiện tên
+   MÓN. Bản trước in thẳng mã quán ("ba-be", "banh-mi-goc") khi quán không còn
+   trong dữ liệu: người đọc thấy một chuỗi mã mà không hiểu vì sao. */
+function tieuDe(p, place) {
+  if (place) {
+    const dc = place.street || (place.ganPho ? `near ${place.ganPho}` : "");
+    return `<button class="cplace" data-cplace="${esc(place.id)}">${esc(place.name)}</button>
+      ${dc ? `<span class="caddr">${esc(dc)}</span>` : ""}`;
+  }
+  const d = M.dishes.find((x) => x.id === p.dishId);
+  if (d) return `<span class="cplace cdish">${esc(d.vi)}<small>${esc(d.en)}</small></span>`;
+  return p.placeId ? `<span class="cplace cgone">A place no longer on the map</span>` : "";
+}
+
+/** Nút mở luồng bàn luận. commentCount null = máy chủ chưa bật bình luận. */
+function nutBinhLuan(p) {
+  const n = p.commentCount;
+  if (n == null && !p.local && !p.seed && !commentsOn()) return "";
+  const k = Number(n) || 0;
+  const nhan = k ? `${k} comment${k === 1 ? "" : "s"}` : "Comment";
+  return `<button class="ccomments" data-cthread="${esc(String(p.id))}">
+    <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 4.5h13v8.5h-7l-4 3v-3h-2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <span>${nhan}</span></button>`;
+}
 
 function postHtml(p) {
   const place = M.places.find((x) => x.id === p.placeId);
@@ -101,10 +131,11 @@ function postHtml(p) {
         ${p.local ? `<span class="conly">this phone only</span>` : ""}
         ${p.far ? `<span class="cfar">posted away from the venue</span>` : ""}
       </div>
-      <button class="cplace" data-cplace="${esc(p.placeId)}">${esc(place?.name || p.placeId)}</button>
+      ${tieuDe(p, place)}
       ${stars(p.stars)}
       ${p.paidVnd ? `<div class="cpaid">Paid ${esc(money(p.paidVnd))}</div>` : ""}
       ${p.body ? `<p class="cnote">${esc(p.body)}</p>` : ""}
+      ${nutBinhLuan(p)}
       ${/* Bài mẫu không có nút nào. Không xoá được vì nó không nằm trên máy
             người dùng, và không báo cáo được vì báo cáo là để tố một người
             THẬT viết sai — gửi một báo cáo về một bài do chính app ship ra
@@ -171,9 +202,9 @@ async function discardStuck() {
   await paint();
 }
 
-export async function open({ host, zone, places = [], onOpenPlace, onCompose, onReport, onConnect }) {
-  M.host = host; M.zone = zone; M.places = places;
-  M.cb = { onOpenPlace, onCompose, onReport, onConnect };
+export async function open({ host, zone, places = [], dishes = [], onOpenPlace, onCompose, onReport, onConnect, onThread }) {
+  M.host = host; M.zone = zone; M.places = places; M.dishes = dishes;
+  M.cb = { onOpenPlace, onCompose, onReport, onConnect, onThread };
   M.posts = []; M.seed = [];
   await paint();                       // vẽ khung ngay, đừng để màn hình trắng
   await refresh();
@@ -189,6 +220,11 @@ export async function refresh() {
     M.posts = ready()
       ? await listPosts({ zone: M.zone, limit: 20 })
       : await Local.listPosts({ zone: M.zone, limit: 20 });
+    // Bài trong sổ tay: đếm bình luận trên máy bằng MỘT lượt đọc cho cả feed.
+    if (!ready() && M.posts.length) {
+      const dem = await Local.commentCounts(M.posts.map((p) => p.id)).catch(() => ({}));
+      for (const p of M.posts) p.commentCount = dem[p.id] ?? 0;
+    }
   } catch { /* im lặng — Community là lớp tuỳ chọn */ }
   /* Bài mẫu nạp SAU và trong try riêng: chúng là phần trang trí, hỏng thì
      màn hình mất một khối chứ không được kéo theo bài thật của người dùng
@@ -198,6 +234,96 @@ export async function refresh() {
 }
 
 export function close() { M.host = null; M.posts = []; }
+
+/* ── LUỒNG BÀN LUẬN ───────────────────────────────────────────
+   Mỗi bài gắn một quán, nên bình luận dưới bài là chỗ bàn về quán đó. Ba
+   nguồn, cùng một hình dạng:
+     seed  — bình luận MẪU ship kèm app: đọc được, không trả lời được, vì
+             chẳng có ai ở đầu kia đọc câu trả lời;
+     local — sổ tay trên máy khi chưa có máy chủ: chỉ người này đọc;
+     cloud — máy chủ: ai cũng đọc được phần đang hiện.
+   Luồng mở trong sheet dùng chung ở cấp #app (xem composer()), nên hàm ở đây
+   chỉ trả dữ liệu và HTML; app.js mở sheet và bắt các nút. */
+
+/** Bài trong feed hoặc trong khối mẫu, theo id dạng chuỗi. */
+export function findPost(id, extra = []) {
+  const k = String(id);
+  return [...M.posts, ...M.seed, ...extra].find((p) => String(p.id) === k) || null;
+}
+
+export async function loadThread(post) {
+  if (!post) return { mode: "none", comments: [] };
+  if (post.seed) {
+    const now = Date.now();
+    return {
+      mode: "seed",
+      comments: (M.seedComments[post.id] || []).map((c) => ({
+        ...c, seed: true, createdAt: new Date(now - (c.hoursAgo || 1) * 3600e3).toISOString(),
+      })),
+    };
+  }
+  if (post.local) return { mode: "local", comments: await Local.listComments(post.id) };
+  try {
+    return { mode: "cloud", comments: await listComments(post.id) };
+  } catch (e) {
+    return { mode: e.code === "no-comments" ? "off" : "error", comments: [], error: e.message };
+  }
+}
+
+function commentHtml(c) {
+  return `<div class="ccomment${c.seed ? " cseed" : ""}">
+    <div class="cwho">
+      <span>${esc(c.authorName)}</span>
+      ${c.authorCountry ? `<span>· ${esc(c.authorCountry)}</span>` : ""}
+      <span>· ${esc(ago(c.createdAt))}</span>
+      ${c.seed ? `<span class="ctag">sample</span>` : ""}
+    </div>
+    <p class="cnote">${esc(c.body)}</p>
+    ${c.seed ? ""
+      : c.mine ? `<button class="creport" data-ccdel="${esc(String(c.id))}" data-local="${c.local ? 1 : 0}">Delete</button>`
+      : `<button class="creport" data-ccreport="${esc(String(c.id))}">Report</button>`}
+  </div>`;
+}
+
+export function threadHtml(post, t) {
+  const n = t.comments.length;
+  const ghiChu = {
+    seed: "These replies are samples shipped with the app, so there is nobody to answer. Post about a real place to start a real discussion.",
+    local: "Notebook mode: replies stay on this phone, next to your post.",
+    off: "Comments are not switched on on the server yet.",
+    error: "Could not load the discussion — check your connection and try again.",
+  }[t.mode];
+  const viet = t.mode === "cloud" || t.mode === "local";
+  return `
+    <h3>Discussion</h3>
+    <div class="cthread-post">${postHtml(post).replace(/<button class="ccomments"[\s\S]*?<\/button>/, "")}</div>
+    <h2 class="sect">${n ? `${n} comment${n === 1 ? "" : "s"}` : "No comments yet"}</h2>
+    <div class="cthread">${t.comments.map(commentHtml).join("")}</div>
+    ${ghiChu ? `<p class="seedwarn">${esc(ghiChu)}</p>` : ""}
+    ${viet ? `
+      <label class="fld"><span>Add a comment <small>500 max</small></span>
+        <textarea id="ccBody" maxlength="500" rows="3"
+          placeholder="Ask about prices, opening hours, what to order…"></textarea></label>
+      <p class="cerr" id="ccErr" hidden></p>
+      <button class="btn" data-cact="csend" data-post="${esc(String(post.id))}">Post comment</button>` : ""}
+    <button class="btn sec" data-act="close">Close</button>`;
+}
+
+/* ── chọn quán trong form đăng bài ────────────────────────────
+   Hàng trăm quán thật mỗi vùng: một <select> dài 370 dòng là không dùng được
+   trên điện thoại. Ô tìm lọc theo tên VÀ địa chỉ (bỏ dấu), để người dùng gõ
+   "tran phu" cũng ra quán trên Trần Phú. Nhãn mỗi dòng kèm địa chỉ, vì hai
+   quán cùng tên "Cơm gà" chỉ phân biệt được bằng con phố. */
+const boDau = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "")
+  .replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+export function placeOptions(places, q = "", selected = "") {
+  const k = boDau(q).trim();
+  const dc = (p) => p.street || (p.ganPho ? `near ${p.ganPho}` : "");
+  const hop = places.filter((p) => p.id === selected || !k || boDau(`${p.name} ${dc(p)}`).includes(k));
+  const top = hop.slice(0, 150);
+  return `<option value="">${k ? `${hop.length} match${hop.length === 1 ? "" : "es"} — pick one…` : "Pick one…"}</option>`
+    + top.map((p) => `<option value="${esc(p.id)}"${selected === p.id ? " selected" : ""}>${esc(p.name)}${dc(p) ? ` — ${esc(dc(p))}` : ""}</option>`).join("");
+}
 
 /**
  * Options HTML cho <select id="cfDish">, theo món "known" của MỘT quán.
@@ -223,13 +349,13 @@ export function dishOptionsFor(placeId, { places = [], dishes = [] } = {}) {
  * đang hidden thì bấm mà không thấy gì.
  */
 export function composer({ places = [], dishes = [], place = null } = {}) {
-  const opts = places.map((p) =>
-    `<option value="${esc(p.id)}"${place === p.id ? " selected" : ""}>${esc(p.name)}</option>`).join("");
   return `
     <h3>Share a place</h3>
-    <p class="src">Photos you post leave your phone. GPS coordinates inside them do not.</p>
+    <p class="src">Photos you post leave your phone. GPS coordinates inside them do not.
+      Other travellers can comment on your post to discuss the place.</p>
     <label class="fld"><span>Place</span>
-      <select id="cfPlace"><option value="">Pick one…</option>${opts}</select></label>
+      <input id="cfPlaceQ" type="search" autocomplete="off" placeholder="Search a name or a street">
+      <select id="cfPlace">${placeOptions(places, "", place || "")}</select></label>
     <label class="fld"><span>Dish <small>optional</small></span>
       <select id="cfDish">${dishOptionsFor(place, { places, dishes })}</select></label>
     <label class="fld"><span>What you paid <small>optional</small></span>
@@ -259,6 +385,8 @@ export function composer({ places = [], dishes = [], place = null } = {}) {
 export function handleClick(target) {
   const place = target.closest("[data-cplace]");
   if (place) return M.cb.onOpenPlace?.(place.dataset.cplace), true;
+  const th = target.closest("[data-cthread]");
+  if (th) return M.cb.onThread?.(th.dataset.cthread), true;
   const rep = target.closest("[data-creport]");
   if (rep) return M.cb.onReport?.(rep.dataset.creport), true;
   /* Xoá bài của CHÍNH MÌNH trên máy — không cần callback ra app.js vì
