@@ -2450,6 +2450,12 @@ console.log("\n── đọc câu trả lời của mô hình ──────
     /KEY_STORE|chatKey|type="password"/.test(web.replace(/\/\*[\s\S]*?\*\//g, "")), false);
   const app = readFileSync("./app.js", "utf8");
   eq("app điện thoại có trợ lý", app.includes('import * as TroLy from "./trolychat.js"') && app.includes("TroLy.mount({"), true);
+  /* Nút trợ lý nổi từng đè nút chỉ đường của bản đồ xem trước. Nó phải tự né
+     nút NHỎ — và bỏ qua vùng chạm lớn như cả khung bản đồ, không thì mọi vị
+     trí đều "chồng" và nó không bao giờ nhích. */
+  const tl = readFileSync("./trolychat.js", "utf8");
+  eq("nút trợ lý tự né nút nhỏ, bỏ qua vùng chạm lớn",
+    tl.includes("function tranhDe()") && tl.includes("r.width <= 200 && r.height <= 120"), true);
   eq("trợ lý không ghi lịch sử xuống máy", /localStorage|indexedDB/.test(readFileSync("./trolychat.js", "utf8").replace(/\/\*[\s\S]*?\*\//g, "")), false);
   eq("trợ lý và module chung nằm trong vỏ offline",
     ['"./trolychat.js"', '"./tro-ly.js"'].every((f) => readFileSync("./sw.js", "utf8").includes(f)), true);

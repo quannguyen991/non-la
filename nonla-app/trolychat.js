@@ -57,6 +57,14 @@ export function mount({ host, zone, zoneName }) {
 
   const fab = host.querySelector("#tlFab");
   fab.onclick = () => mo(true);
+  // Cuộn ở BẤT KỲ khung nào (các tab cuộn trong section riêng) → né lại sau khi dừng.
+  document.addEventListener("scroll", henTranhDe, true);
+  window.addEventListener("resize", henTranhDe);
+  /* Nội dung đổi mà KHÔNG cuộn — đổi vùng, bản đồ xem trước vẽ xong sau khi
+     mở tab — thì cuộn không báo gì. Kiểm lại sau mỗi cú chạm, và một lần nhẹ
+     mỗi 1,5 giây (chỉ đọc toạ độ vài chục nút, không vẽ lại gì). */
+  document.addEventListener("click", () => { henTranhDe(); setTimeout(tranhDe, 1200); }, true);
+  setInterval(() => { if (!document.hidden) tranhDe(); }, 1500);
   host.querySelector("#tlClose").onclick = () => mo(false);
   host.querySelector("#tlForm").onsubmit = (e) => { e.preventDefault(); gui(host.querySelector("#tlInput").value); };
   host.querySelector("#tlGoi").onclick = (e) => {
@@ -69,7 +77,44 @@ export function mount({ host, zone, zoneName }) {
 export function syncTab(tab, { fullscreen = false } = {}) {
   const fab = M.host?.querySelector("#tlFab");
   if (fab) fab.hidden = tab === "scan" || fullscreen;
+  setTimeout(tranhDe, 120);
 }
+
+/* NÉ NÚT KHÁC. Một nút nổi cố định thì khi cuộn sẽ chồng lên thứ bấm được
+   bên dưới: ở Nearby nó đè đúng nút chỉ đường của bản đồ xem trước, và chạm
+   vào đó là mở trợ lý thay vì chỉ đường. Sau mỗi lần cuộn (hoặc đổi tab), nếu
+   nút chồng lên một nút/liên kết đang hiện thì nhích lên từng nấc 60px tới chỗ
+   trống; hết chỗ thì về vị trí gốc — thà chồng còn hơn bay lên giữa màn hình. */
+function tranhDe() {
+  const fab = M.host?.querySelector("#tlFab");
+  if (!fab || fab.hidden || fab.offsetParent === null) return;
+  /* Vị trí GỐC = vị trí hiện tại cộng lại độ nhích đang áp. Không gỡ transform
+     rồi đo: nút có transition, đo giữa lúc trượt ra một toạ độ lưng chừng. */
+  const r0 = fab.getBoundingClientRect();
+  const dyCu = M.dy || 0, dxCu = M.dx || 0;
+  const goc = { left: r0.left - dxCu, right: r0.right - dxCu, top: r0.top + dyCu, bottom: r0.bottom + dyCu };
+  const nut = [...M.host.querySelectorAll("section:not([hidden]) :is(button, a, [role='button'], input, select)")]
+    .filter((el) => !el.closest("#tlPanel") && el !== fab && el.offsetParent !== null)
+    .map((el) => el.getBoundingClientRect())
+    /* Chỉ né NÚT NHỎ. Khung bản đồ xem trước là một nút 338×291 (chạm vào bản
+       đồ để mở bản đồ lớn); tính nó vào thì mọi vị trí đều "chồng" và nút trợ
+       lý không bao giờ nhích. Chồng lên một vùng chạm lớn thì vùng ấy vẫn còn
+       gần hết chỗ để chạm. */
+    .filter((r) => r.width > 0 && r.height > 0 && r.width <= 200 && r.height <= 120);
+  const cham = (dx, dy) => nut.some((r) => !(r.right < goc.left + dx - 6 || r.left > goc.right + dx + 6
+    || r.bottom < goc.top - dy - 6 || r.top > goc.bottom - dy + 6));
+  // Thử sang TRÁI trước rồi mới lên: nút bản đồ xếp dọc, nhích lên phải đi rất xa.
+  for (const [dx, dy] of [[0, 0], [-76, 0], [0, 60], [-76, 60], [0, 120], [0, 180]]) {
+    if (!cham(dx, dy)) {
+      M.dx = dx; M.dy = dy;
+      fab.style.transform = dx || dy ? `translate(${dx}px, ${-dy}px)` : "";
+      return;
+    }
+  }
+  M.dx = 0; M.dy = 0; fab.style.transform = "";
+}
+let henDe = 0;
+const henTranhDe = () => { clearTimeout(henDe); henDe = setTimeout(tranhDe, 140); };
 
 export const isOpen = () => !!M.host && !M.host.querySelector("#tlPanel").hidden;
 
