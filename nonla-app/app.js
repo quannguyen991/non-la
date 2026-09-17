@@ -1180,7 +1180,9 @@ function showMenuResult(rows, conf, traps = null) {
       ? `<button class="btn pri" data-act="ptOpen">${
            esc(T("Confirm with the seller first"))}</button>
          <button class="btn sec" data-act="poOpen">${esc(T("Work out the bill"))}</button>`
-      : `<button class="btn pri" data-act="noMenu">${esc(T("No menu? Tap a dish instead"))}</button>`}
+      : `${S.khungMau ? `<button class="btn pri" data-act="dishFromLast">${esc(T("It's a dish, not a menu — identify it"))}</button>
+         <p class="seedwarn">Menus are read on this phone. Identifying a dish sends this one photo to an online model; nothing is stored.</p>` : ""}
+         <button class="btn ${S.khungMau ? "sec" : "pri"}" data-act="noMenu">${esc(T("No menu? Tap a dish instead"))}</button>`}
 
     <details class="fold">
       <summary>${esc(T("More"))}</summary>
@@ -1680,6 +1682,10 @@ async function doScan() {
   if (!S.ready) return toast("Still loading local prices — one moment");
   if (S.mode === "dish") return doDishScan();
   const c = grabFrame();
+  /* Giữ một bản MÀU của khung vừa chụp: chụp nhầm vào đĩa bánh xèo ở chế độ
+     Menu thì OCR không ra dòng giá nào, và màn kết quả mời nhận diện món trên
+     CHÍNH tấm ảnh ấy — không bắt người dùng đổi chế độ rồi chụp lại. */
+  S.khungMau = S.mode === "menu" && c ? grabFrame({ colour: true }) : null;
   if (!c) {
     openSheet(`<h3>No camera image</h3>
       <p class="src">This device has no usable camera, or the page isn't served over HTTPS.</p>
@@ -1733,6 +1739,7 @@ async function quetTepAnh(file) {
   try {
     const bm = await createImageBitmap(file);
     const c = veVaoKhung(bm, { colour: S.mode === "dish" });
+    S.khungMau = S.mode === "menu" ? veVaoKhung(bm, { colour: true }) : null;
     bm.close?.();
     if (S.mode === "dish") return doDishKhung(c);
     return doKhung(c);
@@ -1769,11 +1776,14 @@ function veVaoKhung(img, { colour = false } = {}) {
    đủ nhỏ để nhét vào một PWA. Nên khi không có mạng, chế độ này phải
    nhường đường cho lối chọn tay chứ không được để người dùng đứng chờ.  */
 async function doDishScan() {
-  if (!Img.hasKey()) {
-    return openSheet(`<h3>Dish photos need a key</h3>
+  /* Không có khoá riêng thì hỏi hàm máy chủ có bật không. Chỉ khi CẢ HAI đều
+     không có mới rơi về chọn món bằng tay — trước đây thiếu khoá riêng là
+     dừng luôn, tức gần như mọi người dùng đều không quét được món. */
+  if (!Img.hasKey() && !(await Img.mayChuNhanMon())) {
+    return openSheet(`<h3>Dish recognition is not on yet</h3>
       <p class="src">Reading a photo of food takes a vision model, which runs online.
         Text on menus is read on your own device and always works offline.</p>
-      <div class="warnbox infobox">${I.clock}<span>Add a key under
+      <div class="warnbox infobox">${I.clock}<span>You can add your own key under
         <b>You → Illustrations</b>, or just pick the dish by hand below.</span></div>
       ${dishPickerHTML()}
       <button class="btn sec" data-act="close">Close</button>`);
@@ -5127,6 +5137,18 @@ document.addEventListener("click", async (ev) => {
   /* Lối vào lưới món khi không có gì để quét. Không phụ thuộc tab nào đang
      mở, vì tình huống này xảy ra ở bất cứ đâu người dùng đang đứng. */
   if (el("[data-act='noMenu']")) return openSheet(noMenuHTML());
+  if (el("[data-act='dishFromLast']")) {
+    const c = S.khungMau;
+    if (!c) return toast("Take the photo again in Dish mode");
+    closeSheet();
+    if (!Img.hasKey() && !(await Img.mayChuNhanMon())) {
+      return openSheet(`<h3>Dish recognition is not on yet</h3>
+        <p class="src">You can still pick the dish by hand.</p>
+        ${dishPickerHTML()}
+        <button class="btn sec" data-act="close">Close</button>`);
+    }
+    return doDishKhung(c);
+  }
 
   if (el("[data-act='poOpen']")) return openSheet(preorderHTML());
   {

@@ -22,6 +22,8 @@
       lượt thì proxy trả 429 hàng loạt và hỏng nhiều hơn là được.
    ═══════════════════════════════════════════════════════════════ */
 
+import { loiNhacNhanMon, docKetQuaNhanMon, diemNhanMon } from "./nhan-mon.js";
+
 /* Giữ nguyên văn theo đặc tả — đây là thứ buộc mọi icon cùng một phong
    cách. Sửa chữ ở đây là icon sinh sau lệch khỏi icon sinh trước. */
 export const STYLE_PREFIX =
@@ -405,11 +407,13 @@ export function registerIcons(items = []) {
    91,3% so với 83,0%.  */
 const VISION_MODEL = "gpt-5.4-mini";
 
+/* Nhận diện món. HAI đường, cùng một lời nhắc (nhan-mon.js):
+     · người dùng đã dán khoá riêng → gọi thẳng model bằng khoá ấy, như cũ;
+     · không có khoá → gọi hàm máy chủ api/nhan-mon trên Vercel, nơi khoá nằm
+       trong biến môi trường. Trước đây không khoá là không quét được món, tức
+       gần như MỌI người dùng chụp một đĩa bánh xèo đều nhận "không đọc được". */
 export async function identifyDish(dataURL, dishes) {
-  if (!hasKey()) throw Object.assign(new Error("chưa có khoá"), { code: "no-key" });
-  const list = dishes
-    .map((d) => `${d.id}=${d.vi} (${d.en || ""}): ${d.desc || ""}`)
-    .join("\n");
+  if (!hasKey()) return identifyDishQuaMayChu(dataURL, dishes);
   const res = await fetch(`${S.base}/chat/completions`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${S.key}` },
@@ -418,23 +422,7 @@ export async function identifyDish(dataURL, dishes) {
       messages: [{
         role: "user",
         content: [
-          { type: "text", text:
-            "Identify the Vietnamese dish in this photo.\n\n"
-            + "Only identify food that is physically present in the photo as prepared food — on a "
-            + "plate, in a bowl, in a glass, on a grill, or in someone's hand. If the photo shows a "
-            + "shopfront, a signboard, a banner, a printed menu, packaging, or an empty table, "
-            + "return an empty list, EVEN IF text in the photo names a dish. Reading a name off a "
-            + "sign is not identifying a dish.\n\n"
-            + "You MUST choose only from these dishes:\n"
-            + list
-            + "\n\nSeveral of these look alike — read the descriptions before choosing between "
-            + "them. If nothing in the list matches what is actually served in the photo, return "
-            + "an empty list rather than guessing.\n\n"
-            + "Reply with JSON only: {\"top\":[{\"id\":\"<id>\",\"confidence\":0-100}]}, at most 3, "
-            + "ordered by confidence. Whenever you return any candidate at all, return AT LEAST 2 — "
-            + "the person will confirm which one is right, so always give them the next most "
-            + "plausible dish from the list even when you are confident. Only an empty list may be "
-            + "shorter than 2." },
+          { type: "text", text: loiNhacNhanMon(dishes) },
           { type: "image_url", image_url: { url: dataURL } },
         ],
       }],
@@ -445,17 +433,34 @@ export async function identifyDish(dataURL, dishes) {
     throw new Error(`HTTP ${res.status} ${t.slice(0, 120)}`);
   }
   const j = await res.json();
-  const raw = j?.choices?.[0]?.message?.content || "";
-  // Model hay bọc JSON trong ```json … ``` dù đã bảo đừng.
-  const m = /\{[\s\S]*\}/.exec(raw);
-  if (!m) throw new Error("phản hồi không phải JSON");
-  const out = JSON.parse(m[0]);
+  return docKetQuaNhanMon(j?.choices?.[0]?.message?.content || "", dishes);
+}
+
+/** Máy chủ có bật nhận diện món không. Hỏi một lần mỗi phiên. */
+let mayChu = null;
+export async function mayChuNhanMon() {
+  if (mayChu !== null) return mayChu;
+  try {
+    const r = await fetch(diemNhanMon(), { method: "GET" });
+    mayChu = r.ok && (await r.json()).on === true;
+  } catch { mayChu = false; }
+  return mayChu;
+}
+
+async function identifyDishQuaMayChu(dataURL, dishes) {
+  const r = await fetch(diemNhanMon(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image: dataURL }),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 429) throw new Error("Too many dish photos in a few minutes — try again shortly, or pick the dish by hand.");
+  if (r.status === 413) throw new Error("That photo is too large to send.");
+  if (r.status === 503) throw Object.assign(new Error("Dish recognition is not switched on for this app yet."), { code: "no-key" });
+  if (!r.ok) throw new Error("The recogniser did not answer — try again, or pick the dish by hand.");
+  // Máy chủ đã lọc id; lọc lại theo danh sách của CHÍNH máy này cho chắc.
   const ids = new Set(dishes.map((d) => d.id));
-  // Lọc lại phía mình: model vẫn có thể trả id ngoài danh sách dù đã ép.
-  return (out.top || [])
-    .filter((x) => ids.has(x.id))
-    .map((x) => ({ id: x.id, confidence: Math.max(0, Math.min(100, Number(x.confidence) || 0)) }))
-    .slice(0, 3);
+  return (j.top || []).filter((x) => ids.has(x.id)).slice(0, 3);
 }
 
 export function reset() {

@@ -2382,6 +2382,40 @@ console.log("\n── đọc câu trả lời của mô hình ──────
     && ap.indexOf('const th = el("[data-cthread]");') < ap.indexOf('if (S.tab === "community" && Community.handleClick(ev.target)) return;'), true);
 }
 
+/* ── NHẬN DIỆN MÓN TỪ ẢNH ─────────────────────────────────────
+   Khoá model nằm ở biến môi trường Vercel, không bao giờ trong mã gửi xuống
+   máy. Hàm máy chủ là cửa tiêu tiền thật của chủ khoá, nên canh các chốt:
+   Origin, cỡ ảnh, tần suất, lời nhắc cố định. Và lời nhắc chỉ có MỘT bản. */
+{
+  const api = readFileSync("./api/nhan-mon.js", "utf8");
+  eq("hàm nhận diện đọc khoá từ biến môi trường", api.includes("process.env.NHAN_MON_KEY"), true);
+  eq("hàm nhận diện không chứa khoá nào", /sk-[A-Za-z0-9]{16,}/.test(api), false);
+  eq("hàm nhận diện chặn Origin lạ", api.includes('if (!NGUON.test(origin)) return res.status(403)'), true);
+  eq("hàm nhận diện giới hạn cỡ ảnh và tần suất",
+    api.includes("TOI_DA_ANH = 700_000") && api.includes("TOI_DA_LUOT = 12") && api.includes("res.status(429)"), true);
+  eq("người gọi chỉ gửi ảnh, không gửi được chữ vào lời nhắc",
+    api.includes("{ type: \"text\", text: LOI_NHAC }") && !/req\.body\?\.(prompt|text|dishes)/.test(api), true);
+  eq("không có khoá thì báo tắt thay vì hỏng", api.includes("return res.status(200).json({ on: bat })"), true);
+  const img = readFileSync("./imgsvc.js", "utf8");
+  eq("app và máy chủ dùng CHUNG một lời nhắc",
+    img.includes("loiNhacNhanMon(dishes)") && api.includes("loiNhacNhanMon(DISHES)")
+    && !img.includes("Identify the Vietnamese dish in this photo"), true);
+  eq("không có khoá riêng thì app gọi máy chủ", img.includes("if (!hasKey()) return identifyDishQuaMayChu"), true);
+  eq("nhan-mon.js nằm trong vỏ offline", readFileSync("./sw.js", "utf8").includes('"./nhan-mon.js"'), true);
+  const sc = readFileSync("./web/scan.html", "utf8");
+  /* Trang web từng hứa ảnh "không bao giờ rời máy" cho MỌI ảnh. Nhận diện món
+     phải gửi ảnh đi, nên lời hứa phải nói rõ ngoại lệ, và ảnh chỉ đi khi bấm. */
+  eq("trang quét nói rõ ảnh món được gửi đi", sc.includes("sends that single photo to an online model"), true);
+  eq("trang quét không còn hứa mọi ảnh không rời máy", sc.includes("<b>The photo never leaves this"), false);
+  eq("không đọc được dòng giá thì mời nhận diện món", sc.includes('id="thuMon"'), true);
+  const { loiNhacNhanMon, docKetQuaNhanMon } = await import("./nhan-mon.js");
+  const dsMon = JSON.parse(readFileSync("./data/dishes.json", "utf8")).dishes;
+  eq("lời nhắc liệt kê đủ món", dsMon.every((d) => loiNhacNhanMon(dsMon).includes(`${d.id}=`)), true);
+  eq("đọc kết quả bỏ id bịa và kẹp độ tin cậy",
+    JSON.stringify(docKetQuaNhanMon('```json {"top":[{"id":"banh-xeo","confidence":140},{"id":"mon-bia","confidence":50}]}```', dsMon)),
+    JSON.stringify([{ id: "banh-xeo", confidence: 100 }]));
+}
+
 /* ── thẻ quán: dữ liệu OSM thật, tranh minh hoạ có lời khai ─────── */
 {
   const pj = JSON.parse(readFileSync("./data/places.json", "utf8")).places;

@@ -58,7 +58,7 @@ Có một phép thử canh năm trường đó: thêm lại là bộ thử đỏ
 | Vùng · món · ô giá | 6 · 77 · 219 |
 | Quán OpenStreetMap | 2.481 |
 | Mô-đun JS | 53 (19.208 dòng) |
-| Phép thử | **874**, 0 trượt |
+| Phép thử | **888**, 0 trượt |
 | Đối chứng mô hình ngôn ngữ | 36 câu × 10 lượt |
 
 **219/219 ô giá vẫn là dữ liệu hạt giống** — chưa ô nào đạt mức đo thật. Đó là chỗ
@@ -71,7 +71,7 @@ cd nonla-app && python -m http.server 8899 --bind 127.0.0.1
 ```
 
 ```bash
-cd nonla-app && node test.mjs        # 874 phép thử lõi
+cd nonla-app && node test.mjs        # 888 phép thử lõi
 ```
 
 ```bash

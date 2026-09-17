@@ -1,0 +1,6 @@
+{
+  "name": "nonla-app",
+  "private": true,
+  "type": "module",
+  "description": "Nón Lá PWA. Không có bước build: tệp này chỉ báo cho Node và cho hàm Vercel trong api/ rằng các tệp .js là ES module."
+}

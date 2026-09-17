@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Scan Menu — Nón Lá</title>
+<title>Scan a menu or a dish — Nón Lá</title>
 <link rel="icon" href="../icon.svg">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,10 +14,10 @@
 <main class="wrap" id="main">
   <div style="display:flex;align-items:flex-end;gap:22px;padding:34px 0 20px;flex-wrap:wrap">
     <div>
-      <h1 style="font-size:46px">Scan Menu</h1>
-      <p class="muted" style="margin-top:10px;max-width:56ch">Drop a menu photo in. The reading
-        happens inside your browser, and every line found is compared with what this
-        neighbourhood actually pays.</p>
+      <h1 style="font-size:46px">Scan a menu or a dish</h1>
+      <p class="muted" style="margin-top:10px;max-width:56ch">Drop in a menu photo and every
+        priced line is compared with what this neighbourhood actually pays. Photographed the
+        food instead? Nón Lá works out which dish it is and shows the local price.</p>
     </div>
     <div class="panel pad" style="margin-left:auto;max-width:420px">
       <div style="display:flex;gap:12px;align-items:flex-start">
@@ -36,19 +36,20 @@
       <div class="dropzone" id="drop">
         <div id="dropInner">
           <span id="upIco"></span>
-          <b style="display:block;font-family:var(--disp);font-size:22px;margin-top:10px">Drop a menu photo here</b>
+          <b style="display:block;font-family:var(--disp);font-size:22px;margin-top:10px">Drop a menu or dish photo here</b>
           <p class="muted" style="margin-top:6px">JPG or PNG · or paste with Ctrl + V</p>
         </div>
       </div>
       <div class="uploads">
-        <button class="upl" id="pickBtn"><span id="i1"></span><span><b>Upload image</b>
+        <button class="upl" id="pickBtn"><span id="i1"></span><span><b>Menu photo</b>
           <span>JPG, PNG up to 10MB</span></span></button>
+        <button class="upl" id="dishBtn"><span id="i5"></span><span><b>Photo of a dish</b>
+          <span>Find out what it is</span></span></button>
         <button class="upl" id="pasteBtn"><span id="i2"></span><span><b>Paste image</b>
           <span>Ctrl + V from clipboard</span></span></button>
-        <a class="upl" href="../index.html"><span id="i3"></span><span><b>Use the camera</b>
-          <span>Open the phone app</span></span></a>
       </div>
       <input type="file" id="file" accept="image/*" hidden>
+      <input type="file" id="dishFile" accept="image/*" hidden>
 
       <div class="warn" style="margin-top:16px" id="ocrNote"></div>
       <div id="ocrOut" style="margin-top:16px"></div>
@@ -88,16 +89,22 @@ import { chrome, paintZoneName, load, zoneId, I, esc, money, photo, dishPhoto } 
    lại cho web là mở đường cho hai bản nói hai kết quả khác nhau về cùng
    một dòng thực đơn. */
 import { parseMenu, matchDish, verdict } from "../match.js";
+import { diemNhanMon } from "../nhan-mon.js";
 
 chrome("scan.html");
 paintZoneName();
 for (const [id, ico] of [["shieldIco", "shield"], ["upIco", "upload"], ["i1", "upload"],
-  ["i2", "clipboard"], ["i3", "camera"], ["i4", "bowl"]]) {
-  document.getElementById(id).innerHTML = I[ico];
+  ["i2", "clipboard"], ["i4", "bowl"], ["i5", "bowl"]]) {
+  document.getElementById(id).innerHTML = I[ico] || I.upload;
 }
-document.getElementById("ocrNote").innerHTML = `${I.shield}<span><b>The photo never leaves this
-  computer.</b> Reading the menu runs inside your browser — no upload, no server, no API key.
-  The first scan downloads the recogniser (~5MB) and takes longer than the ones after it.</span>`;
+/* LỜI HỨA RIÊNG TƯ phải đúng với từng loại ảnh. Bản trước viết "ảnh không
+   bao giờ rời máy tính" cho MỌI ảnh — đúng với thực đơn (đọc chữ ngay trong
+   trình duyệt), nhưng nhận ra một đĩa bánh xèo thì cần model trực tuyến. Nên
+   nói rõ ngoại lệ, và ảnh món chỉ được gửi khi người dùng chủ động bấm. */
+document.getElementById("ocrNote").innerHTML = `${I.shield}<span><b>Menu photos never leave this
+  computer.</b> Reading a menu runs inside your browser — no upload, no server. The one exception
+  is a <b>dish photo</b>: working out which dish it is sends that single photo to an online model,
+  only when you ask, and it is not stored.</span>`;
 
 const zid = zoneId();
 const [prices, dishes] = await Promise.all([load("prices"), load("dishes")]);
@@ -109,12 +116,85 @@ const drop = document.getElementById("drop");
 const out = document.getElementById("ocrOut");
 let worker = null;
 
+let anhCuoi = null;                       // tệp ảnh vừa chọn, để nhận diện món nếu cần
 const show = async (file) => {
   if (!file || !file.type.startsWith("image/")) return;
+  anhCuoi = file;
   const url = URL.createObjectURL(file);
-  drop.innerHTML = `<img class="shot" src="${url}" alt="The menu photo you picked">`;
+  drop.innerHTML = `<img class="shot" src="${url}" alt="The photo you picked">`;
   await readMenu(url);
 };
+
+/* ── NHẬN DIỆN MÓN TỪ ẢNH ──────────────────────────────────────
+   Thu ảnh về cạnh dài 1024px, JPEG 0,72: model không cần nét từng sợi mì,
+   mà mỗi KB là thời gian chờ thật. Dưới trần 700KB của hàm máy chủ. */
+async function thuNho(file) {
+  const bm = await createImageBitmap(file);
+  const k = Math.min(1, 1024 / Math.max(bm.width, bm.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k);
+  c.getContext("2d").drawImage(bm, 0, 0, c.width, c.height);
+  bm.close?.();
+  return c.toDataURL("image/jpeg", 0.72);
+}
+
+async function nhanMon(file) {
+  if (!file) return;
+  out.innerHTML = `<div class="panel pad"><b style="font-family:var(--disp)">Looking at the dish…</b>
+    <p class="small muted" style="margin-top:8px">Sending this one photo to the recogniser — usually
+      a few seconds.</p></div>`;
+  let top;
+  try {
+    const r = await fetch(diemNhanMon(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: await thuNho(file) }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 503) throw new Error("Dish recognition is not switched on for this site yet — pick the dish by hand on the right.");
+    if (r.status === 429) throw new Error("Too many dish photos in a few minutes — wait a little, or pick the dish by hand.");
+    if (!r.ok) throw new Error("The recogniser did not answer — try again, or pick the dish by hand on the right.");
+    top = (j.top || []).filter((x) => dishOf(x.id));
+  } catch (e) {
+    out.innerHTML = `<div class="warn">${I.alert}<span>${esc(e.message)}</span></div>`;
+    return;
+  }
+  if (!top.length) {
+    out.innerHTML = `<div class="warn">${I.alert}<span>No dish from the local list matched this photo.
+      If it is a menu, try a straighter shot; otherwise pick the dish by hand on the right.</span></div>`;
+    return;
+  }
+  /* KHÔNG tự chốt: model đoán, người dùng xác nhận, rồi mới so giá. Đoán sai
+     mà phán giá luôn là so với dải giá của một món khác hẳn. */
+  out.innerHTML = `<div class="panel pad">
+    <div class="sect-head"><h2>Is this what you're looking at?</h2>
+      <span class="more" style="cursor:default">${esc(zone.en || zone.name)}</span></div>
+    ${top.map(({ id, confidence }) => {
+      const d = dishOf(id), it = zone.items[id];
+      return `<button class="spotrow" data-chon="${esc(id)}" style="grid-template-columns:56px 1fr auto;width:100%;text-align:left;background:none;border:0;cursor:pointer">
+        <span class="ph" style="width:56px;height:56px;border-radius:12px">${photo(dishPhoto(id), d.vi)}</span>
+        <span><h4>${esc(d.vi)}</h4>
+          <span class="meta">${esc(d.en || "")} · ${Math.round(confidence)}% sure</span></span>
+        <span class="amt tnum" style="font-size:15px">${it ? `${money(it.p25)} – ${money(it.p75)}` : "not priced here"}</span>
+      </button>`;
+    }).join("")}
+    <p class="small muted" style="margin-top:12px">Tap the right one to compare a price. The guess
+      comes from an AI model and can be wrong — similar dishes look alike.</p>
+  </div>`;
+  out.querySelectorAll("[data-chon]").forEach((b) => b.onclick = () => chonMon(b.dataset.chon));
+}
+
+function chonMon(id) {
+  if (!zone.items[id]) {
+    hand.innerHTML = `<div class="warn">${I.alert}<span>${esc(dishOf(id)?.vi || id)} has no local
+      price range in ${esc(zone.en || zone.name)} yet.</span></div>`;
+    return;
+  }
+  sel.value = id;
+  judge();
+  amt.focus();
+  hand.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 
 /* Một worker cho cả phiên: mỗi lần dựng lại là một lần tải model tiếng
    Việt ~5MB, và người ta thường quét vài tấm liền nhau. */
@@ -151,8 +231,18 @@ async function readMenu(url) {
    tưởng máy đã đọc hết thực đơn. */
 function render(lines) {
   if (!lines.length) {
+    /* Không ra dòng giá nào thường là vì đó KHÔNG phải thực đơn — người ta
+       chụp chính đĩa ăn. Mời nhận diện món trên CHÍNH tấm ảnh ấy, và nói rõ
+       bấm vào là ảnh được gửi đi. */
     out.innerHTML = `<div class="warn">${I.alert}<span>No priced line came out of that photo.
-      Try a straighter, closer shot — or type the price by hand on the right.</span></div>`;
+      If it is a menu, try a straighter, closer shot — or type the price by hand on the right.</span></div>
+      ${anhCuoi ? `<div class="panel pad" style="margin-top:12px">
+        <b style="font-family:var(--disp);font-size:17px">Is it a photo of a dish?</b>
+        <p class="small muted" style="margin-top:6px">Nón Lá can work out which dish it is and show
+          the local price. This sends the photo to an online model; it is not stored.</p>
+        <button class="btn pri" id="thuMon" style="margin-top:12px">Identify the dish</button>
+      </div>` : ""}`;
+    document.getElementById("thuMon")?.addEventListener("click", () => nhanMon(anhCuoi));
     return;
   }
   const rows = lines.map((l) => {
@@ -185,6 +275,16 @@ function render(lines) {
 }
 document.getElementById("file").addEventListener("change", (e) => show(e.target.files[0]));
 document.getElementById("pickBtn").onclick = () => document.getElementById("file").click();
+/* Lối ẢNH MÓN: người dùng đã nói trước đây là ảnh món, nên bỏ qua bước đọc
+   chữ và đi thẳng tới nhận diện — chọn tệp ở nút này chính là lời đồng ý gửi ảnh. */
+document.getElementById("dishBtn").onclick = () => document.getElementById("dishFile").click();
+document.getElementById("dishFile").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  if (!f || !f.type.startsWith("image/")) return;
+  anhCuoi = f;
+  drop.innerHTML = `<img class="shot" src="${URL.createObjectURL(f)}" alt="The dish photo you picked">`;
+  nhanMon(f);
+});
 document.getElementById("pasteBtn").onclick = () => drop.focus();
 drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("hot"); });
 drop.addEventListener("dragleave", () => drop.classList.remove("hot"));
