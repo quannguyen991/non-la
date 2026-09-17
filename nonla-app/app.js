@@ -2715,11 +2715,13 @@ function renderMap() {
     <div class="mini-grid">${rest.slice(0, REST_CAP).map(miniCardHTML).join("")}</div>
     ${rest.length > REST_CAP ? `<p class="ex-empty">${I.clock}${rest.length - REST_CAP} more OpenStreetMap eateries here — open the full map to see them.</p>` : ""}` : ""}
 
-    ${premiumSectionHTML()}
-
     ${sightsRailHTML()}
 
     ${tripsSectionHTML()}
+
+    ${/* Quán vốn ở bậc giá khác nằm CUỐI màn: người dùng muốn thấy điểm tham quan
+          và chuyến đi trong ngày trước, bảng quán cao cấp là thứ tra cứu khi cần. */""}
+    ${premiumSectionHTML()}
 
     <p class="seedwarn">Nón Lá never calls a business dishonest. It reports how a price compares
       with others nearby, shows the sample size, and gives owners a way to contest it.</p>`;
