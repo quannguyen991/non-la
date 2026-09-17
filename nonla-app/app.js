@@ -5,7 +5,7 @@
    ═══════════════════════════════════════════════════════════════ */
 import { parseMenu, matchDish, verdict, readNotes, zeroSlip,
          parsePrice, pickZone, fmtVND, fmtFX } from "./match.js";
-import { birdFlying, birdStanding, deer, cloudBand,
+import { birdFlying, birdStanding, deer,
          FRIEZE, dataURI, wrap } from "./motifs.js";
 import * as BigMap from "./bigmap.js";
 import { distance, fmtDistance } from "./geo.js";
@@ -694,8 +694,6 @@ function setEdge(level) {
   if (level && navigator.vibrate) navigator.vibrate(level === "high" ? [40,60,40,60,40] : level === "warn" ? [40,60,40] : [30]);
 }
 function openSheet(html) {
-  const top = $("#sheet .cloudtop");
-  if (top && !top.style.backgroundImage) top.style.backgroundImage = dataURI(cloudBand(GOLD, GIAY, 8));
   $("#sheetBody").innerHTML = html; $("#sheet").classList.add("open");
   /* Về ĐẦU thẻ mỗi lần mở. Chỉ thay nội dung thì vị trí cuộn của thẻ trước còn
      nguyên: bấm Chùa Cầu sau khi vừa cuộn hết một thẻ quán là thẻ mới mở ra
@@ -5335,9 +5333,9 @@ document.addEventListener("input", (ev) => {
    có khung riêng (ghim bản đồ, ô ảnh món).                          */
 function paintMotifs() {
   const style = document.createElement("style");
-  style.textContent = `
-    .ex-stats::after{background-image:${dataURI(cloudBand(GOLD, GIAY, 5, "line"))}}
-  `;
+  /* Dải mây ở chân khung thống kê đã gỡ cùng dải mây đầu thẻ — người dùng
+     không muốn họa tiết mây. Hàm giữ lại làm chỗ gắn họa tiết động sau này. */
+  style.textContent = ``;
   document.head.appendChild(style);
 }
 
