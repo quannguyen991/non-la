@@ -2432,6 +2432,10 @@ console.log("\n── đọc câu trả lời của mô hình ──────
     api.includes('if (!NGUON.test(req.headers.origin || "")) return res.status(403)') && api.includes('quaTai(req, "tro-ly", 20)'), true);
   eq("người gọi chỉ gửi được lượt user/assistant, không gửi được lời hệ thống",
     api.includes('m?.role === "user" || m?.role === "assistant"') && !/role: "system"/.test(api), true);
+  /* Cổng model có lúc treo quá 50 giây: lượt đầu chờ ngắn, treo hoặc 5xx thì
+     thử lại MỘT lần; 4xx không thử lại vì gửi lại y hệt sẽ hỏng y hệt. */
+  eq("gọi model thử lại một lần khi treo, không thử lại khi 4xx",
+    chan.includes("22_000") && chan.includes("30_000") && chan.includes("if (!thuLai) throw e;"), true);
   eq("mỗi lượt bị cắt 800 ký tự, tối đa 10 lượt",
     api.includes(".slice(0, 800)") && api.includes(".slice(-10)"), true);
   const { nguCanhTroLy } = await import("./tro-ly.js");

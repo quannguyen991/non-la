@@ -44,8 +44,7 @@ export function quaTai(req, loai, toiDa, cuaSoMs = 10 * 60 * 1000) {
   return ds.length > toiDa;
 }
 
-/** Gọi model kiểu OpenAI, có hạn giờ. Trả nội dung chữ của câu trả lời. */
-export async function goiModel(cfg, messages, { henMs = 50_000, maxTokens = 700 } = {}) {
+async function mot(cfg, model, messages, henMs, maxTokens) {
   const ctl = new AbortController();
   const hen = setTimeout(() => ctl.abort(), henMs);
   try {
@@ -53,12 +52,30 @@ export async function goiModel(cfg, messages, { henMs = 50_000, maxTokens = 700 
       method: "POST",
       signal: ctl.signal,
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.key}` },
-      body: JSON.stringify({ model: cfg.model, max_tokens: maxTokens, messages }),
+      body: JSON.stringify({ model, max_tokens: maxTokens, messages }),
     });
     if (!r.ok) throw Object.assign(new Error("model"), { status: r.status });
     const j = await r.json();
     return j?.choices?.[0]?.message?.content || "";
   } finally {
     clearTimeout(hen);
+  }
+}
+
+/** Gọi model kiểu OpenAI, có hạn giờ và THỬ LẠI MỘT LẦN.
+ *
+ *  Cổng model có lúc treo: đo trên bản live, 5/5 lượt trả trong 5–11 giây,
+ *  nhưng có lượt treo quá 50 giây rồi người dùng nhận "không trả lời". Nên lượt
+ *  đầu chỉ chờ 22 giây; treo hoặc lỗi phía máy chủ (5xx) thì thử lại một lần
+ *  với model dự phòng (MODEL_DU_PHONG, mặc định chính model đó) trong phần thời
+ *  gian còn lại dưới trần 60 giây của hàm. Lỗi 4xx thì KHÔNG thử lại — gửi lại
+ *  y hệt sẽ hỏng y hệt, và mỗi lượt là tiền. */
+export async function goiModel(cfg, messages, { maxTokens = 700 } = {}) {
+  try {
+    return await mot(cfg, cfg.model, messages, 22_000, maxTokens);
+  } catch (e) {
+    const thuLai = e.name === "AbortError" || (e.status >= 500) || e.status == null;
+    if (!thuLai) throw e;
+    return mot(cfg, process.env.MODEL_DU_PHONG || cfg.model, messages, 30_000, maxTokens);
   }
 }
