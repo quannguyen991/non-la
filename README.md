@@ -11,6 +11,17 @@
 
 ---
 
+## Mới: bảng giá trước khi gọi món (Hà Nội, 09/2026)
+
+Người bán vỉa hè tự lập bảng giá, in **một tờ A6 có mã QR** dán ở quầy. Khách quét
+bằng camera — không cài app — là đọc được tên món và giá bằng tiếng Anh, Hàn, Trung,
+Nhật, **trước khi gọi**. Cả bảng giá nằm trong mã QR, không lên máy chủ nào.
+
+- Lập bảng: [`web/tao-bang-gia.html`](nonla-app/web/tao-bang-gia.html) · khách đọc: [`web/bang-gia.html`](nonla-app/web/bang-gia.html)
+- Lõi: `biengia.js` (đơn vị, tên 5 thứ tiếng, soát, gói/mở) · `qr.js` (mã hoá QR tự viết)
+- Vì sao, và pilot đo gì: [`docs/superpowers/specs/2026-09-23-bang-gia-truoc-khi-goi-mon-design.md`](docs/superpowers/specs/2026-09-23-bang-gia-truoc-khi-goi-mon-design.md)
+- Hồ sơ nháp Sáng tạo trẻ Hà Nội 2026: [`docs/ho-so-sang-tao-tre-ha-noi-2026.md`](docs/ho-so-sang-tao-tre-ha-noi-2026.md)
+
 ## Nó trả lời một câu
 
 Người nước ngoài đang đứng trước một quầy hàng ở Việt Nam, và câu hỏi duy nhất là:
@@ -58,7 +69,7 @@ Có một phép thử canh năm trường đó: thêm lại là bộ thử đỏ
 | Vùng · món · ô giá | 6 · 77 · 219 |
 | Quán OpenStreetMap | 2.481 |
 | Mô-đun JS | 53 (19.208 dòng) |
-| Phép thử | **904**, 0 trượt |
+| Phép thử | **950**, 0 trượt |
 | Đối chứng mô hình ngôn ngữ | 36 câu × 10 lượt |
 
 **219/219 ô giá vẫn là dữ liệu hạt giống** — chưa ô nào đạt mức đo thật. Đó là chỗ
@@ -71,7 +82,7 @@ cd nonla-app && python -m http.server 8899 --bind 127.0.0.1
 ```
 
 ```bash
-cd nonla-app && node test.mjs        # 904 phép thử lõi
+cd nonla-app && node test.mjs        # 950 phép thử lõi
 ```
 
 ```bash

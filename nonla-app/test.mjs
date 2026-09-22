@@ -2748,6 +2748,143 @@ console.log("\n── đọc câu trả lời của mô hình ──────
     top(/\.offline\{[^}]*top:calc\((\d+)px/) > top(/\.modes\{[^}]*top:calc\((\d+)px/), true);
 }
 
+/* ── biengia + qr: bảng giá trước khi gọi món ──────────────── */
+console.log("\n── biengia: bảng giá người bán tự lập, in thành mã QR ───");
+{
+  const BG = await import("./biengia.js");
+  const { encode: qrEncode, toSVG: qrSVG } = await import("./qr.js");
+
+  const mau = {
+    n: "Cô Lan — bánh rán", a: "Hồ Gươm, phía Đinh Tiên Hoàng", d: "2026-09-23", f: 0,
+    i: [
+      { k: "banh-ran", g: 10_000, u: "chiec" },
+      { k: "nuoc-mia", g: 15_000, u: "coc" },
+      { k: null, ten: "Ốc luộc", en: "Boiled snails", g: 60_000, u: "lang" },
+      { k: "hoa-qua", g: 0, u: "thoigia" },
+    ],
+  };
+
+  /* gói → mở phải trả lại đúng bảng: đây là toàn bộ "cơ sở dữ liệu" */
+  const goi = await BG.dongGoi(mau);
+  eq("gói chỉ dùng ký tự an toàn cho URL", /^[A-Za-z0-9_-]+$/.test(goi), true);
+  const lai = await BG.moGoi(goi);
+  eq("mở gói trả lại tên quán", lai.n, mau.n);
+  eq("mở gói trả lại đủ dòng", lai.i.length, 4);
+  eq("món ngoài danh mục giữ tên người bán gõ", lai.i[2].ten, "Ốc luộc");
+  eq("và tên tiếng Anh người bán gõ", lai.i[2].en, "Boiled snails");
+  eq("món trong danh mục không mang tên gõ tay theo", lai.i[0].ten, "");
+  eq("layGoi đọc được từ hash", BG.layGoi("#g=" + goi), goi);
+  eq("layGoi trả null khi không có gói", BG.layGoi("#x=1"), null);
+  const url = await BG.duongDan(mau, "https://nonla-app.vercel.app/web");
+  ok("đường dẫn vừa một mã QR in được trên A6 (≤ phiên bản 15 mức M)",
+    qrEncode(url, { ecc: "M" }).version <= 15, url.length);
+
+  /* bảng 12 món vẫn phải vừa: một quán bình thường không có nhiều hơn */
+  const dai = { ...mau, i: Object.keys(BG.MON).slice(0, 12).map((k, j) => ({ k, g: (j + 2) * 5000, u: "phan" })) };
+  ok("bảng 12 món vẫn ≤ phiên bản 20", qrEncode(await BG.duongDan(dai, "https://nonla-app.vercel.app/web")).version <= 20);
+
+  /* soát: chặn chỉ khi khách không đọc ra con số */
+  const s = BG.soatBang(mau);
+  eq("bảng mẫu in được", s.inDuoc, true);
+  eq("thiếu giá thì chặn", BG.chan(BG.soatDong({ k: "pho-bo", u: "bat" })), true);
+  eq("thời giá mà có số thì chặn", BG.chan(BG.soatDong({ k: "oc", g: 50_000, u: "thoigia" })), true);
+  eq("gõ 50 thay cho 50.000 thì chặn", BG.chan(BG.soatDong({ k: "pho-bo", g: 50, u: "bat" })), true);
+  eq("giá RẤT cao không bị chặn — app không quyết định ai được bán đắt",
+    BG.chan(BG.soatDong({ k: "non-la", g: 850_000, u: "chiec" })), false);
+  eq("giá lẻ nghìn chỉ nhắc, không chặn",
+    BG.soatDong({ k: "pho-bo", g: 45_500, u: "bat" }).map((x) => x.chan), [false]);
+  eq("trùng món cùng đơn vị thì chặn",
+    BG.soatBang({ n: "x", i: [{ k: "che", g: 20000, u: "coc" }, { k: "che", g: 25000, u: "coc" }] }).inDuoc, false);
+  eq("cùng món khác đơn vị thì được (chè cốc, chè bát)",
+    BG.soatBang({ n: "x", i: [{ k: "che", g: 20000, u: "coc" }, { k: "che", g: 25000, u: "bat" }] }).inDuoc, true);
+  eq("thiếu tên quán thì không in", BG.soatBang({ i: [{ k: "che", g: 20000, u: "coc" }] }).inDuoc, false);
+
+  /* tổng: theo cân phải có số gam, thời giá không bao giờ được cộng */
+  const t = BG.tinhTong(mau, [{ idx: 0, sl: 10 }, { idx: 2, sl: 350 }, { idx: 3, sl: 1 }]);
+  eq("10 bánh rán 10.000₫ = 100.000₫", t.dong[0].tien, 100_000);
+  eq("350 g ốc 60.000₫/lạng = 210.000₫", t.dong[1].tien, 210_000);
+  eq("thời giá nằm ở mục còn phải hỏi", t.conHoi.map((x) => x.lyDo), ["thoigia"]);
+  eq("tổng không cộng món thời giá", t.tong, 310_000);
+  eq("món theo cân chưa có số gam thì không cộng",
+    BG.tinhTong(mau, [{ idx: 2, sl: 0 }]).tong, 0);
+  eq("phụ thu 10% tính trên tạm tính",
+    BG.tinhTong({ ...mau, f: 10 }, [{ idx: 0, sl: 3 }]).tong, 33_000);
+
+  /* tên món: năm thứ tiếng cho mọi món trong bảng dịch */
+  const thieu = Object.entries(BG.MON).filter(([, m]) => BG.NGON_NGU.some((l) => !m[l]));
+  eq("mọi món trong bảng dịch có đủ năm thứ tiếng", thieu.map(([k]) => k), []);
+  const catalog = new Set(dishes.map((d) => d.id));
+  const lechTen = Object.keys(BG.MON).filter((k) => catalog.has(k) &&
+    !dishes.find((d) => d.id === k).vi.split(" / ").includes(BG.MON[k].vi));
+  eq("món trùng mã với dishes.json dùng một trong các tên tiếng Việt của nó", lechTen, []);
+  const donVi = Object.entries(BG.DON_VI).filter(([, v]) => BG.NGON_NGU.some((l) => !v[l]));
+  eq("mọi đơn vị có câu giải thích đủ năm thứ tiếng", donVi.map(([k]) => k), []);
+  eq("chỉ hai đơn vị theo cân", Object.keys(BG.DON_VI).filter((k) => BG.DON_VI[k].can), ["lang", "kg"]);
+  eq("bản dịch chưa duyệt thì phải nói là chưa duyệt", BG.DUYET_BAN_DICH === false && !!BG.CAU.chuaDuyet.ko, true);
+  eq("ngôn ngữ trình duyệt ko-KR → ko", BG.doanNgonNgu("ko-KR"), "ko");
+  eq("ngôn ngữ không có → en", BG.doanNgonNgu("fr-FR"), "en");
+  eq("docGia: 10k", BG.docGia("10k"), 10_000);
+  eq("docGia: 10.000", BG.docGia("10.000"), 10_000);
+  eq("docGia: 1,5 triệu", BG.docGia("1,5 triệu"), 1_500_000);
+  eq("docGia: 1tr2", BG.docGia("1tr2"), 1_200_000);
+  eq("docGia: 15 nghìn", BG.docGia("15 nghìn"), 15_000);
+  eq("docGia: 150.000đ", BG.docGia("150.000đ"), 150_000);
+  eq("docGia: chữ lạ thì null, không đoán", BG.docGia("mười nghìn"), null);
+  eq("docGia: 10.5 (không rõ nghìn hay số lẻ) thì null", BG.docGia("10.5"), null);
+
+  /* luật chữ: không chứng nhận, không buộc tội — quét mọi chuỗi hiển thị
+     của tệp lõi LẪN hai trang web, vì chữ lọt vào thường lọt ở trang. */
+  const chuoi = [readFileSync("./biengia.js", "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, ""),
+    ...["./web/bang-gia.html", "./web/tao-bang-gia.html"].filter(existsSync)
+      .map((p) => readFileSync(p, "utf8").replace(/<!--[\s\S]*?-->/g, "")
+        .replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, ""))].join("\n");
+  const cam = ["fair price", "công bằng", "xác thực", "đúng giá", "verified", "chặt chém", "scam", "rip-off", "overcharg"];
+  eq("không chữ chứng nhận hay buộc tội nào trong chuỗi hiển thị",
+    cam.filter((w) => chuoi.toLowerCase().includes(w)), []);
+  ok("câu 'không kiểm, không chứng nhận' có ở trang khách",
+    !existsSync("./web/bang-gia.html") || readFileSync("./web/bang-gia.html", "utf8").includes("laLoiKhai"));
+
+  /* QR: đọc NGƯỢC bằng OpenCV — bộ giải mã không liên quan gì tới qr.js.
+     So qr.js với chính nó thì một lỗi đặt bit sẽ đúng ở cả hai phía. */
+  const { execFileSync } = await import("child_process");
+  const { tmpdir } = await import("os");
+  const { writeFileSync: ghi, mkdirSync } = await import("fs");
+  const thu = join(tmpdir(), "nonla-qr");
+  mkdirSync(thu, { recursive: true });
+  const cac = [url, "HELLO", "Bánh rán 10 chiếc", "x".repeat(400)];
+  const tep = [];
+  cac.forEach((txt, k) => ["L", "M", "Q", "H"].forEach((e) => {
+    const q = qrEncode(txt, { ecc: e }), px = 6, n = (q.size + 8) * px;
+    const buf = Buffer.alloc(n * n, 255);
+    q.modules.forEach((r, y) => r.forEach((c, x) => {
+      if (c) for (let a = 0; a < px; a++) buf.fill(0, ((y + 4) * px + a) * n + (x + 4) * px, ((y + 4) * px + a) * n + (x + 5) * px);
+    }));
+    const f = join(thu, `q${k}${e}.pgm`);
+    ghi(f, Buffer.concat([Buffer.from(`P5\n${n} ${n}\n255\n`), buf]));
+    tep.push({ f, txt });
+  }));
+  let doc = null;
+  try {
+    doc = execFileSync("python", ["tools/doc-qr.py", ...tep.map((x) => x.f)],
+      { encoding: "utf8", env: { ...process.env, PYTHONIOENCODING: "utf-8" } }).split(/\r?\n/);
+  } catch { /* máy không có python + OpenCV */ }
+  if (doc) {
+    const hong = tep.filter((x, k) => doc[k] !== x.txt).map((x) => x.f.split(/[\/]/).pop());
+    eq("OpenCV đọc lại đúng cả 16 mã QR (4 chuỗi × 4 mức sửa lỗi)", hong, []);
+  } else {
+    console.log("  ·  bỏ qua phép đọc QR bằng OpenCV — máy này thiếu python/cv2");
+  }
+  ok("SVG của mã QR có lề trắng 4 ô", qrSVG(qrEncode("a")).includes('viewBox="0 0 29 29"'));
+  {
+    const tao = readFileSync("./web/tao-bang-gia.html", "utf8");
+    /* "size:A6" không có trong chuẩn CSS — Chrome lặng lẽ in khổ Letter
+       (đo 23/09/2026: PDF ra 216×279 mm thay vì 105×148 mm). */
+    eq("tờ bảng giá in đúng khổ A6 ghi bằng mm", /@page\{size:105mm 148mm/.test(tao), true);
+    eq("không dùng tên khổ A6 mà Chrome bỏ qua", /size:\s*A6/i.test(tao.replace(/\/\*[\s\S]*?\*\//g, "")), false);
+  }
+}
+
 console.log("\n════════════════════════════════════════════");
 console.log(`${pass} pass · ${fail} fail\n`);
 process.exit(fail ? 1 : 0);
