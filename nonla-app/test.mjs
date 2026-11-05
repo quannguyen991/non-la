@@ -1118,6 +1118,9 @@ console.log("\n── change: đếm tiền thối ─────────�
   eq("180k trông như thế nào",
     breakdown(180000).map((b) => `${b.count}×${b.note / 1000}`).join("+"),
     "1×100+1×50+1×20+1×10");
+  eq("đưa 500k trả bát phở 40k thì thối 200k+200k+50k+10k",
+    breakdown(changeDue(500000, 40000)).map((b) => `${b.count}×${b.note / 1000}`).join("+"),
+    "2×200+1×50+1×10");
   eq("số 0 không có tờ nào", breakdown(0).length, 0);
   ok("mọi mệnh giá dựng lại đúng chính nó",
     NOTES.every((n) => breakdown(n).length === 1 && breakdown(n)[0].note === n));

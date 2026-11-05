@@ -1505,6 +1505,20 @@ function renderChange() {
   const due = Change.changeDue(paid, g.bill);
   /* Chỉ chấm điểm khi ĐÃ có tiền trong tay. Gọi check() với got = 0 sẽ
      báo "thiếu đúng bằng khoảng cách hai tờ xanh" cho một người còn chưa
+/* Vẽ nắm tiền thối bằng các "tờ tiền" nhỏ đúng tông màu, mỗi tờ một ô —
+   đối chiếu hình dạng nhanh hơn đọc "460.000₫" khi tay còn đang cầm tiền.
+   Chữ nằm ngay dưới để người đọc màn hình vẫn có đủ thông tin; hình chỉ là
+   lớp trực quan, nên aria-hidden. */
+function changeNotesHTML(due) {
+  const parts = Change.breakdown(due);
+  const text = parts.map((b) => `${b.count}×${Math.round(b.note / 1000)}k`).join(" + ");
+  const notes = parts.map((b) => `<span class="ch-bill-note" data-n="${b.note}">${
+    Math.round(b.note / 1000)}k</span>`.repeat(b.count)).join("");
+  return `<div class="ch-notes" aria-hidden="true">${notes}</div>
+    <p class="src">${fmtVND(due)} = ${text}</p>
+    <p class="src">Usually handed back as these notes.</p>`;
+}
+
      đếm gì cả — một lời cảnh báo đúng công thức nhưng sai hoàn cảnh. */
   const v = due != null && due >= 0 && got > 0 ? Change.check(due, got) : null;
 
@@ -1534,8 +1548,7 @@ function renderChange() {
       <div class="ch-due">
         <p class="kicker">${esc(T("Change owed"))}</p>
         <p class="ch-big">${fmtVND(due)}</p>
-        ${due > 0 ? `<p class="src">Usually handed back as ${Change.breakdown(due)
-          .map((b) => `${b.count}×${Math.round(b.note / 1000)}k`).join(" + ")}</p>` : ""}
+        ${due > 0 ? changeNotesHTML(due) : ""}
       </div>` : ""}
 
     ${due != null && due < 0 ? `<div class="warnbox">You have handed over
