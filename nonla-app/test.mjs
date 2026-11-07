@@ -13,6 +13,7 @@ import { mapsLinks, socialLinks, shareTargets, shareText, hashtag } from "./link
 import { provenance, badge as trustBadge, summary as trustSummary, isMeasured,
          MIN_SAMPLES as TRUST_MIN } from "./trust.js";
 import { changeDue, breakdown, explain, check as checkChange, NOTES } from "./change.js";
+import { luatBaiDang, docKetQuaKiemDuyet, quyetDinh, loiNhacKiemDuyet, LY_DO } from "./kiemduyet.js";
 import { compare as compareMenus, MIN_PAIRS } from "./menutax.js";
 import { tripSummary, dateLine, fileName } from "./postcard.js";
 import { PHRASES } from "./showcard.js";
@@ -2886,6 +2887,33 @@ console.log("\n── biengia: bảng giá người bán tự lập, in thành m
     eq("tờ bảng giá in đúng khổ A6 ghi bằng mm", /@page\{size:105mm 148mm/.test(tao), true);
     eq("không dùng tên khổ A6 mà Chrome bỏ qua", /size:\s*A6/i.test(tao.replace(/\/\*[\s\S]*?\*\//g, "")), false);
   }
+}
+
+console.log("\n── kiemduyet: luật + kết quả AI ──────────");
+{
+  eq("bài kể chuyện bình thường qua luật", luatBaiDang({ body: "Pho bo 50k, broth was great, a bit crowded." }), []);
+  ok("đường dẫn bị chặn", luatBaiDang({ body: "best food see www.quananngon.com" }).includes("lien-he"));
+  ok("số điện thoại bị chặn", luatBaiDang({ body: "call 0912 345 678 to book" }).includes("lien-he"));
+  ok("tài khoản @ bị chặn", luatBaiDang({ body: "follow @quanngon_hn" }).includes("lien-he"));
+  ok("lời mời đặt bàn là quảng cáo", luatBaiDang({ body: "Book a table now, 20% off" }).includes("quang-cao"));
+  eq("không có chữ thì không có gì để bắt", luatBaiDang({ body: null }), []);
+  eq("giá tiền không bị nhầm là số điện thoại", luatBaiDang({ body: "paid 500000 total" }), []);
+
+  eq("đọc JSON bọc trong ```", docKetQuaKiemDuyet('```json\n{"verdict":"cho","reasons":["nghi-gia"]}\n```'),
+    { verdict: "cho", reasons: ["nghi-gia"] });
+  eq("lý do ngoài danh sách bị bỏ", docKetQuaKiemDuyet('{"verdict":"chan","reasons":["hack","quang-cao"]}').reasons, ["quang-cao"]);
+  eq("phán quyết xấu không có lý do hợp lệ thì thành ok", docKetQuaKiemDuyet('{"verdict":"chan","reasons":["bịa"]}').verdict, "ok");
+  let nem = false; try { docKetQuaKiemDuyet('{"verdict":"delete-all"}'); } catch { nem = true; }
+  ok("phán quyết lạ bị từ chối", nem);
+  nem = false; try { docKetQuaKiemDuyet("sorry I cannot"); } catch { nem = true; }
+  ok("không phải JSON thì ném lỗi", nem);
+
+  eq("luật chặn thì AI nói ok cũng vẫn chặn", quyetDinh(["lien-he"], { verdict: "ok", reasons: [] }).status, "chan");
+  eq("AI chỉ nâng mức", quyetDinh([], { verdict: "cho", reasons: ["nghi-gia"] }).status, "cho");
+  eq("AI hỏng thì bài qua luật vẫn đi", quyetDinh([], null).status, "ok");
+  ok("lý do không trùng lặp", quyetDinh(["quang-cao"], { verdict: "chan", reasons: ["quang-cao"] }).reasons.length === 1);
+  ok("mọi lý do đều có câu nói với người dùng", Object.values(LY_DO).every((m) => m && m.length > 10));
+  ok("lời nhắc coi chữ người dùng là dữ liệu", /UNTRUSTED DATA/.test(loiNhacKiemDuyet()));
 }
 
 console.log("\n════════════════════════════════════════════");

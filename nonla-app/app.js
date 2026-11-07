@@ -18,6 +18,7 @@ import * as Community from "./community.js";
 import * as Cloud from "./cloud.js";
 import * as Outbox from "./outbox.js";
 import { validate as validatePost, farFrom, summarise, priceBand } from "./posts.js";
+import { luatBaiDang, quyetDinh, diemKiemDuyet } from "./kiemduyet.js";
 import { compress } from "./photo.js";
 import { mapsLinks, socialLinks, shareTargets, shareText } from "./links.js";
 import * as Local from "./localdb.js";
@@ -4707,10 +4708,52 @@ function go(tab) {
   }
   if (tab === "eat") renderEat();
   if (tab === "map") renderMap();
+/* Kiểm duyệt trước khi đăng: lớp luật (offline) rồi AI đọc chữ + ảnh. Trả về
+   câu nói với người dùng khi bài bị giữ, hoặc null khi được đi tiếp.
+   - "chan" thì dừng hẳn; "cho" dừng MỘT lần: bấm Post lại với đúng nội dung
+     đó là người dùng xác nhận và bài đi tiếp (AI có thể đoán sai).
+   - AI không trả lời được (mạng, hạn mức, chưa bật) thì chỉ còn lớp luật. */
+async function kiemDuyetBai(draft) {
+  const luat = luatBaiDang(draft);
+  let ai = null;
+  if (!luat.length || draft.photo) {
+    try {
+      let image = null;
+      if (draft.photo) {
+        const c = await compress(draft.photo);
+        const url = await new Promise((ok, no) => {
+          const r = new FileReader();
+          r.onload = () => ok(String(r.result)); r.onerror = no; r.readAsDataURL(c.blob);
+        });
+        if (url.length <= 700_000) image = url;
+      }
+      if (draft.body || image) {
+        const r = await fetch(diemKiemDuyet(), {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ body: draft.body || "", image }),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (r.ok) ai = await r.json();
+      }
+    } catch { ai = null; }
+  }
+  const q = quyetDinh(luat, ai && ["ok", "cho", "chan"].includes(ai.verdict)
+    ? { verdict: ai.verdict, reasons: Array.isArray(ai.reasons) ? ai.reasons : [] } : null);
+  if (q.status === "ok") return null;
+  const key = `${draft.body}|${draft.photo?.name || ""}|${draft.photo?.size || 0}`;
+  if (q.status === "cho" && S.kdCho === key) return null;
+  S.kdCho = q.status === "cho" ? key : null;
+  return q.messages.join(" ") + (q.status === "cho" ? " Tap Post again to send it anyway." : "");
+}
+
   if (tab === "journal") renderJournal();
   if (tab === "community") renderCommunity();
   if (tab === "me") renderMe();
 }
+  busy(true, "Checking…");
+  const giu = await kiemDuyetBai(draft);
+  busy(false);
+  if (giu) { const e = $("#cfErr"); e.hidden = false; e.textContent = giu; return; }
 
 /* ── sự kiện ──────────────────────────────────────────────── */
 /* Enter = lưu. Gắn ở cấp document vì surveyui.js dựng lại toàn bộ DOM của
