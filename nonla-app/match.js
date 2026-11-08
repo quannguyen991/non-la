@@ -188,6 +188,14 @@ export function matchDish(name, dishes, threshold = 0.45) {
 export function verdict(price, stat) {
   if (!stat) return { level: "unknown", label: "No local data yet", pct: null };
   const { p50, p75, p95, n } = stat;
+  /* Dải seed thuần (chưa đo, chưa có nguồn menu) có n là SỐ HƯ CẤU — xem
+     prices.json. Không được phán quyết trên đó. Dải có nguồn menu (sourced)
+     vẫn phán được vì giá là của chính quán công bố. */
+  if (stat.seed && !stat.sourced && !stat.surveyedAt)
+    return { level: "unknown", label: "Estimate only", pct: null, n };
+  /* Khảo sát thật mà dưới 5 lượt đo thì một người đi qua không đủ để kết tội. */
+  if (stat.surveyedAt && typeof n === "number" && n < 5)
+    return { level: "unknown", label: "Too few readings", pct: null, n };
   const pct = p50 > 0 ? Math.round(((price - p50) / p50) * 100) : null;
 
   if (price <= p75) {

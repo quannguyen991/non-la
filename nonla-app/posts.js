@@ -294,3 +294,23 @@ export function quanGanToaDo(places, coords, { radius = 400, limit = 6 } = {}) {
     .sort((a, b) => a.m - b.m)
     .slice(0, limit);
 }
+
+/* ── Gợi ý của người dùng ──────────────────────────────────────
+   Danh sách xếp hạng dưới đây là ĐẾM số người đã bấm "gợi ý quán" — đây là
+   danh sách của người dùng, không phải điểm chấm của Nón Lá. */
+
+/**
+ * Xếp hạng quán theo số lượt gợi ý. Chỉ đếm bài có recommend === true và
+ * có placeId. Hoà số thì quán có bài mới hơn lên trước.
+ */
+export function rankRecommended(posts) {
+  const by = new Map();
+  for (const p of posts || []) {
+    if (p?.recommend !== true || !p.placeId) continue;
+    const r = by.get(p.placeId) || { placeId: p.placeId, count: 0, latest: 0 };
+    r.count += 1;
+    r.latest = Math.max(r.latest, Date.parse(p.createdAt) || 0);
+    by.set(p.placeId, r);
+  }
+  return [...by.values()].sort((a, b) => b.count - a.count || b.latest - a.latest);
+}

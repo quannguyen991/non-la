@@ -52,9 +52,11 @@
 </main>
 
 <script type="module">
-import { chrome, paintZoneName, I } from "./web.js";
+import { chrome, paintZoneName, I, dichTrang } from "./web.js";
+import { t as T } from "../i18n.js";
 
 chrome("");
+dichTrang();
 paintZoneName();
 document.getElementById("i1").innerHTML = I.mail;
 document.getElementById("i2").innerHTML = I.lock;
@@ -64,16 +66,13 @@ document.getElementById("eye").innerHTML = I.eye;
    chủ tài khoản nào — nên form phải nói thẳng điều đó TRƯỚC khi người ta
    gõ mật khẩu vào, chứ không phải sau khi bấm nút. Mật khẩu không được
    lưu, không được gửi đi đâu, kể cả để "thử". */
-document.getElementById("note").innerHTML = `${I.alert}<span><b>Accounts are not connected on
-  this build.</b> The form below is the finished screen, but nothing is sent anywhere and no
-  password is stored. Saved spots, scans and notes already work without an account — they live
-  in this browser.</span>`;
+document.getElementById("note").innerHTML = `${I.alert}<span><b>${T("Accounts are not connected on this build.")}</b> ${T("The form below is the finished screen, but nothing is sent anywhere and no password is stored. Saved spots, scans and notes already work without an account — they live in this browser.")}</span>`;
 
 const eye = document.getElementById("eye");
 const pw = document.getElementById("pw");
 eye.onclick = () => {
   pw.type = pw.type === "password" ? "text" : "password";
-  eye.setAttribute("aria-label", pw.type === "password" ? "Show password" : "Hide password");
+  eye.setAttribute("aria-label", pw.type === "password" ? T("Show password") : T("Hide password"));
 };
 
 const say = (msg) => {
@@ -90,12 +89,12 @@ const say = (msg) => {
 document.getElementById("form").onsubmit = (e) => {
   e.preventDefault();
   pw.value = "";
-  say("No account server is configured, so there is nothing to log in to yet. Your journal works without one.");
+  say(T("No account server is configured, so there is nothing to log in to yet. Your journal works without one."));
 };
 for (const id of ["google", "apple", "forgot"]) {
   document.getElementById(id).onclick = (e) => {
     e.preventDefault();
-    say("Single sign-on is not wired up on this build either — nothing was sent.");
+    say(T("Single sign-on is not wired up on this build either — nothing was sent."));
   };
 }
 </script>

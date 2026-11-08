@@ -82,7 +82,7 @@ input,select{font:inherit}
 #v-map::before{
   content:"";position:absolute;z-index:0;pointer-events:none;
   top:-14vw;right:-26vw;width:78vw;max-width:420px;aspect-ratio:1;
-  background:no-repeat center/contain url("assets/motifs/hoa-van-tron.webp");
+  background:no-repeat center/contain url("assets/motifs/trong-dong-v2.webp");
   opacity:.12;
 }
 /* Dải sóng nước chạy ngang ở cuối trang, chỗ nội dung đã hết. Lặp ngang
@@ -390,7 +390,12 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
 
    Ba mức tin cậy luôn có ICON + CHỮ, không bao giờ chỉ dựa vào màu.
    ═════════════════════════════════════════════════════ */
-.ex-head{position:relative;z-index:1}
+/* Kính mờ: nền giấy trong suốt, làm mờ phần phía sau, viền sáng mảnh. */
+.ex-head{position:relative;z-index:1;margin:0 0 4px;padding:14px 16px 16px;
+  background:rgba(251,247,236,.58);
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.7);border-radius:24px;
+  box-shadow:0 10px 30px -18px rgba(93,72,20,.4), inset 0 1px 0 rgba(255,255,255,.6)}
 
 .nb-topbar{display:flex;align-items:center;gap:9px;padding-right:58px;
   min-height:48px;position:relative;z-index:2}
@@ -439,17 +444,17 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
    Cuộn ngang và tràn ra hai mép rồi tự đệm lại, cùng khuôn với .ex-chips:
    sáu vùng không bao giờ vừa một màn 360px, và cắt cụt thẻ cuối ở mép
    phải là cách chắc chắn nhất để người dùng tưởng chỉ có bốn vùng. */
-.zone-row{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;
-  padding:14px var(--pad-x) 2px;margin:0 calc(-1 * var(--pad-x));
-  scrollbar-width:none;overscroll-behavior-x:contain;position:relative;z-index:2}
-.zone-row::-webkit-scrollbar{display:none}
-.zone-chip{display:grid;gap:1px;flex:0 0 auto;text-align:left;
+/* Lưới, không cuộn ngang: vùng nào cũng hiện ra ngay, kể cả trên máy tính không
+   có cử chỉ vuốt. Mỗi ô nhường đủ chỗ cho tên và số điểm tham quan. */
+.zone-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;
+  padding:14px 0 2px;position:relative;z-index:2}
+.zone-chip{display:grid;gap:1px;min-width:0;text-align:left;
   min-height:52px;padding:8px 14px;border-radius:16px;
   background:var(--giay);border:1.5px solid var(--vien-in);
   transition:transform .2s cubic-bezier(.22,.61,.36,1)}
 .zone-chip b{font-family:var(--disp);font-size:15px;font-weight:600;color:var(--then);
-  white-space:nowrap;line-height:1.15}
-.zone-chip span{font-size:11px;color:var(--muc-nhat);white-space:nowrap}
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.15}
+.zone-chip span{font-size:11px;color:var(--muc-nhat);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .zone-chip:active{transform:scale(.97)}
 .zone-chip[aria-pressed="true"]{background:var(--then);border-color:var(--vien-dam);
   box-shadow:0 6px 16px -8px rgba(14,43,36,.7)}
@@ -2188,3 +2193,64 @@ h2.sect{font-family:var(--disp);font-size:19px;font-weight:600;letter-spacing:-.
    khác nhau thì không được trông giống nhau. */
 .pt-dau.nhe{background:rgba(245,240,228,.07);border-color:rgba(245,240,228,.22)}
 .pt-dau.nhe time{color:rgba(245,240,228,.5)}
+
+/* ── Deal Recorder, quán tự thêm, Local Compass, ứng xử ──────────────── */
+#v-ghikeo{position:fixed;inset:0;z-index:76;overflow-y:auto;
+  background:var(--then);color:var(--diep);
+  padding:0 var(--pad-x) calc(24px + var(--safe))}
+#v-ghikeo[hidden]{display:none}
+.gk-bar{display:flex;justify-content:flex-end;padding:10px 0;position:sticky;top:0;
+  background:var(--then);z-index:2}
+.gk-h{font-size:22px;margin:4px 0 6px}
+.gk-sub,.gk-priv,.gk-note{font-size:14px;line-height:1.45;opacity:.85;margin:0 0 12px}
+.gk-lab{display:block;font-size:14px;margin:14px 0 6px;opacity:.9}
+.gk-in{width:100%;min-height:48px;padding:10px 12px;font-size:16px;border-radius:10px;
+  border:1px solid rgba(201,162,39,.45);background:rgba(245,240,228,.08);color:inherit}
+#v-ghikeo .btn{width:100%;min-height:52px;margin-top:10px}
+.gk-mic.on{outline:3px solid var(--vang, #c9a227)}
+.gk-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.gk-chip{min-height:48px;padding:8px 14px;border-radius:12px;text-align:left;
+  border:1px solid rgba(201,162,39,.55);background:rgba(245,240,228,.08);color:inherit}
+.gk-chip small{display:block;opacity:.75;font-size:12px}
+.gk-warn{font-size:14px;margin:8px 0;color:#e8a33d}
+.gk-ok{font-size:15px;margin:10px 0 0;color:#7fd18b}
+.gk-card{margin-top:18px;padding:16px;border-radius:16px;
+  border:2px solid rgba(201,162,39,.6);background:rgba(245,240,228,.06)}
+.gk-k{margin:0;font-weight:600}
+.gk-k small{font-weight:400;opacity:.8}
+.gk-amt{font-size:26px;font-weight:700;margin:10px 0 4px;line-height:1.25}
+.gk-dv{margin:0 0 8px;opacity:.9}
+.gk-read{display:flex;flex-direction:column;gap:6px;margin:12px 0 4px}
+#sheet .gk-lab{color:inherit}
+#sheet .gk-in{border:1px solid var(--line, #cdbf9a);background:transparent;color:inherit}
+.ux-list{margin:0;padding-left:18px;line-height:1.5}
+.ux-list li{margin:3px 0}
+details.compass{margin-top:10px;padding:10px 12px;border-radius:12px;
+  border:1px solid var(--line, #cdbf9a)}
+details.compass summary{cursor:pointer;min-height:44px;display:flex;flex-wrap:wrap;
+  align-items:center;gap:8px}
+details.compass summary small{opacity:.7}
+
+/* ═══ Đánh giá Google trên thẻ quán ═══ */
+.grate { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.grate-n { font: 600 22px/1 var(--disp); color: var(--then); }
+.grate-t { font-size: 13px; color: var(--muted, #5b6b66); }
+.grate-l { margin-left: auto; font-size: 13px; color: var(--ngoc); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ═══ Đổi mật khẩu trong tab Bạn ═══ */
+.pw-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.pw-h { font: 600 15px/1.2 var(--disp); color: var(--then); margin: 0 0 8px; }
+
+/* ═══ Chuyển tab và chuyển khối: trượt nhẹ theo chiều, các khối hiện lần lượt ═══ */
+@keyframes trIn { from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 22px)); } to { opacity: 1; transform: none; } }
+@keyframes trUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.view.tr-in { animation: trIn .34s cubic-bezier(.22,.61,.36,1) both; }
+.view.tr-in > .pad > * { animation: trUp .44s cubic-bezier(.22,.61,.36,1) both; }
+.view.tr-in > .pad > :nth-child(2) { animation-delay: .04s; }
+.view.tr-in > .pad > :nth-child(3) { animation-delay: .08s; }
+.view.tr-in > .pad > :nth-child(4) { animation-delay: .12s; }
+.view.tr-in > .pad > :nth-child(n+5) { animation-delay: .16s; }
+@media (prefers-reduced-motion: reduce) {
+  .view.tr-in, .view.tr-in > .pad > * { animation: none; }
+}
+

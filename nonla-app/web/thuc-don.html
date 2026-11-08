@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Read a menu — Nón Lá</title>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="web.css">
+<style>
+  .khuCard{border:1px solid var(--line, #e5e0d6);border-radius:12px;padding:12px 14px;margin-top:12px;background:#fff}
+  .khuCard .dong1{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+  .khuCard .vi{font-weight:600;font-size:17px}
+  .khuCard .sub{color:#6b6257;font-size:14px;margin-top:2px}
+  .khuCard .gia{white-space:nowrap;font-weight:600}
+  .khuCard .dong2{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}
+  .khuCard input[type=text],.khuCard select{padding:6px;font:inherit;max-width:9rem}
+  .khuCard input[type=number]{padding:6px;font:inherit;width:6rem}
+  .tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:8px;background:#f1ede4;color:#6b6257;margin-left:4px;vertical-align:middle}
+  .tag.xac{background:#e3efe3;color:#2f5d2f}
+  .tag.chua{background:#f7ebd9;color:#7a5118}
+  .tag.warn{background:#f6e0d8;color:#8a2d1f}
+  .intro{margin-top:8px;font-size:14px;line-height:1.5}
+  .intro dt{font-weight:600;margin-top:8px}
+  .intro dd{margin:2px 0 0 0;color:#333}
+  details summary{cursor:pointer;color:#6b6257;font-size:14px;margin-top:8px}
+  .row2{display:flex;gap:12px;flex-wrap:wrap}
+  .row2>*{flex:1 1 220px}
+  .grp{margin-top:14px}
+  .grp b{display:block;margin-bottom:4px}
+  .muted2{color:#6b6257;font-size:13px}
+  .bad{color:#8a2d1f}
+  .lang-pick select{padding:6px 8px;font:inherit}
+</style>
+</head>
+<body>
+<main class="wrap" id="main">
+  <div style="padding:34px 0 16px">
+    <h1 style="font-size:40px" data-i>Read a menu</h1>
+    <p class="muted" style="margin-top:10px;max-width:60ch" data-i>Take a photo of a menu. You get a translation of each dish, what it is, how to order it, and whether the prices add up.</p>
+    <p class="muted2" style="margin-top:6px" data-i>Translations marked ✓ come from a checked source. The rest are machine translations that no native speaker has reviewed yet.</p>
+    <p class="muted2" style="margin-top:4px" data-i>Dish names stay in Vietnamese — point at them on the menu.</p>
+    <p class="muted2" id="ngonNguNote" hidden data-i>Names in Russian, French, Thai, Malay and German are not translated yet, so English is shown.</p>
+  </div>
+
+  <section class="panel pad">
+    <label class="small" style="display:block;margin-bottom:12px"><span data-i>Area</span>
+      <select id="khu" style="display:block;margin-top:4px;padding:8px;font:inherit;max-width:24rem;width:100%"></select>
+    </label>
+    <div class="row2">
+      <div>
+        <button class="btn pri" id="chupBtn" data-i>Take or choose a menu photo</button>
+        <input type="file" id="file" accept="image/*" hidden>
+        <p class="small muted" style="margin-top:8px" id="anhTt"></p>
+      </div>
+      <div>
+        <label class="small muted" for="gote" data-i>Or type the dish names, one per line (for example: Pho bo 60k)</label>
+        <textarea id="gote" rows="5" style="width:100%;box-sizing:border-box;margin-top:6px;padding:8px;font:inherit" placeholder="Pho bo 60k&#10;Bun cha 50k&#10;Tom su rang me 180k"></textarea>
+        <button class="btn" id="doBtn" style="margin-top:8px" data-i>Read the typed lines</button>
+      </div>
+    </div>
+    <div id="loi" class="warn" style="margin-top:12px" hidden></div>
+  </section>
+
+  <section class="panel pad" style="margin-top:18px" id="secMon" hidden>
+    <h2 style="font-size:22px" data-i>Dishes</h2>
+    <p class="small muted" style="margin-top:4px" data-i>Tick what you ordered. For dishes priced by weight, enter the grams.</p>
+    <div id="cacMon"></div>
+  </section>
+
+  <section class="panel pad" style="margin-top:18px" id="secTong" hidden>
+    <h2 style="font-size:22px" data-i>Your order</h2>
+    <div id="tong" style="margin-top:8px"></div>
+  </section>
+
+  <section class="panel pad" style="margin-top:18px" id="secPT" hidden>
+    <h2 style="font-size:22px" data-i>Price analysis</h2>
+    <div id="pt" style="margin-top:8px"></div>
+  </section>
+
+  <section class="panel pad" style="margin-top:18px" id="secGY" hidden>
+    <h2 style="font-size:22px" data-i>Dish suggestions</h2>
+    <p class="small muted" style="margin-top:4px" data-i>Suggestions follow the taste you choose, from the list of 77 dishes. They are not ranked by price or advertising; each one gives a reason taken from the data.</p>
+    <div class="row2" style="margin-top:10px">
+      <label class="small"><input type="checkbox" id="kChay"> <span data-i>Vegetarian</span></label>
+      <label class="small"><span data-i>Max spice</span>
+        <select id="kCay">
+          <option value="" data-i>no limit</option>
+          <option value="none" data-i>not spicy</option>
+          <option value="mild" data-i>mild</option>
+          <option value="medium" data-i>medium</option>
+        </select></label>
+      <label class="small"><input type="checkbox" id="kRuou"> <span data-i>Skip alcohol</span></label>
+    </div>
+    <div class="small" style="margin-top:8px"><span data-i>Avoid:</span>
+      <label><input type="checkbox" class="kTranh" value="Peanuts"> <span data-i>Peanuts</span></label>
+      <label><input type="checkbox" class="kTranh" value="Shrimp"> <span data-i>Shrimp</span></label>
+      <label><input type="checkbox" class="kTranh" value="Fish sauce"> <span data-i>Fish sauce</span></label>
+      <label><input type="checkbox" class="kTranh" value="Pork"> <span data-i>Pork</span></label>
+      <label><input type="checkbox" class="kTranh" value="Beef"> <span data-i>Beef</span></label>
+      <label><input type="checkbox" class="kTranh" value="Shellfish"> <span data-i>Shellfish</span></label>
+    </div>
+    <div id="gy"></div>
+  </section>
+</main>
+
+<script type="module">
+import { chrome, esc, zoneId } from "./web.js";
+import { t as T, current as curLang } from "../i18n.js";
+import { parseLine } from "../match.js";
+import { detectUnit } from "../units.js";
+import { dichMon } from "../thucdon.js";
+import { goiY } from "../goiymon.js";
+import { tongBua, soSanhTrongThucDon, danhGiaGia } from "../phantichbua.js";
+import { gioiThieuMon } from "../gioithieu.js";
+import { DON_VI, docGia, vnd, nhanDonVi } from "../biengia.js";
+
+chrome("thuc-don.html");
+document.querySelectorAll("[data-i]").forEach((el) => { el.textContent = T(el.textContent.trim()); });
+document.title = T("Read a menu") + " — Nón Lá";
+
+const $ = (s) => document.querySelector(s);
+const DON_VI_CHON = Object.keys(DON_VI).filter((u) => u !== "thoigia");
+const NGON_NGU_CHUA_DICH = ["ru", "fr", "th", "ms", "de"];
+const diemAnh = () => /\.vercel\.app$/.test(location.hostname) ? "/api/dichthucdon" : "https://nonla-app.vercel.app/api/dichthucdon";
+const CAY_NHAN = { none: "not spicy", mild: "mild", medium: "medium", hot: "Hot" };
+
+let dishes = [];
+let prices = { zones: {} };
+let dong = [];       // mỗi dòng: { vi, id, en, ko, zh, ja, xac, gia, donvi, biet, nguon, chon, sl }
+let phuthu = [];
+
+const loiHien = (msg) => { const el = $("#loi"); el.hidden = !msg; el.textContent = msg ? T(msg) : ""; };
+
+Promise.all([
+  fetch("../data/dishes.json").then((r) => r.json()),
+  fetch("../data/prices.json").then((r) => r.json()),
+]).then(([d, p]) => {
+  dishes = d.dishes;
+  prices = p;
+  const khu = $("#khu");
+  khu.innerHTML = Object.entries(p.zones).map(([id, z]) => `<option value="${esc(id)}">${esc(z.en || z.name)}</option>`).join("");
+  khu.value = Object.keys(p.zones).includes(zoneId()) ? zoneId() : Object.keys(p.zones)[0];
+  if (NGON_NGU_CHUA_DICH.includes(curLang())) $("#ngonNguNote").hidden = false;
+  if (dong.length) ve();
+});
+
+/* Ghép kết quả đọc với lớp dịch có nguồn: nguồn có sẵn thắng dịch máy. */
+function gop(m) {
+  const a = dichMon(m.vi, dishes);
+  return {
+    vi: m.vi,
+    id: a.id,
+    en: a.en || m.en || null,
+    ko: a.ko || m.ko || null,
+    zh: a.zh || m.zh || null,
+    ja: a.ja || m.ja || null,
+    xac: { ko: !!a.xacMinh?.ko, zh: !!a.xacMinh?.zh, ja: !!a.xacMinh?.ja },
+    gia: m.gia ?? null,
+    donvi: m.donvi || (m.gia != null ? "phan" : "thoigia"),
+    biet: a.biet ?? m.biet ?? null,
+    nguon: a.nguon,
+    chon: false,
+    sl: 1,
+  };
+}
+
+function gopDongGo(d) {
+  const a = dichMon(d.name, dishes);
+  return {
+    vi: d.name, id: a.id, en: a.en, ko: a.ko, zh: a.zh, ja: a.ja,
+    xac: { ko: !!a.xacMinh?.ko, zh: !!a.xacMinh?.zh, ja: !!a.xacMinh?.ja },
+    gia: d.price, donvi: d.donvi || "phan", biet: a.biet, nguon: a.nguon, chon: false, sl: DON_VI[d.donvi || "phan"]?.can ? 0 : 1,
+  };
+}
+
+/* Ảnh: thu nhỏ về 1400px, JPEG, và giảm chất lượng nếu vẫn quá lớn. */
+async function thuNho(file) {
+  const bm = await createImageBitmap(file);
+  const s = Math.min(1, 1400 / Math.max(bm.width, bm.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bm.width * s); c.height = Math.round(bm.height * s);
+  c.getContext("2d").drawImage(bm, 0, 0, c.width, c.height);
+  for (const q of [0.82, 0.7, 0.55]) {
+    const url = c.toDataURL("image/jpeg", q);
+    if (url.length <= 1_400_000) return url;
+  }
+  return c.toDataURL("image/jpeg", 0.45);
+}
+
+async function docAnh(file) {
+  if (!file) return;
+  $("#anhTt").textContent = T("Reading the menu…");
+  loiHien("");
+  let j;
+  try {
+    const r = await fetch(diemAnh(), {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: await thuNho(file) }),
+    });
+    j = await r.json().catch(() => ({}));
+    if (r.status === 503) throw new Error("Dish reading is not switched on for this site. Type the dish names in the box next to it.");
+    if (r.status === 429) throw new Error("Too many photos in a few minutes. Wait a little and try again, or type the names.");
+    if (!r.ok) throw new Error("The server did not answer. Try again, or type the names.");
+  } catch (e) {
+    $("#anhTt").textContent = "";
+    loiHien(e.message);
+    return;
+  }
+  $("#anhTt").textContent = T("Read {n} lines.").replace("{n}", j.mon.length);
+  phuthu = j.phuthu || [];
+  dong = j.mon.map(gop);
+  ve();
+}
+
+/* Đọc từng dòng gõ tay: giá, và đơn vị nếu dòng có ghi (100g, kg, lạng, cân, thời giá).
+   Dòng thời giá không có giá vẫn được giữ lại, để khách biết còn món phải hỏi. */
+function docGo() {
+  const dongGo = $("#gote").value.split(/\r?\n/).filter((x) => x.trim());
+  const doc = [];
+  for (const line of dongGo) {
+    const p = parseLine(line);
+    const u = detectUnit(line);
+    if (!p && u?.kind !== "open") continue;
+    const tho = p ? p.name : line.replace(/[—–].*$/, "").trim();
+    const ten = tho.replace(/\s*\/\s*\d*\s*(g|kg|lạng|cân)\b.*$/i, "").replace(/\s*[—–-]?\s*(thời giá|market price).*$/i, "").trim();
+    let donvi = "phan", gia = p ? p.price : null;
+    if (u?.kind === "weight") donvi = u.gam === 1000 ? "kg" : "lang";
+    else if (u?.kind === "open") { donvi = "thoigia"; gia = null; }
+    doc.push({ name: ten, price: gia, donvi });
+  }
+  if (!doc.length) { loiHien("Could not read any line with a price. Each line looks like: Dish name 60k."); return; }
+  loiHien("");
+  phuthu = [];
+  dong = doc.map(gopDongGo);
+  ve();
+}
+
+/* ── tên theo ngôn ngữ của khách ─────────────────────────── */
+
+function tenNgu(d) {
+  const L = curLang();
+  if (L === "vi") return { chinh: d.vi, phu: d.en || "", dau: "" };
+  if (["ko", "zh", "ja"].includes(L) && d[L]) {
+    return { chinh: d[L], phu: d.vi, dau: d.xac?.[L] ? T("✓ source") : T("machine translation") };
+  }
+  return { chinh: d.en || d.vi, phu: d.vi, dau: "" };
+}
+
+/* ── vẽ ─────────────────────────────────────────────────── */
+
+function ve() {
+  const co = dong.length > 0;
+  for (const id of ["secMon", "secTong", "secPT", "secGY"]) $("#" + id).hidden = !co;
+  if (!co) return;
+  $("#cacMon").innerHTML = dong.map((d, i) => cardMon(d, i)).join("");
+  capNhatTong();
+  capNhatPT();
+  capNhatGY();
+}
+
+const khuHienTai = () => $("#khu").value;
+
+function cardMon(d, i) {
+  const ten = tenNgu(d);
+  const gt = d.gia != null ? vnd(d.gia).replace("₫", "") : "";
+  const dv = DON_VI[d.donvi];
+  const luuY = [];
+  if (d.donvi === "lang" || d.donvi === "kg") luuY.push(`<span class="tag warn">${esc(T("Priced by weight"))}</span>`);
+  if (d.donvi === "thoigia") luuY.push(`<span class="tag warn">${esc(T("ask the price"))}</span>`);
+  if (d.nguon === "chuadich") luuY.push(`<span class="tag chua">${esc(T("Not in our dish list — the translation is machine-made and not checked."))}</span>`);
+
+  const danhGia = d.id && d.gia != null ? danhGiaGia(d.id, d.gia, khuHienTai(), prices) : null;
+  const nhanGia = danhGia ? `<span class="tag">${esc(T(danhGia.nhan))}</span>` : "";
+
+  const gt2 = gioiThieuMon(d.id, dishes);
+  let gioi = "";
+  if (!gt2) {
+    gioi = `<p class="intro muted2">${esc(T(d.nguon === "chuadich" ? "Not in our dish list — the translation is machine-made and not checked." : "No introduction for this dish yet."))}</p>`;
+  } else {
+    const L = curLang();
+    const chuyen = L === "vi" ? (gt2.chuyen.vi || gt2.chuyen.en) : gt2.chuyen.en;
+    const dong2 = [];
+    if (gt2.mota) dong2.push(`<dt>${esc(T("Description"))}</dt><dd>${esc(gt2.mota)}</dd>`);
+    if (chuyen) dong2.push(`<dt>${esc(T("The story"))}</dt><dd>${esc(chuyen)}</dd>`);
+    if (gt2.cachGoi) dong2.push(`<dt>${esc(T("How to order it"))}</dt><dd>${esc(gt2.cachGoi.vi)}${gt2.cachGoi.ph ? ` <span class="muted2">(${esc(gt2.cachGoi.ph)})</span>` : ""}</dd>`);
+    dong2.push(`<dt>${esc(T("Spice"))}</dt><dd>${esc(T(CAY_NHAN[gt2.cay] || "not spicy"))}</dd>`);
+    if (gt2.dauHieu.length) {
+      dong2.push(`<dt>${esc(T("Notes"))}</dt><dd>${gt2.dauHieu.map((x) => esc(T(x))).join(" · ")}</dd>`);
+    }
+    const ghiChu = NGON_NGU_CHUA_DICH.includes(L) || !["en", "vi", "ko", "zh", "ja"].includes(L)
+      ? `<p class="muted2">${esc(T("The introduction is in English for now."))}</p>` : "";
+    gioi = `<details><summary>${esc(T("About this dish"))}</summary><dl class="intro">${dong2.join("")}</dl>${ghiChu}</details>`;
+  }
+
+  return `<article class="khuCard" data-i-mon="${i}">
+    <div class="dong1">
+      <label style="display:flex;gap:8px;align-items:flex-start">
+        <input type="checkbox" data-chon="${i}" ${d.chon ? "checked" : ""} style="margin-top:4px">
+        <span><span class="vi">${esc(d.vi)}</span>
+          ${ten.chinh && ten.chinh !== d.vi ? `<div class="sub">${esc(ten.chinh)}${ten.dau ? ` <span class="tag ${ten.dau === T("✓ source") ? "xac" : "chua"}">${esc(ten.dau)}</span>` : ""}</div>` : ""}
+        </span>
+      </label>
+      <div class="gia">${gt ? `${esc(gt)}₫` : esc(T("ask the price"))}${dv ? ` <span class="muted2">· ${esc(nhanDonVi(d.donvi, curLang()))}</span>` : ""}</div>
+    </div>
+    <div class="dong2">
+      ${luuY.join("")}${nhanGia}
+    </div>
+    <div class="dong2">
+      <label class="small">${esc(T("Price"))} <input type="text" data-gia="${i}" value="${esc(gt)}" placeholder="${esc(T("ask the price"))}" style="width:7rem"></label>
+      <label class="small">${esc(T("Unit"))} <select data-donvi="${i}">${DON_VI_CHON.map((u) => `<option value="${u}"${u === d.donvi ? " selected" : ""}>${esc(nhanDonVi(u, curLang()))}</option>`).join("")}</select></label>
+      <label class="small">${esc(T("Quantity"))} <input type="number" min="0" data-sl="${i}" value="${d.sl}" ${dv && dv.can ? "" : "disabled"}></label>
+    </div>
+    ${gioi}
+  </article>`;
+}
+
+/* Dữ liệu cho phép tính tổng: cùng hình dạng với một bảng giá. */
+const bangTam = () => ({ f: 0, i: dong.map((d) => ({ ten: d.vi, g: d.gia ?? 0, u: d.gia == null ? "thoigia" : d.donvi })) });
+
+function capNhatTong() {
+  const chon = dong.map((d, idx) => ({ idx, sl: d.sl })).filter((x) => dong[x.idx].chon);
+  const phiDv = phuthu.find((p) => p.kind === "service");
+  const vat = phuthu.find((p) => p.kind === "vat");
+  const thieuGam = chon.filter((x) => DON_VI[dong[x.idx].donvi]?.can && !(x.sl > 0)).map((x) => dong[x.idx].vi);
+  const t = tongBua({ ...bangTam(), f: phiDv && phiDv.pct != null ? phiDv.pct : 0 }, chon);
+  const cacDong = t.dong.map((x) => `${x.sl}${DON_VI[dong[x.idx].donvi]?.can ? " g" : " ×"} ${esc(dong[x.idx].vi)} = ${vnd(x.tien)}`).join("<br>");
+  const chuaTinh = t.conHoi.map((x) => `${esc(dong[x.idx].vi)} — ${esc(T("ask the price"))}`).join("<br>");
+  const phi = !phiDv ? ""
+    : phiDv.pct == null ? `<p class="muted2">${esc(T("A service charge exists but its percentage is unclear — the total excludes it."))}</p>`
+    : `<p class="muted2">${esc(T("Service charge {p}%: {v}").replace("{p}", phiDv.pct).replace("{v}", vnd(t.phi)))}</p>`;
+  const thue = vat ? `<p class="muted2">${esc(T("Prices may exclude VAT — the total can be higher."))}</p>` : "";
+  const nhacGam = thieuGam.length ? `<p class="bad">${esc(thieuGam.join(", "))}: ${esc(T("Tick what you ordered. For dishes priced by weight, enter the grams."))}</p>` : "";
+  $("#tong").innerHTML = chon.length
+    ? `${cacDong ? `<p>${cacDong}</p>` : ""}${nhacGam}${chuaTinh ? `<p class="bad">${chuaTinh}</p>` : ""}
+       <p><b>${esc(T("Estimated subtotal"))}: ${vnd(t.tamTinh)}</b>${t.tongThieu ? ` <span class="muted2">(${esc(T("Still has dishes to ask about — not the total yet"))})</span>` : ""}</p>${phi}${thue}`
+    : `<p class="muted2">${esc(T("Tick the dishes the guest chose to see the total."))}</p>`;
+}
+
+function capNhatPT() {
+  const so = soSanhTrongThucDon(dong.filter((d) => d.gia != null).map((d) => ({ ten: d.vi, gia: d.gia, donvi: d.donvi })));
+  const coUocLuong = dong.some((d) => d.id && d.gia != null && danhGiaGia(d.id, d.gia, khuHienTai(), prices).uocLuong);
+  const soHtml = so.duDuLieu
+    ? `<p>${esc(T("Median of this menu: {v}. This compares dishes within this menu only, not with market prices.").replace("{v}", vnd(so.trungVi)))}</p>
+       <ul>${so.ketQua.map((x) => `<li>${esc(x.ten)}: ${vnd(x.gia)} — ${esc(T(x.nhan))}</li>`).join("")}</ul>`
+    : `<p class="muted2">${esc(T("Not enough items priced per portion to compare within this menu. Two dishes that differ in price may just be different dishes."))}</p>`;
+  const uocHtml = coUocLuong ? `<p class="muted2">${esc(T("These are estimates from published menus, not prices measured at the counter. Nón Lá does not judge a price it cannot compare."))}</p>` : "";
+  $("#pt").innerHTML = `<h3 style="font-size:17px;margin-top:0">${esc(T("Price check"))}</h3>${uocHtml}${soHtml}`;
+}
+
+function capNhatGY() {
+  const tranh = [...document.querySelectorAll(".kTranh:checked")].map((x) => x.value);
+  const khauVi = { chay: $("#kChay").checked, tranh, caytoida: $("#kCay").value || null, tranhRuou: $("#kRuou").checked };
+  const g = goiY(dishes, khauVi, { toiDa: 3 });
+  const nhom = (ten, ds) => ds.length
+    ? `<div class="grp"><b>${esc(ten)}</b><ul>${ds.map((x) => `<li>${esc(x.vi)}${x.en ? ` <span class="muted2">(${esc(x.en)})</span>` : ""}</li>`).join("")}</ul></div>`
+    : "";
+  const html = nhom(T("Safe for a first try"), g.antoan) + nhom(T("Local specialities"), g.dacsan) + nhom(T("Ask before ordering"), g.canNhac);
+  $("#gy").innerHTML = html || `<p class="muted2">${esc(T("No dish matches the chosen taste."))}</p>`;
+}
+
+/* ── sự kiện ─────────────────────────────────────────────── */
+
+$("#chupBtn").addEventListener("click", () => $("#file").click());
+$("#file").addEventListener("change", (e) => docAnh(e.target.files[0]));
+$("#doBtn").addEventListener("click", docGo);
+$("#khu").addEventListener("change", ve);
+
+$("#cacMon").addEventListener("change", (e) => {
+  const t = e.target;
+  if (t.dataset.chon != null) dong[+t.dataset.chon].chon = t.checked;
+  if (t.dataset.gia != null) {
+    const v = docGia(t.value);
+    const d = dong[+t.dataset.gia];
+    d.gia = v;
+    d.donvi = v == null ? "thoigia" : (d.donvi === "thoigia" ? "phan" : d.donvi);
+  }
+  if (t.dataset.donvi != null) dong[+t.dataset.donvi].donvi = t.value;
+  if (t.dataset.sl != null) dong[+t.dataset.sl].sl = Math.max(0, Number(t.value) || 0);
+  ve();
+});
+
+["#kChay", "#kCay", "#kRuou"].forEach((s) => $(s).addEventListener("change", capNhatGY));
+document.querySelectorAll(".kTranh").forEach((x) => x.addEventListener("change", capNhatGY));
+</script>
+</body>
+</html>

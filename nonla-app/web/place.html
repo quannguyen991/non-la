@@ -19,9 +19,11 @@
 
 <script type="module">
 import { chrome, paintZoneName, load, I, esc, money, km, distance, photo,
-         placePhoto, dishPhoto, verdictPill, signedIn, gate } from "./web.js";
+         placePhoto, dishPhoto, verdictPill, signedIn, gate, dichTrang, tf } from "./web.js";
+import { t as T } from "../i18n.js";
 
 chrome("place.html");
+dichTrang();
 paintZoneName();
 
 const id = new URLSearchParams(location.search).get("id");
@@ -31,16 +33,16 @@ const p = places.places.find((x) => x.id === id);
 const page = document.getElementById("page");
 
 if (!p) {
-  page.innerHTML = `<div class="empty" style="margin:40px 0 60px"><b>No such place</b>
-    <p>That link points at a place this build does not carry. Open the map and pick one.</p>
-    <a class="btn pri" style="margin-top:16px" href="map.html">Open the map</a></div>`;
+  page.innerHTML = `<div class="empty" style="margin:40px 0 60px"><b>${T("No such place")}</b>
+    <p>${T("That link points at a place this build does not carry. Open the map and pick one.")}</p>
+    <a class="btn pri" style="margin-top:16px" href="map.html">${T("Open the map")}</a></div>`;
 } else {
   const zone = prices.zones[p.zone];
   const geo = maps.zones[p.zone];
   const dishOf = (k) => dishes.dishes.find((d) => d.id === k);
 
   document.getElementById("crumb").innerHTML =
-    `<a href="index.html">Explore</a>${I.chevron}<a href="map.html">Tracked spots</a>${I.chevron}
+    `<a href="index.html">${T("Explore")}</a>${I.chevron}<a href="map.html">${T("Tracked spots")}</a>${I.chevron}
      <span>${esc(p.name)}</span>`;
   document.title = `${p.name} — Nón Lá`;
 
@@ -59,24 +61,21 @@ if (!p) {
     meter = `
       <div class="panel pad" style="margin-top:18px">
         <div class="sect-head">
-          <h2>Price check</h2>
+          <h2>${T("Price check")}</h2>
           <span class="more" style="cursor:default">${inside
-            ? `<span class="pill ok soft">${I.shield}Inside local range</span>`
-            : `<span class="pill bad">${I.alert}Above the local range</span>`}</span>
+            ? `<span class="pill ok soft">${I.shield}${T("Inside local range")}</span>`
+            : `<span class="pill bad">${I.alert}${T("Above the local range")}</span>`}</span>
         </div>
-        <p class="small muted">${esc(dishOf(lead.k)?.vi || lead.k)} here vs what
-          ${zone.en || zone.name} usually pays</p>
+        <p class="small muted">${tf("{dish} here vs what {zone} usually pays", { dish: esc(dishOf(lead.k)?.vi || lead.k), zone: esc(zone.en || zone.name) })}</p>
         <div class="meter">
           <div class="bar"><span class="dot" style="left:${pct}%"></span></div>
           <div class="ends">
-            <span>low ${money(lo)}</span>
-            <span><b>this place ${money(v)}</b></span>
-            <span>high ${money(hi)}</span>
+            <span>${tf("low {v}", { v: money(lo) })}</span>
+            <span><b>${tf("this place {v}", { v: money(v) })}</b></span>
+            <span>${tf("high {v}", { v: money(hi) })}</span>
           </div>
         </div>
-        <p class="small muted" style="margin-top:12px">Ranges come from seed data for
-          ${esc(zone.en || zone.name)}, updated ${esc(zone.updated || "")}. A price inside the
-          range is not a promise the food is good — only that the number is normal here.</p>
+        <p class="small muted" style="margin-top:12px">${tf("Ranges come from seed data for {zone}, updated {date}. A price inside the range is not a promise the food is good — only that the number is normal here.", { zone: esc(zone.en || zone.name), date: esc(zone.updated || "") })}</p>
       </div>`;
   }
 
@@ -97,17 +96,16 @@ if (!p) {
         <div class="inner">
           <h1>${esc(p.name)}</h1>
           <p class="muted" style="margin-top:8px">${I.pin} ${esc(p.street || (p.ganPho ? `near ${p.ganPho}` : ""))} ·
-            ${esc(p.tier)} · <small>illustration, not a photo of this place</small></p>
+            ${esc(p.tier)} · <small>${T("illustration, not a photo of this place")}</small></p>
           <div style="margin-top:12px">${verdictPill()}</div>
           <div class="facts">
-            <div class="fact"><b>${I.bowl}Known for</b>
+            <div class="fact"><b>${I.bowl}${T("Known for")}</b>
               <p>${(p.known || []).map((k) => esc(dishOf(k)?.vi || k)).join(" · ") || "—"}</p></div>
-            <div class="fact"><b>${I.clock}Typical price</b>
-              <p>${lead ? `${money(lead.it.p25)} – ${money(lead.it.p75)} for
-                ${esc(dishOf(lead.k)?.vi || lead.k)}` : "No priced dish recorded here yet."}</p></div>
-            <div class="fact"><b>${I.pin}Where</b>
+            <div class="fact"><b>${I.clock}${T("Typical price")}</b>
+              <p>${lead ? tf("{a} – {b} for {dish}", { a: money(lead.it.p25), b: money(lead.it.p75), dish: esc(dishOf(lead.k)?.vi || lead.k) }) : T("No priced dish recorded here yet.")}</p></div>
+            <div class="fact"><b>${I.pin}${T("Where")}</b>
               <p>${esc(p.street)}, ${esc((zone.en || zone.name).replace(" · ", ", "))}.
-                Coordinates are approximate placements on the named street.</p></div>
+                ${T("Coordinates are approximate placements on the named street.")}</p></div>
           </div>
         </div>
       </div>
@@ -115,8 +113,8 @@ if (!p) {
       ${meter}
 
       <div class="panel pad" style="margin-top:18px">
-        <div class="sect-head"><h2>Signature dishes</h2>
-          <a class="more" href="scan.html">Check a menu</a></div>
+        <div class="sect-head"><h2>${T("Signature dishes")}</h2>
+          <a class="more" href="scan.html">${T("Check a menu")}</a></div>
         <div class="dishes3">
           ${(p.known || []).map((k) => {
             const d = dishOf(k), it = zone.items[k], mine = (p.prices || {})[k];
@@ -126,14 +124,14 @@ if (!p) {
               <span>
                 <h4>${esc(d.vi)}</h4>
                 <span class="amt">${money(mine ?? it?.p50)}</span>
-                <p>${esc(d.en)}${it ? ` · local ${money(it.p25)}–${money(it.p75)}` : ""}</p>
+                <p>${esc(d.en)}${it ? ` · ${tf("local {a}–{b}", { a: money(it.p25), b: money(it.p75) })}` : ""}</p>
               </span></article>`;
-          }).join("") || `<p class="muted">No dish recorded for this place yet.</p>`}
+          }).join("") || `<p class="muted">${T("No dish recorded for this place yet.")}</p>`}
         </div>
       </div>
 
       ${sights.length ? `<div class="panel pad" style="margin-top:18px">
-        <div class="sect-head"><h2>Sights within 400 m</h2></div>
+        <div class="sect-head"><h2>${T("Sights within 400 m")}</h2></div>
         <div class="dishes3">
           ${sights.map((l) => `<article class="dish">
             <span class="ph">${photo(`../assets/sights/${l.img}.jpg`, l.n)}</span>
@@ -144,24 +142,21 @@ if (!p) {
 
     <aside style="display:flex;flex-direction:column;gap:18px">
       <div class="panel pad">
-        <h3 style="font-size:19px">Save this spot</h3>
-        ${signedIn() ? `<p class="small muted" style="margin:8px 0 14px">Saved spots sit in your
-            journal and follow your account.</p>
-          <button class="btn pri wide" id="saveBtn">${I.bookmark}Save to my journal</button>`
-          : `<p class="small muted" style="margin:8px 0 14px">Saving a place writes it into your
-            journal, so it needs an account to write into.</p>
-          <a class="btn pri wide" href="login.html">${I.lock}Log in to save</a>`}
+        <h3 style="font-size:19px">${T("Save this spot")}</h3>
+        ${signedIn() ? `<p class="small muted" style="margin:8px 0 14px">${T("Saved spots sit in your journal and follow your account.")}</p>
+          <button class="btn pri wide" id="saveBtn">${I.bookmark}${T("Save to my journal")}</button>`
+          : `<p class="small muted" style="margin:8px 0 14px">${T("Saving a place writes it into your journal, so it needs an account to write into.")}</p>
+          <a class="btn pri wide" href="login.html">${I.lock}${T("Log in to save")}</a>`}
       </div>
 
       <div class="panel pad">
-        <h3 style="font-size:19px">Report a price</h3>
-        <p class="small muted" style="margin:8px 0 14px">Paid something different? The scan
-          history is what moves the range — reports without a scan do not.</p>
-        <a class="btn sec wide" href="scan.html">${I.scan}Scan the menu here</a>
+        <h3 style="font-size:19px">${T("Report a price")}</h3>
+        <p class="small muted" style="margin:8px 0 14px">${T("Paid something different? The scan history is what moves the range — reports without a scan do not.")}</p>
+        <a class="btn sec wide" href="scan.html">${I.scan}${T("Scan the menu here")}</a>
       </div>
 
       <div class="panel pad">
-        <div class="sect-head"><h2 style="font-size:19px">Nearby tracked spots</h2></div>
+        <div class="sect-head"><h2 style="font-size:19px">${T("Nearby tracked spots")}</h2></div>
         <div class="rowlist">
           ${near.map(({ x, m }) => `<a href="place.html?id=${encodeURIComponent(x.id)}">
             <span class="avatar" style="background:var(--kem);color:var(--dong-chu)">${esc(x.name.slice(0, 1))}</span>
@@ -181,7 +176,7 @@ if (!p) {
   const btn = document.getElementById("saveBtn");
   const sync = () => {
     const on = saved().includes(p.id);
-    btn.innerHTML = `${I.bookmark}${on ? "Saved to journal" : "Save to my journal"}`;
+    btn.innerHTML = `${I.bookmark}${on ? T("Saved to journal") : T("Save to my journal")}`;
     btn.className = `btn wide ${on ? "sec" : "pri"}`;
   };
   btn.onclick = () => {

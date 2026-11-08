@@ -18,7 +18,7 @@
 
   <section class="hero">
     <div>
-      <h1>Ready to explore<br>street prices in <span id="heroZone">Hội An</span>?</h1>
+      <h1 id="heroTitle"></h1>
       <p class="lede">Live scan insights, local tips and honest prices from people who love
         this place. Eat well, spend smart, and support the people who cook.</p>
       <div class="hero-tools">
@@ -103,16 +103,20 @@
 
 <script type="module">
 import { chrome, paintZoneName, zonePicker, load, zoneId, I, esc, money,
-         placePhoto, dishPhoto, photo, verdictPill, signedIn, gate } from "./web.js";
+         placePhoto, dishPhoto, photo, verdictPill, signedIn, gate, dichTrang, tf } from "./web.js";
+import { t as T } from "../i18n.js";
 
 chrome("index.html");
+dichTrang();
 paintZoneName();
 zonePicker("zonePick");
+document.getElementById("heroTitle").innerHTML =
+  tf("Ready to explore<br>street prices in {zone}?", { zone: `<span id="heroZone">Hội An</span>` });
 document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
 document.getElementById("langPick").innerHTML = `${I.globe}English`;
 for (const [id, ico, label] of [["c1", "bowl", "Street food"], ["c2", "coffee", "Coffee"],
   ["c3", "bag", "Sit-down"], ["c4", "compass", "Everything"]]) {
-  document.getElementById(id).innerHTML = `${I[ico]}${label}`;
+  document.getElementById(id).innerHTML = `${I[ico]}${T(label)}`;
 }
 
 const zid = zoneId();
@@ -124,9 +128,10 @@ const mine = places.places.filter((p) => p.zone === zid);
 const zone = prices.zones[zid];
 const sights = (maps.zones[zid]?.landmarks || []).filter((l) => l.note && !l.an).length;
 document.getElementById("heroZone").textContent = (zone.en || zone.name).split(" · ")[0];
-document.getElementById("statLine").innerHTML =
-  `<b>${mine.length}</b> eateries mapped · <b>${Object.keys(zone.items).length}</b> dishes priced ·
-   <b>${sights}</b> sights · updated ${esc(zone.updated || "")}`;
+document.getElementById("statLine").innerHTML = tf(
+  "{a} eateries mapped · {b} dishes priced · {c} sights · updated {d}",
+  { a: `<b>${mine.length}</b>`, b: `<b>${Object.keys(zone.items).length}</b>`,
+    c: `<b>${sights}</b>`, d: esc(zone.updated || "") });
 
 /* Ba chỗ đứng đầu = nhiều lượt quét nhất, không phải "được chọn". */
 /* Không xếp theo lượt quét nữa — trường đó đã gỡ. Giữ thứ tự dữ liệu. */
@@ -163,11 +168,9 @@ if (signedIn()) document.getElementById("homeFeed").innerHTML = posts.length
         </span>
         <span class="amt">${money(p.paidVnd)}</span>
       </a>`).join("")}</div>
-    <p class="pill seed" style="margin-top:14px">Sample posts shipped with the app — not real
-      user posts</p>`
-  : `<div class="empty"><b>No posts in this area yet</b>
-      <p>The community layer is not connected to a server on this build, so posts stay on the
-      device that wrote them.</p></div>`;
+    <p class="pill seed" style="margin-top:14px">${T("Sample posts shipped with the app — not real user posts")}</p>`
+  : `<div class="empty"><b>${T("No posts in this area yet")}</b>
+      <p>${T("The community layer is not connected to a server on this build, so posts stay on the device that wrote them.")}</p></div>`;
 
 /* Dải món: lấy món đặc trưng của vùng + hai món có ảnh, kèm khoảng giá thật. */
 const dishes = (await load("dishes")).dishes;
@@ -181,7 +184,7 @@ document.getElementById("dishStrip").innerHTML = pick.map(({ d, it }) => `
     <span>
       <h4>${esc(d.vi)}</h4>
       <span class="amt">${money(it.p25)} – ${money(it.p75)}</span>
-      <p>${esc(d.en)} · typical ${money(it.p50)} ${esc(d.unit || "")}</p>
+      <p>${esc(d.en)} · ${tf("typical {v}", { v: money(it.p50) })} ${esc(d.unit || "")}</p>
     </span>
   </article>`).join("");
 </script>

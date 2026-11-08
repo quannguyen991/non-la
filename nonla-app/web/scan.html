@@ -86,7 +86,9 @@
 </main>
 
 <script type="module">
-import { chrome, paintZoneName, load, zoneId, I, esc, money, photo, dishPhoto } from "./web.js";
+import { chrome, paintZoneName, load, zoneId, I, esc, money, photo, dishPhoto,
+         dichTrang, tf, nhanGia } from "./web.js";
+import { t as T } from "../i18n.js";
 /* Dùng ĐÚNG bộ khớp món và luật phán quyết của app (../match.js). Viết
    lại cho web là mở đường cho hai bản nói hai kết quả khác nhau về cùng
    một dòng thực đơn. */
@@ -94,6 +96,7 @@ import { parseMenu, matchDish, verdict } from "../match.js";
 import { diemNhanMon } from "../nhan-mon.js";
 
 chrome("scan.html");
+dichTrang();
 paintZoneName();
 for (const [id, ico] of [["shieldIco", "shield"], ["upIco", "upload"], ["i1", "upload"],
   ["i2", "clipboard"], ["i4", "bowl"], ["i5", "bowl"]]) {
@@ -103,10 +106,7 @@ for (const [id, ico] of [["shieldIco", "shield"], ["upIco", "upload"], ["i1", "u
    bao giờ rời máy tính" cho MỌI ảnh — đúng với thực đơn (đọc chữ ngay trong
    trình duyệt), nhưng nhận ra một đĩa bánh xèo thì cần model trực tuyến. Nên
    nói rõ ngoại lệ, và ảnh món chỉ được gửi khi người dùng chủ động bấm. */
-document.getElementById("ocrNote").innerHTML = `${I.shield}<span><b>Menu photos never leave this
-  computer.</b> Reading a menu runs inside your browser — no upload, no server. The one exception
-  is a <b>dish photo</b>: working out which dish it is sends that single photo to an online model,
-  only when you ask, and it is not stored.</span>`;
+document.getElementById("ocrNote").innerHTML = `${I.shield}<span>${T("<b>Menu photos never leave this computer.</b> Reading a menu runs inside your browser — no upload, no server. The one exception is a <b>dish photo</b>: working out which dish it is sends that single photo to an online model, only when you ask, and it is not stored.")}</span>`;
 
 const zid = zoneId();
 const [prices, dishes] = await Promise.all([load("prices"), load("dishes")]);
@@ -142,9 +142,8 @@ async function thuNho(file) {
 
 async function nhanMon(file) {
   if (!file) return;
-  out.innerHTML = `<div class="panel pad"><b style="font-family:var(--disp)">Looking at the dish…</b>
-    <p class="small muted" style="margin-top:8px">Sending this one photo to the recogniser — usually
-      a few seconds.</p></div>`;
+  out.innerHTML = `<div class="panel pad"><b style="font-family:var(--disp)">${T("Looking at the dish…")}</b>
+    <p class="small muted" style="margin-top:8px">${T("Sending this one photo to the recogniser — usually a few seconds.")}</p></div>`;
   let top;
   try {
     const r = await fetch(diemNhanMon(), {
@@ -153,35 +152,34 @@ async function nhanMon(file) {
       body: JSON.stringify({ image: await thuNho(file) }),
     });
     const j = await r.json().catch(() => ({}));
-    if (r.status === 503) throw new Error("Dish recognition is not switched on for this site yet — pick the dish by hand on the right.");
-    if (r.status === 429) throw new Error("Too many dish photos in a few minutes — wait a little, or pick the dish by hand.");
-    if (!r.ok) throw new Error("The recogniser did not answer — try again, or pick the dish by hand on the right.");
+    if (r.status === 503) throw new Error(T("Dish recognition is not switched on for this site yet — pick the dish by hand on the right."));
+    if (r.status === 429) throw new Error(T("Too many dish photos in a few minutes — wait a little, or pick the dish by hand."));
+    if (!r.ok) throw new Error(T("The recogniser did not answer — try again, or pick the dish by hand on the right."));
     top = (j.top || []).filter((x) => dishOf(x.id));
   } catch (e) {
     out.innerHTML = `<div class="warn">${I.alert}<span>${esc(e.message)}</span></div>`;
     return;
   }
   if (!top.length) {
-    out.innerHTML = `<div class="warn">${I.alert}<span>No dish from the local list matched this photo.
-      If it is a menu, try a straighter shot; otherwise pick the dish by hand on the right.</span></div>`;
+    out.innerHTML = `<div class="warn">${I.alert}<span>${T("No dish from the local list matched this photo. If it is a menu, try a straighter shot; otherwise pick the dish by hand on the right.")}</span></div>`;
     return;
   }
   /* KHÔNG tự chốt: model đoán, người dùng xác nhận, rồi mới so giá. Đoán sai
      mà phán giá luôn là so với dải giá của một món khác hẳn. */
   out.innerHTML = `<div class="panel pad">
-    <div class="sect-head"><h2>Is this what you're looking at?</h2>
+    <div class="sect-head"><h2>${T("Is this what you're looking at?")}</h2>
       <span class="more" style="cursor:default">${esc(zone.en || zone.name)}</span></div>
     ${top.map(({ id, confidence }) => {
       const d = dishOf(id), it = zone.items[id];
       return `<button class="spotrow" data-chon="${esc(id)}" style="grid-template-columns:56px 1fr auto;width:100%;text-align:left;background:none;border:0;cursor:pointer">
         <span class="ph" style="width:56px;height:56px;border-radius:12px">${photo(dishPhoto(id), d.vi)}</span>
         <span><h4>${esc(d.vi)}</h4>
-          <span class="meta">${esc(d.en || "")} · ${Math.round(confidence)}% sure</span></span>
-        <span class="amt tnum" style="font-size:15px">${it ? `${money(it.p25)} – ${money(it.p75)}` : "not priced here"}</span>
+          <span class="meta">${esc(d.en || "")} · ${tf("{p}% sure", { p: Math.round(confidence) })}</span></span>
+        <span class="amt tnum" style="font-size:15px">${it ? `${money(it.p25)} – ${money(it.p75)}` : T("not priced here")}</span>
       </button>`;
     }).join("")}
-    <button class="btn" id="khongPhai" style="margin-top:12px">None of these — pick the dish myself</button>
-    <p class="small muted" style="margin-top:10px">An AI guess — similar dishes look alike.</p>
+    <button class="btn" id="khongPhai" style="margin-top:12px">${T("None of these — pick the dish myself")}</button>
+    <p class="small muted" style="margin-top:10px">${T("An AI guess — similar dishes look alike.")}</p>
   </div>`;
   out.querySelectorAll("[data-chon]").forEach((b) => b.onclick = () => chonMon(b.dataset.chon));
   /* Đoán sai thì người dùng không được bị kẹt với ba lựa chọn sai: đưa thẳng tới
@@ -195,8 +193,7 @@ async function nhanMon(file) {
 
 function chonMon(id) {
   if (!zone.items[id]) {
-    hand.innerHTML = `<div class="warn">${I.alert}<span>${esc(dishOf(id)?.vi || id)} has no local
-      price range in ${esc(zone.en || zone.name)} yet.</span></div>`;
+    hand.innerHTML = `<div class="warn">${I.alert}<span>${tf("{name} has no local price range in {zone} yet.", { name: esc(dishOf(id)?.vi || id), zone: esc(zone.en || zone.name) })}</span></div>`;
     return;
   }
   sel.value = id;
@@ -209,13 +206,12 @@ function chonMon(id) {
    Việt ~5MB, và người ta thường quét vài tấm liền nhau. */
 async function readMenu(url) {
   if (typeof Tesseract === "undefined") {
-    out.innerHTML = `<div class="warn">${I.alert}<span>The recogniser did not load — check the
-      network and reload. You can still use the by-hand check on the right.</span></div>`;
+    out.innerHTML = `<div class="warn">${I.alert}<span>${T("The recogniser did not load — check the network and reload. You can still use the by-hand check on the right.")}</span></div>`;
     return;
   }
-  out.innerHTML = `<div class="panel pad"><b style="font-family:var(--disp)">Reading the menu…</b>
+  out.innerHTML = `<div class="panel pad"><b style="font-family:var(--disp)">${T("Reading the menu…")}</b>
     <div class="progress" style="margin-top:10px"><i id="ocrBar" style="width:6%"></i></div>
-    <p class="small muted" style="margin-top:8px" id="ocrStep">Starting the recogniser</p></div>`;
+    <p class="small muted" style="margin-top:8px" id="ocrStep">${T("Starting the recogniser")}</p></div>`;
   const bar = document.getElementById("ocrBar"), step = document.getElementById("ocrStep");
   try {
     if (!worker) {
@@ -229,9 +225,7 @@ async function readMenu(url) {
     const { data } = await worker.recognize(url);
     render(parseMenu(data.text || ""));
   } catch (e) {
-    out.innerHTML = `<div class="warn">${I.alert}<span>Could not read that image
-      (${esc(e.message || "unknown error")}). A flat, well-lit photo of the printed menu works
-      best.</span></div>`;
+    out.innerHTML = `<div class="warn">${I.alert}<span>${tf("Could not read that image ({err}). A flat, well-lit photo of the printed menu works best.", { err: esc(e.message || T("unknown error")) })}</span></div>`;
   }
 }
 
@@ -243,13 +237,11 @@ function render(lines) {
     /* Không ra dòng giá nào thường là vì đó KHÔNG phải thực đơn — người ta
        chụp chính đĩa ăn. Mời nhận diện món trên CHÍNH tấm ảnh ấy, và nói rõ
        bấm vào là ảnh được gửi đi. */
-    out.innerHTML = `<div class="warn">${I.alert}<span>No priced line came out of that photo.
-      If it is a menu, try a straighter, closer shot — or type the price by hand on the right.</span></div>
+    out.innerHTML = `<div class="warn">${I.alert}<span>${T("No priced line came out of that photo. If it is a menu, try a straighter, closer shot — or type the price by hand on the right.")}</span></div>
       ${anhCuoi ? `<div class="panel pad" style="margin-top:12px">
-        <b style="font-family:var(--disp);font-size:17px">Is it a photo of a dish?</b>
-        <p class="small muted" style="margin-top:6px">Nón Lá can work out which dish it is and show
-          the local price. This sends the photo to an online model; it is not stored.</p>
-        <button class="btn pri" id="thuMon" style="margin-top:12px">Identify the dish</button>
+        <b style="font-family:var(--disp);font-size:17px">${T("Is it a photo of a dish?")}</b>
+        <p class="small muted" style="margin-top:6px">${T("Nón Lá can work out which dish it is and show the local price. This sends the photo to an online model; it is not stored.")}</p>
+        <button class="btn pri" id="thuMon" style="margin-top:12px">${T("Identify the dish")}</button>
       </div>` : ""}`;
     document.getElementById("thuMon")?.addEventListener("click", () => nhanMon(anhCuoi));
     return;
@@ -258,28 +250,27 @@ function render(lines) {
     const m = matchDish(l.name, dishes.dishes);
     const it = m ? zone.items[m.dish.id] : null;
     const v = verdict(l.price, it);
-    const pill = v.level === "ok" ? `<span class="pill ok soft">${I.shield}${esc(v.label)}</span>`
-      : v.level === "warn" ? `<span class="pill unknown">${I.clock}${esc(v.label)}</span>`
-      : v.level === "high" ? `<span class="pill bad">${I.alert}${esc(v.label)}</span>`
-      : `<span class="pill unknown">${I.clock}Not priced in this area</span>`;
+    const pill = v.level === "ok" ? `<span class="pill ok soft">${I.shield}${esc(nhanGia(v.label))}</span>`
+      : v.level === "warn" ? `<span class="pill unknown">${I.clock}${esc(nhanGia(v.label))}</span>`
+      : v.level === "high" ? `<span class="pill bad">${I.alert}${esc(nhanGia(v.label))}</span>`
+      : `<span class="pill unknown">${I.clock}${T("Not priced in this area")}</span>`;
     return `<div class="spotrow" style="grid-template-columns:56px 1fr auto">
       <span class="ph" style="width:56px;height:56px;border-radius:12px">
         ${m ? photo(dishPhoto(m.dish.id), m.dish.vi) : ""}</span>
       <span>
         <h4>${esc(m ? m.dish.vi : l.name)}</h4>
-        <span class="meta">${m ? `read as “${esc(l.name)}”` : "no dish matched this line"}${
-          it ? ` · local ${money(it.p25)}–${money(it.p75)}` : ""}</span>
+        <span class="meta">${m ? tf("read as “{name}”", { name: esc(l.name) }) : T("no dish matched this line")}${
+          it ? ` · ${tf("local {a}–{b}", { a: money(it.p25), b: money(it.p75) })}` : ""}</span>
         <span class="r2">${pill}</span>
       </span>
       <span class="amt tnum" style="font-size:16px">${money(l.price)}</span>
     </div>`;
   }).join("");
   out.innerHTML = `<div class="panel pad">
-    <div class="sect-head"><h2>${lines.length} priced line${lines.length > 1 ? "s" : ""} found</h2>
+    <div class="sect-head"><h2>${lines.length > 1 ? tf("{n} priced lines found", { n: lines.length }) : tf("{n} priced line found", { n: lines.length })}</h2>
       <span class="more" style="cursor:default">${esc(zone.en || zone.name)}</span></div>
     ${rows}
-    <p class="small muted" style="margin-top:12px">Matching is fuzzy and OCR misreads happen —
-      check the line it read before trusting the verdict. Ranges are seed data, not a survey.</p>
+    <p class="small muted" style="margin-top:12px">${T("Matching is fuzzy and OCR misreads happen — check the line it read before trusting the verdict. Ranges are seed data, not a survey.")}</p>
   </div>`;
 }
 document.getElementById("file").addEventListener("change", (e) => show(e.target.files[0]));
@@ -322,10 +313,10 @@ function judge() {
   const id = sel.value, it = zone.items[id], d = dishOf(id);
   const v = Number(amt.value || 0);
   const level = !v ? "none" : v <= it.p75 ? "ok" : v <= it.p95 ? "warn" : "bad";
-  const pill = level === "ok" ? `<span class="pill ok soft">${I.shield}Inside local range</span>`
-    : level === "warn" ? `<span class="pill unknown">${I.clock}Top of the range</span>`
-    : level === "bad" ? `<span class="pill bad">${I.alert}Above the local range</span>`
-    : `<span class="pill unknown">${I.clock}Type the menu price</span>`;
+  const pill = level === "ok" ? `<span class="pill ok soft">${I.shield}${T("Inside local range")}</span>`
+    : level === "warn" ? `<span class="pill unknown">${I.clock}${T("Top of the range")}</span>`
+    : level === "bad" ? `<span class="pill bad">${I.alert}${T("Above the local range")}</span>`
+    : `<span class="pill unknown">${I.clock}${T("Type the menu price")}</span>`;
   const pct = v ? Math.max(2, Math.min(98, ((v - it.p25) / Math.max(1, it.p95 - it.p25)) * 100)) : null;
   hand.innerHTML = `
     <div style="display:flex;align-items:center;gap:14px">
@@ -338,15 +329,14 @@ function judge() {
       ${pill}
     </div>
     <div class="verdict">
-      <div class="v"><b>Listed price</b><span>${v ? money(v) : "—"}</span></div>
-      <div class="v"><b>Typical local range</b><span>${money(it.p25)} – ${money(it.p75)}</span></div>
-      <div class="v"><b>Local high</b><span>${money(it.p95)}</span></div>
+      <div class="v"><b>${T("Listed price")}</b><span>${v ? money(v) : "—"}</span></div>
+      <div class="v"><b>${T("Typical local range")}</b><span>${money(it.p25)} – ${money(it.p75)}</span></div>
+      <div class="v"><b>${T("Local high")}</b><span>${money(it.p95)}</span></div>
     </div>
     ${pct != null ? `<div class="meter"><div class="bar"><span class="dot" style="left:${pct}%"></span></div>
-      <div class="ends"><span>${money(it.p25)}</span><span>typical ${money(it.p50)}</span>
+      <div class="ends"><span>${money(it.p25)}</span><span>${tf("typical {v}", { v: money(it.p50) })}</span>
       <span>${money(it.p95)}</span></div></div>` : ""}
-    <p class="small muted" style="margin-top:12px">${esc(zone.en || zone.name)} · ranges are seed
-      data updated ${esc(zone.updated || "")}, not a field survey.</p>`;
+    <p class="small muted" style="margin-top:12px">${esc(zone.en || zone.name)} · ${tf("ranges are seed data updated {date}, not a field survey.", { date: esc(zone.updated || "") })}</p>`;
 }
 sel.onchange = judge; amt.oninput = judge; judge();
 

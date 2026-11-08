@@ -15,7 +15,7 @@
 <main class="wrap" id="main">
   <div class="authwrap">
     <section class="authform">
-      <h1>Create your<br>account</h1>
+      <h1>Create your account</h1>
       <p class="lede">Join the fair-price community and keep your scans across devices.</p>
 
       <div class="warn" style="margin-top:22px" id="note"></div>
@@ -32,8 +32,7 @@
             aria-label="Password">
           <button class="eye" type="button" id="eye" aria-label="Show password"></button></label>
         <label class="check"><input type="checkbox" id="agree">
-          <span>I agree to the <a href="#" style="color:var(--dong-chu);font-weight:600">Terms &amp;
-            Privacy Policy</a> — including that prices shown are seed data, not a survey.</span></label>
+          <span id="agreeTxt"></span></label>
         <button class="btn pri wide" style="margin-top:18px" type="submit">Create account</button>
       </form>
 
@@ -62,10 +61,15 @@
 </main>
 
 <script type="module">
-import { chrome, paintZoneName, I } from "./web.js";
+import { chrome, paintZoneName, I, dichTrang, tf } from "./web.js";
+import { t as T } from "../i18n.js";
 
 chrome("");
+dichTrang();
 paintZoneName();
+document.getElementById("agreeTxt").innerHTML = tf(
+  "I agree to the {terms} — including that prices shown are seed data, not a survey.",
+  { terms: `<a href="#" style="color:var(--dong-chu);font-weight:600">${T("Terms & Privacy Policy")}</a>` });
 for (const [id, k] of [["i0", "user"], ["i1", "mail"], ["i2", "lock"], ["eye", "eye"],
   ["k1", "shield"], ["k2", "bookmark"], ["k3", "pin"]]) {
   const el = document.getElementById(id);
@@ -74,9 +78,7 @@ for (const [id, k] of [["i0", "user"], ["i1", "mail"], ["i2", "lock"], ["eye", "
 
 /* Cùng lý do với trang đăng nhập: chưa có máy chủ tài khoản thì không
    được dựng một cái form trông như thật rồi nuốt mật khẩu của người ta. */
-document.getElementById("note").innerHTML = `${I.alert}<span><b>Sign-up is not open on this
-  build.</b> There is no account server behind this form: nothing is sent, and no password is
-  kept. Everything on the site already works without an account.</span>`;
+document.getElementById("note").innerHTML = `${I.alert}<span><b>${T("Sign-up is not open on this build.")}</b> ${T("There is no account server behind this form: nothing is sent, and no password is kept. Everything on the site already works without an account.")}</span>`;
 
 const pw = document.getElementById("pw");
 document.getElementById("eye").onclick = () => {
@@ -97,10 +99,10 @@ const say = (msg) => {
 document.getElementById("form").onsubmit = (e) => {
   e.preventDefault();
   pw.value = "";
-  say("No account server is configured, so no account was created and nothing was sent.");
+  say(T("No account server is configured, so no account was created and nothing was sent."));
 };
 document.getElementById("google").onclick = () =>
-  say("Single sign-on is not wired up on this build — nothing was sent.");
+  say(T("Single sign-on is not wired up on this build — nothing was sent."));
 </script>
 </body>
 </html>

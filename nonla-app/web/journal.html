@@ -48,12 +48,14 @@
 
 <script type="module">
 import { chrome, paintZoneName, load, I, esc, money, photo, placePhoto, dishPhoto,
-         signedIn, gate } from "./web.js";
+         signedIn, gate, dichTrang, tf } from "./web.js";
+import { t as T } from "../i18n.js";
 
 chrome("journal.html");
+dichTrang();
 paintZoneName();
 document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
-document.getElementById("newNote").innerHTML = `${I.plus}New note`;
+document.getElementById("newNote").innerHTML = `${I.plus}${T("New note")}`;
 
 /* Cả trang này là sổ tay của MỘT người. Chưa đăng nhập thì không có
    "người" nào để mở sổ, nên ba khối để trống và nói thẳng — thay vì bịa
@@ -74,8 +76,8 @@ if (!signedIn()) {
            ["note", "Travel notes", "Opening hours, quoted prices, which alley to turn down."]]
           .map(([ic, t, d]) => `<article style="display:flex;gap:12px;align-items:flex-start">
             <span style="color:var(--dong-chu)">${I[ic]}</span>
-            <span><b style="font-family:var(--disp);font-size:15px">${t}</b>
-              <span class="small muted" style="display:block">${d}</span></span>
+            <span><b style="font-family:var(--disp);font-size:15px">${T(t)}</b>
+              <span class="small muted" style="display:block">${T(d)}</span></span>
           </article>`).join("")}
       </div>
     </section>`;
@@ -94,7 +96,7 @@ const TABS = [["all", "All", "grid"], ["saved", "Saved spots", "bookmark"],
 let tab = "all";
 const tb = document.getElementById("tabs");
 tb.innerHTML = TABS.map(([k, l, ic]) =>
-  `<button class="chip" data-t="${k}" aria-pressed="${k === tab}">${I[ic]}${l}</button>`).join("");
+  `<button class="chip" data-t="${k}" aria-pressed="${k === tab}">${I[ic]}${T(l)}</button>`).join("");
 tb.onclick = (e) => {
   const b = e.target.closest("[data-t]");
   if (!b) return;
@@ -118,10 +120,9 @@ document.getElementById("saved").innerHTML = saved.length
         <span class="b"><h4>${esc(p.name)}</h4>
           <span class="small muted">${esc(p.street)} · ${esc(p.tier)}</span></span>
       </a>`).join("")}</div>`
-  : `<div class="empty"><b>Nothing saved yet</b>
-      <p>Open a place and press <b>Save to my journal</b>. Saved spots stay in this browser —
-      nothing is sent to a server.</p>
-      <a class="btn pri" style="margin-top:14px" href="map.html">Open the map</a></div>`;
+  : `<div class="empty"><b>${T("Nothing saved yet")}</b>
+      <p>${T("Open a place and press <b>Save to my journal</b>. Saved spots stay in this browser — nothing is sent to a server.")}</p>
+      <a class="btn pri" style="margin-top:14px" href="map.html">${T("Open the map")}</a></div>`;
 
 /* ── lượt quét đã ghi ───────────────────────────────────────── */
 const fmtWhen = (t) => {
@@ -136,17 +137,16 @@ document.getElementById("scans").innerHTML = journal.length
       return `<div class="tl">
         <span class="when">${esc(fmtWhen(j.at || j.time))}</span>
         <span class="ph">${d ? photo(dishPhoto(d.id), d.vi) : ""}</span>
-        <span><h4>${esc(d?.vi || j.title || "Menu check")}</h4>
+        <span><h4>${esc(d?.vi || j.title || T("Menu check"))}</h4>
           <span class="small muted">${esc(j.place || "")}
             ${j.price ? ` · ${money(j.price)}` : ""}</span></span>
         ${lvl ? `<span class="pill ${lvl === "ok" ? "ok soft" : lvl === "bad" ? "bad" : "unknown"}"
           style="justify-self:end">${esc(lvl)}</span>` : ""}
       </div>`;
     }).join("")}</div>`
-  : `<div class="empty"><b>No menu checks recorded</b>
-      <p>Every scan the app makes is written here automatically, and can be exported. This
-      browser has none yet.</p>
-      <a class="btn pri" style="margin-top:14px" href="scan.html">Check a price</a></div>`;
+  : `<div class="empty"><b>${T("No menu checks recorded")}</b>
+      <p>${T("Every scan the app makes is written here automatically, and can be exported. This browser has none yet.")}</p>
+      <a class="btn pri" style="margin-top:14px" href="scan.html">${T("Check a price")}</a></div>`;
 
 /* ── ghi chú ────────────────────────────────────────────────── */
 function paintNotes() {
@@ -155,22 +155,21 @@ function paintNotes() {
     ? notes.map((n, i) => `<div class="note">
         <span class="ph" style="display:grid;place-items:center;background:var(--kem);
           color:var(--dong-chu)">${I.note}</span>
-        <span><h4>${esc(n.title || "Note")}</h4><p>${esc(n.body || "")}</p>
+        <span><h4>${esc(n.title || T("Note"))}</h4><p>${esc(n.body || "")}</p>
           <span class="small muted">${esc(n.date || "")}</span></span>
-        <button class="btn ghost" data-del="${i}" aria-label="Delete note">${I.minus}</button>
+        <button class="btn ghost" data-del="${i}" aria-label="${T("Delete note")}">${I.minus}</button>
       </div>`).join("")
-    : `<div class="empty"><b>No notes yet</b>
-        <p>Opening hours, the price someone quoted you, which alley the good bánh mì is down —
-        the things worth remembering by tomorrow.</p></div>`;
+    : `<div class="empty"><b>${T("No notes yet")}</b>
+        <p>${T("Opening hours, the price someone quoted you, which alley the good bánh mì is down — the things worth remembering by tomorrow.")}</p></div>`;
   host.querySelectorAll("[data-del]").forEach((b) => {
     b.onclick = () => { notes.splice(Number(b.dataset.del), 1); save(); };
   });
 }
 const save = () => { localStorage.setItem("nl.notes", JSON.stringify(notes)); paintNotes(); };
 document.getElementById("newNote").onclick = () => {
-  const title = prompt("Note title");
+  const title = prompt(T("Note title"));
   if (!title) return;
-  const body = prompt("Note") || "";
+  const body = prompt(T("Note")) || "";
   notes.unshift({ title, body, date: new Date().toISOString().slice(0, 10) });
   save();
 };

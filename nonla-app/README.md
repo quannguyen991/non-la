@@ -509,8 +509,22 @@ co theo `cos(vĩ độ)` — bỏ bước này thì ở vĩ độ 15° bản đ�
 - Giá và cơ sở của ba vùng mới là **hạt giống viết tay**, cùng hạng với ba vùng
   cũ — không phải khảo sát thực địa, và tên cơ sở là tên mô tả chứ không phải
   tên quán có thật.
-- Deal Recorder, Culture Lens, Local Compass chưa cài đặt. Đặc tả đầy đủ 28 tính
-  năng nằm ở `D:/Non_La_Dac_Ta_San_Pham.docx`.
+- Bốn tính năng của đặc tả 28 tính năng (`D:/Non_La_Dac_Ta_San_Pham.docx`) đã có
+  bản thu hẹp, mỗi cái khai rõ chỗ nó KHÔNG làm được:
+  - **Deal Recorder** (`ghikeo.js`, `ghikeoui.js`): đọc "trăm rưỡi", "hai lít" ra số
+    tiền, dựng thẻ song ngữ hai bên cùng đọc. Nhận dạng tiếng nói dùng Web Speech
+    của trình duyệt (không phải PhoWhisper), không giữ âm thanh, luôn có ô gõ tay.
+    Số tiền là `declared`, không vào dải giá. Mở ở tab You → Record a deal.
+  - **Local Compass** (`bandia.js`): chỉ số SUY RA từ giờ mở cửa, khoảng cách tới
+    điểm khách chen chúc và dáng tên quán, kèm lý do. Đặc tả gốc cần dữ liệu đánh
+    giá Google — không có, không cào — nên đây không phải bản đo.
+  - **Culture Lens** (`ungxu.js`, `data/ungxu.json`): cảnh báo ứng xử theo LOẠI điểm
+    tham quan, hiện trên thẻ điểm. Chưa có nhận diện công trình bằng camera. Nội dung
+    còn `verify: true`, chờ người am hiểu soát.
+  - **Cộng đồng mở rộng** (`diadiemmoi.js`, `supabase/places.sql`): thêm quán mới
+    (chặn trùng trong 40 m, phải nằm trong khung vùng, không có nhãn giá) và điểm đóng
+    góp là số đếm công khai. Quán mới đang lưu trên máy; chưa nối vào `cloud.js`.
+  Còn chưa làm: hồ sơ công khai, theo dõi, nhắn tin, bản đồ ảnh, Scam Radar.
 - Lớp cộng đồng mới có review + ảnh cho quán CÓ SẴN. Chưa có: địa điểm do người
   dùng tự thêm, hồ sơ công khai, theo dõi, nhắn tin, bản đồ ảnh, điểm đóng góp.
 - Kiểm duyệt hiện dựa vào báo cáo của người dùng. Chưa có lọc ảnh nhạy cảm bằng

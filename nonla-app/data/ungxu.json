@@ -1,0 +1,76 @@
+{
+  "_note": "Cảnh báo ứng xử theo LOẠI điểm tham quan (trường `t` trong maps.json). Chỉ là phép tắc phổ biến, không phải câu chuyện từng công trình. Công trình cụ thể có ngoại lệ riêng (giờ cửa, khu cấm chụp ảnh) — app không biết, nên không nói.",
+  "_luat": [
+    "Nội dung văn hoá do người viết, không do mô hình ngôn ngữ sinh. Mục nào chưa được người am hiểu soát thì mang verify:true; phép thử ĐẾM chúng, không làm trượt.",
+    "Chỉ viết điều khuyên ứng xử phổ biến và ít gây tranh cãi. Không phán đoán lịch sử, niên đại hay tín ngưỡng của một nơi cụ thể.",
+    "Mỗi mục có `src` ghi nguồn hoặc nói rõ là tập quán chung.",
+    "`en` là khoá i18n (khoá chính là chuỗi tiếng Anh đầy đủ)."
+  ],
+  "loai": {
+    "temple": {
+      "ten": { "vi": "Chùa, đền, đình", "en": "Temples, pagodas and communal houses" },
+      "ghiChu": [
+        { "id": "an-mac", "en": "Cover shoulders and knees. Take off your hat before going in.", "vi": "Che vai và đầu gối. Bỏ mũ nón trước khi vào.", "weight": 3 },
+        { "id": "chan", "en": "Do not point your feet at a Buddha statue or an altar. Sit with your feet tucked to the side.", "vi": "Đừng chỉ chân về phía tượng Phật hay bàn thờ. Ngồi nghiêng, gập chân sang một bên.", "weight": 3 },
+        { "id": "cua", "en": "Step over the door threshold, never on it. Keep your voice low.", "vi": "Bước qua ngưỡng cửa, không dẫm lên. Nói nhỏ tiếng.", "weight": 2 },
+        { "id": "anh", "en": "Ask before photographing people who are praying.", "vi": "Xin phép trước khi chụp người đang lễ.", "weight": 3 }
+      ],
+      "src": "Tập quán chung khi vào nơi thờ tự ở Việt Nam, không dẫn từ một văn bản riêng",
+      "verify": true
+    },
+    "church": {
+      "ten": { "vi": "Nhà thờ", "en": "Churches" },
+      "ghiChu": [
+        { "id": "an-mac", "en": "Dress modestly. Take off your hat inside.", "vi": "Ăn mặc kín đáo. Bỏ mũ nón khi vào trong.", "weight": 3 },
+        { "id": "le", "en": "If a service is on, keep quiet and do not walk through the nave. Ask before taking photos.", "vi": "Khi đang có lễ, giữ yên lặng và đừng đi ngang gian giữa. Xin phép trước khi chụp ảnh.", "weight": 3 }
+      ],
+      "src": "Tập quán chung khi vào nơi thờ tự ở Việt Nam, không dẫn từ một văn bản riêng",
+      "verify": true
+    },
+    "house": {
+      "ten": { "vi": "Nhà cổ, nhà thờ họ", "en": "Old houses and family shrines" },
+      "ghiChu": [
+        { "id": "giay", "en": "Take your shoes off if the owner or a sign asks you to.", "vi": "Cởi giày nếu chủ nhà hoặc biển báo yêu cầu.", "weight": 2 },
+        { "id": "ban-tho", "en": "Do not touch the family altar or the offerings on it.", "vi": "Đừng chạm vào bàn thờ gia tiên hay đồ cúng trên đó.", "weight": 3 },
+        { "id": "chu-nha", "en": "These are often lived-in homes. Ask before going into a room that is not clearly open.", "vi": "Đây thường là nhà đang có người ở. Hỏi trước khi vào gian không mở rõ ràng.", "weight": 2 }
+      ],
+      "src": "Tập quán chung khi vào nhà ở và nhà thờ họ, không dẫn từ một văn bản riêng",
+      "verify": true
+    },
+    "hall": {
+      "ten": { "vi": "Hội quán", "en": "Assembly halls" },
+      "ghiChu": [
+        { "id": "an-mac", "en": "Treat it as a place of worship: dress modestly and speak quietly.", "vi": "Coi như nơi thờ tự: ăn mặc kín đáo và nói nhỏ.", "weight": 2 },
+        { "id": "anh", "en": "Ask before photographing the altar or people who are praying.", "vi": "Xin phép trước khi chụp bàn thờ hoặc người đang lễ.", "weight": 2 }
+      ],
+      "src": "Tập quán chung khi vào nơi thờ tự ở Việt Nam, không dẫn từ một văn bản riêng",
+      "verify": true
+    },
+    "museum": {
+      "ten": { "vi": "Bảo tàng, di tích", "en": "Museums and relics" },
+      "ghiChu": [
+        { "id": "ve", "en": "Keep your ticket: many sites check it again at inner gates.", "vi": "Giữ vé: nhiều nơi kiểm lại ở cổng trong.", "weight": 1 },
+        { "id": "anh", "en": "Look for a no-photo sign before using a flash or a tripod.", "vi": "Tìm biển cấm chụp ảnh trước khi dùng đèn flash hoặc chân máy.", "weight": 2 }
+      ],
+      "src": "Quy ước thường gặp ở bảo tàng, không dẫn từ một văn bản riêng",
+      "verify": true
+    },
+    "market": {
+      "ten": { "vi": "Chợ", "en": "Markets" },
+      "ghiChu": [
+        { "id": "hoi", "en": "Ask the price before you pick something up or have it weighed.", "vi": "Hỏi giá trước khi cầm lên hoặc nhờ cân.", "weight": 2 },
+        { "id": "anh", "en": "Ask before photographing a stall holder up close.", "vi": "Xin phép trước khi chụp cận người bán.", "weight": 2 }
+      ],
+      "src": "Tập quán chung khi đi chợ ở Việt Nam, không dẫn từ một văn bản riêng",
+      "verify": true
+    },
+    "bridge": {
+      "ten": { "vi": "Cầu, cổng", "en": "Bridges and gates" },
+      "ghiChu": [
+        { "id": "ve", "en": "Some old bridges and gates are ticketed to cross or to climb. Check the sign before you queue.", "vi": "Một số cầu, cổng cổ có thu vé khi qua hoặc lên. Xem biển trước khi xếp hàng.", "weight": 1 }
+      ],
+      "src": "Quy ước thường gặp ở điểm tham quan, không dẫn từ một văn bản riêng",
+      "verify": true
+    }
+  }
+}

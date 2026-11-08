@@ -23,6 +23,8 @@ export const DEFAULT_ZONE = "hoian-oldtown";
 const S = (d, extra = "") => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none"
   stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
   aria-hidden="true" ${extra}>${d}</svg>`;
+import { t as T, LANGS, setLang, current as curLang } from "../i18n.js";
+
 export const I = {
   compass: S('<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5.5-5.5 2 2-5.5z"/>'),
   scan: S('<path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><path d="M7.5 12h9"/>'),
@@ -118,11 +120,11 @@ export const signedIn = () => false;
 export function gate(title, why, cta = "Log in to continue") {
   return `<div class="gatebox">
     <span class="gicon">${I.lock}</span>
-    <b>${esc(title)}</b>
-    <p>${esc(why)}</p>
+    <b>${esc(T(title))}</b>
+    <p>${esc(T(why))}</p>
     <div class="grow">
-      <a class="btn pri" href="login.html">${I.shield}${esc(cta)}</a>
-      <a class="btn sec" href="signup.html">${I.userPlus}Create account</a>
+      <a class="btn pri" href="login.html">${I.shield}${esc(T(cta))}</a>
+      <a class="btn sec" href="signup.html">${I.userPlus}${T("Create account")}</a>
     </div>
   </div>`;
 }
@@ -136,7 +138,47 @@ export function gate(title, why, cta = "Log in to continue") {
    "undefined scans" và luôn "Not enough data". Giờ nó nói đúng một câu mà
    nó có cơ sở để nói. */
 export const verdictPill = () =>
-  `<span class="pill unknown">${I.clock}No scans on this device</span>`;
+  `<span class="pill unknown">${I.clock}${T("No scans on this device")}</span>`;
+
+/* Chuỗi có chỗ điền: "{n} spots · {s} sights" → thay {n}, {s} bằng giá trị.
+   Khoá không có {x} nào thì trả nguyên. Dùng hàm thay bằng callback để giá
+   trị chứa "$" (ký hiệu tiền, mã HTML) không bị diễn giải lạ. */
+export const tf = (khoa, bien = {}) =>
+  T(khoa).replace(/\{(\w+)\}/g, (m, k) => (k in bien ? String(bien[k]) : m));
+
+/* Nhãn giá của app (match.js) có một dạng có số: "40% above the local median".
+   Các nhãn cố định thì đi thẳng qua T(). */
+export const nhanGia = (nhan) => {
+  const m = /^(\d+)% above the local median$/.exec(nhan);
+  return m ? tf("{p}% above the local median", { p: m[1] }) : T(nhan);
+};
+
+/* Dịch chữ tĩnh có sẵn trong HTML: nội dung text node, placeholder và
+   aria-label. Chỉ đổi khi có bản dịch — chuỗi lạ (tên món, số, tên đường)
+   giữ nguyên. Khoá là câu tiếng Anh đã gộp khoảng trắng, đúng quy ước
+   của i18n.js. Gọi một lần sau chrome(). */
+export function dichTrang(goc = document.body) {
+  const duyet = document.createTreeWalker(goc, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => (/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentElement?.tagName || "")
+      ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  const nodes = [];
+  while (duyet.nextNode()) nodes.push(duyet.currentNode);
+  for (const n of nodes) {
+    const goc1 = n.data.replace(/\s+/g, " ").trim();
+    if (!goc1) continue;
+    const dich = T(goc1);
+    if (dich === goc1) continue;
+    const dau = n.data.match(/^\s*/)[0], cuoi = n.data.match(/\s*$/)[0];
+    n.data = dau + dich + cuoi;
+  }
+  for (const el of goc.querySelectorAll("[placeholder],[aria-label]")) {
+    for (const a of ["placeholder", "aria-label"]) {
+      const v = el.getAttribute(a);
+      if (v && T(v) !== v) el.setAttribute(a, T(v));
+    }
+  }
+}
 
 /* ── khung trang ─────────────────────────────────────────────
    Thanh trên và chân trang dựng bằng JS để mười trang không phải chép
@@ -182,41 +224,52 @@ export function chrome(current) {
           </div>
         </div>
         <nav class="nav" aria-label="Chính">
-          ${NAV.map(([f, label, ico]) => `<a href="${f}"${here(f)}>${I[ico]}<span>${label}</span></a>`).join("")}
+          ${NAV.map(([f, label, ico]) => `<a href="${f}"${here(f)}>${I[ico]}<span>${T(label)}</span></a>`).join("")}
         </nav>
         <div class="top-cta">
+          <label class="lang-pick small">
+            <span class="sr">Language</span>
+            <select id="langPick" aria-label="Language">
+              ${LANGS.map((l) => `<option value="${l.code}"${l.code === curLang() ? " selected" : ""}>${l.native}</option>`).join("")}
+            </select>
+          </label>
           <!-- Đường về bản điện thoại. Bản web không quét được thực đơn
                bằng camera và không chạy offline, nên chỗ nào cũng phải có
                một lối sang bản làm được hai việc đó. -->
-          <a class="btn ghost" href="../index.html" title="Open the phone app (camera scanning, offline)">
-            ${I.scan}<span class="hide-sm">Phone app</span></a>
-          <a class="btn sec" href="login.html">${I.shield}Log in</a>
-          <a class="btn pri" href="signup.html">${I.userPlus}Create account</a>
+          <a class="btn ghost" href="../index.html" title="${T("Open the phone app (camera scanning, offline)")}">
+            ${I.scan}<span class="hide-sm">${T("Phone app")}</span></a>
+          <a class="btn sec" href="login.html">${I.shield}${T("Log in")}</a>
+          <a class="btn pri" href="signup.html">${I.userPlus}${T("Create account")}</a>
         </div>
       </div>
     </header>`);
 
   /* Hộp chat nạp SAU khung trang và nạp động: trang nào cũng có nó, mà
      trang nào cũng không được chờ nó mới vẽ xong. */
-  import("./chat.js").then((m) => m.mountChat()).catch(() => {});
+  /* Hộp chat vẽ SAU lượt dichTrang() của trang, nên dịch lại chính chỗ nó
+     vừa thêm vào. Không làm vậy thì nút "Ask Nón Lá" và ô nhập vẫn tiếng Anh. */
+  import("./chat.js").then((m) => { m.mountChat(); dichTrang(); }).catch(() => {});
+
+  document.getElementById("langPick")?.addEventListener("change", (e) => {
+    setLang(e.target.value);
+    location.reload();
+  });
 
   document.body.insertAdjacentHTML("beforeend", `
     <footer class="foot">
       <div class="wrap">
         <div class="values panel" style="flex:1;box-shadow:none;background:transparent;border:0">
-          ${[["shield", "Fair &amp; transparent", "Real prices from real scans"],
-             ["heart", "Local first", "Support small businesses"],
-             ["people", "Community powered", "Tips from travellers &amp; locals"],
-             ["star", "Always improving", "Your feedback shapes the data"]]
+          ${[["shield", T("Fair & transparent"), T("Real prices from real scans")],
+             ["heart", T("Local first"), T("Support small businesses")],
+             ["people", T("Community powered"), T("Tips from travellers & locals")],
+             ["star", T("Always improving"), T("Your feedback shapes the data")]]
             .map(([ic, t, s]) => `<div class="value">${I[ic]}<div><b>${t}</b><span>${s}</span></div></div>`).join("")}
         </div>
       </div>
       <div class="wrap" style="margin-top:18px;gap:18px">
-        <a class="btn sec" href="../index.html">${I.scan}Open the phone app</a>
-        <p class="small muted" style="max-width:62ch">Giá là <b>dữ liệu hạt giống</b> chưa
-        qua khảo sát thực địa, và tên cơ sở trong sáu vùng là tên mô tả chứ không phải tên
-        quán có thật. Toạ độ, tên phố và điểm tham quan lấy từ OpenStreetMap (ODbL).</p>
-        <span class="small muted" style="margin-left:auto">Nón Lá · bản web</span>
+        <a class="btn sec" href="../index.html">${I.scan}${T("Open the phone app")}</a>
+        <p class="small muted" style="max-width:62ch">${T("Prices here are seed data not yet checked in the field. Place names in the six areas are descriptive, not the names of real shops. Coordinates, street names and sights come from OpenStreetMap (ODbL).")}</p>
+        <span class="small muted" style="margin-left:auto">${T("Nón Lá · web version")}</span>
       </div>
     </footer>`);
 }
@@ -246,7 +299,7 @@ export async function paintZoneName() {
     return `<button role="option" aria-selected="${id === cur}" data-zone="${esc(id)}">
       <span class="tick">${id === cur ? I.shield : ""}</span>
       <span><b>${esc(main)}</b><i>${esc(sub || "")}</i></span>
-      <span class="n">${n} spots · ${s} sights</span>
+      <span class="n">${tf("{n} spots · {s} sights", { n, s })}</span>
     </button>`;
   }).join("");
 

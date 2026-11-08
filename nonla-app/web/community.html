@@ -18,7 +18,7 @@
     grid-template-columns:1.05fr 1fr;align-items:center">
     <div style="padding:38px 40px">
       <span class="kicker">Together for fairer travel</span>
-      <h1 style="font-size:42px;margin-top:10px">Community-powered<br>fair travel</h1>
+      <h1 style="font-size:42px;margin-top:10px">Community-powered fair travel</h1>
       <p class="muted" style="margin-top:12px;max-width:46ch">Share what you paid, ask before you
         order, and keep the local ranges honest for whoever eats here tomorrow.</p>
       <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
@@ -67,15 +67,17 @@
 
 <script type="module">
 import { chrome, paintZoneName, load, zoneId, I, esc, money, photo, placePhoto,
-         dishPhoto, signedIn, gate } from "./web.js";
+         dishPhoto, signedIn, gate, dichTrang, tf } from "./web.js";
+import { t as T } from "../i18n.js";
 
 chrome("community.html");
+dichTrang();
 paintZoneName();
 document.querySelectorAll(".spark").forEach((el) => { el.innerHTML = I.spark; });
-document.getElementById("ctaShare").innerHTML = `${I.scan}Share a scan`;
-document.getElementById("ctaGuide").innerHTML = `${I.shield}Community guidelines`;
-document.getElementById("askBtn").innerHTML = `${I.chat}Ask a question`;
-document.getElementById("seedFlag").textContent = "Sample posts — not real user posts";
+document.getElementById("ctaShare").innerHTML = `${I.scan}${T("Share a scan")}`;
+document.getElementById("ctaGuide").innerHTML = `${I.shield}${T("Community guidelines")}`;
+document.getElementById("askBtn").innerHTML = `${I.chat}${T("Ask a question")}`;
+document.getElementById("seedFlag").textContent = T("Sample posts — not real user posts");
 
 const zid = zoneId();
 const [com, places, dishes, prices] = await Promise.all([
@@ -100,8 +102,8 @@ document.getElementById("stats").innerHTML = [
     <span style="width:52px;height:52px;border-radius:50%;background:var(--kem);display:grid;
       place-items:center;color:var(--ngoc-sau);flex:0 0 auto">${ico}</span>
     <span><b style="font-family:var(--disp);font-size:28px;display:block">${n}</b>
-      <b style="font-size:14px">${label}</b>
-      <span class="small muted" style="display:block">${sub}</span></span>
+      <b style="font-size:14px">${T(label)}</b>
+      <span class="small muted" style="display:block">${T(sub)}</span></span>
   </article>`).join("");
 
 /* ── bộ lọc theo loại bài ────────────────────────────────────── */
@@ -110,7 +112,7 @@ const KINDS = [["all", "All", "grid"], ["price", "Price reports", "shield"],
 let kind = "all";
 const kbox = document.getElementById("kinds");
 kbox.innerHTML = KINDS.map(([k, l, ic]) =>
-  `<button class="chip" data-k="${k}" aria-pressed="${k === kind}">${I[ic]}${l}</button>`).join("");
+  `<button class="chip" data-k="${k}" aria-pressed="${k === kind}">${I[ic]}${T(l)}</button>`).join("");
 kbox.onclick = (e) => {
   const b = e.target.closest("[data-k]");
   if (!b) return;
@@ -135,29 +137,28 @@ function paint() {
   document.getElementById("feed").innerHTML = list.length ? list.map((p) => {
     const pl = placeOf(p.placeId), d = dishOf(p.dishId);
     const img = d ? dishPhoto(d.id) : pl ? placePhoto(pl) : null;
-    const label = kindOf(p) === "question" ? "Question" : kindOf(p) === "price" ? "Price report" : "Tip";
+    const label = kindOf(p) === "question" ? T("Question") : kindOf(p) === "price" ? T("Price report") : T("Tip");
     return `<article class="post">
       <div class="ph">${img ? photo(img, d?.vi || pl?.name || "") : ""}
         <span class="tagpos pill tag">${label}</span></div>
       <div class="body">
         <div class="byline">
           <span class="avatar">${esc((p.authorName || "?").slice(0, 1))}</span>
-          <span><b style="color:var(--muc)">${esc(p.authorName || "Someone")}</b>
-            ${p.authorCountry ? ` · ${esc(p.authorCountry)}` : ""} · ${p.hoursAgo}h ago</span>
-          <span class="pill seed" style="margin-left:auto">sample</span>
+          <span><b style="color:var(--muc)">${esc(p.authorName || T("Someone"))}</b>
+            ${p.authorCountry ? ` · ${esc(p.authorCountry)}` : ""} · ${tf("{h}h ago", { h: p.hoursAgo })}</span>
+          <span class="pill seed" style="margin-left:auto">${T("sample")}</span>
         </div>
-        <h3>${esc(pl?.name || d?.vi || "A note from the area")}</h3>
+        <h3>${esc(pl?.name || d?.vi || T("A note from the area"))}</h3>
         <p>${esc(p.body)}</p>
         <div class="foot">
-          ${p.paidVnd ? `<span>${I.shield}Paid ${money(p.paidVnd)}</span>` : ""}
+          ${p.paidVnd ? `<span>${I.shield}${tf("Paid {v}", { v: money(p.paidVnd) })}</span>` : ""}
           ${p.stars ? `<span>${I.star}${p.stars}.0</span>` : ""}
           ${pl ? `<a href="place.html?id=${encodeURIComponent(pl.id)}">${I.pin}${esc(pl.street)}</a>` : ""}
         </div>
       </div>
     </article>`;
-  }).join("") : `<div class="empty"><b>Nothing of that kind here yet</b>
-    <p>Sample posts only cover a few kinds. Real posts need the community server, which this
-    build does not have configured.</p></div>`;
+  }).join("") : `<div class="empty"><b>${T("Nothing of that kind here yet")}</b>
+    <p>${T("Sample posts only cover a few kinds. Real posts need the community server, which this build does not have configured.")}</p></div>`;
 }
 paint();
 
@@ -168,24 +169,21 @@ for (const p of posts) if (p.dishId) count[p.dishId] = (count[p.dishId] || 0) + 
 const tags = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 10);
 document.getElementById("tags").innerHTML = tags.length
   ? tags.map(([id, n]) => `<span class="pill tag">${esc(dishOf(id)?.vi || id)} ${n}</span>`).join("")
-  : `<span class="small muted">No dish tags in this area yet.</span>`;
+  : `<span class="small muted">${T("No dish tags in this area yet.")}</span>`;
 
-document.getElementById("askNote").textContent =
-  "Posting needs the community server. This build ships with config.js empty, so the app keeps "
-  + "anything you write in a private notebook on your own device.";
+document.getElementById("askNote").textContent = T("Posting needs the community server. This build ships with config.js empty, so the app keeps anything you write in a private notebook on your own device.");
 
 const byAuthor = {};
 for (const p of posts) byAuthor[p.authorName] = (byAuthor[p.authorName] || 0) + 1;
 document.getElementById("contrib").innerHTML = !signedIn()
-  ? `<p class="small muted">Who is contributing in this area is part of the community layer —
-     it appears once you are signed in.</p>`
+  ? `<p class="small muted">${T("Who is contributing in this area is part of the community layer — it appears once you are signed in.")}</p>`
   : Object.entries(byAuthor)
   .sort((a, b) => b[1] - a[1]).slice(0, 6)
   .map(([name, n]) => `<div class="r"><span class="avatar">${esc(name.slice(0, 1))}</span>
     <span><b style="font-size:14.5px">${esc(name)}</b>
-      <span class="small muted" style="display:block">sample author</span></span>
-    <span class="amt">${n} post${n > 1 ? "s" : ""}</span></div>`).join("")
-  || `<span class="small muted">No sample authors for this area.</span>`;
+      <span class="small muted" style="display:block">${T("sample author")}</span></span>
+    <span class="amt">${n > 1 ? tf("{n} posts", { n }) : tf("{n} post", { n })}</span></div>`).join("")
+  || `<span class="small muted">${T("No sample authors for this area.")}</span>`;
 </script>
 </body>
 </html>

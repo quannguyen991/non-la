@@ -16,6 +16,8 @@ import { changeDue, breakdown, explain, check as checkChange, NOTES } from "./ch
 import { luatBaiDang, docKetQuaKiemDuyet, quyetDinh, loiNhacKiemDuyet, LY_DO } from "./kiemduyet.js";
 import { quanGanToaDo, CATEGORIES, CATEGORY_IDS, categoryLabel, lamTronToaDo, diemAnh, cellDeg, gomCum, loaiDiaDiem, diemDiaDiem, CATEGORY_COLOR, QUAN_DAO, muaAnh } from "./posts.js";
 import { compare as compareMenus, MIN_PAIRS } from "./menutax.js";
+import { rankRecommended } from "./posts.js";
+import { chonQuan, docQuan, nhan as nhanDG, layDanhGia, diemDanhGia, NGUONG } from "./danhgia.js";
 import { tripSummary, dateLine, fileName } from "./postcard.js";
 import { PHRASES } from "./showcard.js";
 import { merge as mergePrices, count as countPrices,
@@ -1329,7 +1331,7 @@ console.log("\n── menutax: cộng dồn nhiều quán ───────�
    nhau không được dùng chung một khoá. */
 console.log("\n── i18n: các màn mới ───────────────────────");
 {
-  const langs = ["vi", "ko", "zh", "ja"];
+  const langs = ["vi", "ko", "zh", "ja", "ru", "fr", "th", "ms", "de"];
   for (const code of langs) {
     setLang(code);
     const miss = PHRASES.filter((p) => tr(p.en) === p.en).map((p) => p.id);
@@ -1347,6 +1349,22 @@ console.log("\n── i18n: các màn mới ────────────
   }
   setLang("en");
   eq("tiếng Anh trả về chính câu gốc", tr("Check my change"), "Check my change");
+  {
+    const { LANGS } = await import("./i18n.js");
+    eq("LANGS có đủ 10 ngôn ngữ", LANGS.map((l) => l.code).sort(),
+      ["de", "en", "fr", "ja", "ko", "ms", "ru", "th", "vi", "zh"]);
+    /* Mọi thông báo toast đi qua T() phải có bản dịch ở mọi ngôn ngữ. Lấy khoá
+       thẳng từ app.js để một thông báo mới thêm vào mà quên dịch sẽ làm đỏ bộ thử. */
+    const src = readFileSync("./app.js", "utf8");
+    const khoa = [...new Set([...src.matchAll(/toast\(T\("((?:\\.|[^"\\])*)"\)\)/g)].map((m) => JSON.parse(`"${m[1]}"`)))];
+    const thieu = [];
+    for (const l of LANGS) {
+      setLang(l.code);
+      for (const k of khoa) if (tr(k) === k && l.code !== "en") thieu.push(`${l.code}: ${k}`);
+    }
+    setLang("en");
+    ok(`mọi thông báo toast (${khoa.length} câu) có bản dịch ở đủ 10 ngôn ngữ`, thieu.length === 0, thieu.slice(0, 5).join(" | "));
+  }
   ok("mã ngôn ngữ lạ bị từ chối", setLang("xx") === false);
 }
 
@@ -2753,141 +2771,332 @@ console.log("\n── đọc câu trả lời của mô hình ──────
     top(/\.offline\{[^}]*top:calc\((\d+)px/) > top(/\.modes\{[^}]*top:calc\((\d+)px/), true);
 }
 
-/* ── biengia + qr: bảng giá trước khi gọi món ──────────────── */
-console.log("\n── biengia: bảng giá người bán tự lập, in thành mã QR ───");
+console.log("\n── thucdon: dịch lớp A ─────────────────────");
 {
-  const BG = await import("./biengia.js");
-  const { encode: qrEncode, toSVG: qrSVG } = await import("./qr.js");
+  const TD = await import("./thucdon.js");
+  const dichMon = TD.dichMon;
+  const pho = dichMon("Phở bò", dishes);
+  eq("món trong danh mục: lấy tên chuẩn", [pho.nguon, pho.en, pho.ko], ["tudien", "Beef pho", "소고기 쌀국수"]);
+  eq("món trong danh mục: chưa duyệt", pho.chuaDuyet, true);
+  const tom = dichMon("Tôm sú rang me", dishes);
+  eq("ghép từ nguyên liệu + cách nấu", [tom.nguon, tom.en], ["ghep", "Sautéed tiger prawn & tamarind"]);
+  ok("ghép có tiếng Hàn và Trung", tom.ko.includes("대하") && tom.zh.includes("炒"));
+  eq("tôm sú gắn dị ứng Tôm", tom.biet, ["Shrimp"]);
+  const bo = dichMon("Bơ tỏi tôm", dishes);
+  ok("cụm 'bơ tỏi' là garlic butter, không phải bò", bo.en.includes("garlic butter") && !bo.en.includes("beef"));
+  const la = dichMon("Cà tím xào tỏi", dishes);
+  eq("chữ lạ (cà) → chưa dịch, không đoán", [la.nguon, la.en, la.chuaRo], ["chuadich", null, true]);
+  eq("chưa dịch thì dị ứng là CHƯA RÕ (null), không phải []", la.biet, null);
+  eq("bánh cuốn đậu phộng: 'cuốn' chưa có trong bảng → chưa dịch", dichMon("Bánh cuốn đậu phộng", dishes).nguon, "chuadich");
+  eq("lẩu → hot pot", dichMon("Lẩu cá", dishes).en, "Hot pot with fish");
+  eq("tên khớp đúng một món thì lấy món đó, không ghép", dichMon("Lẩu", dishes).nguon, "tudien");
+  eq("ô trống → chưa dịch", dichMon("", dishes).nguon, "chuadich");
+  eq("chỉ có cách nấu, không có nguyên liệu → chưa dịch", dichMon("Nướng", dishes).nguon, "chuadich");
+}
 
-  const mau = {
-    n: "Cô Lan — bánh rán", a: "Hồ Gươm, phía Đinh Tiên Hoàng", d: "2026-09-23", f: 0,
-    i: [
-      { k: "banh-ran", g: 10_000, u: "chiec" },
-      { k: "nuoc-mia", g: 15_000, u: "coc" },
-      { k: null, ten: "Ốc luộc", en: "Boiled snails", g: 60_000, u: "lang" },
-      { k: "hoa-qua", g: 0, u: "thoigia" },
+console.log("\n── thucdon: kiểm kết quả model (lớp B) ─────");
+{
+  const TD = await import("./thucdon.js");
+  const raw = "```json\n" + JSON.stringify({
+    mon: [
+      { vi: "Tôm sú rang me", en: "x", ko: "y", zh: "z", ja: "w", gia: 120000, donvi: "dia", diung: ["Shrimp", "Lạ"], cay: "mild" },
+      { vi: "Món giá vô lý", gia: 5, donvi: "phan" },
+      { vi: "Món đơn vị lạ", gia: 50000, donvi: "gam" },
+      { vi: "Món thời giá", gia: null, donvi: "thoigia" },
+      { vi: "x".repeat(500), en: "dài" },
+      { vi: "", gia: 10000 },
     ],
-  };
+    phuthu: [{ kind: "service", pct: 45 }, { kind: "vat", pct: 8 }, { kind: "khac", pct: 1 }],
+    thay: "mờ góc dưới",
+  }) + "\n```";
+  const r = TD.docKetQuaThucDon(raw);
+  eq("bỏ món không có tên", r.mon.length, 5);
+  eq("giá vô lý → null", r.mon[1].gia, null);
+  eq("đơn vị lạ → null", r.mon[2].donvi, null);
+  eq("thời giá không được là đơn vị trả về", r.mon[3].donvi, null);
+  eq("tên quá dài bị cắt", r.mon[4].vi.length, 80);
+  eq("dị ứng lạ bị loại, còn lại giữ", r.mon[0].biet, ["Shrimp"]);
+  eq("cay ngoài danh sách → null", TD.docKetQuaThucDon('{"mon":[{"vi":"a","cay":"cực"}]}').mon[0].cay, null);
+  eq("phần trăm ngoài 0–30 → null", r.phuthu[0].pct, null);
+  eq("loại phụ thu lạ bị bỏ", r.phuthu.map((p) => p.kind), ["service", "vat"]);
+  eq("kết quả luôn đánh dấu là của model", r.mon.every((m) => m.nguon === "may"), true);
+  let loi = null;
+  try { TD.docKetQuaThucDon("không có gì"); } catch (e) { loi = e.message; }
+  eq("không phải JSON thì báo lỗi", loi, "phản hồi không phải JSON");
+  ok("lời nhắc gửi model có danh sách dị ứng", TD.loiNhacThucDon().includes("Shrimp"));
+}
 
-  /* gói → mở phải trả lại đúng bảng: đây là toàn bộ "cơ sở dữ liệu" */
-  const goi = await BG.dongGoi(mau);
-  eq("gói chỉ dùng ký tự an toàn cho URL", /^[A-Za-z0-9_-]+$/.test(goi), true);
-  const lai = await BG.moGoi(goi);
-  eq("mở gói trả lại tên quán", lai.n, mau.n);
-  eq("mở gói trả lại đủ dòng", lai.i.length, 4);
-  eq("món ngoài danh mục giữ tên người bán gõ", lai.i[2].ten, "Ốc luộc");
-  eq("và tên tiếng Anh người bán gõ", lai.i[2].en, "Boiled snails");
-  eq("món trong danh mục không mang tên gõ tay theo", lai.i[0].ten, "");
-  eq("layGoi đọc được từ hash", BG.layGoi("#g=" + goi), goi);
-  eq("layGoi trả null khi không có gói", BG.layGoi("#x=1"), null);
-  const url = await BG.duongDan(mau, "https://nonla-app.vercel.app/web");
-  ok("đường dẫn vừa một mã QR in được trên A6 (≤ phiên bản 15 mức M)",
-    qrEncode(url, { ecc: "M" }).version <= 15, url.length);
+console.log("\n── goiymon ─────────────────────────────────");
+{
+  const GY = await import("./goiymon.js");
+  const idTags = new Map(dishes.map((d) => [d.id, d.tags || []]));
+  const idSpice = new Map(dishes.map((d) => [d.id, d.spice]));
+  const chay = GY.goiY(dishes, { chay: true }, { toiDa: 50 });
+  const tatCa = [...chay.antoan, ...chay.dacsan, ...chay.canNhac];
+  eq("chay: mọi món gợi ý đều có thẻ chay hoặc bản chay",
+    tatCa.every((x) => idTags.get(x.id).some((t) => ["Vegetarian", "Vegan", "Vegetarian option", "Veg version exists"].includes(t))), true);
+  eq("chay: không món nào có thẻ thịt/cá/hải sản",
+    tatCa.some((x) => idTags.get(x.id).some((t) => ["Pork", "Beef", "Chicken", "Shrimp", "Fish", "Shellfish", "Crab"].includes(t))), false);
+  const khongDau = GY.goiY(dishes, { tranh: ["Peanuts"] }, { toiDa: 50 });
+  eq("tránh đậu phộng: không món nào có Peanuts",
+    [...khongDau.antoan, ...khongDau.dacsan, ...khongDau.canNhac].some((x) => idTags.get(x.id).includes("Peanuts")), false);
+  const nhe = GY.goiY(dishes, { caytoida: "mild" }, { toiDa: 50 });
+  eq("chịu cay nhẹ: không món cay vừa/nhiều",
+    [...nhe.antoan, ...nhe.dacsan, ...nhe.canNhac].some((x) => ["medium", "hot"].includes(idSpice.get(x.id))), false);
+  const canNhac = GY.goiY(dishes, {}, { toiDa: 50 }).canNhac;
+  ok("nhóm cần nhắc có lý do lấy từ thẻ dữ liệu", canNhac.length > 0 && canNhac.every((x) => x.ly.length > 0));
+  ok("không có trường điểm/giá trong gợi ý", ![...canNhac, ...GY.goiY(dishes, {}).antoan].some((x) => "score" in x || "rating" in x || "gia" in x));
+  ok("mặc định mỗi nhóm tối đa 3 món", GY.goiY(dishes).antoan.length <= 3);
+}
 
-  /* bảng 12 món vẫn phải vừa: một quán bình thường không có nhiều hơn */
-  const dai = { ...mau, i: Object.keys(BG.MON).slice(0, 12).map((k, j) => ({ k, g: (j + 2) * 5000, u: "phan" })) };
-  ok("bảng 12 món vẫn ≤ phiên bản 20", qrEncode(await BG.duongDan(dai, "https://nonla-app.vercel.app/web")).version <= 20);
+console.log("\n── phantichbua ─────────────────────────────");
+{
+  const PT = await import("./phantichbua.js");
+  const bang = { n: "Quán", d: "2026-11-03", f: 10, i: [
+    { ten: "Phở bò", g: 60000, u: "bat" },
+    { ten: "Cá song", g: 100000, u: "lang" },
+    { ten: "Hỏi giá", g: 0, u: "thoigia" },
+  ] };
+  const t = PT.tongBua(bang, [{ idx: 0, sl: 2 }, { idx: 1, sl: 1500 }, { idx: 2, sl: 1 }]);
+  eq("tổng dòng chắc chắn: 2 bát + 1.500g cá song", t.tamTinh, 120000 + 1500000);
+  eq("món thời giá không vào tổng, nằm trong conHoi", t.conHoi.map((x) => x.lyDo), ["thoigia"]);
+  eq("có dòng phải hỏi → tongThieu", t.tongThieu, true);
+  eq("phí phục vụ 10% trên phần đã tính", t.phi, Math.round(t.tamTinh * 0.1));
+  eq("không có dòng hỏi → tongThieu false", PT.tongBua({ i: [{ ten: "a", g: 50000, u: "phan" }] }, [{ idx: 0, sl: 1 }]).tongThieu, false);
+  eq("đơn vị lạ được coi như phải hỏi", PT.tongBua({ i: [{ ten: "a", g: 1, u: "lạ" }] }, [{ idx: 0, sl: 1 }]).conHoi.length, 1);
 
-  /* soát: chặn chỉ khi khách không đọc ra con số */
-  const s = BG.soatBang(mau);
-  eq("bảng mẫu in được", s.inDuoc, true);
-  eq("thiếu giá thì chặn", BG.chan(BG.soatDong({ k: "pho-bo", u: "bat" })), true);
-  eq("thời giá mà có số thì chặn", BG.chan(BG.soatDong({ k: "oc", g: 50_000, u: "thoigia" })), true);
-  eq("gõ 50 thay cho 50.000 thì chặn", BG.chan(BG.soatDong({ k: "pho-bo", g: 50, u: "bat" })), true);
-  eq("giá RẤT cao không bị chặn — app không quyết định ai được bán đắt",
-    BG.chan(BG.soatDong({ k: "non-la", g: 850_000, u: "chiec" })), false);
-  eq("giá lẻ nghìn chỉ nhắc, không chặn",
-    BG.soatDong({ k: "pho-bo", g: 45_500, u: "bat" }).map((x) => x.chan), [false]);
-  eq("trùng món cùng đơn vị thì chặn",
-    BG.soatBang({ n: "x", i: [{ k: "che", g: 20000, u: "coc" }, { k: "che", g: 25000, u: "coc" }] }).inDuoc, false);
-  eq("cùng món khác đơn vị thì được (chè cốc, chè bát)",
-    BG.soatBang({ n: "x", i: [{ k: "che", g: 20000, u: "coc" }, { k: "che", g: 25000, u: "bat" }] }).inDuoc, true);
-  eq("thiếu tên quán thì không in", BG.soatBang({ i: [{ k: "che", g: 20000, u: "coc" }] }).inDuoc, false);
+  eq("dưới 3 món thì không so", PT.soSanhTrongThucDon([{ ten: "A", gia: 40000, donvi: "phan" }, { ten: "B", gia: 50000, donvi: "phan" }]).duDuLieu, false);
+  const ba = PT.soSanhTrongThucDon([
+    { ten: "A", gia: 40000, donvi: "phan" },
+    { ten: "B", gia: 50000, donvi: "phan" },
+    { ten: "C", gia: 100000, donvi: "phan" },
+    { ten: "D", gia: 200000, donvi: "lang" },
+  ]);
+  eq("trung vị trên món theo phần", ba.trungVi, 50000);
+  eq("món theo cân bị loại khỏi phép so", ba.soMon, 3);
+  eq("nhãn trung tính", ba.ketQua.map((x) => x.nhan), ["below the menu's median", "near the menu's median", "above the menu's median"]);
+  ok("không chữ nào kết tội người bán", !/chặt|overcharg|rip|scam|cheat/i.test(ba.ketQua.map((x) => x.nhan).join(" ")));
 
-  /* tổng: theo cân phải có số gam, thời giá không bao giờ được cộng */
-  const t = BG.tinhTong(mau, [{ idx: 0, sl: 10 }, { idx: 2, sl: 350 }, { idx: 3, sl: 1 }]);
-  eq("10 bánh rán 10.000₫ = 100.000₫", t.dong[0].tien, 100_000);
-  eq("350 g ốc 60.000₫/lạng = 210.000₫", t.dong[1].tien, 210_000);
-  eq("thời giá nằm ở mục còn phải hỏi", t.conHoi.map((x) => x.lyDo), ["thoigia"]);
-  eq("tổng không cộng món thời giá", t.tong, 310_000);
-  eq("món theo cân chưa có số gam thì không cộng",
-    BG.tinhTong(mau, [{ idx: 2, sl: 0 }]).tong, 0);
-  eq("phụ thu 10% tính trên tạm tính",
-    BG.tinhTong({ ...mau, f: 10 }, [{ idx: 0, sl: 3 }]).tong, 33_000);
+  eq("giá sau VAT 8% chưa gồm", PT.giaSauPhuThu(100000, [{ kind: "vat", pct: 8 }]).tong, 108000);
+  const chuaRo = PT.giaSauPhuThu(100000, [{ kind: "service", pct: null }]);
+  eq("phí phục vụ không rõ → tổng là null", [chuaRo.tong, chuaRo.chuaRo], [null, true]);
 
-  /* tên món: năm thứ tiếng cho mọi món trong bảng dịch */
-  const thieu = Object.entries(BG.MON).filter(([, m]) => BG.NGON_NGU.some((l) => !m[l]));
-  eq("mọi món trong bảng dịch có đủ năm thứ tiếng", thieu.map(([k]) => k), []);
-  const catalog = new Set(dishes.map((d) => d.id));
-  const lechTen = Object.keys(BG.MON).filter((k) => catalog.has(k) &&
-    !dishes.find((d) => d.id === k).vi.split(" / ").includes(BG.MON[k].vi));
-  eq("món trùng mã với dishes.json dùng một trong các tên tiếng Việt của nó", lechTen, []);
-  const donVi = Object.entries(BG.DON_VI).filter(([, v]) => BG.NGON_NGU.some((l) => !v[l]));
-  eq("mọi đơn vị có câu giải thích đủ năm thứ tiếng", donVi.map(([k]) => k), []);
-  eq("chỉ hai đơn vị theo cân", Object.keys(BG.DON_VI).filter((k) => BG.DON_VI[k].can), ["lang", "kg"]);
-  eq("bản dịch chưa duyệt thì phải nói là chưa duyệt", BG.DUYET_BAN_DICH === false && !!BG.CAU.chuaDuyet.ko, true);
-  eq("ngôn ngữ trình duyệt ko-KR → ko", BG.doanNgonNgu("ko-KR"), "ko");
-  eq("ngôn ngữ không có → en", BG.doanNgonNgu("fr-FR"), "en");
-  eq("docGia: 10k", BG.docGia("10k"), 10_000);
-  eq("docGia: 10.000", BG.docGia("10.000"), 10_000);
-  eq("docGia: 1,5 triệu", BG.docGia("1,5 triệu"), 1_500_000);
-  eq("docGia: 1tr2", BG.docGia("1tr2"), 1_200_000);
-  eq("docGia: 15 nghìn", BG.docGia("15 nghìn"), 15_000);
-  eq("docGia: 150.000đ", BG.docGia("150.000đ"), 150_000);
-  eq("docGia: chữ lạ thì null, không đoán", BG.docGia("mười nghìn"), null);
-  eq("docGia: 10.5 (không rõ nghìn hay số lẻ) thì null", BG.docGia("10.5"), null);
+  const can = PT.canhBaoThucDon(["Cá song 100.000/100g", "Phở bò 60.000", "Giá chưa bao gồm VAT 8%"]);
+  ok("cảnh báo đơn vị theo cân được nêu", can.bay.length >= 1);
+  ok("cảnh báo VAT được nêu", can.phuthu.some((s) => s.kind === "vat"));
+}
 
-  /* luật chữ: không chứng nhận, không buộc tội — quét mọi chuỗi hiển thị
-     của tệp lõi LẪN hai trang web, vì chữ lọt vào thường lọt ở trang. */
-  const chuoi = [readFileSync("./biengia.js", "utf8")
-      .replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, ""),
-    ...["./web/bang-gia.html", "./web/tao-bang-gia.html"].filter(existsSync)
-      .map((p) => readFileSync(p, "utf8").replace(/<!--[\s\S]*?-->/g, "")
-        .replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, ""))].join("\n");
-  const cam = ["fair price", "công bằng", "xác thực", "đúng giá", "verified", "chặt chém", "scam", "rip-off", "overcharg"];
-  eq("không chữ chứng nhận hay buộc tội nào trong chuỗi hiển thị",
-    cam.filter((w) => chuoi.toLowerCase().includes(w)), []);
-  ok("câu 'không kiểm, không chứng nhận' có ở trang khách",
-    !existsSync("./web/bang-gia.html") || readFileSync("./web/bang-gia.html", "utf8").includes("laLoiKhai"));
+console.log("\n── dịch có nguồn (tên món có nguồn, ko/zh/ja) ───");
+{
+  const TD = await import("./thucdon.js");
+  const BG = await import("./biengia.js");
+  const { nguonCua } = await import("./dichnguon.js");
 
-  /* QR: đọc NGƯỢC bằng OpenCV — bộ giải mã không liên quan gì tới qr.js.
-     So qr.js với chính nó thì một lỗi đặt bit sẽ đúng ở cả hai phía. */
-  const { execFileSync } = await import("child_process");
-  const { tmpdir } = await import("os");
-  const { writeFileSync: ghi, mkdirSync } = await import("fs");
-  const thu = join(tmpdir(), "nonla-qr");
-  mkdirSync(thu, { recursive: true });
-  const cac = [url, "HELLO", "Bánh rán 10 chiếc", "x".repeat(400)];
-  const tep = [];
-  cac.forEach((txt, k) => ["L", "M", "Q", "H"].forEach((e) => {
-    const q = qrEncode(txt, { ecc: e }), px = 6, n = (q.size + 8) * px;
-    const buf = Buffer.alloc(n * n, 255);
-    q.modules.forEach((r, y) => r.forEach((c, x) => {
-      if (c) for (let a = 0; a < px; a++) buf.fill(0, ((y + 4) * px + a) * n + (x + 4) * px, ((y + 4) * px + a) * n + (x + 5) * px);
-    }));
-    const f = join(thu, `q${k}${e}.pgm`);
-    ghi(f, Buffer.concat([Buffer.from(`P5\n${n} ${n}\n255\n`), buf]));
-    tep.push({ f, txt });
-  }));
-  let doc = null;
-  try {
-    doc = execFileSync("python", ["tools/doc-qr.py", ...tep.map((x) => x.f)],
-      { encoding: "utf8", env: { ...process.env, PYTHONIOENCODING: "utf-8" } }).split(/\r?\n/);
-  } catch { /* máy không có python + OpenCV */ }
-  if (doc) {
-    const hong = tep.filter((x, k) => doc[k] !== x.txt).map((x) => x.f.split(/[\/]/).pop());
-    eq("OpenCV đọc lại đúng cả 16 mã QR (4 chuỗi × 4 mức sửa lỗi)", hong, []);
-  } else {
-    console.log("  ·  bỏ qua phép đọc QR bằng OpenCV — máy này thiếu python/cv2");
+  const goiCuon = TD.dichMon("Gỏi cuốn", dishes);
+  eq("gỏi cuốn có tiếng Trung và Nhật từ nguồn", [goiCuon.xacMinh.zh, goiCuon.xacMinh.ja], [true, true]);
+  eq("gỏi cuốn: tiếng Nhật là 生春巻き", goiCuon.ja, "生春巻き");
+  const pho = TD.dichMon("Phở bò", dishes);
+  eq("phở bò: không có nguồn tiếng Trung → chưa xác minh", pho.xacMinh.zh, false);
+  eq("phở bò: tiếng Trung lấy bảng MON, nhưng vẫn chưa xác minh", pho.zh, "牛肉河粉");
+  eq("cụm mờ 'mot-phan' không được tính là đã xác minh", nguonCua("bun-cha", "ko").m, "mot-phan");
+  const ghep = TD.dichMon("Tôm sú rang me", dishes);
+  eq("món ghép: mọi ngôn ngữ chưa xác minh", ghep.xacMinh, { ko: false, zh: false, ja: false });
+  eq("tên món ngoài bảng vẫn hiện đúng tiếng người chọn", BG.tenMon({ ten: "Chè", ko: "쩨", en: "Sweet soup" }, "ko").chinh, "쩨");
+  eq("thiếu bản ngữ thì rơi về tiếng Anh", BG.tenMon({ ten: "Chè", en: "Sweet soup" }, "ko").chinh, "Sweet soup");
+}
+
+console.log("\n── hints & freshness ───────────────────────");
+{
+  const { hintFor, HINTS } = await import("./hints.js");
+  const { ageMonths, freshness } = await import("./freshness.js");
+  eq("món không có gợi ý trả null", hintFor("pho-bo"), null);
+  ok("mọi gợi ý đều có tiếng Việt", Object.values(HINTS).every((h) => h.vi));
+  ok("không gợi ý nào ghi số tiền", Object.values(HINTS).every((h) => !/\d{3}|₫|vnd|đồng/i.test(h.vi + h.en)));
+  ok("gợi ý cho trà đá có nguồn", !!hintFor("tra-da").source);
+  eq("ngôn ngữ lạ rơi về tiếng Anh", hintFor("tra-da", "ko").text, HINTS["tra-da"].en);
+
+  const now = new Date(2026, 10, 3); // tháng 11/2026
+  eq("tháng hiện tại là 0 tháng", ageMonths("2026-11", now), 0);
+  eq("2026-09 cách 2 tháng", ageMonths("2026-09", now), 2);
+  eq("sai định dạng trả null", ageMonths("09/2026", now), null);
+  eq("dữ liệu 2 tháng là mới", freshness("2026-09", now), "fresh");
+  eq("dữ liệu 13 tháng là cũ", freshness("2025-10", now), "stale");
+  eq("không đọc được tuổi thì không gắn nhãn", freshness("", now), null);
+}
+
+/* ── Deal Recorder · Local Compass · Culture Lens · quán do cộng đồng thêm ── */
+console.log("\n── ghikeo.js · bandia.js · ungxu.js · diadiemmoi.js ──");
+{
+  const GK = await import("./ghikeo.js");
+  const BD = await import("./bandia.js");
+  const UX = await import("./ungxu.js");
+  const DD = await import("./diadiemmoi.js");
+  const vnd1 = (s) => GK.timSoTien(s).map((x) => x.vnd);
+
+  /* đọc số tiền nói miệng */
+  eq("một trăm nghìn chẵn", vnd1("một trăm nghìn chẵn"), [100000]);
+  eq("hai lít = 200 nghìn", vnd1("hai lít"), [200000]);
+  eq("hai lít rưỡi", vnd1("hai lít rưỡi"), [250000]);
+  eq("hai triệu rưỡi", vnd1("hai triệu rưỡi"), [2500000]);
+  eq("một triệu hai", vnd1("một triệu hai"), [1200000]);
+  eq("một trăm hai mươi ngàn", vnd1("một trăm hai mươi ngàn"), [120000]);
+  eq("tám mươi lăm nghìn", vnd1("tám mươi lăm nghìn"), [85000]);
+  eq("hai trăm nghìn năm chục", vnd1("hai trăm nghìn năm chục"), [250000]);
+  eq("một củ = một triệu", vnd1("một củ"), [1000000]);
+  eq("100k", vnd1("100k"), [100000]);
+  eq("100.000đ", vnd1("100.000đ"), [100000]);
+  eq("1,5 triệu", vnd1("1,5 triệu"), [1500000]);
+  eq("giờ 14:32 không bị đọc là tiền", vnd1("lúc 14:32 nhé"), []);
+  eq("câu không có số tiền", vnd1("không biết"), []);
+  ok("trăm rưỡi là ĐOÁN đơn vị", GK.timSoTien("trăm rưỡi nha")[0].doDoan === true);
+  eq("trăm rưỡi = 150 nghìn", vnd1("trăm rưỡi nha"), [150000]);
+  ok("có từ cỡ thì không phải đoán", GK.timSoTien("hai trăm nghìn")[0].doDoan === false);
+  eq("'hai người ba trăm nghìn' chỉ ra số tiền", vnd1("đi hai người ba trăm nghìn"), [300000]);
+  eq("một số duy nhất thì được chọn hộ", GK.docLoiNoi("trăm rưỡi nha").chon, 0);
+  eq("hai số thì KHÔNG chọn hộ", GK.docLoiNoi("ba trăm nghìn đi, hoặc hai trăm nghìn").chon, null);
+  ok("số đoán đơn vị mang cảnh báo", GK.docLoiNoi("hai chục").canhBao.includes(GK.CHU_KY.DOAN_DON_VI));
+
+  /* thẻ */
+  const luc = Date.UTC(2026, 7, 7, 7, 32); // 14:32 giờ VN, 07/08
+  const the = GK.dungThe({ loiNoi: "trăm rưỡi", vnd: 150000, noi: "Hoàn Kiếm", luc });
+  eq("giờ Việt Nam UTC+7", [the.gio, the.ngay], ["14:32", "07/08"]);
+  eq("dòng thẻ", GK.dongThe(the).dong, `${GK.fmtDong(150000)} · Hoàn Kiếm · 14:32 · 07/08`);
+  ok("thẻ không phải hợp đồng", the.khongPhaiHopDong === true);
+  ok("thẻ là declared, không vào dải giá", the.nguon === NGUON.DECLARED && the.vaoDai === false && !GK.duocVaoDai(the));
+  eq("số tiền 0 không dựng được thẻ", GK.dungThe({ vnd: 0, luc }), null);
+  ok("chưa ai đọc thì chưa hai bên đã đọc", !GK.haiBenDaDoc(the));
+  ok("hai bên đọc xong mới tính", GK.haiBenDaDoc(GK.danhDauDoc(GK.danhDauDoc(the, "seller"), "guest")));
+  ok("đánh dấu không đổi thẻ gốc", the.daDoc.seller === false);
+  ok("thẻ không mang âm thanh", !("audio" in the) && !("blob" in the));
+
+  /* Local Compass */
+  eq("giờ mở 06:30", BD.docGio("Mo-Su 06:30-22:30").mo, 6.5);
+  eq("giờ lạ → null", BD.docGio("sunrise-sunset"), null);
+  const moc = [{ n: "Chùa Cầu", at: [15.877117, 108.326023] }];
+  const gan = { id: "a", name: "Riverside Restaurant", kind: "restaurant", at: [15.8772, 108.3261], hours: "Mo-Su 11:00-23:00" };
+  const xa = { id: "b", name: "Bún mắm bà Tư", kind: "street", at: [15.9, 108.35], hours: "Mo-Su 05:30-10:00" };
+  const dg1 = BD.danhGia(gan, moc), dg2 = BD.danhGia(xa, moc);
+  eq("quán sát điểm khách nghiêng về khách", dg1.nhan, "visitor");
+  eq("quán sáng sớm xa mốc nghiêng địa phương", dg2.nhan, "local");
+  ok("mỗi tín hiệu có lý do cả hai thứ tiếng", [...dg1.tinHieu, ...dg2.tinHieu].every((t) => t.vi && t.en));
+  eq("chỉ tên và toạ độ → không nhãn", BD.danhGia({ id: "c", at: [15.9, 108.35] }, []).nhan, null);
+  const xepKq = BD.xep([gan, xa, { id: "c", at: [15.9, 108.35] }], moc);
+  eq("quán thiếu tín hiệu không lẫn vào thứ tự", [xepKq.xep.length, xepKq.thieu], [2, 1]);
+  eq("quán địa phương xếp trước", xepKq.xep[0].quan.id, "b");
+  ok("Local Compass không đọc giá", !/prices|paid|vnd|gia/i.test(JSON.stringify(dg1.tinHieu.map((t) => t.id))));
+
+  /* Culture Lens */
+  const ungxu = JSON.parse(readFileSync("./data/ungxu.json", "utf8"));
+  const maps = JSON.parse(readFileSync("./data/maps.json", "utf8")).zones;
+  const moc2 = Object.values(maps).flatMap((z) => z.landmarks);
+  ok("chùa có cảnh báo", UX.canhBao({ t: "temple" }, ungxu)?.ghiChu.length > 0);
+  eq("loại chưa có nội dung → null", UX.canhBao({ t: "lake" }, ungxu), null);
+  eq("loại không biết → null", UX.canhBao({ t: "zzz" }, ungxu), null);
+  ok("mọi mục ứng xử có src", Object.values(ungxu.loai).every((m) => m.src && m.src.length > 5));
+  ok("mọi ghi chú có hai thứ tiếng", Object.values(ungxu.loai).every((m) => m.ghiChu.every((g) => g.en && g.vi)));
+  ok("không ghi chú nào nói số tiền", Object.values(ungxu.loai).every((m) => m.ghiChu.every((g) => !/\d{2,}\s?(k|₫|vnd|đồng)|\d+\.\d{3}/i.test(g.en + g.vi))));
+  ok("mọi loại trong ungxu.json có trong maps.json hoặc là loại gộp",
+    Object.keys(ungxu.loai).every((k) => moc2.some((l) => UX.loaiUngXu(l.t, ungxu) === k)));
+  const dp = UX.doPhu(moc2, ungxu);
+  ok("độ phủ đếm được và nhỏ hơn tổng", dp.co > 0 && dp.co < dp.tong);
+  console.log(`   ↳ Culture Lens phủ ${dp.co}/${dp.tong} mốc · ${UX.chuaSoat(ungxu)} loại còn verify:true`);
+
+  /* quán do cộng đồng thêm */
+  const vung = { "hoian-oldtown": { bbox: maps["hoian-oldtown"].bbox } };
+  const quans = eateries.filter((e) => e.zone === "hoian-oldtown");
+  const goc = quans[0];
+  const nhap = { name: "Quán Mới Tinh Không Trùng", kind: "cafe", at: [15.8773, 108.3262], zone: "hoian-oldtown" };
+  ok("nháp hợp lệ qua kiểm", DD.kiemTra(nhap, { vung, quans: [] }).ok);
+  ok("tên 1 ký tự bị chặn", DD.kiemTra({ ...nhap, name: "A" }, { vung }).loi.includes(DD.LOI.TEN));
+  ok("loại lạ bị chặn", DD.kiemTra({ ...nhap, kind: "hotel" }, { vung }).loi.includes(DD.LOI.LOAI));
+  ok("toạ độ NaN bị chặn", DD.kiemTra({ ...nhap, at: [NaN, 1] }, { vung }).loi.includes(DD.LOI.TOA_DO));
+  ok("ngoài khung vùng bị chặn", DD.kiemTra({ ...nhap, at: [10, 100] }, { vung }).loi.includes(DD.LOI.NGOAI_VUNG));
+  ok("vùng lạ bị chặn", DD.kiemTra({ ...nhap, zone: "mars" }, { vung }).loi.includes(DD.LOI.VUNG));
+  const trung = DD.kiemTra({ ...nhap, name: goc.name, at: [goc.at[0] + 0.0001, goc.at[1]] }, { vung: { "hoian-oldtown": { bbox: [[goc.at[0] + 1, goc.at[1] - 1], [goc.at[0] - 1, goc.at[1] + 1]] } }, quans });
+  ok("cùng tên, sát quán có sẵn → trùng", trung.loi.includes(DD.LOI.TRUNG) && trung.trung.quan.id === goc.id);
+  ok("cùng tên nhưng xa 200 m thì không trùng",
+    !DD.timTrung(goc.name, [goc.at[0] + 0.002, goc.at[1]], quans));
+  const q = DD.dungQuan(nhap, { luc: 123 });
+  ok("quán mới không nhãn giá", q.fair === null && q.nguon === "user");
+  eq("điểm đóng góp rỗng", DD.diemDongGop({}).tong, 0);
+  eq("điểm: 2 bài, 1 ảnh, 1 giá, 1 quán = 2+1+1+3", DD.diemDongGop({ post: 2, photo: 1, price: 1, place: 1 }).tong, 7);
+  eq("lượt quét không cộng điểm", DD.diemDongGop({ scan: 999 }).tong, 0);
+  eq("số âm không trừ điểm", DD.diemDongGop({ post: -5 }).tong, 0);
+  eq("gom từ bài", DD.tuBai([{ paid_vnd: 50000, photo_path: "x" }, {}], [{ status: "hidden" }, {}]),
+    { post: 2, photo: 1, price: 1, place: 1 });
+}
+
+console.log("\n── khách nước ngoài: giới thiệu món, đánh giá giá, bản dịch ───");
+{
+  const GT = await import("./gioithieu.js");
+  const PT = await import("./phantichbua.js");
+  const { DICH_KHACH } = await import("./i18n-khach.js");
+  const { DICH_WEB } = await import("./i18n-web.js");
+  const { setLang, t: tr, coBanDich } = await import("./i18n.js");
+
+  const gt = GT.gioiThieuMon("cao-lau", dishes);
+  eq("giới thiệu: có tên Việt và Anh", [gt.vi, gt.en], ["Cao lầu", "Cao lau noodles"]);
+  eq("giới thiệu: câu gọi món và cách đọc lấy từ dữ liệu", gt.cachGoi, { vi: "Cho tôi cao lầu", ph: "chaw toy kow-loh" });
+  ok("giới thiệu: có mô tả tiếng Anh", gt.mota.length > 20);
+  eq("món ngoài danh mục: không có giới thiệu (không bịa)", GT.gioiThieuMon("khong-co", dishes), null);
+  eq("id rỗng: không có giới thiệu", GT.gioiThieuMon("", dishes), null);
+  const khongChuyen = dishes.filter((d) => !d.story?.en);
+  eq("món chưa có câu chuyện thì để trống, không viết thêm",
+    khongChuyen.length > 0 && khongChuyen.every((d) => GT.gioiThieuMon(d.id, dishes).chuyen.en === ""), true);
+
+  const prices = JSON.parse(readFileSync("./data/prices.json", "utf8"));
+  const seed = PT.danhGiaGia("cao-lau", 70000, "hoian-oldtown", prices);
+  eq("dải hạt giống (kể cả sourced) chỉ là ước lượng, không phán quyết", [seed.nhan, seed.uocLuong], ["Estimate only", true]);
+  eq("không có dữ liệu khu thì nói là chưa có", PT.danhGiaGia("cao-lau", 70000, "khong-co", prices).nhan, "No local data yet");
+  const fake = { zones: { z: { items: { m: { p25: 1, p50: 2, p75: 3, p95: 4, n: 50, surveyedAt: "2026-11-01" } } } } };
+  eq("khảo sát thật mới được phán quyết", PT.danhGiaGia("m", 2, "z", fake).uocLuong, false);
+
+  for (const khoa of ["Price check", "Estimate only", "Within the usual range", "Above 75% of places nearby",
+                      "Too few readings", "No local data yet", "Description", "The story", "How to order it",
+                      "Spice", "Notes", "Your order", "About this dish", "Hot", "Priced by weight",
+                      "Prices may exclude VAT — the total can be higher."]) {
+    if (!DICH_KHACH.vi[khoa]) { ok("khoá khách có bản vi: " + khoa, false); continue; }
   }
-  ok("SVG của mã QR có lề trắng 4 ô", qrSVG(qrEncode("a")).includes('viewBox="0 0 29 29"'));
-  {
-    const tao = readFileSync("./web/tao-bang-gia.html", "utf8");
-    /* "size:A6" không có trong chuẩn CSS — Chrome lặng lẽ in khổ Letter
-       (đo 23/09/2026: PDF ra 216×279 mm thay vì 105×148 mm). */
-    eq("tờ bảng giá in đúng khổ A6 ghi bằng mm", /@page\{size:105mm 148mm/.test(tao), true);
-    eq("không dùng tên khổ A6 mà Chrome bỏ qua", /size:\s*A6/i.test(tao.replace(/\/\*[\s\S]*?\*\//g, "")), false);
+  const thieuKhach = [];
+  for (const lang of ["vi", "ko", "zh", "ja", "ru", "fr", "th", "ms", "de"]) {
+    for (const khoa of Object.keys(DICH_KHACH.vi)) if (!DICH_KHACH[lang]?.[khoa]) thieuKhach.push(lang + ":" + khoa);
   }
+  ok("bảng khách: mọi khoá có đủ 9 ngôn ngữ", thieuKhach.length === 0, thieuKhach.slice(0, 4).join(" | "));
+
+  /* Mọi chuỗi trang khách và khung web phải đi qua T() và có bản dịch ở đủ 10 ngôn ngữ.
+     Lấy khoá thẳng từ mã nguồn để chuỗi mới thêm vào mà quên dịch thì bộ thử đỏ ngay. */
+  /* Mọi trang web đều phải đi qua T()/dichTrang(): chuỗi gọi qua T()/tf()
+     trong mã, và chữ tĩnh trong HTML (nội dung thẻ, placeholder, aria-label). */
+  const TRANG_WEB = ["thuc-don.html", "web.js", "chat.js", "login.html", "signup.html",
+    "community.html", "journal.html", "helpers.html", "index.html", "map.html", "place.html", "scan.html"];
+  const nguon = [];
+  for (const f of TRANG_WEB) {
+    for (const m of readFileSync("./web/" + f, "utf8").matchAll(/\b(?:T|tf)\("([^"]*)"/g)) {
+      nguon.push(JSON.parse('"' + m[1] + '"'));
+    }
+  }
+  const dataI = [...readFileSync("./web/thuc-don.html", "utf8").matchAll(/data-i[^>]*>([^<]+)</g)].map((m) => m[1].trim());
+  for (const f of TRANG_WEB.filter((x) => x.endsWith(".html") && x !== "thuc-don.html")) {
+    const body = readFileSync("./web/" + f, "utf8").replace(/<script[\s\S]*?<\/script>/g, "").replace(/<title>[\s\S]*?<\/title>/g, "");
+    for (const m of body.matchAll(/>([^<>]+)</g)) {
+      const s = m[1].replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+      if (/[A-Za-z]{2}/.test(s) && !/[{}$]/.test(s)) dataI.push(s);
+    }
+    for (const m of body.matchAll(/(?:placeholder|aria-label)="([^"]*)"/g)) {
+      const s = m[1].replace(/\s+/g, " ").trim();
+      if (/[A-Za-z]{2}/.test(s)) dataI.push(s);
+    }
+  }
+  const khoaTrang = [...new Set([...nguon, ...dataI])].filter((k) => k && !k.includes("$" + "{") && !/[=\n]|\{ /.test(k));
+  const khongDich = [];
+  for (const l of ["vi", "ko", "zh", "ja", "ru", "fr", "th", "ms", "de"]) {
+    setLang(l);
+    for (const k of khoaTrang) if (!coBanDich(l, k)) khongDich.push(l + ":" + k.slice(0, 40));
+  }
+  setLang("en");
+  ok("trang khách + khung web: mọi chuỗi (" + khoaTrang.length + ") có bản dịch ở đủ 9 ngôn ngữ", khongDich.length === 0, khongDich.slice(0, 5).join(" | "));
+  ok("không còn chuỗi QR trong bản dịch khung web", !Object.values(DICH_WEB).some((b) => Object.keys(b).some((k) => /QR price|seller/.test(k))));
+  ok("trang thực đơn không còn gọi bảng QR", !readFileSync("./web/thuc-don.html", "utf8").includes("tao-bang-gia"));
 }
 
 console.log("\n── kiemduyet: luật + kết quả AI ──────────");
@@ -2917,9 +3126,6 @@ console.log("\n── kiemduyet: luật + kết quả AI ───────�
   ok("lời nhắc coi chữ người dùng là dữ liệu", /UNTRUSTED DATA/.test(loiNhacKiemDuyet()));
 }
 
-console.log("\n════════════════════════════════════════════");
-console.log(`${pass} pass · ${fail} fail\n`);
-process.exit(fail ? 1 : 0);
 console.log("\n── quanGanToaDo: quán quanh nơi chụp ảnh ──");
 {
   const ds = [
@@ -3045,3 +3251,51 @@ console.log("\n── bản đồ ảnh: lớp quán và mốc, hai quần đả
   eq("ảnh mẫu rỗng thì rỗng", muaAnh(), []);
 }
 
+/* ── đánh giá Google ── */
+{
+  const ds = [
+    { id: "p1", displayName: { text: "Bún Chả Hương Liên" }, rating: 4.6, userRatingCount: 5200 },
+    { id: "p2", displayName: { text: "Cửa hàng tiện lợi 24h" }, rating: 4.9, userRatingCount: 3 },
+  ];
+  eq("khớp đúng quán theo tên", chonQuan("Bun Cha Huong Lien", ds)?.id, "p1");
+  eq("tên khác hẳn thì không nhận", chonQuan("Phở Thìn", ds), null);
+  eq("không có kết quả thì null", chonQuan("Phở Thìn", []), null);
+  const q = docQuan(ds[0]);
+  eq("đọc điểm và số lượt", [q.sao, q.luot, q.placeId], [4.6, 5200, "p1"]);
+  eq("điểm ngoài 1–5 bị bỏ", docQuan({ id: "x", rating: 9, userRatingCount: 10 }).sao, null);
+  ok("thiếu id thì null", docQuan({ rating: 4 }) === null);
+  ok("liên kết lạ bị bỏ", docQuan({ id: "x", rating: 4, userRatingCount: 1, googleMapsUri: "https://evil.example/maps" }).uri === null);
+  ok("liên kết Google Maps được giữ", docQuan({ id: "x", rating: 4, userRatingCount: 1, googleMapsUri: "https://maps.google.com/?cid=1" }).uri !== null);
+  eq("nhãn: đủ lượt và điểm cao", nhanDG({ sao: 4.6, luot: 500 }), "good");
+  eq("nhãn: 4,9 sao trên 3 lượt chỉ là ít", nhanDG({ sao: 4.9, luot: 3 }), "few");
+  eq("nhãn: điểm thường thì không nhãn", nhanDG({ sao: 3.9, luot: 900 }), "");
+  eq("nhãn: sát ngưỡng", nhanDG({ sao: NGUONG.sao, luot: NGUONG.luot }), "good");
+  eq("địa chỉ hàm khi chạy localhost", diemDanhGia({ hostname: "localhost" }), "https://nonla-app.vercel.app/api/danhgia");
+  eq("lỗi mạng thì null, không ném", await layDanhGia({ name: "A", at: [1, 1] }, async () => { throw new Error("off"); }), null);
+  eq("máy chủ chưa bật thì null", await layDanhGia({ name: "A", at: [1, 1] }, async () => ({ ok: false })), null);
+  const got = await layDanhGia({ name: "A", at: [1, 1], street: "Tran Hung Dao" },
+    async () => ({ ok: true, json: async () => ({ found: true, placeId: "p9", sao: 4.4, luot: 210 }) }));
+  eq("trả về gọn", [got.placeId, got.sao, got.luot], ["p9", 4.4, 210]);
+}
+
+/* ── gợi ý của người dùng ── */
+{
+  const bai = [
+    { placeId: "a", recommend: true, createdAt: "2026-10-01T00:00:00Z" },
+    { placeId: "a", recommend: true, createdAt: "2026-10-02T00:00:00Z" },
+    { placeId: "b", recommend: true, createdAt: "2026-10-05T00:00:00Z" },
+    { placeId: "b", recommend: false, createdAt: "2026-10-06T00:00:00Z" },
+    { placeId: "c", recommend: true, createdAt: "2026-09-01T00:00:00Z" },
+    { placeId: "c", recommend: true, createdAt: "2026-09-02T00:00:00Z" },
+    { placeId: null, recommend: true, createdAt: "2026-10-09T00:00:00Z" },
+    { placeId: "d", createdAt: "2026-10-09T00:00:00Z" },
+  ];
+  const xep = rankRecommended(bai);
+  eq("xếp theo số lượt gợi ý, hoà số thì bài mới hơn lên trước", xep.map((r) => r.placeId), ["a", "c", "b"]);
+  eq("bài không gợi ý và bài không có quán không được đếm", xep.find((r) => r.placeId === "b").count, 1);
+  eq("danh sách rỗng khi chưa ai gợi ý", rankRecommended([]), []);
+}
+
+console.log("\n════════════════════════════════════════════");
+console.log(`${pass} pass · ${fail} fail\n`);
+process.exit(fail ? 1 : 0);

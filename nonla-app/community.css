@@ -283,7 +283,7 @@
 /* Hoạ tiết trống đồng mờ ở góc, như .crest của các màn khác (opacity .14). */
 .pm-sheet::before {
   content: ""; position: absolute; right: -34px; top: -30px; width: 150px; height: 150px; pointer-events: none;
-  background: url("assets/motifs/hoa-van-tron.webp") center / contain no-repeat; opacity: .13;
+  background: url("assets/motifs/trong-dong-v2.webp") center / contain no-repeat; opacity: .13;
 }
 .pm:not(.pm-drag) .pm-sheet { transition: height .38s cubic-bezier(.2, .8, .2, 1); }
 .pm-head { position: relative; flex: none; padding: 0 var(--pad-x); touch-action: none; user-select: none; -webkit-user-select: none; }
@@ -474,10 +474,10 @@
 /* dải sen và vân mây phân cách tiêu đề với bộ lọc */
 .pm-orn { display: block; width: min(150px, 44%); height: auto; margin: -6px auto 6px; opacity: .85; }
 
-/* trạng thái tải: huy hiệu mặt trời 14 tia quay chậm */
+/* trạng thái tải: trống đồng quay chậm */
 .pm-loading i {
   width: 26px; height: 26px; border: 0; border-radius: 0;
-  background: url("assets/motifs/mat-troi-14.webp") center / contain no-repeat;
+  background: url("assets/motifs/trong-dong-v2.webp") center / contain no-repeat;
   animation: pm-spin 2.6s linear infinite;
 }
 
@@ -505,7 +505,7 @@
 .pcard-c.br { right: 3px; bottom: 3px; transform: scale(-1, -1); }
 .pcard-band {
   height: 24px; margin: 18px -2px 0; opacity: .9;
-  background: url("assets/motifs/dai-chim-lac-tile.webp") repeat-x center / auto 24px;
+  background: none;
 }
 @media (prefers-reduced-motion: reduce) { .pm-loading i { animation: none; } }
 
@@ -520,7 +520,49 @@
 .sheet:has(.pcard) { position: absolute; }
 .sheet:has(.pcard)::before {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .06;
-  background: url("assets/motifs/nen-luoi-dong-son.webp") 0 0 / 150px auto repeat;
+  background: url("assets/motifs/trong-dong-v2.webp") center / 78% auto no-repeat;
 }
 .sheet:has(.pcard) > :not(.sheetx) { position: relative; z-index: 1; }
 .sheet:has(.pcard) > .sheetx { z-index: 3; }
+
+/* Nhãn "Minh hoạ" trên thẻ dùng tranh theo loại quán thay cho ảnh thật. */
+.pc-ill{position:absolute;top:9px;left:9px;z-index:3;font:600 10.5px/1.2 var(--body);
+  letter-spacing:.02em;padding:4px 8px;border-radius:999px;background:rgba(251,247,236,.9);
+  color:var(--then);border:1px solid var(--vien-in)}
+
+
+/* ═══ Gợi ý của người dùng ═══ */
+  border-radius: 14px; border: 1.5px solid var(--vien-in); background: var(--giay); position: relative; cursor: pointer; }
+.cgoi { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  background: rgba(14,74,60,.1); color: var(--ngoc-sau); }
+.crcm { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
+.crcm li { display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: center;
+  padding: 10px 12px; border-radius: 14px; background: var(--giay); border: 1px solid var(--vien-in); }
+.crcm-n { font: 600 16px/1 var(--disp); color: var(--dong); }
+.crcm-t { font-weight: 600; color: var(--then); }
+.crcm-c { font-size: 12px; color: var(--muc-nhat); white-space: nowrap; }
+
+/* ═══ Composer kiểu bài đăng mạng xã hội ═══ */
+.fbh { text-align: center; font: 600 17px/1.2 var(--disp); color: var(--then); margin: 0 0 12px; }
+.fbwho { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.fbav { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--then); color: var(--dong); font: 600 16px/1 var(--disp); flex: 0 0 auto; }
+.fbwho b { display: block; font-size: 14px; color: var(--then); }
+.fbaud { display: inline-block; margin-top: 3px; font-size: 11px; font-weight: 600; padding: 2px 9px;
+  border-radius: 999px; background: rgba(14,74,60,.08); color: var(--ngoc-sau); }
+.fbtext { width: 100%; min-height: 96px; resize: vertical; border: 0; outline: 0; background: transparent;
+  font: 400 16px/1.45 var(--body); color: var(--then); padding: 6px 2px; }
+.fbtext::placeholder { color: var(--muc-nhat); }
+.fbadd { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 6px;
+  padding: 8px 10px; border: 1px solid var(--vien-in); border-radius: 14px; background: var(--giay); }
+.fbadd-t { flex: 1 1 100%; font-size: 13px; font-weight: 600; color: var(--muc-nhat); }
+.fbtool { position: relative; }
+.fbtool > summary { list-style: none; cursor: pointer; width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; color: var(--ngoc-sau); background: rgba(14,74,60,.06); }
+.fbtool > summary::-webkit-details-marker { display: none; }
+.fbtool > summary svg { width: 22px; height: 22px; }
+.fbtool > summary:hover { background: rgba(14,74,60,.12); }
+.fbtool > summary:focus-visible { outline: 2px solid var(--dong); outline-offset: 2px; }
+.fbtool[open] > summary { background: var(--then); color: var(--dong); }
+.fbtray { margin: 8px 0 4px; padding: 10px; border-radius: 12px; background: #FDFAF1; border: 1px solid var(--line); }
+.fbpost { width: 100%; margin-top: 4px; }

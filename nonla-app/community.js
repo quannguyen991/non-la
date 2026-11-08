@@ -13,7 +13,7 @@
 import { listPosts, listComments, listPhotoPins, photoUrl, ready, commentsOn } from "./cloud.js";
 import { pending, drop, MAX_TRIES } from "./outbox.js";
 import * as Local from "./localdb.js";
-import { CATEGORIES, CATEGORY_COLOR, categoryLabel, diemAnh, diemDiaDiem } from "./posts.js";
+import { CATEGORIES, CATEGORY_COLOR, categoryLabel, diemAnh, diemDiaDiem, rankRecommended } from "./posts.js";
 import * as AnhUI from "./anhmapui.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
@@ -123,6 +123,7 @@ function postHtml(p) {
   const img = p.seed ? p.photo
     : p.local ? Local.photoUrl(p)
     : (p.photoPath ? photoUrl(p.photoPath) : "");
+  const goiY = p.recommend ? `<span class="cgoi">Recommended by a traveller</span>` : "";
   return `<article class="cpost${p.seed ? " cseed" : ""}">
     ${img ? `<img src="${esc(img)}" alt="" loading="lazy"
        onerror="this.remove()">` : ""}
@@ -132,6 +133,7 @@ function postHtml(p) {
         ${p.authorCountry ? `<span>· ${esc(p.authorCountry)}</span>` : ""}
         <span>· ${esc(ago(p.createdAt))}</span>
         ${p.seed ? `<span class="ctag">sample</span>` : ""}
+        ${goiY}
         ${p.category && p.placeId ? `<span class="ctag">${esc(categoryLabel(p.category))}</span>` : ""}
         ${p.local ? `<span class="conly">this phone only</span>` : ""}
         ${p.far ? `<span class="cfar">posted away from the venue</span>` : ""}
@@ -189,8 +191,25 @@ async function paint() {
   if (M.view === "map") await mountMap();
 }
 
+/* Danh sách của người dùng: quán được gợi ý nhiều nhất trong các bài của
+   khu vực này. Đếm số lượt, không chấm điểm — chữ trên khối nói đúng như vậy. */
+function rcmPane() {
+  const top = rankRecommended(M.posts).slice(0, 5);
+  if (!top.length) return "";
+  return `<div class="cseed-head">
+      <h2>Recommended by travellers</h2>
+      <p>How many travellers recommended each place. This counts their recommendations — Nón Lá does not score places.</p>
+    </div>
+    <ol class="crcm">${top.map((r, i) => {
+      const pl = M.places.find((x) => x.id === r.placeId);
+      return `<li><span class="crcm-n">${i + 1}</span>
+        <span class="crcm-t">${esc(pl ? pl.name : "A place no longer on the map")}</span>
+        <span class="crcm-c">${r.count} ${r.count === 1 ? "recommendation" : "recommendations"}</span></li>`;
+    }).join("")}</ol>`;
+}
+
 function feedPane() {
-  return `${M.posts.length
+  return `${rcmPane()}${M.posts.length
       ? `<div class="cfeed">${M.posts.map(postHtml).join("")}</div>`
       : `<p class="cempty">${ready()
           ? "No posts here yet. Be the first — photograph what you ate, and what you paid for it."
@@ -475,37 +494,88 @@ export function dishOptionsFor(placeId, { places = [], dishes = [] } = {}) {
  * đang hidden thì bấm mà không thấy gì.
  */
 export function composer({ places = [], dishes = [], place = null } = {}) {
+  const ten = (Local.name() || "You").trim();
+  const chan = ready() ? "Travellers" : "This phone only";
+  const ic = {
+    photo: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="2" fill="currentColor"/><path d="M4 18l5-5 4 4 3-3 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+    place: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-5.6-6-10.5a6 6 0 1 1 12 0C18 15.4 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10.5" r="2.2" fill="currentColor"/></svg>',
+    price: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5h5M9.5 13h5M12 7v11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l2.4 5 5.4.6-4 3.7 1.1 5.4L12 16.1 7.1 18.7l1.1-5.4-4-3.7 5.4-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+    thumb: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11v8H4.5v-8zM7 11l4-7c1.6 0 2.5 1 2.3 2.6L13 10h5.2c1.1 0 1.9 1 1.7 2.1l-1.2 6.2c-.2 1-1 1.7-2 1.7H7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
+    more: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="18" cy="12" r="1.8" fill="currentColor"/></svg>',
+  };
   return `
-    <h3>Share a place</h3>
-    <p class="src">Photos you post leave your phone. The GPS data inside the photo file never does.
-      Other travellers can comment on your post to discuss the place.</p>
-    <label class="fld"><span>Place <small>or leave empty and share the photo's location below</small></span>
-      <input id="cfPlaceQ" type="search" autocomplete="off" placeholder="Search a name or a street">
-      <select id="cfPlace">${placeOptions(places, "", place || "")}</select></label>
-    <label class="fld"><span>Type of place <small>optional with a place, needed without one</small></span>
-      <select id="cfCat"><option value="">—</option>
-        ${CATEGORIES.map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join("")}
-      </select></label>
-    <label class="fld"><span>Dish <small>optional</small></span>
-      <select id="cfDish">${dishOptionsFor(place, { places, dishes })}</select></label>
-    <label class="fld"><span>What you paid <small>optional</small></span>
-      <input id="cfPaid" type="number" inputmode="numeric" placeholder="50000"></label>
-    <label class="fld"><span>Rating <small>optional</small></span>
-      <select id="cfStars"><option value="">—</option>
-        ${[5,4,3,2,1].map((n) => `<option value="${n}">${"★".repeat(n)}</option>`).join("")}
-      </select></label>
-    <label class="fld row2"><input id="cfReturn" type="checkbox"><span>I'd come back</span></label>
-    <label class="fld"><span>Note <small>optional, 600 max</small></span>
-      <textarea id="cfBody" maxlength="600" rows="3"></textarea></label>
-    <label class="fld"><span>Photo <small>optional</small></span>
-      <input id="cfPhoto" type="file" accept="image/*"></label>
+    <h3 class="fbh">Create post</h3>
+    <div class="fbwho">
+      <span class="fbav" aria-hidden="true">${esc(ten[0].toUpperCase())}</span>
+      <span><b>${esc(ten)}</b>
+        <span class="fbaud">${esc(chan)}</span></span>
+    </div>
+    <textarea id="cfBody" class="fbtext" maxlength="600" rows="4"
+      placeholder="What did you eat here, and what did you pay?"></textarea>
+
     <div id="cfNear" class="cnear" aria-live="polite"></div>
-    <label class="fld row2"><input id="cfLoc" type="checkbox"><span>Show where I took this on the photo map</span></label>
-    <p class="src" id="cfLocNote">Off by default. If you turn it on, the pin sits within about 30 m of where the photo was taken —
-      from the photo's own location, or your phone's if the photo has none (your phone will ask permission).
-      Left off, the pin sits at the place you chose.</p>
+
+    <div class="fbadd" role="group" aria-label="Add to your post">
+      <span class="fbadd-t">Add to your post</span>
+      <details class="fbtool">
+        <summary aria-label="Photo" title="Photo">${ic.photo}</summary>
+        <div class="fbtray">
+          <label class="fld"><span>Photo <small>optional</small></span>
+            <input id="cfPhoto" type="file" accept="image/*"></label>
+        </div>
+      </details>
+      <details class="fbtool">
+        <summary aria-label="Place" title="Place">${ic.place}</summary>
+        <div class="fbtray">
+          <label class="fld"><span>Place <small>or leave empty and share the photo's location below</small></span>
+            <input id="cfPlaceQ" type="search" autocomplete="off" placeholder="Search a name or a street">
+            <select id="cfPlace">${placeOptions(places, "", place || "")}</select></label>
+          <label class="fld"><span>Type of place <small>optional with a place, needed without one</small></span>
+            <select id="cfCat"><option value="">—</option>
+              ${CATEGORIES.map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join("")}
+            </select></label>
+          <label class="fld"><span>Dish <small>optional</small></span>
+            <select id="cfDish">${dishOptionsFor(place, { places, dishes })}</select></label>
+        </div>
+      </details>
+      <details class="fbtool">
+        <summary aria-label="Price" title="Price">${ic.price}</summary>
+        <div class="fbtray">
+          <label class="fld"><span>What you paid <small>optional</small></span>
+            <input id="cfPaid" type="number" inputmode="numeric" placeholder="50000"></label>
+        </div>
+      </details>
+      <details class="fbtool">
+        <summary aria-label="Rating" title="Rating">${ic.star}</summary>
+        <div class="fbtray">
+          <label class="fld"><span>Rating <small>optional</small></span>
+            <select id="cfStars"><option value="">—</option>
+              ${[5,4,3,2,1].map((n) => `<option value="${n}">${"★".repeat(n)}</option>`).join("")}
+            </select></label>
+        </div>
+      </details>
+      <details class="fbtool">
+        <summary aria-label="Recommend" title="Recommend">${ic.thumb}</summary>
+        <div class="fbtray">
+          <label class="fld row2"><input id="cfRcm" type="checkbox"><span>Recommend this place to other travellers
+            <small>counts toward the travellers' list, not a score from Nón Lá</small></span></label>
+          <label class="fld row2"><input id="cfReturn" type="checkbox"><span>I'd come back</span></label>
+        </div>
+      </details>
+      <details class="fbtool">
+        <summary aria-label="More" title="More">${ic.more}</summary>
+        <div class="fbtray">
+          <label class="fld row2"><input id="cfLoc" type="checkbox"><span>Show where I took this on the photo map</span></label>
+          <p class="src" id="cfLocNote">Off by default. If you turn it on, the pin sits within about 30 m of where the photo was taken —
+            from the photo's own location, or your phone's if the photo has none (your phone will ask permission).
+            Left off, the pin sits at the place you chose.</p>
+        </div>
+      </details>
+    </div>
+
     <p class="cerr" id="cfErr" hidden></p>
-    <button class="btn" data-cact="submit">Post</button>
+    <button class="btn pri fbpost" data-cact="submit">Post</button>
     <button class="btn sec" data-act="close">Cancel</button>`;
 }
 

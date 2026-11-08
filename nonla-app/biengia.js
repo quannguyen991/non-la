@@ -42,7 +42,6 @@
    Không phụ thuộc DOM. Toàn hàm thuần, test.mjs kiểm được.
    ═══════════════════════════════════════════════════════════════ */
 
-export const PHIEN_BAN = 1;
 
 /* ── đơn vị bán ──────────────────────────────────────────────
    Tam Á (2026): quán đã niêm yết mà vẫn tranh chấp, vì "một phần" hay
@@ -140,94 +139,13 @@ export function soatDong(d = {}) {
 
 export const chan = (loi = []) => loi.some((x) => x.chan);
 
-/** Soát cả bảng. `muc` chỉ có ba bậc, không bậc nào nói giá cao hay thấp. */
-export function soatBang(b = {}) {
-  const dong = (b.i || []).map((d) => ({ d, loi: soatDong(d) }));
-  const thay = new Set();
-  dong.forEach((x) => {
-    const khoa = (x.d.k || String(x.d.ten || "").trim().toLowerCase()) + "|" + x.d.u;
-    if (thay.has(khoa)) x.loi.push(LOI.TRUNG);
-    thay.add(khoa);
-  });
-  const loiBang = [];
-  if (!String(b.n || "").trim()) loiBang.push({ ma: "thieuTenQuan", chan: true, vi: "Chưa có tên quán hoặc tên người bán." });
-  if (b.f != null && (b.f < 0 || b.f > 30)) loiBang.push(LOI.PHI_LA);
-  const soChan = dong.filter((x) => chan(x.loi)).length + (chan(loiBang) ? 1 : 0);
-  return {
-    dong, loiBang, soChan,
-    muc: !dong.length ? "trong" : soChan ? "dang" : "du",
-    inDuoc: dong.length > 0 && soChan === 0,
-  };
-}
-
-/* ── gói bảng giá vào đường dẫn ──────────────────────────────
-   Dạng gọn, mảng chứ không phải đối tượng, vì mỗi byte bớt đi là một ô
-   QR to hơn trên tờ A6 — và ô to hơn là quét được từ xa hơn, trong bóng
-   tối hơn. Nén deflate-raw bằng CompressionStream có sẵn trong trình
-   duyệt và Node, không phải chép thư viện nào vào. */
-const b64u = {
-  enc(bytes) {
-    let s = "";
-    for (const b of bytes) s += String.fromCharCode(b);
-    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  },
-  dec(str) {
-    const s = atob(str.replace(/-/g, "+").replace(/_/g, "/"));
-    return Uint8Array.from(s, (c) => c.charCodeAt(0));
-  },
-};
-
-async function chay(bytes, Stream) {
-  const s = new Blob([bytes]).stream().pipeThrough(new Stream("deflate-raw"));
-  return new Uint8Array(await new Response(s).arrayBuffer());
-}
-
-export function rutGon(b) {
-  return [
-    PHIEN_BAN,
-    String(b.n || "").trim(),
-    String(b.a || "").trim(),
-    b.d,
-    Number(b.f) || 0,
-    (b.i || []).map((d) => {
-      const r = [MON[d.k] ? d.k : "", MON[d.k] ? "" : String(d.ten || "").trim(), Number(d.g) || 0, d.u];
-      if (d.en && !MON[d.k]) r.push(String(d.en).trim());
-      return r;
-    }),
-  ];
-}
-
-export function moRong(a) {
-  if (!Array.isArray(a) || a[0] !== PHIEN_BAN) throw new Error("bảng giá: sai phiên bản");
-  const [, n, adr, d, f, i] = a;
-  return {
-    n, a: adr, d, f,
-    i: (i || []).map(([k, ten, g, u, en]) => ({ k: k || null, ten: ten || "", g, u, en: en || "" })),
-  };
-}
-
-export async function dongGoi(b) {
-  const json = new TextEncoder().encode(JSON.stringify(rutGon(b)));
-  return b64u.enc(await chay(json, CompressionStream));
-}
-
-export async function moGoi(chuoi) {
-  const raw = await chay(b64u.dec(String(chuoi)), DecompressionStream);
-  return moRong(JSON.parse(new TextDecoder().decode(raw)));
-}
-
-/** Đường dẫn đặt vào mã QR. `goc` là thư mục chứa bang-gia.html. */
-export async function duongDan(b, goc) {
-  return `${goc.replace(/\/?$/, "/")}bang-gia.html#g=${await dongGoi(b)}`;
-}
-
-export const layGoi = (hash = "") => (/[#&]g=([A-Za-z0-9_-]+)/.exec(hash) || [])[1] || null;
-
 /* ── đọc cho khách ───────────────────────────────────────── */
 
 export function tenMon(d, lang = "en") {
   const m = MON[d.k];
   if (m) return { chinh: m[lang] || m.en, vi: m.vi, dich: lang !== "vi" && lang !== "en" };
+  const khac = ["ko", "zh", "ja"].includes(lang) ? d[lang] : "";
+  if (khac) return { chinh: khac, vi: d.ten, dich: true };
   const en = d.en || "";
   return { chinh: lang === "vi" ? d.ten : en || d.ten, vi: d.ten, dich: false };
 }
@@ -319,14 +237,6 @@ export const cau = (khoa, lang = "en") => (CAU[khoa] || {})[lang] || (CAU[khoa] 
 export function doanNgonNgu(navLang = "en") {
   const l = String(navLang).toLowerCase().slice(0, 2);
   return NGON_NGU.includes(l) ? l : "en";
-}
-
-/** Dòng in trên tờ giấy: tối đa `toiDa` dòng, món có giá cố định trước. */
-export function dongIn(b, toiDa = 6) {
-  return b.i
-    .map((d, idx) => ({ d, idx }))
-    .sort((x, y) => (x.d.u === "thoigia") - (y.d.u === "thoigia"))
-    .slice(0, toiDa);
 }
 
 /**

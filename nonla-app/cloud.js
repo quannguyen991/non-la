@@ -185,6 +185,35 @@ export async function uploadPhoto(blob, userId, name) {
   return path;
 }
 
+/* ── Quán do người dùng thêm (supabase/places.sql) ─────────────
+   Bảng chưa chạy thì mọi hàm ở đây ném lỗi — app.js bắt và giữ quán trên máy. */
+const toPlace = (r) => ({
+  id: `user-${r.id}`, name: r.name, kind: r.kind, at: [r.lat, r.lng],
+  zone: r.zone, nguon: "user", fair: null, status: r.status,
+  luc: Date.parse(r.created_at) || 0,
+});
+
+export async function listPlaces({ zone, limit = 100 } = {}) {
+  const q = new URLSearchParams({ order: "created_at.desc", limit: String(limit), status: "eq.visible" });
+  if (zone) q.set("zone", `eq.${zone}`);
+  return (await rest(`user_places?${q}`) || []).map(toPlace);
+}
+
+export async function createPlace(q) {
+  const rows = await rest("user_places", {
+    method: "POST",
+    prefer: "return=representation",
+    body: [{ author: Auth.user()?.id, zone: q.zone, name: q.name, kind: q.kind, lat: q.at[0], lng: q.at[1] }],
+  });
+  return toPlace(rows[0]);
+}
+
+export const reportPlace = (placeId, reason) =>
+  rest("place_reports", {
+    method: "POST",
+    body: [{ place_id: String(placeId).replace(/^user-/, ""), reporter: Auth.user()?.id, reason }],
+  }).then(() => undefined);
+
 export const photoUrl = (path) =>
   path ? `${cfg().url}/storage/v1/object/public/posts/${path}` : "";
 

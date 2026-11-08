@@ -19,6 +19,7 @@ import * as Cloud from "./cloud.js";
 import * as Outbox from "./outbox.js";
 import { validate as validatePost, farFrom, summarise, priceBand, quanGanToaDo, lamTronToaDo } from "./posts.js";
 import { luatBaiDang, quyetDinh, diemKiemDuyet } from "./kiemduyet.js";
+import { layDanhGia, nhan as nhanDanhGia } from "./danhgia.js";
 import { compress, readExifGps } from "./photo.js";
 import * as AnhUI from "./anhmapui.js";
 import { mapsLinks, socialLinks, shareTargets, shareText } from "./links.js";
@@ -50,8 +51,14 @@ import * as Tien from "./tien.js";
 import * as HoChieuUI from "./hochieuui.js";
 import { bachPhanVi } from "./pricesrc.js";
 import { inferDishes } from "./eaterydish.js";
+import * as Hints from "./hints.js";
+import * as Fresh from "./freshness.js";
 import * as Lich from "./lich.js";
 import * as HanhTrinh from "./hanhtrinh.js";
+import * as GhiKeoUI from "./ghikeoui.js";
+import * as UngXu from "./ungxu.js";
+import * as BanDia from "./bandia.js";
+import * as DiaDiemMoi from "./diadiemmoi.js";
 import * as TroLy from "./trolychat.js";
 
 /* Icon mốc tham quan: ưu tiên bản AI nếu người dùng đã sinh, không thì
@@ -425,13 +432,13 @@ const stat = (id) => zone()?.items?.[id];
 const dishById = (id) => S.dishes.find((d) => d.id === id);
 
 function say(text) {
-  if (!("speechSynthesis" in window)) return toast("Speech not available on this device");
+  if (!("speechSynthesis" in window)) return toast(T("Speech not available on this device"));
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "vi-VN"; u.rate = 0.85;
   const v = speechSynthesis.getVoices().find((x) => x.lang?.startsWith("vi"));
   if (v) u.voice = v;
   speechSynthesis.cancel(); speechSynthesis.speak(u);
-  if (!v) toast("No Vietnamese voice installed — showing text only");
+  if (!v) toast(T("No Vietnamese voice installed — showing text only"));
 }
 
 /* ── nhật ký ──────────────────────────────────────────────── */
@@ -682,7 +689,7 @@ async function ocr(canvas) {
     return { text: data.text || "", conf: data.confidence ?? null };
   } catch (e) {
     console.error(e);
-    toast("Could not read that — try again or enter by hand");
+    toast(T("Could not read that — try again or enter by hand"));
     return { text: "", conf: null };
   } finally {
     busy.classList.remove("on");
@@ -724,7 +731,8 @@ function rowHTML(r) {
     ? `${T("this line says")} ${curLang() === "vi" ? r.pk.vi : r.pk.en} · ${
         T("street range does not apply")}`
     : v.level === "unknown"
-      ? (r.st ? T("Not enough data") : T("Not in our catalogue — see below"))
+      ? (r.st ? T(v.label === "Estimate only" || v.label === "Too few readings" ? v.label : "Not enough data")
+              : T("Not in our catalogue — see below"))
       : `${T("typical")} ${fmtVND(r.st.p25)}–${fmtVND(r.st.p75)}${src ? ` · ${src}` : ""}`;
   const badge = r.pk ? "own segment"
     : v.level === "ok" ? "fair"
@@ -1227,7 +1235,7 @@ function showCashResult(text, { tuHinh = null } = {}) {
      thay vì mở ra một thẻ thứ hai bắt họ tự cộng lại lần nữa. */
   if (S.chg.wantScan) {
     S.chg.wantScan = false;
-    if (!notes.length) { setEdge(null); toast("No banknotes recognised — tap them in below"); }
+    if (!notes.length) { setEdge(null); toast(T("No banknotes recognised — tap them in below")); }
     else S.chg.got.push(...notes);
     return renderChange();
   }
@@ -1393,7 +1401,7 @@ async function savePostcard() {
   const s = Postcard.tripSummary(journal.all(), { zoneNames: zoneNames() });
   const name = Postcard.fileName(s);
   const blob = await new Promise((r) => cv.toBlob(r, "image/png"));
-  if (!blob) return toast("Could not build the image");
+  if (!blob) return toast(T("Could not build the image"));
 
   const file = new File([blob], name, { type: "image/png" });
   if (navigator.canShare?.({ files: [file] })) {
@@ -1404,7 +1412,7 @@ async function savePostcard() {
   const a = document.createElement("a");
   a.href = url; a.download = name; a.click();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-  toast("Saved to your downloads");
+  toast(T("Saved to your downloads"));
 }
 
 /* ── so hai tấm thực đơn ───────────────────────────────────
@@ -1417,7 +1425,7 @@ function taxStart(rows) {
   closeSheet();
   go("scan");
   setMode("menu");
-  toast("Now scan the other menu");
+  toast(T("Now scan the other menu"));
 }
 
 function renderTax() {
@@ -1697,7 +1705,7 @@ const manualBlock = (kind = "menu") => `
 
 /* ── xử lý quét ───────────────────────────────────────────── */
 async function doScan() {
-  if (!S.ready) return toast("Still loading local prices — one moment");
+  if (!S.ready) return toast(T("Still loading local prices — one moment"));
   if (S.mode === "dish") return doDishScan();
   const c = grabFrame();
   /* Giữ một bản MÀU của khung vừa chụp: chụp nhầm vào đĩa bánh xèo ở chế độ
@@ -1750,7 +1758,7 @@ async function doKhung(c) {
    chỗ, đúng đường mà ảnh camera đi. Không có lời gọi mạng nào. */
 async function quetTepAnh(file) {
   if (!file) return;
-  if (!/^image\//.test(file.type)) return toast("Pick an image file");
+  if (!/^image\//.test(file.type)) return toast(T("Pick an image file"));
   closeSheet();
   const busy = $("#busy");
   busy.classList.add("on");
@@ -1762,7 +1770,7 @@ async function quetTepAnh(file) {
     if (S.mode === "dish") return doDishKhung(c);
     return doKhung(c);
   } catch (e) {
-    toast("Could not read that image");
+    toast(T("Could not read that image"));
   } finally {
     busy.classList.remove("on");
   }
@@ -1880,7 +1888,7 @@ function showDishGuess(top) {
 }
 
 function handleText(text, conf) {
-  if (!S.ready) return toast("Still loading local prices — one moment");
+  if (!S.ready) return toast(T("Still loading local prices — one moment"));
   if (S.mode === "cash") return showCashResult(text);
   const pairs = parseMenu(text);
   const rows = judgeRows(pairs);
@@ -2031,15 +2039,32 @@ function renderEat(filter = "") {
   const z = zone();
   const f = featured();
   const q = filter.trim().toLowerCase();
+  const norm = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase();
+  const nq = norm(filter.trim());
+
+  // Quán ăn khớp từ khoá (Google Maps / Báo chí & OSM)
+  const matchFamous = nq
+    ? (S.famous || []).filter((fm) => {
+        const text = norm(`${fm.name} ${fm.street || ""} ${fm.note || ""} ${fm.source || ""}`);
+        return text.includes(nq);
+      })
+    : [];
+  const matchedDishIds = new Set(matchFamous.map((fm) => fm.dish));
 
   // Món khác trong vùng: bỏ những món đã nằm ở hàng Signature phía trên
   const shown = new Set(f ? f.place.known : []);
-  const rest = S.dishes.filter((d) => {
-    if (!(z.items && z.items[d.id])) return false;
-    if (!q && shown.has(d.id)) return false;
-    if (!q) return true;
-    return (d.vi + " " + d.en + " " + d.aliases.join(" ")).toLowerCase().includes(q);
-  });
+  const rest = !nq
+    ? S.dishes.filter((d) => (z.items && z.items[d.id]) && !shown.has(d.id))
+    : S.dishes.filter((d) => {
+        const hitDish = norm(`${d.vi} ${d.en} ${(d.aliases || []).join(" ")}`).includes(nq);
+        const hitPlace = matchedDishIds.has(d.id);
+        return hitDish || hitPlace;
+      }).sort((a, b) => {
+        // Ưu tiên món có sẵn trong vùng hiện tại trước
+        const inA = (z.items && z.items[a.id]) ? 1 : 0;
+        const inB = (z.items && z.items[b.id]) ? 1 : 0;
+        return inB - inA;
+      });
 
   const heroDish = f ? dishById(f.dishId) : null;
   const heroStat = f ? stat(f.dishId) : null;
@@ -2123,13 +2148,32 @@ function renderEat(filter = "") {
       <span class="rule" aria-hidden="true"></span>
     </div>
     <div class="manual" style="grid-template-columns:1fr;margin-bottom:12px">
-      <input id="eatSearch" type="search" placeholder="Search a dish" value="${esc(filter)}"
-        aria-label="Search a dish">
+      <input id="eatSearch" type="search" placeholder="Search a dish or eatery" value="${esc(filter)}"
+        aria-label="Search a dish or eatery">
     </div>
+
+    ${matchFamous.length ? `
+      <div class="famous-hits" style="margin-bottom:16px">
+        <p class="kicker" style="margin:4px 0 8px">${curLang() === "vi" ? "Quán nổi tiếng khớp từ khoá" : "Eateries matching your search"} (${matchFamous.length})</p>
+        ${matchFamous.slice(0, 6).map((fm) => {
+          const d = dishById(fm.dish);
+          return `<button class="row" ${fm.at ? `data-goto="${esc(fm.at.join(","))}" data-goname="${esc(fm.name)}"` : ""}>
+            <span class="dot" data-l="unknown"></span>
+            <span>
+              <span class="nm">${esc(fm.name)}</span>
+              <span class="note">${esc(fm.street || "")}${fm.note ? ` · ${esc(fm.note)}` : ""}</span>
+              ${d ? `<span class="note" style="color:var(--brand,#0e2c24);font-weight:600">${curLang() === "vi" ? "Món" : "Dish"}: ${esc(d.vi)}</span>` : ""}
+            </span>
+            <span class="amt">${fm.phone ? esc(fm.phone) : ""}</span>
+          </button>`;
+        }).join("")}
+      </div>
+    ` : ""}
+
     <div class="dish-list">
       ${rest.length
         ? rest.map((d) => dishCardHTML(d.id)).join("")
-        : `<p class="muted">Nothing matches “${esc(filter)}”.</p>`}
+        : (!matchFamous.length ? `<p class="muted">Nothing matches “${esc(filter)}”.</p>` : "")}
     </div>
 
     <p class="seedwarn">Prices shown are the local typical range, not what any one place
@@ -2197,7 +2241,10 @@ function showDish(id) {
     <div class="tagrow">${d.tags.map((t) => `<span class="tg ${tagCls(t)}">${esc(t)}</span>`).join("")}${d.spice === "hot" ? '<span class="tg hot">Spicy</span>' : ""}</div>
     ${st ? `<div class="card"><p class="kicker">Local price</p>
         <p style="font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:3px">${fmtVND(st.p25)} – ${money(st.p75)}</p>
-        <p class="src">Typical range in ${esc(zone().name)} · ${esc(zone().updated)}</p></div>` : ""}
+        <p class="src">Typical range in ${esc(zone().name)} · ${esc(zone().updated)}${Fresh.freshness(zone().updated) === "stale" ? " · dữ liệu cũ, hãy hỏi giá tại quán" : ""}</p></div>` : ""}
+    ${(() => { const h = Hints.hintFor(id, curLang());
+      return h ? `<div class="card"><p class="kicker">Before you order</p>
+        <p>${esc(h.text)}</p>${h.source ? `<p class="src">Source: ${esc(h.source)}</p>` : ""}</div>` : ""; })()}
     ${storyHTML(d)}
     ${whyHTML(id)}
     ${whereToEat(id)}
@@ -2255,7 +2302,9 @@ function whereToEat(dishId) {
   const osm = (S.eateries || [])
     .filter((e) => needles.some((n) => n.length > 3 && bare(e.name).includes(n)))
     .filter((e) => !tracked.some((p) => p.at && distance(e.at, p.at) < 40))
-    .slice(0, 8);
+    /* Gần nhất trước, ba quán là đủ: spec "quán gần bạn" không phải danh sách. */
+    .sort((a, b) => (S.me ? distance(S.me, a.at) - distance(S.me, b.at) : 0))
+    .slice(0, 3);
 
   const fam0 = (S.famous || []).filter((f) => f.dish === dishId);
   if (!tracked.length && !osm.length && !fam0.length) return "";
@@ -2652,7 +2701,6 @@ function renderMap() {
   $("#mapBody").innerHTML = `
     <div class="ex-head">
       <div class="nb-topbar">
-        <span class="pag" aria-hidden="true">${I.pagoda}</span>
         <span class="kick">${esc(zoneEn())}</span>
       </div>
       <button class="nb-bell" aria-label="Notifications" data-act="notif">${I.bell}</button>
@@ -3019,6 +3067,7 @@ function showPlace(id, metres = null) {
     <p class="src">${[diaChi(p), TIER_EN[p.tier] || p.tier, CoSo.dong(dg),
       metres != null ? `${fmtDistance(metres)} away` : ""].filter(Boolean).map(esc).join(" · ")}</p>
     <div style="margin-top:9px">${pill}</div>
+    ${compassHTML(p)}
     ${chiTietOSM(p)}
     ${wave()}
     ${dg.muc === "high" ? `<div class="warnbox">${I.alert}<span>Worth checking a few
@@ -3355,7 +3404,15 @@ function accountHTML() {
         <button class="btn sec" data-act="authSave"${stale ? " disabled" : ""}>Save name</button>
         <button class="btn sec" data-act="authOut">Sign out</button>
       </div>
-      ${stale ? `<p class="src">Showing your saved profile. Reconnect to sync.</p>` : ""}
+      ${stale ? `<p class="src">Showing your saved profile. Reconnect to sync.</p>` : `
+      <div class="pw-box">
+        <h3 class="pw-h">Change password</h3>
+        <div class="manual" style="grid-template-columns:1fr">
+          <input id="pwNew" type="password" autocomplete="new-password" minlength="6" placeholder="New password (6+ characters)">
+          <input id="pwNew2" type="password" autocomplete="new-password" minlength="6" placeholder="Repeat new password" style="margin-top:8px">
+        </div>
+        <button class="btn sec" data-act="pwChange" style="margin-top:8px">Change password</button>
+      </div>`}
     </div>`;
   }
 
@@ -3393,6 +3450,7 @@ function accountHTML() {
       <button class="btn sec" data-act="authUp"${busy ? " disabled" : ""}>Create account</button>
     </div>
     ${err ? `<div class="warnbox">${I.alert}<span>${esc(err)}</span></div>` : ""}
+    <button class="btn sec" data-act="pwForgot">Forgot password?</button>
     <button class="btn sec" data-act="authForget">Disconnect project</button>
   </div>`;
 }
@@ -3417,7 +3475,7 @@ const SPLIT_MAX = 8;
 
 function openSplit() {
   const rows = (S.billRows || []).filter((r) => r.price > 0);
-  if (!rows.length) return toast("Nothing to split");
+  if (!rows.length) return toast(T("Nothing to split"));
   S.split = {
     n: 2,
     // Mặc định mọi dòng thuộc về cả bàn — cách đúng trong đa số bữa ăn.
@@ -3518,19 +3576,19 @@ function stopWatch() {
 }
 
 function toggleWatch() {
-  if (S.watch) { stopWatch(); renderMe(); return toast("Walking alerts off"); }
-  if (!navigator.geolocation) return toast("Location not available on this device");
+  if (S.watch) { stopWatch(); renderMe(); return toast(T("Walking alerts off")); }
+  if (!navigator.geolocation) return toast(T("Location not available on this device"));
   S.warned = new Set();
   S.watch = navigator.geolocation.watchPosition(
     (pos) => {
       S.me = [pos.coords.latitude, pos.coords.longitude];
       checkNearby();
     },
-    () => { stopWatch(); renderMe(); toast("Could not follow your location"); },
+    () => { stopWatch(); renderMe(); toast(T("Could not follow your location")); },
     { enableHighAccuracy: false, maximumAge: 20_000, timeout: 25_000 },
   );
   renderMe();
-  toast("On — I'll say something if you walk past one");
+  toast(T("On — I'll say something if you walk past one"));
 }
 
 function checkNearby() {
@@ -3623,6 +3681,104 @@ function openHoChieu(placeId) {
   });
 }
 
+/* Deal Recorder — câu chốt giá nói miệng thành một thẻ hai bên cùng đọc. */
+function openGhiKeo() {
+  GhiKeoUI.open({
+    host: $("#v-ghikeo"),
+    noi: zoneEn(),
+    toaDo: () => S.me || null,
+    T,
+    onClose: () => {},
+  });
+}
+
+/* ── Quán do người dùng tự thêm ─────────────────────────────────
+   Nằm trên MÁY (localStorage, danh sách nhỏ), nhập vào S.eateries như một quán
+   OSM: có chấm trên bản đồ, đăng bài vào được, nhưng KHÔNG có nhãn giá. Phía máy
+   chủ: supabase/places.sql + cloud.js (createPlace/listPlaces), đẩy lên khi đã đăng nhập. */
+const KHO_QUAN_MOI = "nl-user-places";
+function quanMoiDaLuu() {
+  try { return JSON.parse(localStorage.getItem(KHO_QUAN_MOI) || "[]"); } catch { return []; }
+}
+function nhapQuanMoi() {
+  const ds = quanMoiDaLuu();
+  const co = new Set((S.eateries || []).map((e) => e.id));
+  for (const q of ds) if (q && q.at && !co.has(q.id)) S.eateries.push(q);
+  /* Quán của người khác từ máy chủ: nền, một lần, im lặng nếu không có. */
+  if (Cloud.ready() && navigator.onLine !== false && !S.placesPulled) {
+    S.placesPulled = true;
+    Cloud.listPlaces({ zone: S.zone }).then((rows) => {
+      const dd = new Set((S.eateries || []).map((e) => e.id));
+      for (const q of rows) if (!dd.has(q.id)) S.eateries.push(q);
+    }).catch(() => {});
+  }
+}
+
+function openAddPlace() {
+  const mine = S.me;
+  openSheet(`
+    <h3>${esc(T("Add a place that is missing"))}</h3>
+    <p class="src">${esc(mine
+      ? T("It will be pinned where you are standing now.")
+      : T("Turn on location first, then stand at the place."))}</p>
+    <label class="gk-lab" for="apName">${esc(T("Name"))}</label>
+    <input id="apName" class="gk-in" type="text" maxlength="80" autocomplete="off">
+    <label class="gk-lab" for="apKind">${esc(T("Kind"))}</label>
+    <select id="apKind" class="gk-in">
+      <option value="restaurant">${esc(T("Restaurant"))}</option>
+      <option value="cafe">${esc(T("Cafe"))}</option>
+      <option value="street">${esc(T("Street stall"))}</option></select>
+    <p class="seedwarn">${esc(T("A place you add never gets a Fair Price badge. That only comes from real menu scans."))}</p>
+    <p id="apMsg" class="gk-warn" role="alert"></p>
+    <button class="btn pri" data-act="addPlaceSave"${mine ? "" : " disabled"}>${esc(T("Add here"))}</button>
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
+}
+
+const LOI_QUAN_MOI = {
+  name: "Give it a name of 2 to 80 characters.",
+  kind: "Pick a kind.",
+  position: "Turn on location first.",
+  "outside-zone": "You are outside the area this region covers.",
+  zone: "Pick a region first.",
+  duplicate: "A place with this name is already here.",
+};
+
+function saveAddPlace() {
+  const name = $("#apName")?.value || "";
+  const kind = $("#apKind")?.value || "";
+  const vung = Object.fromEntries(Object.entries(S.maps).map(([k, z]) => [k, { bbox: z.bbox }]));
+  const kq = DiaDiemMoi.kiemTra({ name, kind, at: S.me, zone: S.zone },
+    { vung, quans: (S.eateries || []).filter((e) => e.zone === S.zone) });
+  const msg = $("#apMsg");
+  if (!kq.ok) {
+    if (msg) msg.textContent = T(LOI_QUAN_MOI[kq.loi[0]] || "Could not add it.")
+      + (kq.trung ? ` (${kq.trung.quan.name}, ${kq.trung.m} m)` : "");
+    return;
+  }
+  const q = DiaDiemMoi.dungQuan({ name: kq.ten, kind, at: S.me, zone: S.zone }, { luc: Date.now() });
+  try { localStorage.setItem(KHO_QUAN_MOI, JSON.stringify([q, ...quanMoiDaLuu()].slice(0, 50))); }
+  catch { /* bị chặn: quán vẫn hiện trong phiên này */ }
+  S.eateries.push(q);
+  /* Đã đăng nhập thì thử đẩy lên máy chủ để người khác thấy; lỗi (bảng chưa chạy,
+     mất mạng, quá 3 quán/giờ) thì quán vẫn ở lại trên máy, không báo lỗi giả. */
+  if (Cloud.ready() && Auth.signedIn() && navigator.onLine !== false) Cloud.createPlace(q).catch(() => {});
+  closeSheet();
+  toast(T("Place added"));
+  if (S.tab === "me") renderMe();
+}
+
+/* Điểm đóng góp: số đếm, hệ số công khai, không xếp hạng. Bài đọc từ sổ tay trên máy. */
+function contribHTML() {
+  const mine = quanMoiDaLuu().length;
+  const posts = S.notes ?? 0;
+  const d = DiaDiemMoi.diemDongGop({ post: posts, place: mine });
+  if (!d.tong) return "";
+  const ten = { post: "posts", place: "places added" };
+  return `<p class="src" style="margin-top:8px">${esc(T("Your contribution"))}: <b>${d.tong}</b>
+    — ${d.chiTiet.filter((x) => x.so).map((x) => `${x.so} × ${x.he} (${esc(T(ten[x.k] || x.k))})`).join(" + ")}.
+    ${esc(T("A count of what you did, not a ranking."))}</p>`;
+}
+
 function openPhieu() {
   const nguon = S.preorder?.rows || [];
   if (!nguon.length) return toast(T("Scan a menu first"));
@@ -3670,7 +3826,7 @@ function download(obj, name) {
 
 async function exportSurvey() {
   const doc = await Survey.exportAll();
-  if (!doc.rows.length) return toast("Nothing surveyed yet");
+  if (!doc.rows.length) return toast(T("Nothing surveyed yet"));
   download(doc, `non-la-survey-${new Date().toISOString().slice(0, 10)}.json`);
   toast(`${doc.rows.length} prices downloaded`);
 }
@@ -3682,7 +3838,7 @@ async function exportSurvey() {
 async function buildPriceTable() {
   const { doc, changed, pending } = await Survey.buildPrices(
     { zones: S.prices, _fx: S.fx });
-  if (!changed.length && !pending.length) return toast("Nothing surveyed yet");
+  if (!changed.length && !pending.length) return toast(T("Nothing surveyed yet"));
   const dn = (id) => dishById(id)?.vi || id;
   setEdge(null);
   openSheet(`
@@ -3743,9 +3899,9 @@ const KIND_LABEL = {
 function applyLocalPrices() {
   const zones = LocalPrices.extract(S._builtPrices, S._builtChanged || []);
   const n = LocalPrices.count({ zones }, S.shipped);
-  if (!n) return toast("Nothing ready to apply yet");
+  if (!n) return toast(T("Nothing ready to apply yet"));
   if (!LocalPrices.save(zones, new Date().toISOString())) {
-    return toast("This browser will not let the app save anything");
+    return toast(T("This browser will not let the app save anything"));
   }
   S.localPrices = LocalPrices.load();
   S.prices = LocalPrices.merge(S.shipped, S.localPrices);
@@ -3762,7 +3918,7 @@ function dropLocalPrices() {
   S.localPrices = LocalPrices.load();
   S.prices = S.shipped;
   renderMe();
-  toast("Back to the prices that shipped with the app");
+  toast(T("Back to the prices that shipped with the app"));
 }
 
 function dataStats() {
@@ -3835,6 +3991,9 @@ function dataHTML() {
           chỗ của bốn tab họ dùng hằng ngày. */""}
     <button class="btn sec" data-act="surveyOpen" style="margin-top:12px">
       ${I.camera}${esc(T("Survey prices here"))}</button>
+    <button class="btn sec" data-act="gkOpen" style="margin-top:12px">${esc(T("Record a deal"))}</button>
+    <button class="btn sec" data-act="addPlaceOpen" style="margin-top:12px">${esc(T("Add a place that is missing"))}</button>
+    ${contribHTML()}
     <p class="src" style="margin-top:6px">Every reference price in this build is an
       estimate, not a field survey. This is how you replace them with real ones.</p>
 
@@ -4076,6 +4235,10 @@ function renderMe() {
         sub: "Prices, dishes and the reader live here. Nothing you scan is uploaded.",
         value: `<span id="cacheState">Checking…</span>` })}
 
+      ${youRow({ icon: I.shield, label: "Storage used", tag: "div", chev: false,
+        sub: "Everything this app keeps on this phone: maps, artwork, photos, your history",
+        value: `<span id="storeUse">Checking…</span>` })}
+
       ${youRow({ icon: I.play, label: "Replay the tour", act: "replayIntro",
         sub: "The four screens from the first launch" })}
 
@@ -4124,6 +4287,10 @@ function renderMe() {
   caches?.keys?.().then((k) => {
     $("#cacheState").textContent = k.length ? "Cached and ready" : "Not cached yet";
   }).catch(() => { $("#cacheState").textContent = "Unavailable"; });
+  navigator.storage?.estimate?.().then((e) => {
+    const mb = (e.usage || 0) / 1048576;
+    $("#storeUse").textContent = mb < 1 ? `${Math.round(e.usage / 1024)} KB` : `${mb.toFixed(1)} MB`;
+  }).catch(() => { $("#storeUse").textContent = "Unavailable"; });
 }
 
 /* ── màn hình bản đồ chi tiết ─────────────────────────────
@@ -4133,7 +4300,7 @@ function renderMe() {
    chiếm trọn màn hình, và trả lại khi đóng. */
 function openFoodMap() {
   const geo = S.maps[S.zone];
-  if (!geo) return toast("No map for this area yet");
+  if (!geo) return toast(T("No map for this area yet"));
   $("#v-foodmap").hidden = false;
   $(".tabbar").hidden = true;
   FoodMap.open({
@@ -4226,7 +4393,16 @@ async function openExplore(geo) {
     note: `${nFair} fair-price · ${nHigh} above range in ${zoneEn().replace(" · ", " ")}`,
     start: { center: geo.center, zoom: 14.2 },
     pins, rows, chips, keepPin, keepRow, dots: dotsFor("", ""), dotsFor, showDots: true,
-    imgOf: (x) => (x.kind === "sight" && x.lm.img ? `assets/sights/${x.lm.img}.jpg` : ""),
+    imgOf: (x) => {
+      if (x.kind === "sight") return x.lm.img ? `assets/sights/${x.lm.img}.jpg` : "";
+      // Quán có món đã biết thì lấy tranh món đầu tiên (mọi mã trong known đều có tranh
+      // trong assets/dishes/). Quán chưa có món nào thì không có ảnh — không bịa tranh.
+      const k = (x.place.known || [])[0];
+      if (k) return `assets/dishes/${k}.jpg`;
+      // Chưa có món nào: tranh minh hoạ theo loại quán. anhmapui.js ghi rõ đó là minh hoạ.
+      const loai = ["cafe", "street", "restaurant"].includes(x.place.tier) ? x.place.tier : "restaurant";
+      return `assets/illus/quan-${loai}.jpg`;
+    },
     cardOf: (x) => {
       if (x.kind === "sight") return { title: x.lm.n, sub: x.zname, bg: "#5B4A1E" };
       const p = x.place, d = dgOf(p).muc;
@@ -4307,6 +4483,24 @@ const likelyDishesHTML = anToan(function (e) {
     <p class="src">${esc(T("Worked out from the name on the sign, not from a menu we have read."))}</p>`;
 });
 
+/* Khối đánh giá Google của một quán. Lấy lúc mở thẻ, không lưu (điều khoản Google
+   chỉ cho giữ place_id lâu dài). Lỗi hay chưa bật khoá thì khối đơn giản không hiện. */
+async function ratingBlock(e) {
+  const r = await layDanhGia(e);
+  const el = $("#gRate");
+  if (!r || r.sao == null || !el) return;
+  const tag = nhanDanhGia(r);
+  el.hidden = false;
+  el.innerHTML = `<div class="grate">
+      <span class="grate-n">${r.sao.toFixed(1)}</span>
+      <span class="grate-t">${esc(T("on Google"))} · ${r.luot.toLocaleString()} ${esc(T("reviews"))}</span>
+      ${tag === "good" ? `<span class="pill ok">${esc(T("Well reviewed"))}</span>`
+        : tag === "few" ? `<span class="pill unknown">${esc(T("Few reviews"))}</span>` : ""}
+      ${r.uri ? `<a class="grate-l" href="${esc(r.uri)}" target="_blank" rel="noopener noreferrer">Google Maps</a>` : ""}
+    </div>
+    <p class="seedwarn">${esc(T("Rating and review count from Google, shown as Google reports them. Nón Lá does not score places."))}</p>`;
+}
+
 function showEatery(e, metres = null) {
   setEdge(null);
   const KIND = { restaurant: "Restaurant", cafe: "Café", street: "Street food" };
@@ -4322,6 +4516,8 @@ function showEatery(e, metres = null) {
     <div style="margin-top:9px">${
       tracked ? `<span class="pill unknown">${I.question}Price data under “${esc(tracked.name)}”</span>`
               : `<span class="pill unknown">${I.question}No price data yet</span>`}</div>
+    <div id="gRate" hidden></div>
+    ${compassHTML(e)}
     ${wave()}
     ${likelyDishesHTML(e)}
     ${e.hours ? `<h2 class="sect">Opening hours</h2>
@@ -4349,6 +4545,8 @@ function showEatery(e, metres = null) {
     <p class="seedwarn">Name, address and position from OpenStreetMap contributors (ODbL),
       not from Nón Lá. Details can be out of date — shops in the old town change hands often.</p>
     <button class="btn sec" data-act="close">Close</button>`);
+
+  ratingBlock(e);
 }
 
 /* Thẻ một điểm tham quan. Tên Việt để to nhất — đó là thứ viết trên biển
@@ -4364,6 +4562,33 @@ const MARK_KIND = {
   craft: "Workshop", lake: "Lake", church: "Church", civic: "Civic building",
   heritage: "Heritage site", sight: "Sight",
 };
+/* Culture Lens: phép tắc phổ biến của LOẠI nơi này. Không có nội dung cho loại
+   đó thì không có khối — luật 1 của ungxu.js. Dòng cuối khai giới hạn. */
+function ungxuHTML(lm) {
+  const cb = S.ungxu && UngXu.canhBao(lm, S.ungxu);
+  if (!cb) return "";
+  return `<h2 class="sect">${esc(T("Etiquette"))}</h2>
+    <div class="warnbox infobox" style="display:block">
+      <ul class="ux-list">${cb.ghiChu.map((g) => `<li>${esc(T(g.en))}</li>`).join("")}</ul>
+      <p class="src" style="margin-top:6px">${esc(T(cb.gioiHan.en))}</p>
+    </div>`;
+}
+
+/* Local Compass: chỉ số SUY RA, kèm lý do. Không đủ tín hiệu thì không hiện gì. */
+function compassHTML(p) {
+  if (!p.at) return "";
+  const moc = Object.values(S.maps || {}).flatMap((z) => z.landmarks || []).filter((l) => l.star);
+  const dg = BanDia.danhGia(p, moc);
+  if (!dg.nhan) return "";
+  const nh = BanDia.NHAN[dg.nhan];
+  const lyDo = dg.tinHieu.filter((t) => t.diem !== 0).map((t) => t.en);
+  return `<details class="compass"><summary><b>${esc(T(nh.en))}</b>
+      <small>${esc(T("inferred, not measured"))}</small></summary>
+    <ul class="ux-list">${lyDo.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+    <p class="src">${esc(T("Worked out from opening hours, distance to major sights and the name. It says who tends to come, not how good or fairly priced the place is."))}</p>
+  </details>`;
+}
+
 function showMark(lm, metres = null) {
   setEdge(null);
   History.add("sight", { id: lm.img || lm.n, label: lm.n, kindOf: lm.t, zone: S.zone })
@@ -4399,6 +4624,7 @@ function showMark(lm, metres = null) {
       : `<div class="warnbox infobox">${I.clock}<span>No place near this sight is being
         tracked yet. That means no price data — not that the food here is bad.</span></div>`}
 
+    ${ungxuHTML(lm)}
     ${outsideHTML({ name: lm.n, at: lm.at, kind: "sight", addr: lm.en || "",
       tags: [lm.n, lm.en || ""] })}
     <button class="btn sec" data-act="shareThing" data-name="${esc(lm.n)}"
@@ -4418,9 +4644,9 @@ function showMark(lm, metres = null) {
 function openWalk() {
   const geo = S.maps[S.zone];
   const def = geo?.routes?.[0];
-  if (!def) return toast("No walking route for this area yet");
+  if (!def) return toast(T("No walking route for this area yet"));
   const route = resolveRoute(def, geo, S.places);
-  if (!route) return toast("That route is missing its stops");
+  if (!route) return toast(T("That route is missing its stops"));
   $("#v-bigmap").hidden = false;
   $(".tabbar").hidden = true;
   BigMap.openRoute({
@@ -4539,7 +4765,7 @@ function needAuth() {
      ngõ cụt — nhánh "lưu vào máy này" mới là đường đi được. Auth.thamDo()
      hỏi máy chủ, app không tự chép một cờ vào mã. */
   if (!Auth.sanSangMatKhau()) {
-    toast("Accounts are off in this build — it saved to this phone instead");
+    toast(T("Accounts are off in this build — it saved to this phone instead"));
     return Promise.resolve(false);
   }
   return new Promise((resolve) => {
@@ -4566,7 +4792,7 @@ const THREAD_EXTRA = [];
 
 async function openThread(id) {
   const post = Community.findPost(id, THREAD_EXTRA);
-  if (!post) return toast("That post is no longer here");
+  if (!post) return toast(T("That post is no longer here"));
   openSheet(`<h3>Discussion</h3><p class="src">Loading…</p>`);
   const t = await Community.loadThread(post);
   openSheet(Community.threadHtml(post, t));
@@ -4592,13 +4818,13 @@ async function sendComment(postId) {
       await Cloud.createComment(post.id, body);
     } catch (e) {
       busy(false);
-      if (e.status === 403 && e.code === "42501") return toast("You've commented 20 times this hour. Try again later.");
-      return toast("Could not post that comment — please try again.");
+      if (e.status === 403 && e.code === "42501") return toast(T("You've commented 20 times this hour. Try again later."));
+      return toast(T("Could not post that comment — please try again."));
     }
     busy(false);
   }
   post.commentCount = (Number(post.commentCount) || 0) + 1;
-  toast("Comment posted");
+  toast(T("Comment posted"));
   await openThread(post.id);
   if (S.tab === "community") Community.refresh();
 }
@@ -4607,9 +4833,9 @@ async function deleteComment(id, local) {
   try {
     if (local) await Local.removeComment(id);
     else await Cloud.deleteComment(id);
-  } catch { return toast("Could not delete that comment"); }
+  } catch { return toast(T("Could not delete that comment")); }
   const postId = $("[data-cact='csend']")?.dataset.post;
-  toast("Comment deleted");
+  toast(T("Comment deleted"));
   if (postId) {
     const post = Community.findPost(postId, THREAD_EXTRA);
     if (post) post.commentCount = Math.max(0, (Number(post.commentCount) || 1) - 1);
@@ -4633,7 +4859,7 @@ async function sendCommentReport(id, reason) {
   closeSheet();
   try {
     await Cloud.reportComment(id, reason);
-    toast("Reported — thank you");
+    toast(T("Reported — thank you"));
   } catch (e) {
     toast(e.status === 409 ? "You already reported this comment" : "Could not send the report");
   }
@@ -4724,6 +4950,7 @@ function readDraft() {
     photo: $("#cfPhoto")?.files?.[0] || null,
     coords: null,
     category: $("#cfCat")?.value || null,
+    recommend: !!$("#cfRcm")?.checked,
     ...viTriBai(),
   };
 }
@@ -4811,7 +5038,7 @@ async function submitPost() {
         // lỗi mạng nên không được đẩy vào hàng chờ. Nói thẳng và dừng ở đây,
         // sheet vẫn mở, draft vẫn nguyên: người dùng chọn ảnh khác rồi bấm
         // Post lại.
-        toast("That photo could not be read");
+        toast(T("That photo could not be read"));
         return;
       }
       coords = c.coords;
@@ -4822,7 +5049,7 @@ async function submitPost() {
     const far = farFrom(place, coords || S.me);
     await Cloud.createPost({ ...draft, photo: null }, { photoPath, photoHash, far });
     closeSheet();
-    toast("Posted — thank you");
+    toast(T("Posted — thank you"));
     renderCommunity();
   } catch (e) {
     // Vượt rate limit là lỗi RLS, không phải lỗi mạng — nói đúng chuyện. Khớp
@@ -4830,17 +5057,17 @@ async function submitPost() {
     // .status (xem cloud.js), và một lỗi 403 từ Storage không liên quan gì tới
     // giới hạn đăng bài — gộp chung sẽ báo sai lý do.
     if (e.status === 403 && e.code === "42501") {
-      toast("You've posted 5 times this hour. Try again later.");
+      toast(T("You've posted 5 times this hour. Try again later."));
     } else if (e.status != null && e.status >= 400 && e.status < 500) {
       // 4xx còn lại là lỗi CỐ ĐỊNH của chính yêu cầu (Storage từ chối tệp,
       // token hỏng…) — thử lại y hệt trong hàng chờ sẽ hỏng y hệt. Nói thẳng,
       // đừng chôn nó vào hàng chờ chỉ để nó âm thầm hỏng lần nữa.
-      toast("Could not post that — please try again.");
+      toast(T("Could not post that — please try again."));
     } else {
       // Còn lại mới thật sự là "có thể tự khỏi": mất mạng, hoặc máy chủ lỗi
       // tạm thời (5xx). Chỉ nhóm này đáng để hàng chờ thử lại giúp.
       await Outbox.queue({ ...draft });
-      toast("No connection — saved to send later");
+      toast(T("No connection — saved to send later"));
       closeSheet();
       renderCommunity();
     }
@@ -4860,7 +5087,7 @@ async function submitPostLocally(draft) {
         const c = await compress(draft.photo);
         blob = c.blob; coords = c.coords;
       } catch {
-        toast("That photo could not be read");
+        toast(T("That photo could not be read"));
         return;
       }
     }
@@ -4873,7 +5100,7 @@ async function submitPostLocally(draft) {
     // thì viết bài xong mở tab You vẫn thấy con số cũ cho tới lần tải lại.
     S.notes = null;
     closeSheet();
-    toast("Saved to this phone");
+    toast(T("Saved to this phone"));
     renderCommunity();
   } catch (e) {
     // IndexedDB đầy hoặc bị chặn (chế độ riêng tư). Nói ra chứ đừng im lặng
@@ -4909,8 +5136,18 @@ function go(tab) {
   // Bản đồ xem trước giữ một ResizeObserver; rời tab mà không gỡ thì mỗi lần
   // quay lại lại chồng thêm một cái nữa và khung vẽ lại nhiều lần mỗi frame.
   if (tab !== "map") { S.exMap?.destroy(); S.exMap = null; }
+  const prev = S.tab;
   S.tab = tab;
   for (const t of ["scan", "eat", "map", "journal", "community", "me"]) $("#v-" + t).hidden = t !== tab;
+  // Chuyển tab: trượt theo đúng chiều thứ tự thanh tab (sang phải thì trượt từ phải vào).
+  // Lớp hoạt ảnh được gỡ khi chạy xong để lần sau có thể chạy lại.
+  if (prev && prev !== tab) {
+    const order = ["scan", "eat", "map", "journal", "community", "me"];
+    const v = $("#v-" + tab);
+    v.style.setProperty("--dir", order.indexOf(tab) > order.indexOf(prev) ? 1 : -1);
+    v.classList.remove("tr-in"); void v.offsetWidth; v.classList.add("tr-in");
+    v.addEventListener("animationend", () => v.classList.remove("tr-in"), { once: true });
+  }
   renderTabs();
   TroLy.syncTab(tab);
   if (tab === "scan") {
@@ -5055,7 +5292,7 @@ document.addEventListener("click", async (ev) => {
     closeSheet();
     go("scan");
     setMode("cash");
-    toast("Point at the change and tap the shutter");
+    toast(T("Point at the change and tap the shutter"));
     return;
   }
 
@@ -5097,7 +5334,7 @@ document.addEventListener("click", async (ev) => {
   }
   const stp = el("[data-stop]");
   if (stp) return BigMap.setStop(Number(stp.dataset.stop));
-  if (el("[data-act='rtAudio']")) return toast("Audio guide arrives with the community layer");
+  if (el("[data-act='rtAudio']")) return toast(T("Audio guide arrives with the community layer"));
   if (el("[data-act='rtSave']")) {
     const st = BigMap.routeState();
     if (!st) return;
@@ -5113,7 +5350,7 @@ document.addEventListener("click", async (ev) => {
     // clipboard. Im lặng không làm gì là cách tệ nhất.
     if (navigator.share) return navigator.share({ title: st.route.name, text: txt }).catch(() => {});
     return navigator.clipboard?.writeText(txt)
-      .then(() => toast("Route copied"), () => toast("Could not share on this device"));
+      .then(() => toast(T("Route copied")), () => toast(T("Could not share on this device")));
   }
 
   /* Chỉ đường tới một địa điểm. Có vị trí người dùng thì gửi cả điểm đầu,
@@ -5143,16 +5380,16 @@ document.addEventListener("click", async (ev) => {
   // ── tài khoản ──
   if (el("[data-act='authCfg']")) {
     const u = $("#sbUrl")?.value, k = $("#sbKey")?.value;
-    if (!Auth.configure(u, k)) return toast("Need a project URL and an anon key");
+    if (!Auth.configure(u, k)) return toast(T("Need a project URL and an anon key"));
     Auth.thamDo().then(renderMe);
     renderMe();
-    return toast("Project connected");
+    return toast(T("Project connected"));
   }
-  if (el("[data-act='authForget']")) { Auth.configure("", ""); renderMe(); return toast("Project disconnected"); }
+  if (el("[data-act='authForget']")) { Auth.configure("", ""); renderMe(); return toast(T("Project disconnected")); }
   if (el("[data-act='authIn']") || el("[data-act='authUp']")) {
     const up = !!el("[data-act='authUp']");
     const em = $("#acctEmail")?.value?.trim(), pw = $("#acctPass")?.value || "";
-    if (!em || pw.length < 6) return toast("Email and a password of 6+ characters");
+    if (!em || pw.length < 6) return toast(T("Email and a password of 6+ characters"));
     renderMe();
     try {
       if (up) {
@@ -5163,7 +5400,7 @@ document.addEventListener("click", async (ev) => {
         toast(r.needsEmailConfirm
           ? "Account created, but this project still requires email confirmation"
           : "Account created");
-      } else { await Auth.signIn(em, pw); toast("Signed in"); }
+      } else { await Auth.signIn(em, pw); toast(T("Signed in")); }
       /* Đăng nhập xong: KÉO VỀ trước, ĐẨY LÊN sau.
          Kéo trước để máy mới có ngay lịch sử cũ — đó là toàn bộ lý do
          người ta chịu đăng nhập. Đẩy sau để những gì họ vừa làm trên máy
@@ -5178,12 +5415,28 @@ document.addEventListener("click", async (ev) => {
     return;
   }
   if (el("[data-act='authSave']")) {
-    try { await Auth.updateProfile({ name: $("#acctName")?.value?.trim() || "" }); toast("Saved"); }
+    try { await Auth.updateProfile({ name: $("#acctName")?.value?.trim() || "" }); toast(T("Saved")); }
     catch (e) { toast(e.message || "Could not save"); }
     renderMe();
     return;
   }
-  if (el("[data-act='authOut']")) { await Auth.signOut(); renderMe(); return toast("Signed out"); }
+  if (el("[data-act='authOut']")) { await Auth.signOut(); renderMe(); return toast(T("Signed out")); }
+  if (el("[data-act='pwChange']")) {
+    const a = $("#pwNew")?.value || "", b = $("#pwNew2")?.value || "";
+    if (a.length < 6) return toast(T("Use a password of 6+ characters"));
+    if (a !== b) return toast(T("The two passwords do not match"));
+    try { await Auth.changePassword(a); toast(T("Password changed")); }
+    catch (e) { toast(e.message || "Could not change password"); }
+    renderMe();
+    return;
+  }
+  if (el("[data-act='pwForgot']")) {
+    const em = $("#acctEmail")?.value?.trim();
+    if (!em) return toast(T("Type your email above first"));
+    try { await Auth.forgotPassword(em); toast(T("If that email has an account, a reset link is on its way")); }
+    catch (e) { toast(e.message || "Could not send the reset email"); }
+    return;
+  }
   if (el("[data-act='saveLocalName']")) {
     const n = Local.setName($("#localName")?.value || "");
     renderMe();
@@ -5211,13 +5464,13 @@ document.addEventListener("click", async (ev) => {
   // ── xưởng icon ──
   if (el("[data-act='aiSave']")) {
     const k = $("#aiKey")?.value || "";
-    if (k.trim().length < 9) return toast("Paste an API key first");
+    if (k.trim().length < 9) return toast(T("Paste an API key first"));
     Img.setKey(k, $("#aiBase")?.value);
     // Xoá ô ngay sau khi nhận: khoá không nên nằm lại trong DOM để một
     // ảnh chụp màn hình hay một extension đọc được.
     $("#aiKey").value = "";
     renderMe();
-    return toast("Key accepted — kept in memory only");
+    return toast(T("Key accepted — kept in memory only"));
   }
   if (el("[data-act='aiGen']")) {
     const r = Img.generate();
@@ -5226,7 +5479,7 @@ document.addEventListener("click", async (ev) => {
   }
   const gg = el("[data-gengroup]");
   if (gg) {
-    if (!Img.hasKey()) return toast("Add a key first");
+    if (!Img.hasKey()) return toast(T("Add a key first"));
     const g = gg.dataset.gengroup;
     const keys = Img.ICON_SET.filter((i) => i.group === g).map((i) => i.key);
     const pending = keys.filter((k) => Img.statusOf(k) !== "done");
@@ -5244,22 +5497,22 @@ document.addEventListener("click", async (ev) => {
   if (el("[data-act='aiClear']")) {
     if (!confirm("Delete every saved image from this device? You'll pay to draw them again."))
       return;
-    Img.clearStore().then(() => { renderMe(); toast("Saved images deleted"); });
+    Img.clearStore().then(() => { renderMe(); toast(T("Saved images deleted")); });
     return;
   }
   const rg = el("[data-regen]");
   if (rg) {
-    if (!Img.hasKey()) return toast("Add a key first");
+    if (!Img.hasKey()) return toast(T("Add a key first"));
     Img.generate([rg.dataset.regen], { force: true });
-    return toast("Redrawing…");
+    return toast(T("Redrawing…"));
   }
 
   if (el("[data-act='exFilterInfo']")) {
-    return toast("Filters read your scans: badge, above-range, drinks and street stalls");
+    return toast(T("Filters read your scans: badge, above-range, drinks and street stalls"));
   }
   if (el("[data-act='exLocate']")) {
-    if (!navigator.geolocation) return toast("This device has no location");
-    toast("Finding you…");
+    if (!navigator.geolocation) return toast(T("This device has no location"));
+    toast(T("Finding you…"));
     return navigator.geolocation.getCurrentPosition(
       (pos) => {
         S.me = [pos.coords.latitude, pos.coords.longitude];
@@ -5269,7 +5522,7 @@ document.addEventListener("click", async (ev) => {
         const far = distance(S.me, S.maps[S.zone]?.center || S.me) > 20000;
         toast(far ? "You're outside this area — map stayed put" : "Found you");
       },
-      () => toast("Could not get your location"),
+      () => toast(T("Could not get your location")),
       { timeout: 8000, enableHighAccuracy: true });
   }
 
@@ -5279,10 +5532,10 @@ document.addEventListener("click", async (ev) => {
   if (el("[data-act='bmIn']")) return BigMap.zoom(1.5);
   if (el("[data-act='bmOut']")) return BigMap.zoom(1 / 1.5);
   if (el("[data-act='bmLocate']")) {
-    toast("Finding you…");
+    toast(T("Finding you…"));
     return BigMap.locate().then(
       ({ far }) => toast(far ? "You're outside this area — map stayed put" : "Found you"),
-      () => toast("Could not get your location"));
+      () => toast(T("Could not get your location")));
   }
   const bmf = el("[data-bmf]");
   if (bmf) return BigMap.setFilter(bmf.dataset.bmf);
@@ -5304,7 +5557,7 @@ document.addEventListener("click", async (ev) => {
   }
   if (el("[data-act='bmMode']")) {
     const r = BigMap.toggleMode();
-    if (r.mode !== "3d") return toast("Flat view — best for reading street names");
+    if (r.mode !== "3d") return toast(T("Flat view — best for reading street names"));
     // Tự phóng thì phải nói, không thì người dùng tưởng bản đồ nhảy lung tung.
     return toast(r.zoomed ? "3D view — zoomed in so the buildings fit"
                           : "3D view — tilted, shows buildings");
@@ -5313,7 +5566,7 @@ document.addEventListener("click", async (ev) => {
     const r = BigMap.toggleEat();
     // Bật lớp ở mức thu xa thì chưa vẽ gì. Nói ra lý do, đừng để người dùng
     // bấm rồi tưởng nút hỏng.
-    if (r.on && !r.zoomedEnough) toast("Zoom in to see eateries");
+    if (r.on && !r.zoomedEnough) toast(T("Zoom in to see eateries"));
     return;
   }
   const eat = el("[data-eat]");
@@ -5332,7 +5585,7 @@ document.addEventListener("click", async (ev) => {
   const gz = el("[data-act='gotoZone']");
   if (gz) {
     const z = gz.dataset.zone;
-    if (!S.prices[z]) return toast("No data for that area yet");
+    if (!S.prices[z]) return toast(T("No data for that area yet"));
     S.zone = z;
     localStorage.setItem("nl.zone", z);
     History.add("zone", { id: z, label: S.prices[z].en || S.prices[z].name }).then(scheduleSync);
@@ -5355,14 +5608,14 @@ document.addEventListener("click", async (ev) => {
   const cp = el("[data-act='copyShare']");
   if (cp) {
     return navigator.clipboard?.writeText(cp.dataset.text || "")
-      .then(() => toast("Caption copied"), () => toast("Could not copy on this device"));
+      .then(() => toast(T("Caption copied")), () => toast(T("Could not copy on this device")));
   }
   // Nút chia sẻ ở đầu tab Eat: chia sẻ CHỖ đang được tiến cử, không phải
   // chia sẻ cả ứng dụng. Chưa có chỗ nào được tiến cử thì nói ra, đừng mở
   // một thẻ chia sẻ trống.
   if (el("[data-act='share']")) {
     const f = featured();
-    if (!f) return toast("Nothing badged here yet to share");
+    if (!f) return toast(T("Nothing badged here yet to share"));
     return shareThing({
       name: f.place.name, sub: f.place.street,
       tags: f.place.known.map((k) => dishById(k)?.vi || k),
@@ -5373,7 +5626,7 @@ document.addEventListener("click", async (ev) => {
   if (el("[data-act='noMenu']")) return openSheet(noMenuHTML());
   if (el("[data-act='dishFromLast']")) {
     const c = S.khungMau;
-    if (!c) return toast("Take the photo again in Dish mode");
+    if (!c) return toast(T("Take the photo again in Dish mode"));
     closeSheet();
     if (!Img.hasKey() && !(await Img.mayChuNhanMon())) {
       return openSheet(`<h3>Dish recognition is not on yet</h3>
@@ -5398,8 +5651,8 @@ document.addEventListener("click", async (ev) => {
     }
   }
 
-  if (el("[data-act='save']")) return toast("Saved to this device");
-  if (el("[data-act='notif']")) return toast("No alerts right now");
+  if (el("[data-act='save']")) return toast(T("Saved to this device"));
+  if (el("[data-act='notif']")) return toast(T("No alerts right now"));
 
   /* Nút bấm mở hộp chọn tệp. Không đặt <label for> vì cùng một khối
      manualBlock() được chèn ở nhiều chỗ, và hai id trùng nhau thì nhãn
@@ -5412,31 +5665,31 @@ document.addEventListener("click", async (ev) => {
     if (mn.dataset.kind === "cash") {
       const denom = parsePrice(a) ?? parseInt(a.replace(/\D/g, ""), 10);
       const count = Math.max(1, parseInt(b.replace(/\D/g, ""), 10) || 1);
-      if (!denom) return toast("Type a banknote value, e.g. 500000");
+      if (!denom) return toast(T("Type a banknote value, e.g. 500000"));
       return showCashResult(Array(count).fill(String(denom)).join(" "));
     }
     const price = parsePrice(b);
-    if (!a || !price) return toast("Type an item and a price, e.g. Cao lầu / 55000");
+    if (!a || !price) return toast(T("Type an item and a price, e.g. Cao lầu / 55000"));
     const rows = judgeRows([{ name: a, price }]);
     showMenuResult(rows, null); logScan(rows, "manual");
     return;
   }
 
   if (el("[data-act='locate']")) {
-    if (!navigator.geolocation) return toast("Location not available");
+    if (!navigator.geolocation) return toast(T("Location not available"));
     navigator.geolocation.getCurrentPosition(
       (p) => {
         S.zone = pickZone(S.prices, { lat: p.coords.latitude, lng: p.coords.longitude }, S.zone);
         localStorage.setItem("nl.zone", S.zone);
         toast("Zone set to " + zone().name); renderMe();
       },
-      () => toast("Could not get your location"), { timeout: 8000 });
+      () => toast(T("Could not get your location")), { timeout: 8000 });
     return;
   }
 
   if (el("[data-act='openJournal']")) return go("journal");
 
-  if (el("[data-act='clearJournal']")) { journal.clear(); renderJournal(); return toast("Journal cleared"); }
+  if (el("[data-act='clearJournal']")) { journal.clear(); renderJournal(); return toast(T("Journal cleared")); }
 
   /* ── chia hoá đơn ────────────────────────────────────── */
   if (el("[data-act='splitOpen']")) return openSplit();
@@ -5465,32 +5718,66 @@ document.addEventListener("click", async (ev) => {
   /* ── khảo sát giá ────────────────────────────────────── */
   if (el("[data-act='surveyOpen']")) { closeSheet(); return openSurvey(); }
   if (el("[data-act='ptOpen']")) { closeSheet(); return openPhieu(); }
+  if (el("[data-act='gkOpen']")) return openGhiKeo();
+  if (el("[data-act='addPlaceOpen']")) return openAddPlace();
+  if (el("[data-act='addPlaceSave']")) return saveAddPlace();
 
   /* ── mục Dữ liệu ─────────────────────────────────────── */
   if (el("[data-act='surveyDownload']")) {
-    if (!S._builtPrices) return toast("Build the table first");
+    if (!S._builtPrices) return toast(T("Build the table first"));
     download(S._builtPrices, "prices.json");
-    return toast("prices.json downloaded");
+    return toast(T("prices.json downloaded"));
   }
 
   if (el("[data-act='dataExport']")) {
+    /* Tệp này phải chứa MỌI thứ app đang giữ trên máy về người dùng, không
+       riêng nhật ký. Trước đây chỉ có nhật ký: giá đã đo, bài đã viết, bình
+       luận, bản nháp chưa gửi, phiếu ghi kèo, quán tự thêm và các mục đã lưu
+       đều không có trong tệp, dù lời hứa trên màn hình nói là "mọi thứ". */
     const rows = await History.exportAll();
-    /* Tải về một TỆP, không phải chép vào clipboard như nút Export cũ.
-       Nhật ký ba tuần là vài nghìn dòng — clipboard không phải chỗ để
-       đựng nó, và người dùng muốn giữ dữ liệu thì họ cần một tệp. */
-    const blob = new Blob([JSON.stringify({
+    const [prices, posts, outbox] = await Promise.all([
+      Survey.exportAll().catch(() => ({ rows: [] })),
+      Local.listPosts({ limit: Infinity }).catch(() => []),
+      Outbox.pending().catch(() => []),
+    ]);
+    const comments = [];
+    for (const p of posts) {
+      const cs = await Local.listComments(p.id).catch(() => []);
+      comments.push(...cs.map((c) => ({ postId: p.id, ...c })));
+    }
+    const json = (k, fb) => { try { return JSON.parse(localStorage.getItem(k) ?? "null") ?? fb; } catch { return fb; } };
+    const khai = {};
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k?.startsWith("nl.khai.")) khai[k.slice(8)] = json(k, null);
+      }
+    } catch { /* chế độ riêng tư: không đọc được thì bỏ qua */ }
+    const data = {
       app: "Nón Lá", exportedAt: new Date().toISOString(),
       name: Auth.profile()?.name || Local.name() || "",
-      count: rows.length, events: rows,
-    }, null, 2)], { type: "application/json" });
+      zone: S.zone,
+      history: rows,                       // mọi hoạt động: quét, quán, bài, tuyến…
+      prices: prices.rows || [],           // giá đã đo từ quét và nhập tay
+      posts,                               // bài đã viết trên máy (ảnh không kèm, chỉ có dữ liệu chữ)
+      comments,                            // bình luận của các bài trên
+      unsent: outbox.map((x) => x.draft),  // bài đang chờ gửi khi có mạng
+      deals: GhiKeoUI.layDaLuu(),          // phiếu ghi kèo
+      placesAdded: json("nl-user-places", []), // quán tự thêm
+      saved: { spots: json("nl.saved.spots", []), food: json("nl.food.saved", []) },
+      declarations: khai,                  // điều kiện giá đã khai
+      counts: { history: rows.length, prices: (prices.rows || []).length, posts: posts.length,
+        comments: comments.length, unsent: outbox.length },
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `non-la-history-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `non-la-du-lieu-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     // Thu hồi ngay là Safari huỷ luôn lượt tải chưa kịp bắt đầu.
     setTimeout(() => URL.revokeObjectURL(url), 30_000);
-    return toast(`${rows.length} entries downloaded`);
+    return toast(`${rows.length} history entries and ${data.counts.prices + data.counts.posts} records downloaded`);
   }
 
   if (el("[data-act='dataSync']")) {
@@ -5519,14 +5806,14 @@ document.addEventListener("click", async (ev) => {
       await Pricesync.forget().catch((e) => toast(`Prices not erased: ${e.message}`));
     }
     renderMe();
-    return toast("History erased");
+    return toast(T("History erased"));
   }
 
   if (el("[data-act='export']")) {
     const txt = journal.all().map((e) =>
       `${new Date(e.ts).toLocaleString("en-GB")}  ${e.label}  ${fmtVND(e.price)}  ${e.level}`).join("\n");
-    navigator.clipboard?.writeText(txt).then(() => toast("Journal copied to clipboard"),
-      () => toast("Copy failed — long-press to select"));
+    navigator.clipboard?.writeText(txt).then(() => toast(T("Journal copied to clipboard")),
+      () => toast(T("Copy failed — long-press to select")));
     return;
   }
 
@@ -5536,7 +5823,7 @@ document.addEventListener("click", async (ev) => {
     closeSheet();
     try {
       await Cloud.report(rp.dataset.report, rp.dataset.reason);
-      toast("Reported — thank you");
+      toast(T("Reported — thank you"));
     } catch (e) {
       // 409 = unique(post_id, reporter): người này đã báo cáo bài đó rồi.
       // Nói thật thay vì giả vờ nhận thêm một lần nữa.
@@ -5628,6 +5915,9 @@ async function boot() {
   S.menuRefAt = mr._lookupAt || "";
   S.premium = pv;
   Lich.napLich(lc);
+  /* Cảnh báo ứng xử theo loại điểm (Culture Lens). Lớp phụ: thiếu thì thẻ điểm
+     tham quan vắng một khối, và vắng là hành vi đúng — không điền câu chung chung. */
+  S.ungxu = await load("data/ungxu.json").catch(() => null);
   /* Bản ghi quán ăn phải mang `zone`. Bản xuất cũ chỉ có Hội An và không
      có trường đó — nếu ai đó chạy app với tệp cũ thì lớp này sẽ biến mất
      lặng lẽ, nên suy ngược `zone` từ khung của từng vùng thay vì bỏ qua. */
@@ -5640,6 +5930,7 @@ async function boot() {
     return zid ? { ...e, zone: zid } : e;
   });
   S.eatSource = ea._source || "";
+  nhapQuanMoi();
   S.trips = tr.trips || {};
 
   /* Danh mục ảnh sinh từ CHÍNH dữ liệu, không chép tay sang imgsvc.js.
@@ -5743,7 +6034,7 @@ async function boot() {
   } else {
     go("scan");
   }
-  window.addEventListener("offline", () => toast("Offline — everything still works"));
+  window.addEventListener("offline", () => toast(T("Offline — everything still works")));
 }
 
 /* Icon sinh xong thì vẽ lại chỗ đang hiện nó. Chỉ vẽ lại tab You khi tab

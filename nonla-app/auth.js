@@ -191,6 +191,19 @@ export async function restore() {
   }
 }
 
+/** Đổi mật khẩu cho phiên đang đăng nhập. Máy chủ tự kiểm độ dài tối thiểu. */
+export async function changePassword(newPassword) {
+  if (!S.access) throw new Error("Sign in first");
+  await api("user", { method: "PUT", auth: true, body: { password: newPassword } });
+  return true;
+}
+
+/** Gửi thư đặt lại mật khẩu. Gói free có thể không gửi được thư ra ngoài nhóm dự án. */
+export async function forgotPassword(email) {
+  await api("recover", { body: { email } });
+  return true;
+}
+
 export async function updateProfile(fields) {
   const j = await api("user", { method: "PUT", auth: true, body: { data: fields } });
   S.user = j || S.user;

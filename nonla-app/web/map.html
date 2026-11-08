@@ -48,10 +48,12 @@
 
 <script type="module">
 import { chrome, paintZoneName, zonePicker, load, zoneId, I, esc, money, photo,
-         placePhoto, verdictPill, artTransform } from "./web.js";
+         placePhoto, verdictPill, artTransform, dichTrang, tf } from "./web.js";
+import { t as T } from "../i18n.js";
 let dishName = (k) => k;
 
 chrome("map.html");
+dichTrang();
 paintZoneName();
 zonePicker("zonePick");
 
@@ -64,19 +66,19 @@ const zone = prices.zones[zid];
 const mine = places.places.filter((p) => p.zone === zid && p.at);
 
 document.getElementById("mapLede").textContent =
-  `${mine.length} eateries from OpenStreetMap in ${(zone.en || zone.name).replace(" · ", ", ")}. `
-  + "This page shows where they are and what they are known for — not a verdict on their prices.";
+  `${tf("{n} eateries from OpenStreetMap in {zone}.", { n: mine.length, zone: (zone.en || zone.name).replace(" · ", ", ") })} `
+  + T("This page shows where they are and what they are known for — not a verdict on their prices.");
 
 /* Chú giải phải khớp với số màu ghim THẬT SỰ vẽ ra. Bản trước liệt kê ba
    bậc — Đúng Giá / Trên khoảng / Chưa đủ dữ liệu "dưới 20 lượt quét" —
    trong khi ghim giờ chỉ còn một màu, và con số 20 là ngưỡng cũ đã bỏ.
    Một chú giải ba màu cho một bản đồ một màu là một chú giải nói dối. */
 document.getElementById("lg1").innerHTML =
-  `${I.clock}<span><b>No verdict here</b><i>this page has no scan history</i></span>`;
+  `${I.clock}<span><b>${T("No verdict here")}</b><i>${T("this page has no scan history")}</i></span>`;
 document.getElementById("lg2").innerHTML =
-  `${I.bowl}<span><b>Known for</b><i>dishes the name points to</i></span>`;
+  `${I.bowl}<span><b>${T("Known for")}</b><i>${T("dishes the name points to")}</i></span>`;
 document.getElementById("lg3").innerHTML =
-  `${I.pinSm || I.compass}<span><b>Pin</b><i>right block, not the exact doorway</i></span>`;
+  `${I.pinSm || I.compass}<span><b>${T("Pin")}</b><i>${T("right block, not the exact doorway")}</i></span>`;
 
 /* ── bộ lọc ─────────────────────────────────────────────────── */
 const FILTERS = [
@@ -92,7 +94,7 @@ const wanted = new URLSearchParams(location.search).get("f");
 let active = FILTERS.some((f) => f.k === wanted) ? wanted : "all";
 const fbox = document.getElementById("filters");
 fbox.innerHTML = FILTERS.map((f) => `<button class="chip" data-f="${f.k}"
-  aria-pressed="${f.k === active}">${I[f.ico]}${f.label}</button>`).join("");
+  aria-pressed="${f.k === active}">${I[f.ico]}${T(f.label)}</button>`).join("");
 fbox.addEventListener("click", (e) => {
   const b = e.target.closest("[data-f]");
   if (!b) return;
@@ -116,19 +118,16 @@ if (geo?.art) {
   /* KHÔNG đổ nguyên `art._note` ra trang: đó là ghi chú kỹ thuật viết cho
      người bảo trì dữ liệu, dài cả đoạn và bằng tiếng Việt giữa một giao
      diện tiếng Anh. Điều người xem cần biết gói trong một câu. */
-  document.getElementById("artNote").textContent =
-    "Hand-painted background anchored to real coordinates: distances and bearings between pins "
-    + "are true, but a pin sits on the right block rather than the exact doorway.";
+  document.getElementById("artNote").textContent = T("Hand-painted background anchored to real coordinates: distances and bearings between pins are true, but a pin sits on the right block rather than the exact doorway.");
 } else {
   art.remove();
-  document.getElementById("artNote").textContent =
-    "This area has no hand-painted map yet, so the list is the map.";
+  document.getElementById("artNote").textContent = T("This area has no hand-painted map yet, so the list is the map.");
 }
 
 function paint() {
   const f = FILTERS.find((x) => x.k === active) || FILTERS[0];
   const list = mine.filter(f.test);
-  document.getElementById("listTitle").textContent = `${list.length} spots · ${f.label}`;
+  document.getElementById("listTitle").textContent = `${tf("{n} spots", { n: list.length })} · ${T(f.label)}`;
 
   stage.querySelectorAll(".mappin").forEach((el) => el.remove());
   if (toImg && geo.art) {
@@ -168,8 +167,8 @@ function paint() {
         </span>
       </span>
     </a>`;
-  }).join("") || `<div class="empty"><b>Nothing matches that filter</b>
-    <p>Try another filter — every filter here answers from data the app actually has.</p></div>`;
+  }).join("") || `<div class="empty"><b>${T("Nothing matches that filter")}</b>
+    <p>${T("Try another filter — every filter here answers from data the app actually has.")}</p></div>`;
 }
 paint();
 </script>

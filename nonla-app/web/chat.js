@@ -14,7 +14,8 @@
    Lịch sử chỉ sống trong phiên này: ghi vào localStorage nghĩa là câu hỏi
    của người này còn nằm lại trên máy chung ở sảnh khách sạn.
    ═══════════════════════════════════════════════════════════════ */
-import { I, esc, load, zoneId } from "./web.js";
+import { I, esc, load, zoneId, dichTrang } from "./web.js";
+import { t as T } from "../i18n.js";
 import { diemTroLy } from "../tro-ly.js";
 
 /* Markdown tối thiểu: đậm, gạch đầu dòng, xuống dòng. Mọi thứ đi qua esc()
@@ -47,6 +48,7 @@ export function mountChat() {
       <p class="foot">AI helper · answers from this area's reference prices, which are not a
         field survey · your questions are not stored</p>
     </section>`);
+  dichTrang();
 
   const box = document.getElementById("nlChat");
   const fab = document.getElementById("chatFab");
@@ -91,7 +93,7 @@ export function mountChat() {
     bubble("me", q);
     busy = true;
     const out = bubble("bot", "");
-    out.innerHTML = `<span class="think">đang nghĩ…</span>`;
+    out.innerHTML = `<span class="think">${T("Thinking…")}</span>`;
     try {
       const messages = [...history, { role: "user", content: q }].slice(-10);
       const res = await fetch(diemTroLy(), {
@@ -100,9 +102,9 @@ export function mountChat() {
         body: JSON.stringify({ zone: zoneId(), messages }),
       });
       const j = await res.json().catch(() => ({}));
-      if (res.status === 503) throw new Error("The helper is not switched on for this site yet.");
-      if (res.status === 429) throw new Error("Too many questions in a few minutes — wait a little and ask again.");
-      if (!res.ok) throw new Error("The helper did not answer — try again in a moment.");
+      if (res.status === 503) throw new Error(T("The helper is not switched on for this site yet."));
+      if (res.status === 429) throw new Error(T("Too many questions in a few minutes — wait a little and ask again."));
+      if (!res.ok) throw new Error(T("The helper did not answer — try again in a moment."));
       out.innerHTML = render(j.text || "");
       history.push({ role: "user", content: q }, { role: "assistant", content: j.text || "" });
     } catch (err) {

@@ -209,6 +209,7 @@ function cardHtml(pin, i) {
   return `<article class="pc" style="--ar:${r}">
     <button class="pc-open" type="button" data-pid="${esc(String(p.id))}" aria-label="${esc(c.title)}"${c.bg ? ` style="background:${c.bg}"` : ""}>
       ${src ? `<img src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
+      ${src && src.includes("/illus/") ? `<span class="pc-ill">Illustration · not a photo</span>` : ""}
       <span class="pc-g"></span>
       <span class="pc-t"><b>${esc(c.title)}</b><small>${esc(c.sub)}</small></span>
       <span class="pc-gem" style="color:${CATEGORY_COLOR[p.category] || "#fff"}" title="${esc(categoryLabel(p.category))}">${I.gem}</span>

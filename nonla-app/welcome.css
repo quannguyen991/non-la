@@ -60,7 +60,7 @@
 #v-welcome::before{
   content:"";position:absolute;z-index:0;pointer-events:none;
   top:-13vw;right:-24vw;width:74vw;max-width:380px;aspect-ratio:1;
-  background:no-repeat center/contain url("assets/motifs/hoa-van-tron.webp");
+  background:no-repeat center/contain url("assets/motifs/trong-dong-v2.webp");
   /* .12 chứ không .2: nó chạy NGAY SAU tiêu đề, và ở .2 những vòng hoa văn
      mảnh cắt ngang qua chân chữ serif làm chữ trông như bị nhiễu. */
   opacity:.12;
