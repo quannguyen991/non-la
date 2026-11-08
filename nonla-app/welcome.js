@@ -381,8 +381,11 @@ function cloudFields() {
       <input id="wcEmail" type="email" inputmode="email" autocomplete="username"
         placeholder="you@example.com" value="${esc(M.email)}"></label>
     <label class="wc-fld"><span>Password <small>6 characters or more</small></span>
-      <input id="wcPass" type="password" autocomplete="current-password"
-        placeholder="••••••"></label>`;
+      <input id="wcPass" type="password" autocomplete="new-password"
+        placeholder="••••••"></label>
+    <label class="wc-fld"><span>Phone <small>optional, saved to your profile</small></span>
+      <input id="wcPhone" type="tel" inputmode="tel" autocomplete="tel"
+        placeholder="+84 …" value="${esc(M.phone || "")}"></label>`;
 }
 
 function cloudActions() {
@@ -543,7 +546,8 @@ export async function handleClick(target) {
     M.email = email; M.sending = true; paint();
     try {
       if (k === "signup") {
-        const r = await Auth.signUp(email, pass, $("#wcName", M.host)?.value?.trim());
+        const r = await Auth.signUp(email, pass, $("#wcName", M.host)?.value?.trim(),
+          ($("#wcPhone", M.host)?.value || "").trim());
         /* Máy chủ vẫn bắt xác nhận email: tài khoản đã tạo nhưng KHÔNG
            dùng được, và lá thư xác nhận thì gói free không gửi ra ngoài
            nhóm dự án. Nói đúng chuyện đó, đừng mời người ta đi xem hộp thư. */

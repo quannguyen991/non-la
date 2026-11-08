@@ -40,7 +40,7 @@ export function mount({ host, zone, zoneName }) {
     <button class="tlfab" id="tlFab" aria-label="Ask the Nón Lá helper" aria-expanded="false">${ICON_CHAT}</button>
     <section class="tlpanel" id="tlPanel" hidden aria-label="Nón Lá helper">
       <header class="tlhead">
-        <span class="tlava">${ICON_CHAT}</span>
+        <span class="tlava"><img src="assets/motifs/trong-dong-v2.webp" alt="" aria-hidden="true"></span>
         <span class="tlname"><b>Nón Lá helper</b><i id="tlZone"></i></span>
         <button class="tlx" id="tlClose" aria-label="Close the helper">${ICON_X}</button>
       </header>
@@ -57,6 +57,10 @@ export function mount({ host, zone, zoneName }) {
 
   const fab = host.querySelector("#tlFab");
   fab.onclick = () => mo(true);
+  /* Khi hiệu ứng đóng chạy xong thì mới thực sự ẩn panel. */
+  host.querySelector("#tlPanel").addEventListener("animationend", (e) => {
+    if (e.animationName === "tlSheetOut") { e.currentTarget.hidden = true; e.currentTarget.classList.remove("tl-closing"); }
+  });
   // Cuộn ở BẤT KỲ khung nào (các tab cuộn trong section riêng) → né lại sau khi dừng.
   document.addEventListener("scroll", henTranhDe, true);
   window.addEventListener("resize", henTranhDe);
@@ -66,6 +70,10 @@ export function mount({ host, zone, zoneName }) {
   document.addEventListener("click", () => { henTranhDe(); setTimeout(tranhDe, 1200); }, true);
   setInterval(() => { if (!document.hidden) tranhDe(); }, 1500);
   host.querySelector("#tlClose").onclick = () => mo(false);
+  host.querySelector("#tlLog").addEventListener("click", (e) => {
+    const r = e.target.closest("[data-retry]");
+    if (r && M.lastQ) gui(M.lastQ);
+  });
   host.querySelector("#tlForm").onsubmit = (e) => { e.preventDefault(); gui(host.querySelector("#tlInput").value); };
   host.querySelector("#tlGoi").onclick = (e) => {
     const b = e.target.closest("[data-goi]");
@@ -120,15 +128,24 @@ export const isOpen = () => !!M.host && !M.host.querySelector("#tlPanel").hidden
 
 function mo(on) {
   const panel = M.host.querySelector("#tlPanel");
-  panel.hidden = !on;
   M.host.querySelector("#tlFab").setAttribute("aria-expanded", String(on));
-  if (!on) return;
+  if (!on) {
+    // Đóng: chạy hiệu ứng trượt xuống, rồi animationend mới ẩn.
+    if (panel.hidden) return;
+    panel.classList.remove("tl-open");
+    panel.classList.add("tl-closing");
+    return;
+  }
+  panel.hidden = false;
+  panel.classList.remove("tl-closing");
+  panel.classList.remove("tl-open"); void panel.offsetWidth; panel.classList.add("tl-open");
   /* Đổi vùng thì hội thoại cũ nói về bảng giá khác — bắt đầu lại, và nói ra. */
   const z = M.zone();
   if (z !== M.zoneCu) {
     M.zoneCu = z;
     M.history = [];
-    M.host.querySelector("#tlLog").innerHTML = "";
+    M.host.querySelector("#tlLog").innerHTML = `
+      <div class="tlhero" aria-hidden="true"><img src="assets/motifs/trong-dong-v2.webp" alt=""></div>`;
     bong("bot", `Hỏi mình về giá ở **${M.zoneName()}** — tiếng Việt hay tiếng Anh đều được.`);
     goiY();
   }
@@ -154,6 +171,8 @@ function bong(who, text) {
 async function gui(raw) {
   const q = String(raw || "").trim().slice(0, 800);
   if (!q || M.busy) return;
+  M.lastQ = q;
+  M.host.querySelector(".tlhero")?.remove();
   const input = M.host.querySelector("#tlInput");
   input.value = "";
   M.host.querySelector("#tlGoi").innerHTML = "";
@@ -164,7 +183,7 @@ async function gui(raw) {
   }
   M.busy = true;
   const out = bong("bot", "");
-  out.innerHTML = `<span class="tlthink">thinking…</span>`;
+  out.innerHTML = `<span class="tlthink" aria-label="thinking"><i></i><i></i><i></i></span>`;
   try {
     const messages = [...M.history, { role: "user", content: q }].slice(-10);
     const res = await fetch(diemTroLy(), {
@@ -179,8 +198,13 @@ async function gui(raw) {
     out.innerHTML = render(j.text || "");
     M.history.push({ role: "user", content: q }, { role: "assistant", content: j.text || "" });
   } catch (e) {
-    out.innerHTML = render(e.message === "Failed to fetch"
-      ? "Could not reach the helper — check the connection and try again." : e.message);
+    // Không tới được máy chủ: nói rõ vì sao, và cho bấm thử lại đúng câu vừa hỏi.
+    const local = /^(localhost|127\.0\.0\.1)$/.test(globalThis.location?.hostname || "");
+    const msg = e.message === "Failed to fetch"
+      ? (local ? "The helper answers on the deployed app, not on this local server." : "Could not reach the helper — check the connection.")
+      : e.message;
+    out.classList.add("err");
+    out.innerHTML = `${render(msg)}<button class="tlretry" data-retry="1" type="button">Try again</button>`;
   } finally {
     M.busy = false;
     M.host.querySelector("#tlLog").scrollTop = 1e9;

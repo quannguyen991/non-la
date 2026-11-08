@@ -49,6 +49,7 @@ const toPost = (r) => ({
   paidVnd: r.paid_vnd, stars: r.stars, worthReturn: r.worth_return,
   body: r.body, photoPath: r.photo_path, far: r.far,
   lat: r.lat ?? null, lng: r.lng ?? null, category: r.category || "",
+  recommend: r.recommend === true,
   createdAt: r.created_at,
   authorName: r.profiles?.name || "Traveller",
   authorCountry: r.profiles?.country || "",
@@ -134,6 +135,8 @@ export async function createPost(draft, { photoPath = null, photoHash = null, fa
       zone: draft.zone, place_id: draft.placeId, dish_id: draft.dishId,
       paid_vnd: draft.paidVnd, stars: draft.stars, worth_return: draft.worthReturn,
       body: draft.body || null,
+      // Cờ gợi ý chỉ gửi khi bật, để máy chủ chưa có cột này vẫn nhận bài thường.
+      ...(draft.recommend === true ? { recommend: true } : {}),
       photo_path: photoPath, photo_hash: photoHash, far,
       /* Ba cột bản đồ chỉ gửi khi CÓ giá trị: một máy chủ chưa chạy phần SQL
          "bản đồ ảnh" vẫn nhận được bài thường, thay vì từ chối cả bài vì một

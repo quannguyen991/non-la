@@ -14,6 +14,7 @@ import { listPosts, listComments, listPhotoPins, photoUrl, ready, commentsOn } f
 import { pending, drop, MAX_TRIES } from "./outbox.js";
 import * as Local from "./localdb.js";
 import { CATEGORIES, CATEGORY_COLOR, categoryLabel, diemAnh, diemDiaDiem, rankRecommended } from "./posts.js";
+import * as Social from "./social.js";
 import * as AnhUI from "./anhmapui.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
@@ -111,6 +112,22 @@ function nutBinhLuan(p) {
     <span>${nhan}</span></button>`;
 }
 
+/* Hàng hành động dưới bài: thích, bình luận, đăng lại, theo dõi người viết.
+   Bài mẫu chỉ được thích và xem; không đăng lại được (không phải bài của người dùng). */
+function hanhDong(p) {
+  const liked = Social.daThich(p.id);
+  const n = Social.soThich(p);
+  const theo = p.authorName && p.authorName !== "You" && !p.seed;
+  return `<div class="chanh">
+    <button class="cact${liked ? " on" : ""}" data-clike="${esc(String(p.id))}" aria-pressed="${liked}">
+      ${liked ? "♥" : "♡"} <span>${n}</span></button>
+    ${nutBinhLuan(p)}
+    ${p.seed ? "" : `<button class="cact" data-crepost="${esc(String(p.id))}">↻ <span>Repost</span></button>`}
+    ${theo ? `<button class="cact${Social.dangTheoDoi(p.authorName) ? " on" : ""}" data-cfollow="${esc(p.authorName)}">${
+      Social.dangTheoDoi(p.authorName) ? "Following" : "Follow"}</button>` : ""}
+  </div>`;
+}
+
 function postHtml(p) {
   const place = M.places.find((x) => x.id === p.placeId);
   /* Ảnh của bài trên máy chủ là một đường dẫn; ảnh của bài trên máy là một
@@ -141,8 +158,9 @@ function postHtml(p) {
       ${tieuDe(p, place)}
       ${stars(p.stars)}
       ${p.paidVnd ? `<div class="cpaid">Paid ${esc(money(p.paidVnd))}</div>` : ""}
+      ${p.repostOf ? `<p class="crepost">Reposted${p.repostAuthor ? ` from ${esc(p.repostAuthor)}` : ""}</p>` : ""}
       ${p.body ? `<p class="cnote">${esc(p.body)}</p>` : ""}
-      ${nutBinhLuan(p)}
+      ${hanhDong(p)}
       ${/* Bài mẫu không có nút nào. Không xoá được vì nó không nằm trên máy
             người dùng, và không báo cáo được vì báo cáo là để tố một người
             THẬT viết sai — gửi một báo cáo về một bài do chính app ship ra
@@ -208,9 +226,26 @@ function rcmPane() {
     }).join("")}</ol>`;
 }
 
+/* Đăng lại: một bài mới trên máy, trỏ về bài gốc. Ảnh không được chép (ảnh
+   của bài gốc là một Blob riêng); nội dung chữ, quán, giá và sao thì chép đủ. */
+async function repostPost(id) {
+  const orig = M.posts.find((x) => String(x.id) === String(id)) || M.seed.find((x) => String(x.id) === String(id));
+  if (!orig) return;
+  try {
+    await Local.savePost({
+      placeId: orig.placeId || "", zone: orig.zone || M.zone, dishId: orig.dishId || null,
+      paidVnd: orig.paidVnd ?? null, stars: orig.stars ?? null, worthReturn: orig.worthReturn ?? null,
+      body: orig.body || "", category: orig.category || "", recommend: orig.recommend === true,
+      repostOf: String(orig.id), repostAuthor: orig.authorName || "", lat: null, lng: null,
+    }, { photo: null, far: false });
+    M.cb?.onToast?.("Reposted to this phone");
+    paint();
+  } catch { M.cb?.onToast?.("Could not repost on this phone"); }
+}
+
 function feedPane() {
   return `${rcmPane()}${M.posts.length
-      ? `<div class="cfeed">${M.posts.map(postHtml).join("")}</div>`
+      ? `<div class="cfeed">${Social.uuTienTheoDoi(M.posts).map(postHtml).join("")}</div>`
       : `<p class="cempty">${ready()
           ? "No posts here yet. Be the first — photograph what you ate, and what you paid for it."
           : "Nothing written down yet. Photograph what you ate and what you paid — it saves to this phone."}</p>`}
@@ -416,6 +451,7 @@ export async function loadThread(post) {
 }
 
 function commentHtml(c) {
+  const liked = Social.daThichBinhLuan(c.id);
   return `<div class="ccomment${c.seed ? " cseed" : ""}">
     <div class="cwho">
       <span>${esc(c.authorName)}</span>
@@ -424,6 +460,7 @@ function commentHtml(c) {
       ${c.seed ? `<span class="ctag">sample</span>` : ""}
     </div>
     <p class="cnote">${esc(c.body)}</p>
+    ${c.seed ? "" : `<button class="cact${liked ? " on" : ""}" data-clikec="${esc(String(c.id))}" aria-pressed="${liked}">${liked ? "♥" : "♡"} <span>${Social.soThichBinhLuan(c)}</span></button>`}
     ${c.seed ? ""
       : c.mine ? `<button class="creport" data-ccdel="${esc(String(c.id))}" data-local="${c.local ? 1 : 0}">Delete</button>`
       : `<button class="creport" data-ccreport="${esc(String(c.id))}">Report</button>`}
@@ -443,7 +480,7 @@ export function threadHtml(post, t) {
     <h3>Discussion</h3>
     <div class="cthread-post">${postHtml(post).replace(/<button class="ccomments"[\s\S]*?<\/button>/, "")}</div>
     <h2 class="sect">${n ? `${n} comment${n === 1 ? "" : "s"}` : "No comments yet"}</h2>
-    <div class="cthread">${t.comments.map(commentHtml).join("")}</div>
+    <div class="cthread">${Social.dayBinhLuanLen(t.comments).map(commentHtml).join("")}</div>
     ${ghiChu ? `<p class="seedwarn">${esc(ghiChu)}</p>` : ""}
     ${viet ? `
       <label class="fld"><span>Add a comment <small>500 max</small></span>
@@ -608,7 +645,21 @@ export function handleClick(target) {
   const place = target.closest("[data-cplace]");
   if (place) return M.cb.onOpenPlace?.(place.dataset.cplace), true;
   const th = target.closest("[data-cthread]");
-  if (th) return M.cb.onThread?.(th.dataset.cthread), true;
+  if (th) { M.lastThread = th.dataset.cthread; return M.cb.onThread?.(th.dataset.cthread), true; }
+
+  // Thích / đăng lại / theo dõi: làm ở trên máy, rồi vẽ lại đúng chỗ đang xem.
+  const lk = target.closest("[data-clike]");
+  if (lk) { Social.thichBai(lk.dataset.clike); paint(); return true; }
+  const lkc = target.closest("[data-clikec]");
+  if (lkc) {
+    Social.thichBinhLuan(lkc.dataset.clikec);
+    if (M.lastThread) M.cb.onThread?.(M.lastThread);
+    return true;
+  }
+  const fl = target.closest("[data-cfollow]");
+  if (fl) { Social.theoDoi(fl.dataset.cfollow); paint(); return true; }
+  const rp = target.closest("[data-crepost]");
+  if (rp) { repostPost(rp.dataset.crepost); return true; }
   const rep = target.closest("[data-creport]");
   if (rep) return M.cb.onReport?.(rep.dataset.creport), true;
   /* Xoá bài của CHÍNH MÌNH trên máy — không cần callback ra app.js vì

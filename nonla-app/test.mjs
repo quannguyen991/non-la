@@ -17,6 +17,7 @@ import { luatBaiDang, docKetQuaKiemDuyet, quyetDinh, loiNhacKiemDuyet, LY_DO } f
 import { quanGanToaDo, CATEGORIES, CATEGORY_IDS, categoryLabel, lamTronToaDo, diemAnh, cellDeg, gomCum, loaiDiaDiem, diemDiaDiem, CATEGORY_COLOR, QUAN_DAO, muaAnh } from "./posts.js";
 import { compare as compareMenus, MIN_PAIRS } from "./menutax.js";
 import { rankRecommended } from "./posts.js";
+import { dayBinhLuanLen, uuTienTheoDoi } from "./social.js";
 import { chonQuan, docQuan, nhan as nhanDG, layDanhGia, diemDanhGia, NGUONG } from "./danhgia.js";
 import { tripSummary, dateLine, fileName } from "./postcard.js";
 import { PHRASES } from "./showcard.js";
@@ -3294,6 +3295,22 @@ console.log("\n── bản đồ ảnh: lớp quán và mốc, hai quần đả
   eq("xếp theo số lượt gợi ý, hoà số thì bài mới hơn lên trước", xep.map((r) => r.placeId), ["a", "c", "b"]);
   eq("bài không gợi ý và bài không có quán không được đếm", xep.find((r) => r.placeId === "b").count, 1);
   eq("danh sách rỗng khi chưa ai gợi ý", rankRecommended([]), []);
+}
+
+/* ── thích, theo dõi, sắp bình luận ── */
+{
+  const bl = [
+    { id: 1, createdAt: "2026-10-01T00:00:00Z", likes: 0 },
+    { id: 2, createdAt: "2026-10-02T00:00:00Z", likes: 5 },
+    { id: 3, createdAt: "2026-10-03T00:00:00Z", likes: 2 },
+    { id: 4, createdAt: "2026-09-30T00:00:00Z", likes: 0 },
+  ];
+  eq("bình luận nhiều thích đứng đầu, hoà thì cái cũ hơn", dayBinhLuanLen(bl).map((c) => c.id), [2, 3, 4, 1]);
+  const bai = [
+    { id: "a", authorName: "Lan", createdAt: "2026-10-03T00:00:00Z" },
+    { id: "b", authorName: "Minh", createdAt: "2026-10-02T00:00:00Z" },
+  ];
+  eq("không theo dõi ai thì giữ nguyên thứ tự", uuTienTheoDoi(bai).map((p) => p.id), ["a", "b"]);
 }
 
 console.log("\n════════════════════════════════════════════");

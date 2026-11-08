@@ -141,10 +141,12 @@ export const mayChu = () => S.cai;
 export const sanSangMatKhau = () =>
   isConfigured() && !!S.cai && S.cai.emailBat && S.cai.dangKyMo && !S.cai.canXacNhan;
 
-export async function signUp(email, password, name) {
+export async function signUp(email, password, name, phone = "") {
   S.status = "busy"; S.error = ""; emit();
   try {
-    const j = await api("signup", { body: { email, password, data: { name: name || "" } } });
+    // Số điện thoại chỉ lưu trong hồ sơ (user_metadata), KHÔNG dùng để đăng nhập:
+    // đăng nhập bằng SMS cần nhà cung cấp Twilio, chưa được bật trên dự án.
+    const j = await api("signup", { body: { email, password, data: { name: name || "", phone: phone || "" } } });
     // Dự án bật xác nhận email thì signup KHÔNG trả phiên — phải nói rõ,
     // không thì người dùng tưởng đăng ký hỏng.
     if (!j?.access_token) {

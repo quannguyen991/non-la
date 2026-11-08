@@ -3444,6 +3444,7 @@ function accountHTML() {
       <input id="acctPass" type="password" autocomplete="current-password"
         placeholder="Password" style="margin-top:8px">
       <input id="acctName" placeholder="Display name (sign up only)" style="margin-top:8px">
+      <input id="acctPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Phone (sign up only, optional)" style="margin-top:8px">
     </div>
     <div class="ic-actions">
       <button class="btn pri" data-act="authIn"${busy ? " disabled" : ""}>${busy ? "Working…" : "Sign in"}</button>
@@ -4703,6 +4704,7 @@ function renderCommunity() {
     /* Chấm quán mở thẻ quán sẵn có; chấm mốc chỉ có tên, nhóm và ghi chú. */
     onOpenDot: (d) => (d.kind === "place" ? showPlace(d.id) : openSheet(Community.sightSheet(d))),
     onOpenIsland: (q) => openSheet(Community.islandSheet(q)),
+    onToast: (m) => toast(m),
     onOpenSample: (p) => openSheet(Community.sampleSheet(p)),
     /* Đưa thẳng tới thẻ Account và cuộn tới nó, không chỉ đổi tab: tab You
        dài hơn một màn hình, và bỏ người dùng ở đầu trang với lời dặn "tìm
@@ -5393,7 +5395,7 @@ document.addEventListener("click", async (ev) => {
     renderMe();
     try {
       if (up) {
-        const r = await Auth.signUp(em, pw, $("#acctName")?.value?.trim());
+        const r = await Auth.signUp(em, pw, $("#acctName")?.value?.trim(), $("#acctPhone")?.value?.trim() || "");
         /* needsEmailConfirm = tài khoản đã tạo nhưng chưa dùng được, và lá
            thư xác nhận thì gói free không gửi ra ngoài nhóm dự án. Mời người
            ta đi xem hộp thư là mời họ chờ một thứ không tới. */

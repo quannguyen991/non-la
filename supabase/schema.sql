@@ -337,3 +337,6 @@ alter table posts add constraint posts_latlng_pair
 
 create index if not exists posts_pin_idx on posts (created_at desc)
   where photo_path is not null and status = 'visible';
+
+-- Gợi ý quán của người dùng (đếm cho xếp hạng gợi ý). Chạy một lần.
+alter table posts add column if not exists recommend boolean not null default false;

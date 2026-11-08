@@ -171,6 +171,13 @@ export function update({ pins, dots, cat, showDots } = {}) {
    đổi tên) thì bỏ qua, không lỗi. */
 function kieuApple() {
   const P = (id, prop, val) => { if (map?.getLayer(id)) map.setPaintProperty(id, prop, val); };
+  /* Ẩn mọi đường biên quốc gia và biên hải phận của nền bản đồ. Nền vẽ đường
+     biên nét đứt từ Việt Nam qua biển tới các nước khác, và trên bản đồ này nó
+     nối Hoàng Sa, Trường Sa với những nước đó như một đường đi. Không hiện đường
+     biên thì chỉ còn các đảo, đúng vị trí của chúng. */
+  for (const l of map?.getStyle?.()?.layers || []) {
+    if (/boundary/i.test(l.id)) map.setLayoutProperty(l.id, "visibility", "none");
+  }
   P("background", "background-color", "#F4EFE2");
   P("water", "fill-color", "#A9CFE6");
   for (const id of ["waterway-river", "waterway-other", "waterway-stream-canal"]) P(id, "line-color", "#A9CFE6");

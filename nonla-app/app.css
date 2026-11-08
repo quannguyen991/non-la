@@ -2254,3 +2254,52 @@ details.compass summary small{opacity:.7}
   .view.tr-in, .view.tr-in > .pad > * { animation: none; }
 }
 
+/* ═══ Trợ lý: trống đồng giữa màn, hiệu ứng mở/đóng, tin nhắn và lỗi ═══ */
+.tlpanel.tl-open { animation: tlSheetIn .34s cubic-bezier(.22,.61,.36,1) both; }
+.tlpanel.tl-closing { animation: tlSheetOut .24s cubic-bezier(.4,0,1,1) both; }
+@keyframes tlSheetIn { from { opacity: 0; transform: translateY(24px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes tlSheetOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(24px) scale(.985); } }
+.tlpanel .tlhead { animation: tlFadeDown .4s .05s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes tlFadeDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+.tlava { overflow: hidden; background: var(--giay); border: 1px solid var(--vien-in); }
+.tlava img { width: 100%; height: 100%; object-fit: contain; padding: 3px; }
+
+/* Trống đồng ở giữa khi chưa có câu hỏi; xoay rất chậm, tắt khi người dùng giảm chuyển động. */
+.tlhero { flex: 1 1 auto; display: grid; place-items: center; min-height: 200px; pointer-events: none;
+  animation: tlHeroIn .6s .1s cubic-bezier(.22,.61,.36,1) both; }
+.tlhero img { width: min(70vw, 260px); aspect-ratio: 1; object-fit: contain; opacity: .95;
+  animation: tlSpin 90s linear infinite; }
+@keyframes tlHeroIn { from { opacity: 0; transform: scale(.92); } to { opacity: 1; transform: none; } }
+@keyframes tlSpin { to { transform: rotate(360deg); } }
+
+.tlmsg { animation: tlMsgIn .32s cubic-bezier(.22,.61,.36,1) both; }
+@keyframes tlMsgIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+.tlmsg.err { border-color: rgba(176,32,26,.35); background: #FBEDE7; }
+
+/* Ba chấm nhấp nháy khi đang trả lời. */
+.tlthink { display: inline-flex; gap: 5px; align-items: center; padding: 4px 2px; }
+.tlthink i { width: 7px; height: 7px; border-radius: 50%; background: var(--muc-nhat); display: block;
+  animation: tlDot 1.1s ease-in-out infinite; }
+.tlthink i:nth-child(2) { animation-delay: .15s; }
+.tlthink i:nth-child(3) { animation-delay: .3s; }
+@keyframes tlDot { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-4px); } }
+
+.tlretry { margin-top: 8px; min-height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--line);
+  background: #fff; color: var(--then); font: 600 13px/1 var(--body); cursor: pointer; }
+.tlretry:focus-visible { outline: 2px solid var(--dong); outline-offset: 2px; }
+
+.tlchip { transition: transform .18s cubic-bezier(.22,.61,.36,1), background .18s; }
+.tlchip:active { transform: scale(.96); }
+.tlsend { transition: transform .18s cubic-bezier(.22,.61,.36,1); }
+.tlsend:active { transform: scale(.92); }
+
+/* Nút nổi: xuất hiện mềm, nhấn thì co lại. */
+.tlfab { animation: tlFabIn .5s .3s cubic-bezier(.22,.61,.36,1) both; }
+.tlfab:active { transform: scale(.93); }
+@keyframes tlFabIn { from { opacity: 0; transform: translateY(10px) scale(.9); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tlpanel.tl-open, .tlpanel.tl-closing, .tlpanel .tlhead, .tlhero, .tlhero img,
+  .tlmsg, .tlthink i, .tlfab { animation: none; }
+}

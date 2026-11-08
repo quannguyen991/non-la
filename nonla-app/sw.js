@@ -155,7 +155,7 @@
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
 // v75: i18n-trang.js — chuỗi các trang web còn lại. i18n.js import nó, nên
 // thiếu trong SHELL là máy offline chết ở dòng import, y như v30.
-const CACHE = "nonla-v86";
+const CACHE = "nonla-v90";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -168,7 +168,7 @@ const VERSIONLESS_CACHES = [IMG_CACHE, "nonla-icons-v1"];
 const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css", "./community.css", "./welcome.css", "./you.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./nhan-mon.js", "./thucdon.js", "./gioithieu.js", "./i18n-web.js", "./i18n-khach.js", "./i18n-trang.js", "./dichnguon.js", "./goiymon.js", "./phantichbua.js", "./biengia.js", "./tro-ly.js", "./trolychat.js", "./route.js",
-  "./cloud.js", "./config.js", "./posts.js", "./kiemduyet.js", "./danhgia.js", "./anhmap.js", "./anhmapui.js", "./photo.js", "./outbox.js", "./community.js",
+  "./cloud.js", "./config.js", "./posts.js", "./kiemduyet.js", "./danhgia.js", "./social.js", "./anhmap.js", "./anhmapui.js", "./photo.js", "./outbox.js", "./community.js",
   "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./i18n-thong-bao.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js", "./units.js", "./predict.js", "./eaterydish.js", "./pricesync.js", "./menuref.js", "./premium.js", "./amlich.js", "./lich.js", "./hanhtrinh.js", "./monla.js", "./pricesrc.js", "./coso.js", "./uutien.js", "./thoathuan.js", "./phieuui.js", "./tien.js", "./hochieu.js", "./hochieuui.js", "./hints.js", "./freshness.js", "./ghikeo.js", "./ghikeoui.js", "./bandia.js", "./ungxu.js", "./diadiemmoi.js",
   "./manifest.json", "./icon.svg", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
   "./apple-touch-icon.png", "./favicon-32.png", "./favicon-16.png",

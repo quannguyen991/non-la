@@ -103,6 +103,8 @@ export async function savePost(draft, { photo = null, far = false } = {}) {
     stars: draft.stars ?? null,
     worthReturn: draft.worthReturn ?? null,
     recommend: draft.recommend === true,    // "gợi ý quán này" — đếm để xếp hạng gợi ý
+    repostOf: draft.repostOf || null,       // bài đăng lại: id của bài gốc
+    repostAuthor: draft.repostAuthor || null,
     body: draft.body || "",
     /* Bản đồ ảnh: loại địa điểm và toạ độ ĐÃ làm tròn (người dùng đã đồng ý).
        Thiếu hai cột này thì bài "điểm chụp" không có chỗ để đặt ghim. */
