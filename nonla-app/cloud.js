@@ -48,6 +48,7 @@ const toPost = (r) => ({
   placeId: r.place_id, dishId: r.dish_id,
   paidVnd: r.paid_vnd, stars: r.stars, worthReturn: r.worth_return,
   body: r.body, photoPath: r.photo_path, far: r.far,
+  lat: r.lat ?? null, lng: r.lng ?? null, category: r.category || "",
   createdAt: r.created_at,
   authorName: r.profiles?.name || "Traveller",
   authorCountry: r.profiles?.country || "",
@@ -134,9 +135,38 @@ export async function createPost(draft, { photoPath = null, photoHash = null, fa
       paid_vnd: draft.paidVnd, stars: draft.stars, worth_return: draft.worthReturn,
       body: draft.body || null,
       photo_path: photoPath, photo_hash: photoHash, far,
+      /* Ba cột bản đồ chỉ gửi khi CÓ giá trị: một máy chủ chưa chạy phần SQL
+         "bản đồ ảnh" vẫn nhận được bài thường, thay vì từ chối cả bài vì một
+         cột nó chưa biết. */
+      ...(draft.category ? { category: draft.category } : {}),
+      ...(draft.lat != null && draft.lng != null ? { lat: draft.lat, lng: draft.lng } : {}),
     }],
   });
   return toPost(rows[0]);
+}
+
+/**
+ * Các bài có ảnh để vẽ lên bản đồ ảnh. Chỉ lấy cột cần cho ghim — không kéo cả
+ * bài về chỉ để vẽ một hình tròn nhỏ. `category` lọc phía máy chủ.
+ * Máy chủ chưa có cột bản đồ thì thử lại không có chúng: ghim rơi về toạ độ quán.
+ */
+export async function listPhotoPins({ zone, category, limit = 300 } = {}) {
+  const q = new URLSearchParams();
+  q.set("photo_path", "not.is.null");
+  q.set("order", "created_at.desc");
+  q.set("limit", String(limit));
+  if (zone) q.set("zone", `eq.${zone}`);
+  const cot = "id,zone,place_id,dish_id,paid_vnd,stars,body,photo_path,created_at,profiles(name,country)";
+  try {
+    if (category) q.set("category", `eq.${category}`);
+    q.set("select", `${cot},lat,lng,category`);
+    return (await rest(`posts?${q}`) || []).map(toPost);
+  } catch (e) {
+    if (!/lat|lng|category|PGRST/i.test(`${e?.message} ${e?.code}`)) throw e;
+    q.delete("category");
+    q.set("select", cot);
+    return (await rest(`posts?${q}`) || []).map(toPost);
+  }
 }
 
 /** Trả về path trong bucket, không phải URL — URL sinh lúc vẽ. */

@@ -10,14 +10,17 @@
    chắc chắn nhất để không ai xem cả.
    ═══════════════════════════════════════════════════════════════ */
 
-import { listPosts, listComments, photoUrl, ready, commentsOn } from "./cloud.js";
+import { listPosts, listComments, listPhotoPins, photoUrl, ready, commentsOn } from "./cloud.js";
 import { pending, drop, MAX_TRIES } from "./outbox.js";
 import * as Local from "./localdb.js";
+import { CATEGORIES, CATEGORY_COLOR, categoryLabel, diemAnh, diemDiaDiem } from "./posts.js";
+import * as AnhUI from "./anhmapui.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-const M = { host: null, posts: [], seed: [], seedAll: null, seedComments: {}, places: [], dishes: [], zone: "", cb: {} };
+const M = { host: null, posts: [], seed: [], seedAll: null, seedComments: {}, places: [], dishes: [], zone: "", cb: {},
+  view: "feed", cat: "", pinPosts: [], allPins: [], maps: {}, dots: null, showDots: false };
 
 /* ── bài mẫu ship kèm app ─────────────────────────────────────
    VÌ SAO CÓ CHÚNG
@@ -93,6 +96,7 @@ function tieuDe(p, place) {
   }
   const d = M.dishes.find((x) => x.id === p.dishId);
   if (d) return `<span class="cplace cdish">${esc(d.vi)}<small>${esc(d.en)}</small></span>`;
+  if (!p.placeId && p.category) return `<span class="cplace cdish">${esc(categoryLabel(p.category))}</span>`;
   return p.placeId ? `<span class="cplace cgone">A place no longer on the map</span>` : "";
 }
 
@@ -128,6 +132,7 @@ function postHtml(p) {
         ${p.authorCountry ? `<span>· ${esc(p.authorCountry)}</span>` : ""}
         <span>· ${esc(ago(p.createdAt))}</span>
         ${p.seed ? `<span class="ctag">sample</span>` : ""}
+        ${p.category && p.placeId ? `<span class="ctag">${esc(categoryLabel(p.category))}</span>` : ""}
         ${p.local ? `<span class="conly">this phone only</span>` : ""}
         ${p.far ? `<span class="cfar">posted away from the venue</span>` : ""}
       </div>
@@ -149,6 +154,7 @@ function postHtml(p) {
 }
 
 async function paint() {
+  if (M.view !== "map") AnhUI.destroy();          // rời bản đồ toàn màn hình khi không còn ở chế độ bản đồ
   const all = await pending().catch(() => []);
   // Một bài đã hỏng đủ MAX_TRIES lần sẽ hỏng y hệt ở lần thử kế tiếp — auto-flush
   // đã thôi tự đụng vào nó, nên nó phải tách khỏi "đang chờ" và có lối thoát,
@@ -175,7 +181,16 @@ async function paint() {
         Connect a project in <em>You → Account</em> and these notes start syncing.</span>
       <button class="btn sec" data-cact="connect">Set it up</button></div>`}
     <button class="btn pri" data-cact="compose">Share a place</button>
-    ${M.posts.length
+    <div class="cview" role="tablist" aria-label="Community view">
+      <button role="tab" data-cview="feed" aria-selected="${M.view === "feed"}">Feed</button>
+      <button role="tab" data-cview="map" aria-selected="${M.view === "map"}">Photo map</button>
+    </div>
+    ${M.view === "map" ? mapPane() : feedPane()}`;
+  if (M.view === "map") await mountMap();
+}
+
+function feedPane() {
+  return `${M.posts.length
       ? `<div class="cfeed">${M.posts.map(postHtml).join("")}</div>`
       : `<p class="cempty">${ready()
           ? "No posts here yet. Be the first — photograph what you ate, and what you paid for it."
@@ -193,6 +208,116 @@ async function paint() {
       <div class="cfeed">${M.seed.map(postHtml).join("")}</div>` : ""}`;
 }
 
+/* ── BẢN ĐỒ ẢNH ───────────────────────────────────────────────
+   Mỗi bài có ảnh thành một ghim hình tròn mang chính tấm ảnh (xem anhmap.js).
+   Bài mẫu KHÔNG lên bản đồ: chúng không phải ảnh người thật chụp ở đó. */
+function mapPane() {
+  /* Bản đồ ảnh là một lớp toàn màn hình gắn vào #app (xem anhmapui.js), không nằm
+     trong luồng của trang. Ở đây chỉ để lại một dòng cho lúc người dùng đóng nó. */
+  return `<p class="cempty">The photo map is open. Tap ‹ to come back.</p>`;
+}
+
+/** Tên + địa chỉ trên thẻ ảnh của một bài thật. */
+function cardOfPost(p) {
+  const place = M.places.find((x) => x.id === p.placeId);
+  const dc = place ? (place.street || (place.ganPho ? `near ${place.ganPho}` : "")) : "";
+  if (place) return { title: place.name, sub: dc || categoryLabel(p.category) || "Vietnam" };
+  /* Bài "điểm chụp" không gắn quán: tên thẻ là câu đầu của ghi chú (nếu có), để hai
+     dòng trên thẻ không lặp lại cùng tên nhóm. */
+  const cau = String(p.body || "").trim().split(/(?<=[.!?])\s/)[0].slice(0, 46).trim();
+  const d = M.dishes.find((x) => x.id === p.dishId);
+  const nhom = categoryLabel(p.category);
+  return { title: d?.en || cau || nhom || "A spot", sub: nhom || "Shared by a traveller" };
+}
+
+async function mountMap() {
+  const app = document.getElementById("app");
+  if (!app || !M.host) return;
+  let posts = [];
+  try {
+    posts = ready()
+      ? await listPhotoPins({ limit: 300 })
+      : await Local.listPosts({ limit: 100 });      // bản đồ là cả nước, không chỉ vùng đang mở
+  } catch { posts = []; }
+  if (M.view !== "map" || !M.host?.isConnected) return;       // người dùng đã chuyển đi trong lúc chờ
+  M.dots = M.dots || diemDiaDiem(M.places, M.maps);
+  await AnhUI.show(app, {
+    pins: diemAnh(posts, M.places), dots: M.dots, maps: M.maps, showDots: M.showDots,
+    imgOf: (p) => (p.local ? Local.photoUrl(p) : (p.photoPath ? photoUrl(p.photoPath) : "")),
+    cardOf: cardOfPost,
+    onClose: () => { M.view = "feed"; paint(); },
+    onOpenPin: (p) => M.cb.onOpenPin?.(p),
+    onOpenSample: (p) => M.cb.onOpenSample?.(p),
+    onOpenDot: (d) => M.cb.onOpenDot?.(d),
+    onOpenIsland: (q) => M.cb.onOpenIsland?.(q),
+  });
+}
+
+const PI = {
+  dir: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 3.6 3.9 10.5c-.9.4-.8 1.7.2 2l6.2 1.7 1.7 6.2c.3 1 1.6 1.1 2 .2l6.9-16.5c.4-.9-.6-1.8-1.5-1.5z" fill="currentColor"/></svg>`,
+  save: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.8h11v16.4l-5.5-4-5.5 4z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>`,
+  share: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3.8m0 0L8.2 7.6M12 3.8l3.8 3.8M6.5 11H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+};
+
+/**
+ * Thẻ chi tiết của MỘT ảnh, kiểu thẻ địa điểm của Apple Maps: ảnh lớn bo góc,
+ * nhãn nhóm, tên cỡ lớn, ba nút hành động (chỉ đường, lưu, chia sẻ), rồi ghi chú.
+ * Dùng cho cả ảnh MẪU (nói rõ là mẫu) và bài thật của khách.
+ */
+export function placeCard(p) {
+  const c = p.sample ? { title: p.title, sub: p.sub } : cardOfPost(p);
+  const place = M.places.find((x) => x.id === p.placeId);
+  const img = p.sample ? p.photo : p.local ? Local.photoUrl(p) : (p.photoPath ? photoUrl(p.photoPath) : "");
+  const at = (p.lat != null && p.lng != null) ? [p.lat, p.lng] : (Array.isArray(place?.at) ? place.at : null);
+  const col = CATEGORY_COLOR[p.category] || "#8E8E93";
+  const id = esc(String(p.id));
+  const saved = AnhUI.isSaved(p.id);
+  const real = !p.sample;
+  return `<div class="pcard">
+    ${img ? `<div class="pcard-hero"><img src="${esc(img)}" alt="" onerror="this.parentNode.remove()">
+        <i class="pcard-c tl"></i><i class="pcard-c tr"></i><i class="pcard-c bl"></i><i class="pcard-c br"></i></div>` : ""}
+    <div class="pcard-body">
+      <p class="pcard-tags">
+        <span class="pcard-tag" style="--c:${col}"><i></i>${esc(categoryLabel(p.category) || "A spot")}</span>
+        ${p.sample ? `<span class="pcard-tag pcard-sample">Sample</span>` : ""}
+        ${p.far ? `<span class="pcard-tag pcard-sample">Posted away from the venue</span>` : ""}
+      </p>
+      <h3 class="pcard-title">${esc(c.title)}</h3>
+      <p class="pcard-sub">${esc(p.sample && p.en ? `${c.sub} · ${p.en}` : c.sub)}</p>
+      <div class="pcard-actions">
+        ${at ? `<a class="pcard-act pcard-primary" href="https://www.google.com/maps/dir/?api=1&amp;destination=${at[0]},${at[1]}" target="_blank" rel="noopener">${PI.dir}<span>Directions</span></a>` : ""}
+        <button class="pcard-act" type="button" data-psave="${id}" aria-pressed="${saved}">${PI.save}<span>${saved ? "Saved" : "Save"}</span></button>
+        <button class="pcard-act" type="button" data-pshare="${id}" data-ptitle="${esc(c.title)}">${PI.share}<span>Share</span></button>
+      </div>
+      ${real && (p.paidVnd || p.stars != null) ? `<div class="pcard-facts">
+        ${p.paidVnd ? `<div><span>Paid</span><b>${esc(money(p.paidVnd))}</b></div>` : ""}
+        ${p.stars != null ? `<div><span>Rating</span><b>${stars(p.stars)}</b></div>` : ""}
+        ${p.authorName ? `<div><span>Shared by</span><b>${esc(p.authorName)}${p.authorCountry ? ` · ${esc(p.authorCountry)}` : ""}</b></div>` : ""}
+        ${p.createdAt ? `<div><span>When</span><b>${esc(ago(p.createdAt))}</b></div>` : ""}
+      </div>` : ""}
+      ${p.body || p.note ? `<p class="pcard-note">${esc(p.body || p.note)}</p>` : ""}
+      <div class="pcard-band" aria-hidden="true"></div>
+      ${p.sample ? `<p class="pcard-foot">A sample photo that ships with the app, not posted by a traveller.</p>` : ""}
+      ${real ? nutBinhLuan(p) : ""}
+      ${real ? (p.local
+        ? `<button class="creport" data-cdel="${id}">Delete</button>`
+        : `<button class="creport" data-creport="${id}">Report</button>`) : ""}
+    </div>
+  </div>`;
+}
+
+/** Cho tương thích với chỗ gọi cũ: ảnh mẫu dùng thẻ chi tiết chung. */
+export const sampleSheet = placeCard;
+
+/** Một hoặc nhiều bài, dựng thành khối HTML cho sheet khi chạm ghim. */
+export function pinSheet(posts) {
+  const ps = Array.isArray(posts) ? posts : [posts];
+  if (ps.length === 1) return placeCard(ps[0]);
+  return `<h3>${ps.length} photos here</h3>
+    <div class="cfeed">${ps.map(postHtml).join("")}</div>
+    <button class="btn sec" data-act="close">Close</button>`;
+}
+
 /** Vứt mọi bài đã hỏng đủ MAX_TRIES lần. Gọi từ nút Discard trong banner hàng chờ. */
 async function discardStuck() {
   const all = await pending().catch(() => []);
@@ -202,9 +327,10 @@ async function discardStuck() {
   await paint();
 }
 
-export async function open({ host, zone, places = [], dishes = [], onOpenPlace, onCompose, onReport, onConnect, onThread }) {
-  M.host = host; M.zone = zone; M.places = places; M.dishes = dishes;
-  M.cb = { onOpenPlace, onCompose, onReport, onConnect, onThread };
+export async function open({ host, zone, places = [], dishes = [], maps = {}, onOpenPlace, onCompose, onReport, onConnect, onThread, onOpenPin, onOpenSample, onOpenDot, onOpenIsland }) {
+  M.host = host; M.zone = zone; M.places = places; M.dishes = dishes; M.maps = maps; M.dots = null;
+  M.view = "feed";                  // quay lại tab Cộng đồng luôn bắt đầu ở bảng tin, không tự mở bản đồ
+  M.cb = { onOpenPlace, onCompose, onReport, onConnect, onThread, onOpenPin, onOpenSample, onOpenDot, onOpenIsland };
   M.posts = []; M.seed = [];
   await paint();                       // vẽ khung ngay, đừng để màn hình trắng
   await refresh();
@@ -233,7 +359,7 @@ export async function refresh() {
   await paint();
 }
 
-export function close() { M.host = null; M.posts = []; }
+export function close() { M.host = null; M.posts = []; AnhUI.destroy(); }
 
 /* ── LUỒNG BÀN LUẬN ───────────────────────────────────────────
    Mỗi bài gắn một quán, nên bình luận dưới bài là chỗ bàn về quán đó. Ba
@@ -351,11 +477,15 @@ export function dishOptionsFor(placeId, { places = [], dishes = [] } = {}) {
 export function composer({ places = [], dishes = [], place = null } = {}) {
   return `
     <h3>Share a place</h3>
-    <p class="src">Photos you post leave your phone. GPS coordinates inside them do not.
+    <p class="src">Photos you post leave your phone. The GPS data inside the photo file never does.
       Other travellers can comment on your post to discuss the place.</p>
-    <label class="fld"><span>Place</span>
+    <label class="fld"><span>Place <small>or leave empty and share the photo's location below</small></span>
       <input id="cfPlaceQ" type="search" autocomplete="off" placeholder="Search a name or a street">
       <select id="cfPlace">${placeOptions(places, "", place || "")}</select></label>
+    <label class="fld"><span>Type of place <small>optional with a place, needed without one</small></span>
+      <select id="cfCat"><option value="">—</option>
+        ${CATEGORIES.map(([id, label]) => `<option value="${id}">${esc(label)}</option>`).join("")}
+      </select></label>
     <label class="fld"><span>Dish <small>optional</small></span>
       <select id="cfDish">${dishOptionsFor(place, { places, dishes })}</select></label>
     <label class="fld"><span>What you paid <small>optional</small></span>
@@ -368,7 +498,12 @@ export function composer({ places = [], dishes = [], place = null } = {}) {
     <label class="fld"><span>Note <small>optional, 600 max</small></span>
       <textarea id="cfBody" maxlength="600" rows="3"></textarea></label>
     <label class="fld"><span>Photo <small>optional</small></span>
-      <input id="cfPhoto" type="file" accept="image/*" capture="environment"></label>
+      <input id="cfPhoto" type="file" accept="image/*"></label>
+    <div id="cfNear" class="cnear" aria-live="polite"></div>
+    <label class="fld row2"><input id="cfLoc" type="checkbox"><span>Show where I took this on the photo map</span></label>
+    <p class="src" id="cfLocNote">Off by default. If you turn it on, the pin sits within about 30 m of where the photo was taken —
+      from the photo's own location, or your phone's if the photo has none (your phone will ask permission).
+      Left off, the pin sits at the place you chose.</p>
     <p class="cerr" id="cfErr" hidden></p>
     <button class="btn" data-cact="submit">Post</button>
     <button class="btn sec" data-act="close">Cancel</button>`;
@@ -383,6 +518,23 @@ export function composer({ places = [], dishes = [], place = null } = {}) {
  * trực tiếp, không phụ thuộc tab nào đang mở.
  */
 export function handleClick(target) {
+  const psv = target.closest("[data-psave]");
+  if (psv) {
+    const on = AnhUI.toggleSaved(psv.dataset.psave);
+    psv.setAttribute("aria-pressed", String(on));
+    const lb = psv.querySelector("span"); if (lb) lb.textContent = on ? "Saved" : "Save";
+    return true;
+  }
+  const psh = target.closest("[data-pshare]");
+  if (psh) {
+    const title = psh.dataset.ptitle || "A spot on Nón Lá";
+    const text = `${title} — found on Nón Lá`;
+    if (navigator.share) navigator.share({ title, text, url: location.origin }).catch(() => {});
+    else navigator.clipboard?.writeText(text).then(() => { const lb = psh.querySelector("span"); if (lb) lb.textContent = "Copied"; }).catch(() => {});
+    return true;
+  }
+  const vw = target.closest("[data-cview]");
+  if (vw) { M.view = vw.dataset.cview === "map" ? "map" : "feed"; if (M.view === "feed") AnhUI.destroy(); paint(); return true; }
   const place = target.closest("[data-cplace]");
   if (place) return M.cb.onOpenPlace?.(place.dataset.cplace), true;
   const th = target.closest("[data-cthread]");
@@ -402,4 +554,34 @@ export function handleClick(target) {
   if (target.closest("[data-cdiscard]")) return discardStuck(), true;
   if (target.closest("[data-cact='connect']")) return M.cb.onConnect?.(), true;
   return false;
+}
+
+/**
+ * Bản đồ nhỏ + danh sách các quán quanh nơi chụp ảnh. Chạm một quán để chọn
+ * nó làm Place của bài. Toàn bộ tính trên máy: toạ độ không rời điện thoại.
+ *
+ * @param {{place:object, m:number}[]} gan  kết quả quanGanToaDo()
+ * @param {"photo"|"device"|null} nguon     toạ độ lấy từ ảnh hay từ vị trí máy
+ * @param {(m:number)=>string} fmt          định dạng khoảng cách
+ * @param {(a:number[],b:number[])=>{x:number,y:number}} chieu  project(point, origin)
+ */
+export function photoNearHtml(gan, nguon, fmt, chieu, origin) {
+  const dau = nguon === "photo" ? "where this photo was taken" : "your current location";
+  if (!nguon) return `<p class="src">This photo has no location, so search the place by name above.</p>`;
+  if (!gan.length) return `<p class="src">No known places within 400 m of ${dau}. Search the place by name above.</p>`;
+  const bk = Math.max(80, gan[gan.length - 1].m) * 1.2;      // bán kính hiển thị, mét
+  const k = 86 / bk;                                         // pixel mỗi mét
+  const dots = gan.map((g, i) => {
+    const { x, y } = chieu(g.place.at, origin);
+    return `<g class="cnear-pin" data-cnear="${esc(g.place.id)}" tabindex="0" role="button"
+        aria-label="${esc(g.place.name)}, ${esc(fmt(g.m))}">
+      <circle cx="${(100 + x * k).toFixed(1)}" cy="${(100 + y * k).toFixed(1)}" r="9"/>
+      <text x="${(100 + x * k).toFixed(1)}" y="${(104 + y * k).toFixed(1)}">${i + 1}</text></g>`;
+  }).join("");
+  return `<p class="src">Places near ${dau} — tap one to choose it.</p>
+    <svg class="cnear-map" viewBox="0 0 200 200" role="img" aria-label="Map of places near the photo">
+      <circle class="cnear-ring" cx="100" cy="100" r="86"/>
+      <circle class="cnear-me" cx="100" cy="100" r="5"/>${dots}</svg>
+    <ol class="cnear-list">${gan.map((g, i) => `<li><button type="button" data-cnear="${esc(g.place.id)}">
+      <b>${i + 1}</b> ${esc(g.place.name)} <small>${esc(fmt(g.m))}</small></button></li>`).join("")}</ol>`;
 }

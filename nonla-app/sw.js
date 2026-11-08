@@ -153,7 +153,7 @@
 // v30: i18n.js — lớp ngôn ngữ. Thiếu tệp này trong SHELL thì máy đang
 // offline mở app ra chết ở dòng import của app.js. Cùng loại lỗi với v22,
 // v28 và v29 — mọi module MỚI phải vào danh sách này, không có ngoại lệ.
-const CACHE = "nonla-v70";
+const CACHE = "nonla-v71";
 
 /* Các cache SỐNG NGOÀI phiên bản vỏ app — activate KHÔNG được đụng vào.
    Nội dung của chúng bất biến và tốn kém để tải lại: ảnh cộng đồng tốn
@@ -166,9 +166,10 @@ const VERSIONLESS_CACHES = [IMG_CACHE, "nonla-icons-v1"];
 const SHELL = [
   "./", "./index.html", "./app.css", "./app.js", "./match.js", "./motifs.js", "./sights.js", "./auth.js", "./foodmap.js", "./foodmap.css", "./community.css", "./welcome.css", "./you.css",
   "./geo.js", "./bigmap.js", "./iso.js", "./artmap.js", "./citymap.js", "./imgsvc.js", "./nhan-mon.js", "./tro-ly.js", "./trolychat.js", "./route.js",
-  "./cloud.js", "./config.js", "./posts.js", "./photo.js", "./outbox.js", "./community.js",
+  "./cloud.js", "./config.js", "./posts.js", "./kiemduyet.js", "./anhmap.js", "./anhmapui.js", "./photo.js", "./outbox.js", "./community.js",
   "./links.js", "./localdb.js", "./welcome.js", "./history.js", "./survey.js", "./surveyui.js", "./i18n.js", "./showcard.js", "./trust.js", "./change.js", "./menutax.js", "./postcard.js", "./localprices.js", "./units.js", "./predict.js", "./eaterydish.js", "./pricesync.js", "./menuref.js", "./premium.js", "./amlich.js", "./lich.js", "./hanhtrinh.js", "./monla.js", "./pricesrc.js", "./coso.js", "./uutien.js", "./thoathuan.js", "./phieuui.js", "./tien.js", "./hochieu.js", "./hochieuui.js",
-  "./manifest.json", "./icon.svg",
+  "./manifest.json", "./icon.svg", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
+  "./apple-touch-icon.png", "./favicon-32.png", "./favicon-16.png",
   "./data/dishes.json", "./data/prices.json", "./data/places.json",
   "./data/maps.json", "./data/eateries.json", "./data/famous.json", "./data/trips.json",
   "./data/menuref.json", "./data/premium.json", "./data/lich.json",
@@ -214,6 +215,12 @@ self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+
+  /* Bản đồ ảnh (anhmap.js): thư viện MapLibre và tile OpenFreeMap đi thẳng ra
+     mạng, KHÔNG qua cache của app. Nhánh network-first bên dưới sẽ chép từng ô
+     tile vào cache vỏ app và làm nó phình ra mãi; trình duyệt tự cache HTTP
+     cho chúng là đủ. */
+  if (/^(tiles\.openfreemap\.org|cdnjs\.cloudflare\.com)$/.test(url.hostname)) return;
 
   /* Ảnh cộng đồng: cache-first và KHÔNG bao giờ dọn theo phiên bản vỏ app.
      Chúng bất biến — mỗi bài một path riêng — nên bản đã tải về luôn đúng.

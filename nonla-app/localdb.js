@@ -103,6 +103,11 @@ export async function savePost(draft, { photo = null, far = false } = {}) {
     stars: draft.stars ?? null,
     worthReturn: draft.worthReturn ?? null,
     body: draft.body || "",
+    /* Bản đồ ảnh: loại địa điểm và toạ độ ĐÃ làm tròn (người dùng đã đồng ý).
+       Thiếu hai cột này thì bài "điểm chụp" không có chỗ để đặt ghim. */
+    category: draft.category || "",
+    lat: draft.lat ?? null,
+    lng: draft.lng ?? null,
     photo,                                  // Blob, không phải path
     far: !!far,
     authorName: name() || "You",

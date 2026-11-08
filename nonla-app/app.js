@@ -8,7 +8,7 @@ import { parseMenu, matchDish, verdict, readNotes, zeroSlip,
 import { birdFlying, birdStanding, deer,
          FRIEZE, dataURI, wrap } from "./motifs.js";
 import * as BigMap from "./bigmap.js";
-import { distance, fmtDistance } from "./geo.js";
+import { distance, fmtDistance, project } from "./geo.js";
 import * as Img from "./imgsvc.js";
 import { iconOf as sightIcon } from "./sights.js";
 import * as Auth from "./auth.js";
@@ -17,9 +17,10 @@ import { SUPABASE_URL, SUPABASE_ANON } from "./config.js";
 import * as Community from "./community.js";
 import * as Cloud from "./cloud.js";
 import * as Outbox from "./outbox.js";
-import { validate as validatePost, farFrom, summarise, priceBand } from "./posts.js";
+import { validate as validatePost, farFrom, summarise, priceBand, quanGanToaDo, lamTronToaDo } from "./posts.js";
 import { luatBaiDang, quyetDinh, diemKiemDuyet } from "./kiemduyet.js";
-import { compress } from "./photo.js";
+import { compress, readExifGps } from "./photo.js";
+import * as AnhUI from "./anhmapui.js";
 import { mapsLinks, socialLinks, shareTargets, shareText } from "./links.js";
 import * as Local from "./localdb.js";
 /* Nhập tên là T, không phải t: chỗ vẽ thanh tab đã dùng `t` làm biến vòng
@@ -1499,13 +1500,6 @@ const tallyLine = (which, notes) => {
     .join("");
 };
 
-function renderChange() {
-  const g = S.chg;
-  const paid = g.paid.reduce((a, b) => a + b, 0);
-  const got = g.got.reduce((a, b) => a + b, 0);
-  const due = Change.changeDue(paid, g.bill);
-  /* Chỉ chấm điểm khi ĐÃ có tiền trong tay. Gọi check() với got = 0 sẽ
-     báo "thiếu đúng bằng khoảng cách hai tờ xanh" cho một người còn chưa
 /* Vẽ nắm tiền thối bằng các "tờ tiền" nhỏ đúng tông màu, mỗi tờ một ô —
    đối chiếu hình dạng nhanh hơn đọc "460.000₫" khi tay còn đang cầm tiền.
    Chữ nằm ngay dưới để người đọc màn hình vẫn có đủ thông tin; hình chỉ là
@@ -1520,6 +1514,13 @@ function changeNotesHTML(due) {
     <p class="src">Usually handed back as these notes.</p>`;
 }
 
+function renderChange() {
+  const g = S.chg;
+  const paid = g.paid.reduce((a, b) => a + b, 0);
+  const got = g.got.reduce((a, b) => a + b, 0);
+  const due = Change.changeDue(paid, g.bill);
+  /* Chỉ chấm điểm khi ĐÃ có tiền trong tay. Gọi check() với got = 0 sẽ
+     báo "thiếu đúng bằng khoảng cách hai tờ xanh" cho một người còn chưa
      đếm gì cả — một lời cảnh báo đúng công thức nhưng sai hoàn cảnh. */
   const v = due != null && due >= 0 && got > 0 ? Change.check(due, got) : null;
 
@@ -4148,19 +4149,129 @@ function openFoodMap() {
   });
 }
 
-function openBigMap() {
+/* ── KHÁM PHÁ BẰNG BẢN ĐỒ (bản đồ toàn màn hình, nền thật) ─────────
+   "Open full map" mở bản đồ nền thật dùng chung với bản đồ ảnh (anhmapui.js):
+     · mốc tham quan CÓ ảnh là ghim ảnh; mốc không ảnh và mọi quán là chấm;
+     · chấm quán tô theo PHÁN QUYẾT GIÁ đọc từ dgOf() (xanh ngọc: giá hợp lý,
+       son: trên khoảng giá, xám: chưa có lượt quét) — KHÔNG bao giờ tô màu theo
+       một nhãn gán tay, cùng quy tắc với bản đồ cũ;
+     · bảng thẻ kéo lên liệt kê quán và mốc trong khung nhìn.
+   Bản đồ nền thật cần mạng. Mất mạng, hoặc thư viện bản đồ không tải được, thì quay
+   về bản đồ vẽ tay offline cũ (openBigMapLegacy) — thứ làm app chạy được ở phố cổ
+   không có sóng. */
+const CULTURAL_TYPES = new Set(["bridge", "hall", "temple", "house", "museum", "church", "lake"]);
+const MUC_MAU = { fair: "#1F8A70", high: "#B0201A" };
+const MUC_NEN = { fair: "#0E4A3C", high: "#8E1C17" };
+const MUC_NHAN = { fair: "Fair price", high: "Above range" };
+
+function exploreData() {
+  const sights = [];
+  for (const [zid, z] of Object.entries(S.maps || {})) {
+    for (const l of z?.landmarks || []) {
+      if (l.an || !Array.isArray(l.at)) continue;
+      sights.push({ zid, zname: z.name || zid, lm: l, id: `sight:${zid}:${l.osm || l.n}` });
+    }
+  }
+  const sightPosts = sights.map((x) => ({ id: x.id, kind: "sight", lm: x.lm, zname: x.zname, at: x.lm.at }));
+  const placePosts = S.places.filter((p) => Array.isArray(p.at)).map((p) => {
+    const muc = dgOf(p).muc;
+    return { id: p.id, kind: "place", place: p, muc, at: p.at };
+  });
+  return { sightPosts, placePosts };
+}
+
+async function openExplore(geo) {
+  const { sightPosts, placePosts } = exploreData();
+  const zname = (zid) => S.maps[zid]?.name || zid;
+  const keep = {
+    all: () => true,
+    fair: (x) => x.kind === "place" && x.muc === "fair",
+    over: (x) => x.kind === "place" && x.muc === "high",
+    food: (x) => x.kind === "place",
+    cafe: (x) => x.kind === "place" && (x.place.known || []).some((k) => /^ca-phe/.test(k)),
+    culture: (x) => x.kind === "sight" && CULTURAL_TYPES.has(x.lm.t),
+    gem: (x) => x.kind === "sight" && !x.lm.star,
+  };
+  // Mốc là KHUNG ĐỊNH HƯỚNG: lọc theo giá thì giữ nguyên chúng trên bản đồ (xem KEEP_MARK
+  // của bigmap.js); chỉ hai bộ lọc nói VỀ mốc mới thu hẹp chúng.
+  const keepPin = (x, k) => (k === "culture" || k === "gem" ? keep[k](x) : true);
+  const keepRow = (x, k) => (keep[k] || keep.all)(x);
+  const MAU_CHIP = { fair: "#1F8A70", over: "#B0201A", food: "#D9822B", culture: "#C2437B", cafe: "#8C6D46", gem: "#17A398" };
+  const chips = BigMap.FILTERS.filter((f) => f.k !== "all").map((f) => ({ k: f.k, label: f.label, color: MAU_CHIP[f.k] }));
+
+  const pins = sightPosts.filter((x) => x.lm.img).map((x) => ({ id: x.id, at: x.at, post: x }));
+  const rows = [...pins, ...sightPosts.filter((x) => !x.lm.img).map((x) => ({ id: x.id, at: x.at, post: x })),
+    ...placePosts.map((x) => ({ id: x.id, at: x.at, post: x }))];
+
+  const dotOf = (x) => x.kind === "place"
+    ? { id: x.id, name: x.place.name, at: x.at, kind: "place", cat: "", color: MUC_MAU[x.muc] || "#8E8A7E", lvl: x.muc || "" }
+    : { id: x.id, name: x.lm.n, en: x.lm.en || "", at: x.at, kind: "sight", cat: "", color: "#D9A227" };
+  const norm = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").toLowerCase();
+  const dotsFor = (k, qq) => {
+    const kk = norm(qq).trim();
+    return [...placePosts, ...sightPosts.filter((x) => !x.lm.img)]
+      .filter((x) => keepRow(x, k))
+      .filter((x) => !kk || norm(x.kind === "place" ? x.place.name : `${x.lm.n} ${x.lm.en || ""}`).includes(kk))
+      .map(dotOf);
+  };
+
+  const here = S.places.filter((p) => p.zone === S.zone);
+  const nFair = here.filter((p) => dgOf(p).muc === "fair").length;
+  const nHigh = here.filter((p) => dgOf(p).muc === "high").length;
+  const zoneCenters = Object.entries(S.maps).map(([id, z]) => ({ id, c: z.center })).filter((z) => Array.isArray(z.c));
+
+  return AnhUI.show($("#app"), {
+    kicker: "Explore by map", placeholder: "Search places, dishes, sights…", unit: "place",
+    wideTitle: "Across Vietnam", noSample: true,
+    note: `${nFair} fair-price · ${nHigh} above range in ${zoneEn().replace(" · ", " ")}`,
+    start: { center: geo.center, zoom: 14.2 },
+    pins, rows, chips, keepPin, keepRow, dots: dotsFor("", ""), dotsFor, showDots: true,
+    imgOf: (x) => (x.kind === "sight" && x.lm.img ? `assets/sights/${x.lm.img}.jpg` : ""),
+    cardOf: (x) => {
+      if (x.kind === "sight") return { title: x.lm.n, sub: x.zname, bg: "#5B4A1E" };
+      const p = x.place, d = dgOf(p).muc;
+      const dc = p.street || (p.ganPho ? `near ${p.ganPho}` : zname(p.zone));
+      return { title: p.name, sub: `${MUC_NHAN[d] || "Not scanned yet"} · ${dc}`, bg: MUC_NEN[d] || "#4A5A50" };
+    },
+    areaOf: (c) => {
+      if (!c) return "";
+      let best = null;
+      for (const z of zoneCenters) {
+        const m = distance(c, z.c);
+        if (m < 12000 && (!best || m < best.m)) best = { m, id: z.id };
+      }
+      return best ? zname(best.id) : "";
+    },
+    onClose: () => AnhUI.destroy(),
+    onOpenRow: (x) => (x.kind === "place" ? showPlace(x.id) : showMark(x.lm)),
+    onOpenPin: (x) => (Array.isArray(x) ? null : (x.kind === "place" ? showPlace(x.id) : showMark(x.lm))),
+    onOpenDot: (d) => {
+      if (d.kind === "place") return showPlace(d.id);
+      const x = sightPosts.find((y) => y.id === d.id);
+      if (x) showMark(x.lm);
+    },
+    onOpenIsland: (q) => openSheet(Community.islandSheet(q)),
+  });
+}
+
+async function openBigMap() {
   const geo = S.maps[S.zone];
-  if (!geo) return toast("No map for this area yet");
+  if (!geo) return toast(T("No map for this area yet"));
+  if (navigator.onLine !== false) {
+    try {
+      if (await openExplore(geo)) return;
+    } catch { /* thư viện bản đồ hoặc dữ liệu hỏng: rơi về bản đồ offline */ }
+    AnhUI.destroy();
+  }
+  openBigMapLegacy(geo);
+}
+
+function openBigMapLegacy(geo) {
   $("#v-bigmap").hidden = false;
   $(".tabbar").hidden = true;
   BigMap.open({
     zoneId: S.zone, zone: zone(), geo, places: S.places, icons: I,
     iconOf: markIcon, lvlOf: (p) => dgOf(p).muc,
-    /* Lọc theo TRƯỜNG `zone` của từng bản ghi, không theo một id ghi cứng.
-       Bản trước khoá vào "hoian-oldtown" vì tệp quán ăn chỉ có Hội An; giờ
-       nó có cả sáu vùng, và một điều kiện ghi cứng như thế khiến mọi vùng
-       thêm sau im lặng mất lớp này mà không có gì báo lên. Vùng nào chưa
-       có quán nào thì mảng rỗng, chip Eateries tự không hiện. */
     // Lớp quán ăn OSM riêng đã trùng với lớp quán (places.json sinh từ OSM).
     eateries: [],
     onOpenPlace: (id, m) => showPlace(id, m),
@@ -4361,6 +4472,12 @@ function renderCommunity() {
     onOpenPlace: (id) => showPlace(id),
     onReport: (id) => reportPost(id),
     onThread: (id) => openThread(id),
+    maps: S.maps,
+    onOpenPin: (posts) => openSheet(Community.pinSheet(posts)),
+    /* Chấm quán mở thẻ quán sẵn có; chấm mốc chỉ có tên, nhóm và ghi chú. */
+    onOpenDot: (d) => (d.kind === "place" ? showPlace(d.id) : openSheet(Community.sightSheet(d))),
+    onOpenIsland: (q) => openSheet(Community.islandSheet(q)),
+    onOpenSample: (p) => openSheet(Community.sampleSheet(p)),
     /* Đưa thẳng tới thẻ Account và cuộn tới nó, không chỉ đổi tab: tab You
        dài hơn một màn hình, và bỏ người dùng ở đầu trang với lời dặn "tìm
        mục Account" là bắt họ làm nốt việc mà mình vừa hứa sẽ làm hộ. */
@@ -4548,6 +4665,50 @@ function openComposer(placeId = "") {
   if (sel) sel.onchange = () => {
     $("#cfDish").innerHTML = Community.dishOptionsFor(sel.value, { places: S.places, dishes: S.dishes });
   };
+
+  /* Chọn ảnh xong thì chỉ ra các quán quanh nơi chụp trên một bản đồ nhỏ.
+     Toạ độ lấy từ EXIF của ảnh; ảnh không có thì dùng vị trí máy nếu có.
+     Chạm một quán để chọn nó làm Place. Mọi thứ tính trên máy. */
+  S.cfGeo = null;                               // toạ độ trong ảnh đang chọn, nếu có
+  const ph = $("#cfPhoto"), near = $("#cfNear");
+  /* Ô "Show where I took this": bật thì xin vị trí máy NẾU ảnh không có toạ độ.
+     Bị từ chối thì tự bỏ tick và nói rõ — không giữ một ô đã tick mà không có gì sau nó. */
+  const loc = $("#cfLoc");
+  if (loc) loc.onchange = () => {
+    /* Ảnh có toạ độ riêng thì dùng nó. Không có thì LUÔN xin vị trí mới: S.me có thể
+       là vị trí của lần xin trước, ở một thành phố khác — người đang đi du lịch. */
+    if (!loc.checked || S.cfGeo) return;
+    if (!navigator.geolocation) { loc.checked = false; return toast(T("Location not available on this device")); }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { S.me = [pos.coords.latitude, pos.coords.longitude]; },
+      () => { loc.checked = false; toast(T("Location not available on this device")); },
+      { enableHighAccuracy: false, maximumAge: 60_000, timeout: 15_000 },
+    );
+  };
+  if (ph && near) {
+    ph.onchange = async () => {
+      const f = ph.files?.[0];
+      if (!f) { near.innerHTML = ""; S.cfGeo = null; return; }
+      let origin = await readExifGps(f), nguon = origin ? "photo" : null;
+      S.cfGeo = origin || null;
+      if (!origin && S.me) { origin = S.me; nguon = "device"; }
+      if (ph.files?.[0] !== f) return;           // người dùng đã chọn ảnh khác trong lúc chờ
+      near.innerHTML = Community.photoNearHtml(quanGanToaDo(S.places, origin), nguon, fmtDistance, project, origin);
+    };
+    near.onclick = (e) => {
+      const el = e.target.closest("[data-cnear]");
+      if (!el) return;
+      const s = $("#cfPlace"), id = el.dataset.cnear;
+      if (![...s.options].some((o) => o.value === id)) {
+        const p = S.places.find((x) => x.id === id);
+        if (!p) return;
+        s.insertAdjacentHTML("beforeend", `<option value="${esc(id)}">${esc(p.name)}</option>`);
+      }
+      s.value = id;
+      s.onchange?.();
+      toast("Place chosen");
+    };
+  }
 }
 
 function readDraft() {
@@ -4562,13 +4723,72 @@ function readDraft() {
     body: $("#cfBody")?.value?.trim() || null,
     photo: $("#cfPhoto")?.files?.[0] || null,
     coords: null,
+    category: $("#cfCat")?.value || null,
+    ...viTriBai(),
   };
+}
+
+/* VỊ TRÍ TRÊN BẢN ĐỒ ẢNH — chỉ khi người dùng tick ô "Show where I took this".
+   Ưu tiên toạ độ trong chính ảnh (S.cfGeo, đặt khi chọn ảnh), rồi tới vị trí máy.
+   Luôn làm tròn vào lưới ~33 m TRƯỚC khi vào bài; không tick thì không có gì
+   được ghi lại và ghim rơi về toạ độ quán. */
+function viTriBai() {
+  if (!$("#cfLoc")?.checked) return { lat: null, lng: null, locWanted: false };
+  const c = lamTronToaDo(S.cfGeo || S.me);
+  return { lat: c ? c[0] : null, lng: c ? c[1] : null, locWanted: true };
+}
+
+/* Kiểm duyệt trước khi đăng: lớp luật (offline) rồi AI đọc chữ + ảnh. Trả về
+   câu nói với người dùng khi bài bị giữ, hoặc null khi được đi tiếp.
+   - "chan" thì dừng hẳn; "cho" dừng MỘT lần: bấm Post lại với đúng nội dung
+     đó là người dùng xác nhận và bài đi tiếp (AI có thể đoán sai).
+   - AI không trả lời được (mạng, hạn mức, chưa bật) thì chỉ còn lớp luật. */
+async function kiemDuyetBai(draft) {
+  const luat = luatBaiDang(draft);
+  let ai = null;
+  if (!luat.length || draft.photo) {
+    try {
+      let image = null;
+      if (draft.photo) {
+        const c = await compress(draft.photo);
+        const url = await new Promise((ok, no) => {
+          const r = new FileReader();
+          r.onload = () => ok(String(r.result)); r.onerror = no; r.readAsDataURL(c.blob);
+        });
+        if (url.length <= 700_000) image = url;
+      }
+      if (draft.body || image) {
+        const r = await fetch(diemKiemDuyet(), {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ body: draft.body || "", image }),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (r.ok) ai = await r.json();
+      }
+    } catch { ai = null; }
+  }
+  const q = quyetDinh(luat, ai && ["ok", "cho", "chan"].includes(ai.verdict)
+    ? { verdict: ai.verdict, reasons: Array.isArray(ai.reasons) ? ai.reasons : [] } : null);
+  if (q.status === "ok") return null;
+  const key = `${draft.body}|${draft.photo?.name || ""}|${draft.photo?.size || 0}`;
+  if (q.status === "cho" && S.kdCho === key) return null;
+  S.kdCho = q.status === "cho" ? key : null;
+  return q.messages.join(" ") + (q.status === "cho" ? " Tap Post again to send it anyway." : "");
 }
 
 async function submitPost() {
   const draft = readDraft();
   const v = validatePost(draft);
   if (!v.ok) { const e = $("#cfErr"); e.hidden = false; e.textContent = v.errors.join(" · "); return; }
+  if (draft.locWanted && draft.lat == null) {
+    const e = $("#cfErr"); e.hidden = false;
+    e.textContent = "No location is available for this post. Allow location access, or turn off “Show where I took this”.";
+    return;
+  }
+  busy(true, "Checking…");
+  const giu = await kiemDuyetBai(draft);
+  busy(false);
+  if (giu) { const e = $("#cfErr"); e.hidden = false; e.textContent = giu; return; }
 
   /* Chưa có máy chủ thì bài KHÔNG rơi vào hư không. Trước đây nhánh này đi
      thẳng vào needAuth() → prompt("Email…") → lời gọi đăng nhập → ném "chưa
@@ -4708,52 +4928,10 @@ function go(tab) {
   }
   if (tab === "eat") renderEat();
   if (tab === "map") renderMap();
-/* Kiểm duyệt trước khi đăng: lớp luật (offline) rồi AI đọc chữ + ảnh. Trả về
-   câu nói với người dùng khi bài bị giữ, hoặc null khi được đi tiếp.
-   - "chan" thì dừng hẳn; "cho" dừng MỘT lần: bấm Post lại với đúng nội dung
-     đó là người dùng xác nhận và bài đi tiếp (AI có thể đoán sai).
-   - AI không trả lời được (mạng, hạn mức, chưa bật) thì chỉ còn lớp luật. */
-async function kiemDuyetBai(draft) {
-  const luat = luatBaiDang(draft);
-  let ai = null;
-  if (!luat.length || draft.photo) {
-    try {
-      let image = null;
-      if (draft.photo) {
-        const c = await compress(draft.photo);
-        const url = await new Promise((ok, no) => {
-          const r = new FileReader();
-          r.onload = () => ok(String(r.result)); r.onerror = no; r.readAsDataURL(c.blob);
-        });
-        if (url.length <= 700_000) image = url;
-      }
-      if (draft.body || image) {
-        const r = await fetch(diemKiemDuyet(), {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ body: draft.body || "", image }),
-          signal: AbortSignal.timeout(15000),
-        });
-        if (r.ok) ai = await r.json();
-      }
-    } catch { ai = null; }
-  }
-  const q = quyetDinh(luat, ai && ["ok", "cho", "chan"].includes(ai.verdict)
-    ? { verdict: ai.verdict, reasons: Array.isArray(ai.reasons) ? ai.reasons : [] } : null);
-  if (q.status === "ok") return null;
-  const key = `${draft.body}|${draft.photo?.name || ""}|${draft.photo?.size || 0}`;
-  if (q.status === "cho" && S.kdCho === key) return null;
-  S.kdCho = q.status === "cho" ? key : null;
-  return q.messages.join(" ") + (q.status === "cho" ? " Tap Post again to send it anyway." : "");
-}
-
   if (tab === "journal") renderJournal();
   if (tab === "community") renderCommunity();
   if (tab === "me") renderMe();
 }
-  busy(true, "Checking…");
-  const giu = await kiemDuyetBai(draft);
-  busy(false);
-  if (giu) { const e = $("#cfErr"); e.hidden = false; e.textContent = giu; return; }
 
 /* ── sự kiện ──────────────────────────────────────────────── */
 /* Enter = lưu. Gắn ở cấp document vì surveyui.js dựng lại toàn bộ DOM của

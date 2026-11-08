@@ -171,3 +171,356 @@
   .cpost { grid-template-columns: 72px 1fr; gap: 10px; }
   .cpost > img { width: 72px; height: 72px; }
 }
+
+/* ── quán gần nơi chụp ảnh ── */
+.cnear { margin-top: 8px; }
+.cnear-map { width: 100%; max-width: 280px; display: block; margin: 8px auto; }
+.cnear-ring { fill: var(--kem); stroke: var(--line); stroke-dasharray: 3 4; }
+.cnear-me { fill: var(--son); stroke: #fff; stroke-width: 2; }
+.cnear-pin { cursor: pointer; }
+.cnear-pin circle { fill: var(--then); stroke: #fff; stroke-width: 1.5; }
+.cnear-pin text { fill: #fff; font-size: 10px; font-weight: 700; text-anchor: middle; pointer-events: none; }
+.cnear-pin:focus circle, .cnear-pin:hover circle { fill: var(--ngoc); }
+.cnear-list { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px; }
+.cnear-list button { width: 100%; min-height: 44px; text-align: left; padding: 8px 12px;
+  border-radius: 12px; border: 1px solid var(--line); background: var(--giay); color: var(--muc); font: inherit; font-size: 13.5px; }
+.cnear-list b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--then); color: #fff; font-size: 11px; margin-right: 6px; }
+.cnear-list small { float: right; color: var(--muc-nhat); }
+
+/* ═══ BẢN ĐỒ ẢNH — theo hệ thiết kế Nón Lá ══════════════════════════
+   Cùng ngôn ngữ với phần còn lại của app (app.css): sơn mài xanh --then, vàng
+   đồng --dong, giấy dó --giay / --kem, viền vàng hairline --vien, tiêu đề serif
+   Playfair, nhãn nhỏ viết hoa giãn chữ, nút tối viền vàng như thanh tab. Kính mờ
+   chỉ dùng như lớp giấy dó trong suốt, không phải vật liệu iOS.
+
+   Toàn màn hình: .pm là một lớp gắn vào #app, nằm trên thanh tab (z 60) và dưới
+   sheet chi tiết (z 82). */
+.cview {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  margin-top: 12px; padding: 4px;
+  border: 1px solid var(--vien-in); border-radius: 14px; background: var(--giay);
+}
+.cview button {
+  min-height: 40px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+  color: var(--muc-nhat); background: none; border: 0;
+}
+.cview button[aria-selected="true"] { background: var(--then); color: var(--dong); }
+
+.pm {
+  --ink: var(--muc); --ink2: var(--muc-nhat);
+  --paper: rgba(251, 247, 236, .9);
+  --blur: saturate(1.3) blur(16px);
+  --lac-line: rgba(217, 162, 39, .45);
+  --h: 268px;
+  position: absolute; inset: 0; z-index: 75; overflow: hidden; isolation: isolate;
+  background: var(--kem); color: var(--ink); font-family: var(--body);
+  -webkit-tap-highlight-color: transparent;
+}
+.pm .pmap { position: absolute; inset: 0; z-index: 0; }
+.pm .pmap .cempty { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; margin: 0; text-align: center; }
+
+/* — hàng trên cùng: quay lại + tìm kiếm — */
+.pm-top {
+  position: absolute; z-index: 5; left: 12px; right: 12px; top: calc(10px + env(safe-area-inset-top, 0px));
+  display: flex; align-items: center; gap: 10px;
+}
+/* Nút tròn: sơn mài xanh, chỉ vàng, biểu tượng vàng — cùng họ với thanh tab. */
+.pm-round {
+  flex: none; width: 46px; height: 46px; padding: 0; display: grid; place-items: center; cursor: pointer;
+  border: 1px solid var(--lac-line); border-radius: 50%; background: var(--then); color: var(--dong);
+  box-shadow: 0 8px 20px -8px rgba(14, 43, 36, .7);
+}
+.pm-round svg { width: 21px; height: 21px; }
+.pm-search {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; height: 46px; padding: 0 10px 0 15px;
+  border: 1px solid var(--vien); border-radius: 23px; color: var(--dong-chu);
+  background: var(--paper); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+  box-shadow: 0 8px 24px -10px rgba(14, 43, 36, .5);
+}
+.pm-search > svg { width: 18px; height: 18px; flex: none; }
+.pm-search input {
+  flex: 1; min-width: 0; height: 100%; border: 0; background: none; outline: 0;
+  font-size: 16px; color: var(--ink); -webkit-appearance: none; appearance: none;
+}
+.pm-search input::placeholder { color: var(--ink2); opacity: .85; }
+.pm-search input::-webkit-search-cancel-button { display: none; }
+.pm-search button { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border: 0; background: none; color: rgba(95, 110, 100, .55); padding: 0; }
+.pm-search button[hidden] { display: none; }
+.pm-search button svg { width: 18px; height: 18px; }
+
+.pm-sub { position: absolute; z-index: 5; left: 68px; top: calc(64px + env(safe-area-inset-top, 0px)); }
+.pm-pill {
+  height: 32px; padding: 0 14px; border: 1px solid var(--vien-in); border-radius: 16px; cursor: pointer;
+  background: var(--paper); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+  color: var(--then); font-size: 13px; font-weight: 600;
+  box-shadow: 0 4px 12px -6px rgba(14, 43, 36, .45);
+}
+.pm-pill[aria-pressed="true"] { background: var(--then); color: var(--dong); border-color: var(--lac-line); }
+
+/* — nút "Search this area" và nút định vị: đi theo mép trên của bảng ảnh — */
+.pm-area {
+  position: absolute; z-index: 6; left: 50%; bottom: calc(var(--h) + 14px); transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 20px; cursor: pointer;
+  border: 1px solid var(--lac-line); border-radius: 21px; background: var(--then); color: #F6F2E6;
+  font-size: 14px; font-weight: 600; white-space: nowrap;
+  box-shadow: 0 8px 20px -8px rgba(14, 43, 36, .75);
+}
+.pm-area[hidden] { display: none; }
+.pm-area svg { width: 16px; height: 16px; color: var(--dong); }
+.pm-loc { position: absolute; z-index: 6; right: 12px; bottom: calc(var(--h) + 14px); }
+.pm:not(.pm-drag) .pm-area, .pm:not(.pm-drag) .pm-loc { transition: bottom .38s cubic-bezier(.2, .8, .2, 1), opacity .2s; }
+.pm[data-detent="full"] .pm-area, .pm[data-detent="full"] .pm-loc { opacity: 0; pointer-events: none; }
+
+/* — bảng ảnh: giấy dó kéo lên, ba mức dừng — */
+.pm-sheet {
+  position: absolute; z-index: 7; left: 0; right: 0; bottom: 0; height: var(--h);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: rgba(251, 247, 236, .94); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+  border-radius: 28px 28px 0 0; border-top: 1px solid var(--vien);
+  box-shadow: 0 -16px 40px -14px rgba(14, 43, 36, .5);
+}
+/* Hoạ tiết trống đồng mờ ở góc, như .crest của các màn khác (opacity .14). */
+.pm-sheet::before {
+  content: ""; position: absolute; right: -34px; top: -30px; width: 150px; height: 150px; pointer-events: none;
+  background: url("assets/motifs/hoa-van-tron.webp") center / contain no-repeat; opacity: .13;
+}
+.pm:not(.pm-drag) .pm-sheet { transition: height .38s cubic-bezier(.2, .8, .2, 1); }
+.pm-head { position: relative; flex: none; padding: 0 var(--pad-x); touch-action: none; user-select: none; -webkit-user-select: none; }
+.pm-grip { display: block; margin: 0 auto; width: 64px; height: 22px; padding: 0; border: 0; background: none; cursor: grab; }
+.pm-grip::before { content: ""; display: block; margin: 9px auto 0; width: 36px; height: 4px; border-radius: 4px; background: #D8CCB4; }
+.pm-kick { margin: 2px 0 3px; font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ink2); }
+.pm-titlerow { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.pm-title {
+  flex: 1; min-width: 0; margin: 0 0 8px; font-family: var(--disp); font-size: 25px; font-weight: 600;
+  letter-spacing: -.012em; line-height: 1.12; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pm-count { flex: none; font-size: 12px; font-weight: 600; color: var(--dong-chu); font-variant-numeric: tabular-nums; }
+.pm-note { margin: -3px 0 9px; font-size: 12px; line-height: 1.3; color: var(--ink2); font-weight: 300; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pm-note[hidden] { display: none; }
+.pm-body { flex: 1; min-height: 0; overflow: hidden; padding: 0 var(--pad-x); }
+.pm[data-detent="full"] .pm-body { overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+
+.pm-chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 calc(-1 * var(--pad-x)) 12px; padding: 0 var(--pad-x); scrollbar-width: none; }
+.pm-chips::-webkit-scrollbar { display: none; }
+.pm-chips button {
+  flex: none; height: 36px; padding: 0 15px; border: 1px solid var(--vien-in); border-radius: var(--pill); cursor: pointer;
+  background: var(--kem); color: var(--ink); font-size: 13.5px; font-weight: 600; white-space: nowrap;
+}
+.pm-chips button[aria-pressed="true"] { background: var(--then); color: #F6F2E6; border-color: var(--lac-line); }
+.pm-chips i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 0; }
+.pm-chips button[aria-pressed="true"] i { box-shadow: 0 0 0 1.5px var(--dong); }
+
+.pm-grid { columns: 2; column-gap: 9px; padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px)); }
+.pm-empty { column-span: all; margin: 18px 2px; font-size: 14px; color: var(--ink2); line-height: 1.6; font-weight: 300; }
+
+/* — thẻ ảnh: ảnh tràn thẻ, viền vàng chỉ, tên serif đè lên nền xanh sơn mài tối dần — */
+.pc {
+  position: relative; break-inside: avoid; margin: 0 0 9px; border-radius: var(--r); overflow: hidden; background: #D9D1BD;
+  box-shadow: 0 0 0 1px var(--vien), 0 12px 22px -14px rgba(14, 43, 36, .6);
+}
+.pc-open {
+  display: block; position: relative; width: 100%; aspect-ratio: 1 / var(--ar, 1.2);
+  padding: 0; border: 0; background: none; color: #FBF7EC; text-align: left; cursor: pointer;
+  transition: transform .18s cubic-bezier(.2, .8, .2, 1), filter .18s;
+}
+.pc-open:active { transform: scale(.974); filter: brightness(.94); }
+.pc-open img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.pc-g { position: absolute; inset: auto 0 0 0; height: 66%; background: linear-gradient(to top, rgba(8, 32, 27, .86), rgba(8, 32, 27, 0)); }
+.pc-t { position: absolute; left: 13px; right: 38px; bottom: 12px; display: grid; gap: 3px; }
+.pc-t b {
+  font-family: var(--disp); font-size: 17px; font-weight: 600; letter-spacing: -.008em; line-height: 1.15;
+  text-shadow: 0 1px 8px rgba(8, 32, 27, .55);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pc-t small { font-size: 11px; font-weight: 400; letter-spacing: .02em; opacity: .86; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-gem { position: absolute; right: 12px; bottom: 12px; width: 20px; height: 20px; filter: drop-shadow(0 1px 3px rgba(8, 32, 27, .6)); }
+.pc-gem svg { width: 100%; height: 100%; display: block; }
+.pc-bm {
+  position: absolute; top: 6px; right: 6px; width: 38px; height: 38px; display: grid; place-items: center; padding: 0;
+  border: 0; background: none; color: #FBF7EC; filter: drop-shadow(0 1px 3px rgba(8, 32, 27, .6));
+}
+.pc-bm svg { width: 22px; height: 22px; fill: none; }
+.pc-bm[aria-pressed="true"] { color: var(--dong); }
+.pc-bm[aria-pressed="true"] svg { fill: currentColor; }
+.pc-open:focus-visible, .pc-bm:focus-visible, .pm-chips button:focus-visible, .pm-pill:focus-visible,
+.pm-area:focus-visible, .pm-grip:focus-visible, .pm-round:focus-visible {
+  outline: 2px solid var(--dong); outline-offset: 2px;
+}
+
+/* — ghim ảnh: khung giấy dó có vòng vàng đặc (như vòng quanh ảnh và huy hiệu ở app) — */
+.apin {
+  position: relative; width: 64px; height: 70px; padding: 0; border: 0; background: none; cursor: pointer;
+  filter: drop-shadow(0 4px 6px rgba(14, 43, 36, .4));
+}
+.apin-in { position: absolute; inset: 0; display: block; transform-origin: 50% 100%; animation: apin-pop .46s cubic-bezier(.2, 1.15, .3, 1) both; }
+.apin:hover .apin-in { transform: translateY(-2px) scale(1.04); transition: transform .18s; }
+.apin-card {
+  position: absolute; left: 0; top: 0; width: 64px; height: 58px; box-sizing: border-box;
+  border: 3px solid var(--giay); border-radius: 15px; background: #E4DDC9;
+  box-shadow: 0 0 0 1.5px var(--vien-dam);
+}
+.apin-card img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 11px; }
+.apin-card.front::after {
+  content: ""; position: absolute; left: 50%; bottom: -9px; width: 14px; height: 14px; z-index: -1;
+  background: var(--giay); border-radius: 3px; transform: translateX(-50%) rotate(45deg);
+  box-shadow: 1.5px 1.5px 0 var(--vien-dam);
+}
+.apin-card.back1 { transform: translate(8px, -3px) rotate(7deg); }
+.apin-card.back2 { transform: translate(-8px, -2px) rotate(-8deg); }
+.apin-n {
+  position: absolute; right: -8px; top: -10px; min-width: 23px; height: 23px; padding: 0 6px;
+  border-radius: 12px; background: var(--dong); color: var(--then); border: 2px solid var(--giay);
+  font-size: 11.5px; font-weight: 700; line-height: 19px; text-align: center; font-variant-numeric: tabular-nums;
+}
+.apin:focus-visible { outline: 2px solid var(--dong); outline-offset: 3px; border-radius: 14px; }
+@keyframes apin-pop { from { opacity: 0; transform: translateY(8px) scale(.5); } to { opacity: 1; transform: none; } }
+
+/* — nhãn các quần đảo: chữ son trên giấy dó — */
+.aisle {
+  padding: 3px 9px; border: 1px solid var(--vien-in); border-radius: 10px; cursor: pointer;
+  background: rgba(251, 247, 236, .94); color: var(--son-dam); font-size: 12px; font-weight: 700;
+  white-space: pre-line; text-align: center; line-height: 1.2;
+  box-shadow: 0 2px 6px -2px rgba(14, 43, 36, .35); transition: opacity .2s;
+}
+.aisle:focus-visible { outline: 2px solid var(--dong); outline-offset: 2px; }
+
+/* — điều khiển của MapLibre: ẩn nút định vị mặc định (ta có nút riêng), giữ ghi nguồn — */
+.pm .maplibregl-ctrl-bottom-right { position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none; }
+.pm .maplibregl-ctrl-bottom-left { bottom: calc(var(--h) + 4px); left: 6px; }
+.pm:not(.pm-drag) .maplibregl-ctrl-bottom-left { transition: bottom .38s cubic-bezier(.2, .8, .2, 1); }
+.pm .maplibregl-ctrl-attrib { font-size: 10px; max-width: 70vw; }
+
+/* — trạng thái tải — */
+.pm-loading {
+  position: absolute; z-index: 4; left: 50%; top: 45%; transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 10px; padding: 11px 18px; border-radius: 22px;
+  border: 1px solid var(--vien-in); background: var(--paper); -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
+  color: var(--ink2); font-size: 13px; font-weight: 500;
+  box-shadow: 0 10px 26px -12px rgba(14, 43, 36, .5);
+  transition: opacity .35s, transform .35s; pointer-events: none;
+}
+.pm-loading i { width: 16px; height: 16px; border-radius: 50%; border: 2.2px solid rgba(201, 162, 39, .25); border-top-color: var(--dong); animation: pm-spin .8s linear infinite; }
+.pm-loading.pm-loaded { opacity: 0; transform: translate(-50%, -50%) scale(.96); }
+@keyframes pm-spin { to { transform: rotate(360deg); } }
+
+.pm-chips button, .pm-pill, .pm-area, .pm-round { transition: transform .15s, background-color .2s, color .2s; }
+.pm-chips button:active, .pm-pill:active, .pm-area:active, .pm-round:active { transform: scale(.95); }
+@media (prefers-reduced-motion: reduce) {
+  .apin-in, .pm-loading i { animation: none; }
+  .pm:not(.pm-drag) .pm-sheet { transition: none; }
+}
+
+/* ═══ THẺ CHI TIẾT (sheet mở khi chạm một ảnh) ═══════════════════════
+   Sheet dùng chung của app đã là giấy dó + viền vàng; khi nội dung là một .pcard
+   chỉ cần: bỏ phần đệm để ảnh tràn lề, thêm vòng vàng quanh ảnh, tiêu đề serif lớn
+   và hàng nút cùng họ với .btn.save. Chọn bằng :has, không đụng sheet khác. */
+.sheet:has(.pcard) { max-height: 90%; border-top: 1px solid var(--vien); }
+.sheet:has(.pcard) .inner { padding: 0 0 calc(28px + var(--safe)); }
+
+.pcard-hero {
+  margin: 8px var(--pad-x) 0; border-radius: 22px; overflow: hidden; aspect-ratio: 4 / 3; background: #E4DDC9;
+  box-shadow: 0 0 0 1.5px var(--vien-dam), 0 16px 30px -16px rgba(14, 43, 36, .55);
+}
+.pcard-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pcard-body { padding: 16px calc(var(--pad-x) + 2px) 4px; }
+.pcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.pcard-tag {
+  display: inline-flex; align-items: center; gap: 6px; height: 25px; padding: 0 11px; border-radius: var(--pill);
+  border: 1px solid var(--vien-in); background: var(--kem); color: var(--muc); font-size: 11.5px; font-weight: 600; letter-spacing: .01em;
+}
+.pcard-tag i { width: 8px; height: 8px; border-radius: 50%; background: var(--c, #8E8E93); }
+.pcard-tag.pcard-sample { color: var(--ho-phach); background: rgba(200, 121, 31, .1); border-color: rgba(200, 121, 31, .3); }
+.sheet .pcard-title { font-family: var(--disp); font-size: 30px; font-weight: 600; letter-spacing: -.014em; line-height: 1.1; margin: 0; padding: 0; }
+.pcard-sub { margin: 5px 0 0; font-size: 14px; color: var(--muc-nhat); font-weight: 300; }
+
+.pcard-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 18px 0 6px; }
+.pcard-act {
+  display: grid; justify-items: center; align-content: center; gap: 5px; height: 62px; padding: 0; cursor: pointer;
+  border: 1px solid var(--vien-in); border-radius: 16px; background: var(--kem); color: var(--then);
+  font: inherit; font-size: 12px; font-weight: 600; text-decoration: none;
+  transition: transform .15s, background-color .2s;
+}
+.pcard-act svg { width: 21px; height: 21px; color: var(--dong-chu); }
+.pcard-act:active { transform: scale(.96); }
+.pcard-primary { background: var(--then); color: #F6F2E6; border-color: var(--lac-line); box-shadow: 0 8px 20px -10px rgba(14, 43, 36, .7); }
+.pcard-primary svg { color: var(--dong); }
+.pcard-act[aria-pressed="true"] { background: rgba(217, 162, 39, .2); border-color: var(--vien-dam); }
+.pcard-act[aria-pressed="true"] svg path { fill: currentColor; }
+
+.pcard-facts { margin: 16px 0 0; border-radius: 16px; background: #FFFDF6; border: 1px solid var(--vien-in); }
+.pcard-facts > div { display: flex; justify-content: space-between; gap: 12px; padding: 12px 16px; font-size: 14.5px; }
+.pcard-facts > div + div { border-top: 1px solid var(--line); }
+.pcard-facts span { color: var(--muc-nhat); font-weight: 300; }
+.pcard-facts b { font-weight: 600; text-align: right; }
+.pcard-note { margin: 16px 0 0; font-size: 16px; line-height: 1.55; color: var(--muc); }
+.pcard-foot { margin: 14px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--muc-nhat); font-weight: 300; }
+.pcard-body .ccomments { margin-top: 14px; }
+.pcard-body .creport { margin-top: 10px; }
+
+.csample { width: 100%; max-height: 260px; object-fit: cover; border-radius: 14px; margin: 4px 0 10px; display: block; }
+
+/* ═══ HOẠ TIẾT TỪ BỘ MỚI (assets/motifs/) ════════════════════════════
+   Bộ này dựng với ChatGPT từ ảnh tham chiếu thật (trống Đông Sơn, trống Ngọc Lũ,
+   rồng thời Lý) và bảng hoạ tiết sẵn có của app; mọi tệp là vàng đồng #C9A227 trên
+   nền trong suốt, cùng nét kép khắc của trống đồng. */
+
+/* đoá sen tròn thời Lý làm hình mờ ở góc bảng ảnh (thay mặt trống cũ) */
+.pm-sheet::before {
+  right: -48px; top: -44px; width: 190px; height: 186px; opacity: .12;
+  background: url("assets/motifs/sen-tron.webp") center / contain no-repeat;
+}
+
+/* dải sen và vân mây phân cách tiêu đề với bộ lọc */
+.pm-orn { display: block; width: min(150px, 44%); height: auto; margin: -6px auto 6px; opacity: .85; }
+
+/* trạng thái tải: huy hiệu mặt trời 14 tia quay chậm */
+.pm-loading i {
+  width: 26px; height: 26px; border: 0; border-radius: 0;
+  background: url("assets/motifs/mat-troi-14.webp") center / contain no-repeat;
+  animation: pm-spin 2.6s linear infinite;
+}
+
+/* trạng thái trống: rồng thời Lý uốn khúc */
+.pm-empty { display: grid; justify-items: center; text-align: center; gap: 10px; }
+.pm-empty::before {
+  content: ""; width: 74px; height: 108px; opacity: .55;
+  background: url("assets/motifs/rong-ly.webp") center / contain no-repeat;
+}
+
+/* thẻ chi tiết: góc khung Đông Sơn ở bốn góc ảnh, dải chim Lạc trước phần chú thích */
+.pcard-hero { position: relative; }
+/* Góc khung tô KEM giấy dó (hoạ tiết vàng làm mặt nạ): vàng chìm vào những ảnh nền
+   vàng (tranh phố cổ), kem thì nổi trên mọi ảnh. */
+.pcard-c {
+  position: absolute; width: 54px; height: 53px; pointer-events: none;
+  background: #FBF7EC;
+  -webkit-mask: url("assets/motifs/khung-goc.webp") center / contain no-repeat;
+  mask: url("assets/motifs/khung-goc.webp") center / contain no-repeat;
+  filter: drop-shadow(0 1px 2px rgba(8, 32, 27, .75));
+}
+.pcard-c.tl { left: 3px; top: 3px; }
+.pcard-c.tr { right: 3px; top: 3px; transform: scaleX(-1); }
+.pcard-c.bl { left: 3px; bottom: 3px; transform: scaleY(-1); }
+.pcard-c.br { right: 3px; bottom: 3px; transform: scale(-1, -1); }
+.pcard-band {
+  height: 24px; margin: 18px -2px 0; opacity: .9;
+  background: url("assets/motifs/dai-chim-lac-tile.webp") repeat-x center / auto 24px;
+}
+@media (prefers-reduced-motion: reduce) { .pm-loading i { animation: none; } }
+
+/* ═══ NỀN HOẠ TIẾT MỜ ════════════════════════════════════════════════
+   Ô lặp thổ cẩm và lưới Đông Sơn, chỉ ~6 % độ đậm: đủ để mặt giấy có chất, không
+   tranh chữ. Lớp nằm DƯỚI nội dung (z-index 0), không nhận chạm. */
+.pm-sheet::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .07;
+  background: url("assets/motifs/nen-tho-cam.webp") 0 0 / 134px auto repeat;
+}
+.pm-head, .pm-body { position: relative; z-index: 1; }
+.sheet:has(.pcard) { position: absolute; }
+.sheet:has(.pcard)::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: .06;
+  background: url("assets/motifs/nen-luoi-dong-son.webp") 0 0 / 150px auto repeat;
+}
+.sheet:has(.pcard) > :not(.sheetx) { position: relative; z-index: 1; }
+.sheet:has(.pcard) > .sheetx { z-index: 3; }

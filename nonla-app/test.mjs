@@ -14,6 +14,7 @@ import { provenance, badge as trustBadge, summary as trustSummary, isMeasured,
          MIN_SAMPLES as TRUST_MIN } from "./trust.js";
 import { changeDue, breakdown, explain, check as checkChange, NOTES } from "./change.js";
 import { luatBaiDang, docKetQuaKiemDuyet, quyetDinh, loiNhacKiemDuyet, LY_DO } from "./kiemduyet.js";
+import { quanGanToaDo, CATEGORIES, CATEGORY_IDS, categoryLabel, lamTronToaDo, diemAnh, cellDeg, gomCum, loaiDiaDiem, diemDiaDiem, CATEGORY_COLOR, QUAN_DAO, muaAnh } from "./posts.js";
 import { compare as compareMenus, MIN_PAIRS } from "./menutax.js";
 import { tripSummary, dateLine, fileName } from "./postcard.js";
 import { PHRASES } from "./showcard.js";
@@ -2919,3 +2920,128 @@ console.log("\n── kiemduyet: luật + kết quả AI ───────�
 console.log("\n════════════════════════════════════════════");
 console.log(`${pass} pass · ${fail} fail\n`);
 process.exit(fail ? 1 : 0);
+console.log("\n── quanGanToaDo: quán quanh nơi chụp ảnh ──");
+{
+  const ds = [
+    { id: "a", at: [21.0285, 105.8542] },
+    { id: "b", at: [21.0290, 105.8542] },
+    { id: "xa", at: [21.0500, 105.8542] },
+    { id: "thieu" },
+  ];
+  eq("gần nhất trước, quán xa bị loại", quanGanToaDo(ds, [21.0286, 105.8542]).map((x) => x.place.id), ["a", "b"]);
+  eq("thiếu toạ độ gốc thì rỗng", quanGanToaDo(ds, null), []);
+  eq("toạ độ gốc hỏng thì rỗng", quanGanToaDo(ds, [NaN, 105]), []);
+  eq("quán không có at bị bỏ qua", quanGanToaDo(ds, [21.0285, 105.8542], { radius: 1e6 }).some((x) => x.place.id === "thieu"), false);
+  eq("giới hạn số quán", quanGanToaDo(ds, [21.0285, 105.8542], { radius: 1e6, limit: 1 }).length, 1);
+}
+
+console.log("\n── bản đồ ảnh: loại địa điểm, làm tròn, ghim, gom cụm ──");
+{
+  eq("mười loại địa điểm", CATEGORY_IDS.length, 10);
+  ok("mã loại không trùng", new Set(CATEGORY_IDS).size === 10);
+  eq("nhãn theo mã", categoryLabel("viewpoint"), "Viewpoints");
+  eq("mã lạ không có nhãn", categoryLabel("nope"), "");
+  ok("mọi nhãn là chữ không rỗng", CATEGORIES.every((c) => c[1].length > 2));
+
+  const r = lamTronToaDo([21.02851234, 105.85421234]);
+  ok("làm tròn ra toạ độ hợp lệ", Array.isArray(r) && r.length === 2 && r.every(Number.isFinite));
+  ok("làm tròn dời tối đa nửa ô (~17 m)", Math.abs(r[0] - 21.02851234) <= 0.00016 && Math.abs(r[1] - 105.85421234) <= 0.00016);
+  eq("hai điểm cùng ô ra cùng toạ độ", lamTronToaDo([21.02851, 105.85421]), lamTronToaDo([21.02856, 105.85424]));
+  eq("toạ độ hỏng thì null", lamTronToaDo([NaN, 105]), null);
+  eq("vĩ độ vượt biên thì null", lamTronToaDo([91, 105]), null);
+  eq("thiếu một chiều thì null", lamTronToaDo([21]), null);
+  eq("không phải mảng thì null", lamTronToaDo(null), null);
+
+  const places = [{ id: "q1", at: [21.03, 105.85] }, { id: "q2" }];
+  const posts = [
+    { id: 1, placeId: "q1", photoPath: "u/a.jpg" },
+    { id: 2, placeId: "q1", photoPath: "u/b.jpg", lat: 21.05, lng: 105.9 },
+    { id: 3, placeId: "q2", photoPath: "u/c.jpg" },
+    { id: 4, placeId: "q1" },
+    { id: 5, placeId: "", photoPath: "u/d.jpg", lat: 21.1, lng: 105.8 },
+    { id: 6, placeId: "q1", photoPath: "u/e.jpg", lat: 999, lng: 105 },
+  ];
+  const pins = diemAnh(posts, places);
+  eq("ghim: bỏ bài không ảnh và bài không có chỗ đặt", pins.map((p) => p.id), [1, 2, 5, 6]);
+  eq("bài không toạ độ riêng dùng toạ độ quán", pins[0].at, [21.03, 105.85]);
+  eq("bài có toạ độ riêng dùng toạ độ đó", pins[1].at, [21.05, 105.9]);
+  eq("đánh dấu toạ độ riêng", pins.map((p) => p.exact), [false, true, true, false]);
+  eq("toạ độ riêng hỏng thì rơi về quán", pins[3].at, [21.03, 105.85]);
+  eq("danh sách rỗng", diemAnh(null, places), []);
+
+  ok("không gom từ mức 18", cellDeg(18) === 0 && cellDeg(20) === 0);
+  ok("mức phóng thấp gom ô rộng hơn", cellDeg(10) > cellDeg(14));
+  const A = (id, la, lo, t) => ({ id, at: [la, lo], post: { createdAt: t } });
+  const dots = [A(1, 21.0301, 105.8501, "2026-01-01T00:00:00Z"), A(2, 21.0302, 105.8502, "2026-03-01T00:00:00Z"), A(3, 21.5, 105.9, "2026-02-01T00:00:00Z")];
+  eq("cell 0: mỗi ghim một cụm", gomCum(dots, 0).length, 3);
+  const c1 = gomCum(dots, 0.01);
+  eq("hai ghim sát nhau gom thành một cụm", c1.map((c) => c.n).sort(), [1, 2]);
+  const big = c1.find((c) => c.n === 2);
+  eq("cụm lấy ảnh bài mới nhất", big.lead.id, 2);
+  ok("tâm cụm nằm giữa hai ghim", Math.abs(big.at[0] - 21.03015) < 1e-9);
+  eq("rỗng thì rỗng", gomCum([], 0.01), []);
+  eq("tổng số ghim được bảo toàn", c1.reduce((s, c) => s + c.n, 0), 3);
+  const same = gomCum([A(7, 21.03, 105.85, "2026-01-01T00:00:00Z"), A(8, 21.03, 105.85, "2026-02-01T00:00:00Z")], 0);
+  eq("cell 0 vẫn gom ghim trùng toạ độ", same.map((c) => c.n), [2]);
+
+  ok("bài điểm chụp hợp lệ khi có toạ độ và loại", validate({ lat: 21.1, lng: 105.8, category: "viewpoint", body: "x" }).ok);
+  ok("điểm chụp thiếu loại thì lỗi", !validate({ lat: 21.1, lng: 105.8, body: "x" }).ok);
+  ok("loại lạ bị từ chối", validate({ placeId: "q", category: "nope", body: "x" }).errors.includes("Pick a category from the list"));
+  ok("bài có quán, loại hợp lệ vẫn qua", validate({ placeId: "q", category: "street-food", body: "x" }).ok);
+}
+
+console.log("\n── bản đồ ảnh: lớp quán và mốc, hai quần đảo ──");
+{
+  eq("quán đường phố → street-food", loaiDiaDiem({ tier: "street" }), "street-food");
+  eq("nhà hàng → restaurant-cafe", loaiDiaDiem({ tier: "restaurant" }), "restaurant-cafe");
+  eq("quán cà phê → restaurant-cafe", loaiDiaDiem({ tier: "cafe" }), "restaurant-cafe");
+  eq("chợ → local-market", loaiDiaDiem({ t: "market" }), "local-market");
+  eq("chùa → cultural-experience", loaiDiaDiem({ t: "temple" }), "cultural-experience");
+  eq("bảo tàng → historical-site", loaiDiaDiem({ t: "museum" }), "historical-site");
+  eq("hồ → viewpoint", loaiDiaDiem({ t: "lake" }), "viewpoint");
+  eq("loại mốc lạ → tourist-attraction", loaiDiaDiem({ t: "zzz" }), "tourist-attraction");
+  eq("không biết gì → tourist-attraction", loaiDiaDiem(null), "tourist-attraction");
+  ok("mọi nhóm được gán đều là nhóm hợp lệ", ["street", "restaurant", "cafe"].every((t) => CATEGORY_IDS.includes(loaiDiaDiem({ tier: t })))
+    && ["temple", "church", "craft", "heritage", "museum", "gate", "hall", "house", "well", "market", "nature", "lake", "beach", "pier", "island", "bridge", "sight", "civic"]
+      .every((t) => CATEGORY_IDS.includes(loaiDiaDiem({ t }))));
+  ok("mỗi nhóm có một màu", CATEGORY_IDS.every((id) => /^#[0-9A-F]{6}$/i.test(CATEGORY_COLOR[id])));
+  ok("mười màu khác nhau", new Set(Object.values(CATEGORY_COLOR)).size === 10);
+
+  const places = [{ id: "a", name: "A", tier: "street", at: [21, 105.8] }, { id: "b", name: "B", tier: "cafe" }, { id: "c", name: "C", tier: "cafe", at: [99, 1] }];
+  const maps = { z1: { landmarks: [
+    { n: "Chùa", t: "temple", at: [21.1, 105.9], osm: "way/1" },
+    { n: "Hướng đi X", t: "bridge", at: [21.1, 105.9], an: true },
+    { n: "Không toạ độ", t: "sight" },
+  ] } };
+  const d = diemDiaDiem(places, maps);
+  eq("chấm: bỏ quán thiếu hoặc sai toạ độ, bỏ ghi chú chỉ đường", d.map((x) => x.id), ["a", "sight:z1:way/1"]);
+  eq("quán và mốc phân loại đúng", d.map((x) => x.cat), ["street-food", "cultural-experience"]);
+  eq("kind phân biệt quán và mốc", d.map((x) => x.kind), ["place", "sight"]);
+  eq("rỗng thì rỗng", diemDiaDiem(), []);
+
+  eq("đúng hai quần đảo", QUAN_DAO.map((q) => q.id), ["hoang-sa", "truong-sa"]);
+  ok("Hoàng Sa ở Biển Đông ngoài khơi miền Trung", QUAN_DAO[0].at[0] > 15 && QUAN_DAO[0].at[0] < 18 && QUAN_DAO[0].at[1] > 110 && QUAN_DAO[0].at[1] < 113);
+  ok("Trường Sa ở phía nam Hoàng Sa", QUAN_DAO[1].at[0] < QUAN_DAO[0].at[0] && QUAN_DAO[1].at[1] > 111 && QUAN_DAO[1].at[1] < 118);
+  ok("toạ độ hai quần đảo hợp lệ", QUAN_DAO.every((q) => lamTronToaDo(q.at) !== null));
+  const hop = (q, [s, w, n, e]) => q.dao.every((d) => d.at[0] >= s && d.at[0] <= n && d.at[1] >= w && d.at[1] <= e);
+  ok("mỗi quần đảo có đảo thật", QUAN_DAO.every((q) => q.dao.length >= 8));
+  ok("đảo Hoàng Sa nằm trong vùng Hoàng Sa", hop(QUAN_DAO[0], [15.5, 110.8, 17.2, 113.0]));
+  ok("đảo Trường Sa nằm trong vùng Trường Sa", hop(QUAN_DAO[1], [6.0, 111.0, 12.5, 118.0]));
+  ok("mọi đảo có tên Việt và tên Anh", QUAN_DAO.every((q) => q.dao.every((d) => d.n && d.en)));
+  ok("tên đảo không trùng trong cùng quần đảo", QUAN_DAO.every((q) => new Set(q.dao.map((d) => d.n)).size === q.dao.length));
+  ok("nhãn quần đảo có tên đầy đủ", QUAN_DAO.every((q) => q.full.startsWith("Quần đảo ")));
+
+  const demo = muaAnh({ z1: { name: "Zone One", landmarks: [
+    { n: "Chùa", en: "Pagoda", t: "temple", at: [21.1, 105.9], img: "chua" },
+    { n: "Không ảnh", t: "temple", at: [21.1, 105.9] },
+    { n: "Hướng đi", t: "bridge", at: [21.1, 105.9], img: "x", an: true },
+    { n: "Toạ độ hỏng", t: "temple", at: [99, 1], img: "y" },
+  ] } });
+  eq("ảnh mẫu: chỉ mốc có ảnh, có toạ độ, không phải ghi chú", demo.map((x) => x.id), ["demo:z1:chua"]);
+  ok("ảnh mẫu tự nhận là mẫu", demo[0].post.sample === true && demo[0].post.seed === true);
+  eq("ảnh mẫu theo nhóm của mốc", demo[0].post.category, "cultural-experience");
+  eq("ảnh mẫu trỏ tới tệp ảnh của mốc", demo[0].post.photo, "assets/sights/chua.jpg");
+  eq("ghim mẫu đặt đúng toạ độ mốc", demo[0].at, [21.1, 105.9]);
+  eq("ảnh mẫu rỗng thì rỗng", muaAnh(), []);
+}
+

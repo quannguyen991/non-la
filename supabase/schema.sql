@@ -309,3 +309,31 @@ group by 1, 2, 3
 having count(*) >= 5;
 
 grant select on price_index_monthly to anon, authenticated;
+
+-- ═══════════════════════════════════════════════════════════════
+-- BẢN ĐỒ ẢNH — thêm 08/11/2026
+--
+-- Mỗi bài có ảnh có thể thành một ghim trên bản đồ. Ba cột, đều TUỲ CHỌN:
+--   lat, lng   toạ độ nơi chụp, CHỈ khi người dùng bật "hiện vị trí chụp".
+--              Máy khách làm tròn vào lưới ~33 m trước khi gửi (posts.js:
+--              lamTronToaDo), nên cột này không bao giờ giữ toạ độ chính xác.
+--              Không bật thì để null và ghim rơi về toạ độ QUÁN công khai.
+--   category   một trong mười loại địa điểm (posts.js: CATEGORIES).
+-- Chạy lại được. Bài cũ không bị đụng tới: ba cột mới đều null.
+-- ═══════════════════════════════════════════════════════════════
+alter table posts add column if not exists lat double precision
+  check (lat is null or lat between -90 and 90);
+alter table posts add column if not exists lng double precision
+  check (lng is null or lng between -180 and 180);
+alter table posts add column if not exists category text
+  check (category is null or category in (
+    'street-food', 'restaurant-cafe', 'local-market', 'tourist-attraction',
+    'photo-spot', 'hidden-gem', 'viewpoint', 'historical-site',
+    'cultural-experience', 'hotel-homestay'));
+-- Toạ độ đi theo cặp: một nửa cặp là dữ liệu hỏng.
+alter table posts drop constraint if exists posts_latlng_pair;
+alter table posts add constraint posts_latlng_pair
+  check ((lat is null) = (lng is null));
+
+create index if not exists posts_pin_idx on posts (created_at desc)
+  where photo_path is not null and status = 'visible';
