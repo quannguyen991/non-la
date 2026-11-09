@@ -59,4 +59,5 @@ docs/_sitemap-*.json
 # Dựng bản triển khai Cloudflare Pages và cache của wrangler — sinh lại được
 .pages-build/
 nonla-app/.pages-build/
+.wrangler/
 nonla-app/.wrangler/
