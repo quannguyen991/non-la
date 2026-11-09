@@ -378,6 +378,7 @@ export function artTransform(anchors, center) {
    Dùng tranh minh hoạ theo LOẠI quán, cùng bộ với app; tên tham số `square`
    giữ lại vì các trang đang gọi placePhoto(p, true). */
 export const placePhoto = (p, _square = false) => {
+  if (p?.photo) return p.photo;
   const tier = typeof p === "string" ? "restaurant" : p.tier;
   return `../assets/illus/quan-${["cafe", "street", "restaurant"].includes(tier) ? tier : "restaurant"}.jpg`;
 };

@@ -27,9 +27,41 @@ dichTrang();
 paintZoneName();
 
 const id = new URLSearchParams(location.search).get("id");
-const [places, prices, dishes, maps] = await Promise.all([
-  load("places"), load("prices"), load("dishes"), load("maps")]);
-const p = places.places.find((x) => x.id === id);
+const [places, prices, dishes, maps, famous] = await Promise.all([
+  load("places"), load("prices"), load("dishes"), load("maps"),
+  load("famous").catch(() => ({ places: [] }))]);
+let p = places.places.find((x) => x.id === id);
+if (!p && famous.places) {
+  const fam = famous.places.find((x) => x.id === id);
+  if (fam) {
+    const zid = fam.zone || Object.entries(maps.zones).find(([, z]) => {
+      if (!fam.at) return false;
+      const [[n, w], [s, e]] = z.bbox;
+      const margin = 0.05;
+      return fam.at[0] <= n + margin && fam.at[0] >= s - margin && fam.at[1] >= w - margin && fam.at[1] <= e + margin;
+    })?.[0] || (fam.street && /hà nội|ha noi/i.test(fam.street) ? "hanoi-hoankiem"
+      : fam.street && /hồ chí minh|sài gòn|ho chi minh/i.test(fam.street) ? "hcmc-district1"
+      : fam.street && /đà nẵng|da nang/i.test(fam.street) ? "danang-hanriver"
+      : fam.street && /huế|hue/i.test(fam.street) ? "hue-citadel"
+      : "hoian-oldtown");
+
+    p = {
+      id: fam.id,
+      name: fam.name,
+      zone: zid,
+      at: fam.at,
+      street: fam.street || "",
+      tier: fam.dish?.startsWith("ca-phe") ? "cafe" : (/nhà hàng|restaurant/i.test(fam.street || "") ? "restaurant" : "street"),
+      known: [fam.dish].filter(Boolean),
+      note: fam.note || "",
+      source: fam.source || "",
+      phone: fam.phone || "",
+      photo: fam.photo || "",
+      mapsUrl: fam.mapsUrl || "",
+      famous: true,
+    };
+  }
+}
 const page = document.getElementById("page");
 
 if (!p) {

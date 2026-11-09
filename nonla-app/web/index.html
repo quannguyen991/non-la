@@ -123,19 +123,40 @@ const zid = zoneId();
 
 /* Số liệu trên đầu trang phải ĐẾM THẬT từ dữ liệu, không viết tay: một
    con số trang trí sai lệch là thứ đầu tiên phá niềm tin của cả trang. */
-const [places, prices, maps] = await Promise.all([load("places"), load("prices"), load("maps")]);
+const [places, prices, maps, famous] = await Promise.all([
+  load("places"), load("prices"), load("maps"),
+  load("famous").catch(() => ({ places: [] }))]);
+const famInZone = (famous.places || []).filter((f) => {
+  if (f.zone === zid) return true;
+  if (!f.at) return false;
+  const [[n, w], [s, e]] = maps.zones[zid]?.bbox || [[0, 0], [0, 0]];
+  const margin = 0.05;
+  return f.at[0] <= n + margin && f.at[0] >= s - margin && f.at[1] >= w - margin && f.at[1] <= e + margin;
+}).map((f) => ({
+  id: f.id,
+  name: f.name,
+  zone: zid,
+  at: f.at,
+  street: f.street || "",
+  tier: f.dish?.startsWith("ca-phe") ? "cafe" : (/nhà hàng|restaurant/i.test(f.street || "") ? "restaurant" : "street"),
+  known: [f.dish].filter(Boolean),
+  note: f.note || "",
+  source: f.source || "",
+  phone: f.phone || "",
+  photo: f.photo || "",
+  famous: true,
+}));
 const mine = places.places.filter((p) => p.zone === zid);
 const zone = prices.zones[zid];
 const sights = (maps.zones[zid]?.landmarks || []).filter((l) => l.note && !l.an).length;
 document.getElementById("heroZone").textContent = (zone.en || zone.name).split(" · ")[0];
 document.getElementById("statLine").innerHTML = tf(
   "{a} eateries mapped · {b} dishes priced · {c} sights · updated {d}",
-  { a: `<b>${mine.length}</b>`, b: `<b>${Object.keys(zone.items).length}</b>`,
+  { a: `<b>${mine.length + famInZone.length}</b>`, b: `<b>${Object.keys(zone.items).length}</b>`,
     c: `<b>${sights}</b>`, d: esc(zone.updated || "") });
 
-/* Ba chỗ đứng đầu = nhiều lượt quét nhất, không phải "được chọn". */
-/* Không xếp theo lượt quét nữa — trường đó đã gỡ. Giữ thứ tự dữ liệu. */
-const top = mine.slice(0, 3);
+/* Ba chỗ đứng đầu: ưu tiên quán nổi tiếng có ảnh chụp thật kèm quán OpenStreetMap */
+const top = [...famInZone.slice(0, 2), ...mine].slice(0, 3);
 document.getElementById("topSpots").innerHTML = top.map((p) => `
   <a class="spot" href="place.html?id=${encodeURIComponent(p.id)}">
     <span class="ph">${photo(placePhoto(p, true), p.name)}</span>
