@@ -30,37 +30,45 @@ const id = new URLSearchParams(location.search).get("id");
 const [places, prices, dishes, maps, famous] = await Promise.all([
   load("places"), load("prices"), load("dishes"), load("maps"),
   load("famous").catch(() => ({ places: [] }))]);
-let p = places.places.find((x) => x.id === id);
-if (!p && famous.places) {
-  const fam = famous.places.find((x) => x.id === id);
-  if (fam) {
-    const zid = fam.zone || Object.entries(maps.zones).find(([, z]) => {
-      if (!fam.at) return false;
-      const [[n, w], [s, e]] = z.bbox;
-      const margin = 0.05;
-      return fam.at[0] <= n + margin && fam.at[0] >= s - margin && fam.at[1] >= w - margin && fam.at[1] <= e + margin;
-    })?.[0] || (fam.street && /hà nội|ha noi/i.test(fam.street) ? "hanoi-hoankiem"
-      : fam.street && /hồ chí minh|sài gòn|ho chi minh/i.test(fam.street) ? "hcmc-district1"
-      : fam.street && /đà nẵng|da nang/i.test(fam.street) ? "danang-hanriver"
-      : fam.street && /huế|hue/i.test(fam.street) ? "hue-citadel"
-      : "hoian-oldtown");
 
-    p = {
-      id: fam.id,
-      name: fam.name,
-      zone: zid,
-      at: fam.at,
-      street: fam.street || "",
-      tier: fam.dish?.startsWith("ca-phe") ? "cafe" : (/nhà hàng|restaurant/i.test(fam.street || "") ? "restaurant" : "street"),
-      known: [fam.dish].filter(Boolean),
-      note: fam.note || "",
-      source: fam.source || "",
-      phone: fam.phone || "",
-      photo: fam.photo || "",
-      mapsUrl: fam.mapsUrl || "",
-      famous: true,
-    };
-  }
+const fam = (famous.places || []).find((x) => x.id === id);
+let p = places.places.find((x) => x.id === id);
+
+if (fam) {
+  // Tìm zone gần nhất dựa trên khoảng cách nếu nằm ngoài bbox
+  const findClosestZone = (at) => {
+    if (!at) return "hoian-oldtown";
+    let best = "hoian-oldtown", minD = Infinity;
+    for (const [zid, z] of Object.entries(maps.zones)) {
+      const d = Math.hypot(at[0] - z.center[0], at[1] - z.center[1]);
+      if (d < minD) { minD = d; best = zid; }
+    }
+    return best;
+  };
+
+  const zid = fam.zone || p?.zone || Object.entries(maps.zones).find(([, z]) => {
+    if (!fam.at) return false;
+    const [[n, w], [s, e]] = z.bbox;
+    const margin = 0.05;
+    return fam.at[0] <= n + margin && fam.at[0] >= s - margin && fam.at[1] >= w - margin && fam.at[1] <= e + margin;
+  })?.[0] || findClosestZone(fam.at);
+
+  p = {
+    ...(p || {}),
+    id: fam.id,
+    name: fam.name || p?.name,
+    zone: zid,
+    at: fam.at || p?.at,
+    street: fam.street || p?.street || "",
+    tier: p?.tier || (fam.dish?.startsWith("ca-phe") ? "cafe" : (/nhà hàng|restaurant/i.test(fam.street || "") ? "restaurant" : "street")),
+    known: [...new Set([...(p?.known || []), fam.dish].filter(Boolean))],
+    note: fam.note || p?.note || "",
+    source: fam.source || p?.source || "",
+    phone: fam.phone || p?.phone || "",
+    photo: fam.photo || p?.photo || "",
+    mapsUrl: fam.mapsUrl || p?.mapsUrl || "",
+    famous: true,
+  };
 }
 const page = document.getElementById("page");
 
@@ -124,11 +132,11 @@ if (!p) {
   <div class="detail" style="padding-bottom:40px">
     <div>
       <div class="dhero">
-        ${photo(placePhoto(p), `Illustration, not a photo of ${p.name}`, "bg")}
+        ${photo(placePhoto(p), p.photo ? p.name : `Illustration, not a photo of ${p.name}`, "bg")}
         <div class="inner">
           <h1>${esc(p.name)}</h1>
           <p class="muted" style="margin-top:8px">${I.pin} ${esc(p.street || (p.ganPho ? `near ${p.ganPho}` : ""))} ·
-            ${esc(p.tier)} · <small>${T("illustration, not a photo of this place")}</small></p>
+            ${esc(p.tier)} · <small>${p.photo ? (p.source ? esc(p.source) : esc(p.name)) : T("illustration, not a photo of this place")}</small></p>
           <div style="margin-top:12px">${verdictPill()}</div>
           <div class="facts">
             <div class="fact"><b>${I.bowl}${T("Known for")}</b>

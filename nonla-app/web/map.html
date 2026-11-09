@@ -86,7 +86,16 @@ const famSpots = (famous.places || []).filter((f) => {
   famous: true,
 }));
 
-const mine = [...famSpots, ...places.places.filter((p) => p.zone === zid && p.at)];
+const osmInZone = places.places.filter((p) => p.zone === zid && p.at);
+const osmIds = new Set(osmInZone.map((p) => p.id));
+// Hợp nhất dữ liệu famous vào các quán OSM có sẵn
+const mergedOsm = osmInZone.map((p) => {
+  const fam = (famous.places || []).find((f) => f.id === p.id);
+  return fam ? { ...p, photo: fam.photo || p.photo, phone: fam.phone || p.phone, note: fam.note, source: fam.source, famous: true } : p;
+});
+// Thêm các quán famous độc lập (chưa có trong OSM)
+const newFam = famSpots.filter((f) => !osmIds.has(f.id));
+const mine = [...newFam, ...mergedOsm];
 
 document.getElementById("mapLede").textContent =
   `${tf("{n} eateries from OpenStreetMap in {zone}.", { n: mine.length, zone: (zone.en || zone.name).replace(" · ", ", ") })} `

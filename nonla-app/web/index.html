@@ -147,16 +147,22 @@ const famInZone = (famous.places || []).filter((f) => {
   famous: true,
 }));
 const mine = places.places.filter((p) => p.zone === zid);
+const osmIds = new Set(mine.map((p) => p.id));
+const newFamInZone = famInZone.filter((f) => !osmIds.has(f.id));
 const zone = prices.zones[zid];
 const sights = (maps.zones[zid]?.landmarks || []).filter((l) => l.note && !l.an).length;
 document.getElementById("heroZone").textContent = (zone.en || zone.name).split(" · ")[0];
 document.getElementById("statLine").innerHTML = tf(
   "{a} eateries mapped · {b} dishes priced · {c} sights · updated {d}",
-  { a: `<b>${mine.length + famInZone.length}</b>`, b: `<b>${Object.keys(zone.items).length}</b>`,
+  { a: `<b>${mine.length + newFamInZone.length}</b>`, b: `<b>${Object.keys(zone.items).length}</b>`,
     c: `<b>${sights}</b>`, d: esc(zone.updated || "") });
 
-/* Ba chỗ đứng đầu: ưu tiên quán nổi tiếng có ảnh chụp thật kèm quán OpenStreetMap */
-const top = [...famInZone.slice(0, 2), ...mine].slice(0, 3);
+/* Ba chỗ đứng đầu: ưu tiên quán nổi tiếng có ảnh chụp thật */
+const combined = [
+  ...famInZone,
+  ...mine.filter((p) => !famInZone.some((f) => f.id === p.id))
+];
+const top = [...combined].sort((a, b) => (b.photo ? 1 : 0) - (a.photo ? 1 : 0)).slice(0, 3);
 document.getElementById("topSpots").innerHTML = top.map((p) => `
   <a class="spot" href="place.html?id=${encodeURIComponent(p.id)}">
     <span class="ph">${photo(placePhoto(p, true), p.name)}</span>
