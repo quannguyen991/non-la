@@ -3290,6 +3290,12 @@ console.log("\n── bản đồ ảnh: lớp quán và mốc, hai quần đả
   const got = await layDanhGia({ name: "A", at: [1, 1], street: "Tran Hung Dao" },
     async () => ({ ok: true, json: async () => ({ found: true, placeId: "p9", sao: 4.4, luot: 210 }) }));
   eq("trả về gọn", [got.placeId, got.sao, got.luot], ["p9", 4.4, 210]);
+  const coSan = await layDanhGia({ name: "Quán Đã Cào", at: [21, 105], rating: 4.8, reviews: 1250, id: "gmaps-123" });
+  eq("quán có sẵn điểm cào → trả ngay không cần mạng", [coSan.sao, coSan.luot, coSan.placeId], [4.8, 1250, "gmaps-123"]);
+  globalThis.S = { famous: [{ id: "fam-1", name: "Phở Gia Truyền", at: [21.03, 105.85], rating: 4.7, reviews: 8900 }] };
+  const fallbackFam = await layDanhGia({ name: "Phở Gia Truyền", at: [21.03, 105.85] }, async () => ({ ok: false }));
+  eq("máy chủ tắt nhưng có trong famous → tự lấy điểm cào", [fallbackFam.sao, fallbackFam.luot], [4.7, 8900]);
+  delete globalThis.S;
 }
 
 /* ── gợi ý của người dùng ── */

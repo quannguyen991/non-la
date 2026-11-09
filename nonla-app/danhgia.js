@@ -53,15 +53,67 @@ export function nhan(r) {
   return r.luot >= NGUONG.luot && r.sao >= NGUONG.sao ? "good" : "";
 }
 
+/** Tìm quán trong danh sách quán nổi tiếng hoặc dữ liệu cào đã nạp sẵn. */
+export function timQuanTrongDanhSach(e, ds) {
+  if (!e || !Array.isArray(ds)) return null;
+  if (e.id) {
+    const byId = ds.find((x) => x.id === e.id);
+    if (byId) return byId;
+  }
+  const norm = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase().trim();
+  const ne = norm(e.name);
+  if (!ne) return null;
+  for (const f of ds) {
+    const nf = norm(f.name);
+    if (nf === ne) return f;
+    if (f.at && e.at) {
+      const dLat = Math.abs(f.at[0] - e.at[0]), dLng = Math.abs(f.at[1] - e.at[1]);
+      if (dLat < 0.005 && dLng < 0.005 && (nf.includes(ne) || ne.includes(nf))) return f;
+    }
+  }
+  return null;
+}
+
 /** Địa chỉ hàm máy chủ — cùng quy tắc với diemKiemDuyet() trong kiemduyet.js. */
 export function diemDanhGia(loc = globalThis.location) {
   const host = loc?.hostname || "";
   return /\.(vercel\.app|pages\.dev)$/.test(host) ? "/api/danhgia" : "https://nonla-etm.pages.dev/api/danhgia";
 }
 
-/** Hỏi hàm máy chủ; mọi lỗi (tắt mạng, chưa bật, quá tải) trả null — thẻ quán vẫn hoạt động bình thường. */
+/** Hỏi đánh giá quán: ưu tiên dữ liệu cào/sẵn có, rơi về hàm máy chủ (không phụ thuộc khoá). */
 export async function layDanhGia(e, fetcher = globalThis.fetch) {
   if (!e?.name || !Array.isArray(e.at)) return null;
+
+  // 1. Quán đã mang sẵn đánh giá (từ famous.json hoặc trường rating/reviews)
+  const coSanSao = Number(e.rating ?? e.sao);
+  const coSanLuot = Number(e.reviews ?? e.luot ?? 0);
+  if (Number.isFinite(coSanSao) && coSanSao >= 1 && coSanSao <= 5) {
+    return {
+      placeId: e.place_id || e.id || "",
+      sao: Math.round(coSanSao * 10) / 10,
+      luot: Number.isFinite(coSanLuot) && coSanLuot >= 0 ? Math.floor(coSanLuot) : 0,
+      uri: e.mapsUrl || e.maps_url || (e.place_id ? `https://www.google.com/maps/place/?q=place_id:${e.place_id}` : null),
+    };
+  }
+
+  // 2. Tra cứu trong danh sách quán nổi tiếng / đã cào nếu có sẵn trong bộ nhớ client
+  if (typeof globalThis !== "undefined" && Array.isArray(globalThis.S?.famous)) {
+    const fam = timQuanTrongDanhSach(e, globalThis.S.famous);
+    if (fam && (fam.rating != null || fam.sao != null)) {
+      const sao = Number(fam.rating ?? fam.sao);
+      const luot = Number(fam.reviews ?? fam.luot ?? 0);
+      if (Number.isFinite(sao) && sao >= 1 && sao <= 5) {
+        return {
+          placeId: fam.place_id || fam.id || "",
+          sao: Math.round(sao * 10) / 10,
+          luot: Number.isFinite(luot) && luot >= 0 ? Math.floor(luot) : 0,
+          uri: fam.mapsUrl || fam.maps_url || null,
+        };
+      }
+    }
+  }
+
+  // 3. Hỏi hàm máy chủ; mọi lỗi (tắt mạng, chưa bật, quá tải) trả null
   try {
     const r = await fetcher(diemDanhGia(), {
       method: "POST", headers: { "Content-Type": "application/json" },

@@ -144,6 +144,8 @@ const famInZone = (famous.places || []).filter((f) => {
   source: f.source || "",
   phone: f.phone || "",
   photo: f.photo || "",
+  rating: f.rating,
+  reviews: f.reviews,
   famous: true,
 }));
 const mine = places.places.filter((p) => p.zone === zid);
@@ -168,8 +170,8 @@ document.getElementById("topSpots").innerHTML = top.map((p) => `
     <span class="ph">${photo(placePhoto(p, true), p.name)}</span>
     <span>
       <h4>${esc(p.name)}</h4>
-      <span class="meta">${I.pin}${esc(p.street)} · ${esc(p.tier)}</span>
-      <span class="row2">${verdictPill()}</span>
+      <span class="meta">${I.pin}${esc(p.street)} · ${esc(p.tier)}${p.rating ? ` · ⭐ ${p.rating}` : ""}</span>
+      <span class="row2">${verdictPill()} ${p.rating ? `<span class="pill ok soft" style="font-weight:600">⭐ ${p.rating} (${(p.reviews || 0).toLocaleString()})</span>` : ""}</span>
     </span>
   </a>`).join("");
 

@@ -60,6 +60,7 @@ export default async function handler(req, res) {
     ] }], { maxTokens: 300 });
     return res.status(200).json({ top: docKetQuaNhanMon(raw, DISHES) });
   } catch (e) {
-    return res.status(e.name === "AbortError" ? 504 : 502).json({ error: "model" });
+    // Chỉ trả mã HTTP của cổng model (không có khoá, không có nội dung), để biết lỗi do đâu.
+    return res.status(e.name === "AbortError" ? 504 : 502).json({ error: "model", up: e.status ?? (e.name === "AbortError" ? "timeout" : "net") });
   }
 }

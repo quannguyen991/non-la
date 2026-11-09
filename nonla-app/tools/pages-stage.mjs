@@ -15,7 +15,7 @@ const DIR_OK = new Set(["api", "functions", "assets", "data", "web"]);
 function keep(rel) {
   const parts = rel.split("\\").join("/").split("/");
   if (parts.length === 1) return !TOP_SKIP.test(parts[0]);
-  if (parts[0] === "data") return !/^_/.test(parts[1]) && parts[1] !== "_menu_survey_raw.json";
+  if (parts[0] === "data") return parts[1] === "_crawl" || (!/^_/.test(parts[1]) && parts[1] !== "_menu_survey_raw.json");
   if (parts[0] === "api" || parts[0] === "functions" || parts[0] === "assets" || parts[0] === "web") return true;
   return false;
 }

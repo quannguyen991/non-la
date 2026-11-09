@@ -149,11 +149,13 @@
       ],
       "street": "Nhà Hàng Hoàng, 54 P. Hàng Buồm, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "pho-bo",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (35,278 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 35,278 đánh giá)",
       "phone": "+84 949 814 805",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJGR8daRurNTERiP2FRKSdIgM"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJGR8daRurNTERiP2FRKSdIgM",
+      "rating": 4.9,
+      "reviews": 35278
     },
     {
       "id": "gmaps-ChIJXROtYr6rNTERRKeVXUeNGUY",
@@ -165,11 +167,13 @@
       ],
       "street": "Hong Hoai's Restaurant, P. Bát Đàn/20 P. Hàng Bồ, Phuờng, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "pho-bo",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (25,570 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 25,570 đánh giá)",
       "phone": "+84 911 295 020",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXROtYr6rNTERRKeVXUeNGUY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXROtYr6rNTERRKeVXUeNGUY",
+      "rating": 4.9,
+      "reviews": 25570
     },
     {
       "id": "gmaps-ChIJlR80_dG9NTERorHk3_x6wTQ",
@@ -181,11 +185,13 @@
       ],
       "street": "Hanoi Corner Restaurant, 45 P. Hàng Bạc, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "pho-bo",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (11,647 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 11,647 đánh giá)",
       "phone": "+84 862 370 386",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJlR80_dG9NTERorHk3_x6wTQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJlR80_dG9NTERorHk3_x6wTQ",
+      "rating": 4.9,
+      "reviews": 11647
     },
     {
       "id": "gmaps-ChIJ7_ZONCYvdTERKiDcl5uyd9A",
@@ -197,11 +203,13 @@
       ],
       "street": "Phở Hòa Pasteur, 260C Pasteur, Phường, Xuân Hòa, Hồ Chí Minh 70000, Việt Nam",
       "dish": "pho-bo",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (6,276 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.2★, 6,276 đánh giá)",
       "phone": "+84 28 3829 7943",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcg_tGSk2RE5-oxRtxPq3EtOy-9HVWdL8Vj2uNDwRckqwaWrwq_IhQfe5M6ts7xvpbMklnE-8eYyuCju26HNJfgZ9oZDlbzPvIdFKj-i32E6E0oldhJ_pw7KLk2hbEq4Un4vAm7YHDvJalI=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ7_ZONCYvdTERKiDcl5uyd9A"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ7_ZONCYvdTERKiDcl5uyd9A",
+      "rating": 4.2,
+      "reviews": 6276
     },
     {
       "id": "gmaps-ChIJg-GCAP0udTERBzmwi8B6NV4",
@@ -213,11 +221,13 @@
       ],
       "street": "Phở Lệ, 413 - 415 Nguyễn Trãi, An Đông, Hồ Chí Minh, Việt Nam",
       "dish": "pho-bo",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (6,173 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.2★, 6,173 đánh giá)",
       "phone": "+84 28 3923 4008",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLewZkMTNM0mI-T4T4TP1xtH-YLceMqJn-GuGQAKHEhscZXAHHOkxY7OhaaUa7FX6W-h1AQEvWhIkqy07Samg5skhQkFqPBDQ4AhqVJrlCbbrLd78UhbNIA8xD0h7SzWUK5WNkBiqg=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJg-GCAP0udTERBzmwi8B6NV4"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJg-GCAP0udTERBzmwi8B6NV4",
+      "rating": 4.2,
+      "reviews": 6173
     },
     {
       "id": "gmaps-ChIJJSRONbovdTERyqDnjqShlKc",
@@ -229,11 +239,13 @@
       ],
       "street": "Phở Việt Nam, 14 Phạm Hồng Thái, Bến Thành, Hồ Chí Minh, Việt Nam",
       "dish": "pho-bo",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (6,132 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.5★, 6,132 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdbv0LmfkSVM2Al-gM40JyiDMH0ydiaYnU4ESc7bqwBtZR1iKaolrg6oJmmNc0WqEyJuy3bmClxHTEbMNjtUOkEW3UUBbl0uzjbAHQ10bnVrxAEf3KNA4Nm8TBBqyE-IZS1zGGsmbKORSe-=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJJSRONbovdTERyqDnjqShlKc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJJSRONbovdTERyqDnjqShlKc",
+      "rating": 4.5,
+      "reviews": 6132
     },
     {
       "id": "gmaps-ChIJx6-KGnIXQjER7x-T0zeOlBw",
@@ -245,11 +257,13 @@
       ],
       "street": "Mộc quán Seafood Đà Nẵng, 26 Tô Hiến Thành, An Hải, Đà Nẵng 550000, Việt Nam",
       "dish": "hai-san-can",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (32,487 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.8★, 32,487 đánh giá)",
       "phone": "+84 905 665 058",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJx6-KGnIXQjER7x-T0zeOlBw"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJx6-KGnIXQjER7x-T0zeOlBw",
+      "rating": 4.8,
+      "reviews": 32487
     },
     {
       "id": "gmaps-ChIJySI1VxkXQjERUSItJZQgxBE",
@@ -261,11 +275,13 @@
       ],
       "street": "Bé Ni 2, 228 Võ Nguyên Giáp, An Hải, Đà Nẵng 550000, Việt Nam",
       "dish": "hai-san-can",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (15,004 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.8★, 15,004 đánh giá)",
       "phone": "+84 773 515 685",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLffQ_IGM5paUEmAnlq1REbLJZ3wg05dTZGK9RIhIS7U7RZmIh1EC0MVf8w57J0F3pvp6y5P9q0sdW4VBSNFvY8kcniOykAOKlelp74d-EMBEWCALv0Cx1RXEXYPC9158cphnHiApA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJySI1VxkXQjERUSItJZQgxBE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJySI1VxkXQjERUSItJZQgxBE",
+      "rating": 4.8,
+      "reviews": 15004
     },
     {
       "id": "gmaps-ChIJr9jG6weFdjERBXLcmciU8HY",
@@ -277,11 +293,13 @@
       ],
       "street": "Bờ kè Mr.Crab 112 ( cơ sở 2), 112 Nguyễn Đình Chiểu, khu phố 2, Mũi Né, Lâm Đồng, Việt Nam",
       "dish": "hai-san-can",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (13,620 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.9★, 13,620 đánh giá)",
       "phone": "+84 367 515 064",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd-9Q6fig04nYlxXumEUkG0WuPw5o419LgjzeR3GQnD0mab1r-v_2ktcrLvRJeS-tr6ay533W0BI2LwCzjltY2U9TwLa2PnN1CKSe_wx5gKN2OXKfQRO_9iPTHm3mz_yr8yKj4=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJr9jG6weFdjERBXLcmciU8HY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJr9jG6weFdjERBXLcmciU8HY",
+      "rating": 4.9,
+      "reviews": 13620
     },
     {
       "id": "gmaps-ChIJrdCB91iFdjERZ1-goqOZNS8",
@@ -293,11 +311,13 @@
       ],
       "street": "Hải Sản Hồng Phát, 130D Nguyễn Đình Chiểu, khu phố 2, Mũi Né, Lâm Đồng, Việt Nam",
       "dish": "hai-san-can",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (12,883 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.9★, 12,883 đánh giá)",
       "phone": "+84 918 111 411",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLe6KkQZcXVKUjYWzJrdRKYBdXZKi4eNva831dua1-dNpizWnk1BfXeJ0mDDiJx6-Pdj8uDqsQl_x7-06lo220gjBNo2ey6EPBip6MDxQwjdD2LRgWTjcZ3A67g2AMxqbLAjWAtARsfnlOaE=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJrdCB91iFdjERZ1-goqOZNS8"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJrdCB91iFdjERZ1-goqOZNS8",
+      "rating": 4.9,
+      "reviews": 12883
     },
     {
       "id": "gmaps-ChIJkxzVMKSFdjERetP8Mzl5tMc",
@@ -309,11 +329,13 @@
       ],
       "street": "Bờ Kè Mr.Crab, 179 Nguyễn Đình Chiểu, khu phố 2, Mũi Né, Lâm Đồng, Việt Nam",
       "dish": "hai-san-can",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (10,722 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.7★, 10,722 đánh giá)",
       "phone": "+84 394 924 345",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLc0pO1Iqh-MR7aVUbvTpqoWN8-m3Fy4KgeOWhM4bB02a8OCtK3JTglsT5n_YIwIesLBaizODox0QqpowrBgvRqoHpM-4TCFWHlanrEDBOlDpFcplVWTaJqVP829ZB2ME9SzpXPGfdnvocZK=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJkxzVMKSFdjERetP8Mzl5tMc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJkxzVMKSFdjERetP8Mzl5tMc",
+      "rating": 4.7,
+      "reviews": 10722
     },
     {
       "id": "gmaps-ChIJN84BNSQXQjERyy7N3rDXisc",
@@ -325,11 +347,13 @@
       ],
       "street": "Thèm Hải Sản, 39 Trần Bạch Đằng, An Hải, Đà Nẵng 550000, Việt Nam",
       "dish": "hai-san-can",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (10,558 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.8★, 10,558 đánh giá)",
       "phone": "+84 946 495 571",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJN84BNSQXQjERyy7N3rDXisc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJN84BNSQXQjERyy7N3rDXisc",
+      "rating": 4.8,
+      "reviews": 10558
     },
     {
       "id": "gmaps-ChIJQRaFSACrNTERSEgVfyfZhXI",
@@ -341,11 +365,13 @@
       ],
       "street": "Vua Chả Cá, 269 P. Giảng Võ, Ô Chợ Dừa, Hà Nội 100000, Việt Nam",
       "dish": "cha-ca",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (21,694 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.5★, 21,694 đánh giá)",
       "phone": "+84 979 279 219",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeBiCuddRKlB0FZIWfUCXtn5B6Z4vqmzlWIIcaCIx3C-81cAAOtc4kM9k77NjzWysMcu8dMreu_4IPejkQgSEtnwKE_lv73GLCnQGdLRQOKZ1SyZbU8jOaClScTT1DtjsZ_iVuthU0LV49-=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJQRaFSACrNTERSEgVfyfZhXI"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJQRaFSACrNTERSEgVfyfZhXI",
+      "rating": 4.5,
+      "reviews": 21694
     },
     {
       "id": "gmaps-ChIJFwB6O6CsNTEROeFzvUPGdRc",
@@ -357,11 +383,13 @@
       ],
       "street": "Vua Chả Cá Nguyễn Thị Định, 48 P. Nguyễn Thị Định, Yên Hòa, Hà Nội 100000, Việt Nam",
       "dish": "cha-ca",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (8,858 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 8,858 đánh giá)",
       "phone": "+84 979 775 566",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfmnKhWS2Yb5TAcsEWSEC9dYc_koNI8R2UthC_bdyd7_SEZ9_QIyVtTy9zKXm5uUDieluaXb3e12S3Ek0qirElTuswMBpzG2sPnC1Iq8mZy0xW01_J2g9JF0AQGwQF3GDJaOH8o=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJFwB6O6CsNTEROeFzvUPGdRc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJFwB6O6CsNTEROeFzvUPGdRc",
+      "rating": 4.9,
+      "reviews": 8858
     },
     {
       "id": "gmaps-ChIJD9G-ou2rNTERgMZzOQZc5q4",
@@ -373,11 +401,13 @@
       ],
       "street": "Vua Chả Cá - 26C Trần Hưng Đạo, 26C Trần Hưng Đạo, Cửa Nam, Hà Nội, Việt Nam",
       "dish": "cha-ca",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (7,245 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 7,245 đánh giá)",
       "phone": "+84 961 757 522",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLe7ld-G8GlYKobGmpRIn5B0UEY_jHmy5I0lQhZbuCdmf4AETCFtnJpzjOL0gk_gK9c2pJO8BWdfjEam4dXu0OYz0BTRP0io9QlQxolb89BZvsN7hpRFqH-rBTqQXdhOZIQLfoH_=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJD9G-ou2rNTERgMZzOQZc5q4"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJD9G-ou2rNTERgMZzOQZc5q4",
+      "rating": 4.9,
+      "reviews": 7245
     },
     {
       "id": "gmaps-ChIJxcagwVmrNTER-7kgPE2srN8",
@@ -389,11 +419,13 @@
       ],
       "street": "Vua Chả Cá - 09 Lý Thường Kiệt, 9 Lý Thường Kiệt, Cửa Nam, Hà Nội 100000, Việt Nam",
       "dish": "cha-ca",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (6,539 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.8★, 6,539 đánh giá)",
       "phone": "+84 968 196 625",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLenGYxVdyPYjAkxo32f3FlenWZo33mqKxl3LGHwKtAJZqXhybXyRynl7KMX-ZflKbYibmH6lyVd9wpnbviJ8PNq21hgLbAA2YAuaNyfi8zP_VCMbHpbb6XIjQvZqdQsJvIhNErI=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJxcagwVmrNTER-7kgPE2srN8"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJxcagwVmrNTER-7kgPE2srN8",
+      "rating": 4.8,
+      "reviews": 6539
     },
     {
       "id": "gmaps-ChIJCwoFmIyrNTERKmtUq595ZYY",
@@ -405,11 +437,13 @@
       ],
       "street": "Vua Chả Cá - 76A Mai Hắc Đế, P. Mai Hắc Đế/76A P. Bùi Thị Xuân, Hai Bà Trưng, Hà Nội, Việt Nam",
       "dish": "cha-ca",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (6,322 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 6,322 đánh giá)",
       "phone": "+84 961 959 518",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfwiHR-aSx85Y8LC6Ati_dVNX_PlFtl_yxooR7rpXWkB1oHzuJMDA7DE3Rt_mUMbYOuaQSzpsB2nesZMW7EQpASFwg6uR_S1t1Bo3AV5rjydG4LNZY9BJDF9TfhwBppCjTxPzlc=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJCwoFmIyrNTERKmtUq595ZYY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJCwoFmIyrNTERKmtUq595ZYY",
+      "rating": 4.9,
+      "reviews": 6322
     },
     {
       "id": "gmaps-ChIJc2gtZHGrNTERbKEOrn8j6S8",
@@ -421,11 +455,13 @@
       ],
       "street": "Vua Chả Cá Lê Đức Thọ, 12A1 Đ. Lê Đức Thọ, Từ Liêm, Hà Nội 10000, Việt Nam",
       "dish": "cha-ca",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (5,987 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 5,987 đánh giá)",
       "phone": "+84 969 592 338",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfbaejIl2nLviuhtw8n2zBqagkC2T-WJj5pkSBmINS7adeSVdKYWFE0axBBG4Uhbaz4EXdCF_5hHpc2HhnpSNAeM9J88FWsRTll9ec0322VUr1_o9iq5YRnAQpLmYMY6Ulryzv4eA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJc2gtZHGrNTERbKEOrn8j6S8"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJc2gtZHGrNTERbKEOrn8j6S8",
+      "rating": 4.9,
+      "reviews": 5987
     },
     {
       "id": "gmaps-ChIJXTOF7sCrNTERY3MOxYpAo_w",
@@ -437,11 +473,13 @@
       ],
       "street": "Café Giảng, 39 P. Nguyễn Hữu Huân, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "ca-phe-trung",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (17,467 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.4★, 17,467 đánh giá)",
       "phone": "+84 917 002 299",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdaG4N5pKq3qn0Cmd16XT2L3gtAPbEoVw8mXQ2TrH1eh6-u0Dn9UeyF1OQqRiWJp9BGr0HNIgz7BibF7VjNewv2SgYs0WDNE_QhNLjVJW4JviuD_ltOeJSnAgH5op8fvpfw4YGv=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXTOF7sCrNTERY3MOxYpAo_w"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXTOF7sCrNTERY3MOxYpAo_w",
+      "rating": 4.4,
+      "reviews": 17467
     },
     {
       "id": "gmaps-ChIJO8pnG7ATcTER2zNICgdwTPs",
@@ -453,11 +491,13 @@
       ],
       "street": "Tiệm Cà Phê Trứng Cô Ba - Đà Lạt, 105 Đường Hai Bà Trưng, Cam Ly - Đà Lạt, Lâm Đồng 670000, Việt Nam",
       "dish": "ca-phe-trung",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (2,382 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.7★, 2,382 đánh giá)",
       "phone": "+84 945 209 079",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJO8pnG7ATcTER2zNICgdwTPs"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJO8pnG7ATcTER2zNICgdwTPs",
+      "rating": 4.7,
+      "reviews": 2382
     },
     {
       "id": "gmaps-ChIJGRL8n9urNTER9vuSFL2dkJc",
@@ -469,11 +509,13 @@
       ],
       "street": "Loading T café, 8 P. Chân Cầm, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "ca-phe-trung",
-      "note": "Hà Nội · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (1,811 đánh giá Google Maps) · Hà Nội · Đã đóng cửa",
+      "source": "Google Maps (4.7★, 1,811 đánh giá)",
       "phone": "+84 903 342 000",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJGRL8n9urNTER9vuSFL2dkJc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJGRL8n9urNTER9vuSFL2dkJc",
+      "rating": 4.7,
+      "reviews": 1811
     },
     {
       "id": "gmaps-ChIJvc7dH3SrNTERXFZL1ui-RWE",
@@ -485,11 +527,13 @@
       ],
       "street": "Quán Nem Giảng Võ, 106-k1 P. Giảng Võ, Ô Chợ Dừa, Hà Nội, Việt Nam",
       "dish": "ca-phe-trung",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (1,116 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.4★, 1,116 đánh giá)",
       "phone": "+84 24 3512 3425",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcSWnngb9wjsC2qaeGcODYjBVd96qRiAPfIiyAaMQaonNNTS65Ni5p2jz-ab9ltkE58dfCmF8HtUNKlTk_jPEBjB_mO0ARAKqfZ8CzFete3-8BPanX2uem_EMqgJnkykpGInED-Qw=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJvc7dH3SrNTERXFZL1ui-RWE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJvc7dH3SrNTERXFZL1ui-RWE",
+      "rating": 4.4,
+      "reviews": 1116
     },
     {
       "id": "gmaps-ChIJ4xFwBzyrNTERxoCCbgK4xxg",
@@ -501,11 +545,13 @@
       ],
       "street": "Chả Cá Anh Vũ - Giảng Võ, 120K1 P. Giảng Võ, Ô Chợ Dừa, Hà Nội 100000, Việt Nam",
       "dish": "ca-phe-trung",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (670 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.6★, 670 đánh giá)",
       "phone": "+84 948 393 998",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdVTRZAyVDz_LW5Kp3sghn9X76HPtxAujHxSoag48_KzI0hIC7zfZoobK1F9CxClRUKNgcH4wsHxvo9HrZFluUcif1bN-iaCOeCYkfUz4-E6umI14FWStefEGctnDIGhyj-nK9rj-wOpYIs=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ4xFwBzyrNTERxoCCbgK4xxg"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ4xFwBzyrNTERxoCCbgK4xxg",
+      "rating": 4.6,
+      "reviews": 670
     },
     {
       "id": "gmaps-ChIJg88QUwmsNTERLLqMoZ1FZik",
@@ -517,11 +563,13 @@
       ],
       "street": "Cafe Trứng, 101 C7a P. Quỳnh Mai, Bạch Mai, Hà Nội, Việt Nam",
       "dish": "ca-phe-trung",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (79 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.3★, 79 đánh giá)",
       "phone": "",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJg88QUwmsNTERLLqMoZ1FZik"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJg88QUwmsNTERLLqMoZ1FZik",
+      "rating": 4.3,
+      "reviews": 79
     },
     {
       "id": "gmaps-ChIJ_____0pESjERjwipLDA-kV4",
@@ -533,11 +581,13 @@
       ],
       "street": "Vườn Quốc gia Cát Bà, Cát Hải, Hải Phòng 05418, Việt Nam",
       "dish": "oc-hut",
-      "note": "Quảng Ninh / Hạ Long · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (13,494 đánh giá Google Maps) · Quảng Ninh / Hạ Long · Đã đóng cửa",
+      "source": "Google Maps (4.5★, 13,494 đánh giá)",
       "phone": "+84 987 632 282",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeJaVQt4ZqKNLlluljt2t-NiTYa45k8qSWvPMJXAkLX5nYqxjaozty-18d2vJW9lQZOb928uPBExVYXek35tMAU8I-fY5OL_RgS4Jn7vucg8vzwFiUZQyRVDuu2bTmb9L1qSajUVQ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_____0pESjERjwipLDA-kV4"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_____0pESjERjwipLDA-kV4",
+      "rating": 4.5,
+      "reviews": 13494
     },
     {
       "id": "gmaps-ChIJAQWxiJWrNTER69Gq01PMo_g",
@@ -549,11 +599,13 @@
       ],
       "street": "Phở 10 Lý Quốc Sư, 10 P. Lý Quốc Sư, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "oc-hut",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (12,512 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.1★, 12,512 đánh giá)",
       "phone": "+84 24 3825 7338",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcnpqWk3p4o4cMskYSImuCrerrVfRVNbP-D672999bR6T97YNzQa6UIJPWNhEjpBUNXreGgZjptmZ8fdoWKkPVqgWgMZAxFQ7nZ4VDsrsEk78TQiL5fv3db9JtC7G-jMlNH0Led=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJAQWxiJWrNTER69Gq01PMo_g"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJAQWxiJWrNTER69Gq01PMo_g",
+      "rating": 4.1,
+      "reviews": 12512
     },
     {
       "id": "gmaps-ChIJT90dXUQUpDERuJ1YTHGYJjA",
@@ -565,11 +617,13 @@
       ],
       "street": "Mốc Toạ độ Quốc gia GPS 0001, ấp Mũi, Đất Mũi, Cà Mau, Việt Nam",
       "dish": "oc-hut",
-      "note": "Cà Mau · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (7,670 đánh giá Google Maps) · Cà Mau · Đã đóng cửa",
+      "source": "Google Maps (4.5★, 7,670 đánh giá)",
       "phone": "+84 857 975 394",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcrKXsLo1MoveBfEx1pUNy7gLBYLqEXNFIDlKgZTtjEnYvvdPoJ39cZ0zULHWY6S0e3MDFfR1bvFSAwBFYFowbBjvzpU11SVSd7xSFqDPR_bFapjdXr15iRrtCbCvtmU3pQldMosVMKcZAi=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJT90dXUQUpDERuJ1YTHGYJjA"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJT90dXUQUpDERuJ1YTHGYJjA",
+      "rating": 4.5,
+      "reviews": 7670
     },
     {
       "id": "gmaps-ChIJqSUY9d8udTER3gWPfy0eMms",
@@ -581,11 +635,13 @@
       ],
       "street": "Quán Ốc Như, 650/4/29D Điện Biên Phủ, Vườn Lài, Hồ Chí Minh, Việt Nam",
       "dish": "oc-hut",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (4,378 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.2★, 4,378 đánh giá)",
       "phone": "+84 908 337 360",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfS6YoZ60sXFIa9ZJv1ZHRHO2NR7wQxFubD6GnWYG5IzijcBlFQTUioYhQl6Eiksvjb9EBvD3juJKfrgFLN8tbkehohQLJJkvC81fdIwgk7RMhf1Ag4fhsB20bsz41VVyGKG_N6OX8QfUkR=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJqSUY9d8udTER3gWPfy0eMms"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJqSUY9d8udTER3gWPfy0eMms",
+      "rating": 4.2,
+      "reviews": 4378
     },
     {
       "id": "gmaps-ChIJVX1ODrIfCDERlnrDWWdlWYQ",
@@ -597,11 +653,13 @@
       ],
       "street": "Mai Hương Restaurant - Grand World Phú Quốc, TH1-09 GrandWorld, Phú Quốc, An Giang 92512, Việt Nam",
       "dish": "oc-hut",
-      "note": "Kiên Giang / Phú Quốc · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (4,037 đánh giá Google Maps) · Kiên Giang / Phú Quốc · Đang mở cửa",
+      "source": "Google Maps (4.8★, 4,037 đánh giá)",
       "phone": "+84 907 677 888",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJVX1ODrIfCDERlnrDWWdlWYQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJVX1ODrIfCDERlnrDWWdlWYQ",
+      "rating": 4.8,
+      "reviews": 4037
     },
     {
       "id": "gmaps-ChIJm4RnYFRVNDER1CeHdEcKrD4",
@@ -613,11 +671,13 @@
       ],
       "street": "Kimmari Chicken (Hàm Nghi), 01 P. Hàm Nghi, Vinhomes Gardenia, Từ Liêm, Hà Nội, Việt Nam",
       "dish": "oc-hut",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (3,963 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 3,963 đánh giá)",
       "phone": "+84 965 104 084",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeJLL0pgCNpie9A1ywmBddPVjgD-r3TZxrsaAgoXqFRqKPVCserm6UnvsWPuOef8mrfxApw8hpCAZICSdjTAXPHJTGl6JIYCyc9s1jv_mdDwkPrWt07wpYIbgdoMPHOWzLGFkwBmhrYpvXK=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJm4RnYFRVNDER1CeHdEcKrD4"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJm4RnYFRVNDER1CeHdEcKrD4",
+      "rating": 4.9,
+      "reviews": 3963
     },
     {
       "id": "gmaps-ChIJXWi6pPKrNTER55D6MD-WZ34",
@@ -629,11 +689,13 @@
       ],
       "street": "Bún chả Hương Liên, 24 P. Lê Văn Hưu, Cửa Nam, Hà Nội, Việt Nam",
       "dish": "bun-cha",
-      "note": "Hà Nội · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (12,487 đánh giá Google Maps) · Hà Nội · Sắp đóng cửa",
+      "source": "Google Maps (4.1★, 12,487 đánh giá)",
       "phone": "+84 24 3943 4106",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLecnQ2VsOsquoGK--durqvBh6HxNylLgTJImLy_pbAJIrQbZAr-0tnqHdCeh2tFMrSMsAzL2yvlB71QtbHhK5JPRI4HeNtGvv3E3y4QNnYW_Wbxa6VwXuBueu-U51RPVQ3zqi5qEdez4TRy=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXWi6pPKrNTER55D6MD-WZ34"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXWi6pPKrNTER55D6MD-WZ34",
+      "rating": 4.1,
+      "reviews": 12487
     },
     {
       "id": "gmaps-ChIJY89m6cCrNTERG-N0Fy4dWBw",
@@ -645,11 +707,13 @@
       ],
       "street": "Bun Cha Ta Hanoi, 21 P. Nguyễn Hữu Huân, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "bun-cha",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (5,396 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.4★, 5,396 đánh giá)",
       "phone": "+84 966 848 389",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfOhlyOpshBE2bA6faP85fdPNkNJsrl8Bb3VaVizttlJdQReOO_mbRfzeWh0kcbqnWKC0-IdvfVQiaGvMkagMUEwpwA_BUOh2i4IJIbDXhjUzpIZa-fWsDVCCgf2PeQuEMNHCIb=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJY89m6cCrNTERG-N0Fy4dWBw"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJY89m6cCrNTERG-N0Fy4dWBw",
+      "rating": 4.4,
+      "reviews": 5396
     },
     {
       "id": "gmaps-ChIJydaldR8vdTERaeB7G6QOMzE",
@@ -661,11 +725,13 @@
       ],
       "street": "Quán Ngon - Bún Chả Hà Nội, 209 Đề Thám, Bến Thành, Hồ Chí Minh 700000, Việt Nam",
       "dish": "bun-cha",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (2,077 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.8★, 2,077 đánh giá)",
       "phone": "+84 971 718 888",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdiHfAxJ8lBqqzScyqC8ZaBix_lab4f97nQqC48FToMC2CFF9koyvwNR1C-G7vsNWyWdZm4W2AJCFcNc9WaKM1K0MG-p8y0X2L0fws4bmKND_dJJ-_m9qFsyhpDi2-C_nSUbRnarYYnMKuh=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJydaldR8vdTERaeB7G6QOMzE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJydaldR8vdTERaeB7G6QOMzE",
+      "rating": 4.8,
+      "reviews": 2077
     },
     {
       "id": "gmaps-ChIJgToqIoirNTERj77d_vHYmmY",
@@ -677,11 +743,13 @@
       ],
       "street": "Bún chả CỘI phố cổ: Hanoi Specialty food & Vegetarian food, 57 P. Nguyễn Hữu Huân, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "bun-cha",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (1,314 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.7★, 1,314 đánh giá)",
       "phone": "+84 987 481 946",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeB67f9seQ68sK0cr-4AYqvdR8XpxBjEKyww1Xu9KCBraIw3wlDydH-TMrkBVjmdrQplHmt-XNXtryXT2g_i93MuXMjP1a2JuDUVjt5moBGbYINYk-HV-Zvw_b0c19DGWzASZap54uAQW0=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJgToqIoirNTERj77d_vHYmmY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJgToqIoirNTERj77d_vHYmmY",
+      "rating": 4.7,
+      "reviews": 1314
     },
     {
       "id": "gmaps-ChIJk8e1QACrNTERqPGE5PeROi0",
@@ -693,11 +761,13 @@
       ],
       "street": "Bún chả ngon, 4 P. Nguyễn Siêu, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "bun-cha",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (1,215 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 1,215 đánh giá)",
       "phone": "+84 989 760 178",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJk8e1QACrNTERqPGE5PeROi0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJk8e1QACrNTERqPGE5PeROi0",
+      "rating": 4.9,
+      "reviews": 1215
     },
     {
       "id": "gmaps-ChIJa0wdOkurNTERPpXEP8OoTuE",
@@ -709,11 +779,13 @@
       ],
       "street": "Bún Chả Lằu Gất Gụ, 41-43 P. Hàng Bè, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "bun-cha",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (1,181 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 1,181 đánh giá)",
       "phone": "+84 978 277 758",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfVhg75Osr9JA_S9riAqy_cmBx8nazBDaytDq6o50yEO_0S70-AzHmorY1bpBi8XgP5VC7Qyh0i7Q7AMCzvNuo4MYa0H-oTLekwiBL1Akolhbb2tcZyObISAzzrzsb2w5B3hs_4xLbah0k=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJa0wdOkurNTERPpXEP8OoTuE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJa0wdOkurNTERPpXEP8OoTuE",
+      "rating": 4.9,
+      "reviews": 1181
     },
     {
       "id": "gmaps-ChIJKbnmWQApdTERwsotmjhioIE",
@@ -725,11 +797,13 @@
       ],
       "street": "Du Miên Garden Cafe, 7 Đ. Phan Văn Trị, Gò Vấp, Hồ Chí Minh, Việt Nam",
       "dish": "ca-phe-sua-da",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (11,864 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.3★, 11,864 đánh giá)",
       "phone": "+84 28 3894 5555",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeHYrsF90A3-WnZkANGxY1MdZXbMkN66dFS6oss9HcAPZWNHP2ZeuvlzUDnmKMN6ZR4zSna8sN1kq6Xx10-Rs0pxmCp8yW15eFKCDJMu13u_yi7ylwi9dFRIQbl6XveU0PmxnJo=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJKbnmWQApdTERwsotmjhioIE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJKbnmWQApdTERwsotmjhioIE",
+      "rating": 4.3,
+      "reviews": 11864
     },
     {
       "id": "gmaps-ChIJE00Dh5x7NjERJnIicVFMXNY",
@@ -741,11 +815,13 @@
       ],
       "street": "Khu du lịch sinh thái Thung Nham - Ninh Bình, Thung Nham, Thôn Hải Nham, Nam Hoa Lư, Ninh Bình, Việt Nam",
       "dish": "ca-phe-sua-da",
-      "note": "Ninh Bình",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (7,805 đánh giá Google Maps) · Ninh Bình",
+      "source": "Google Maps (4.3★, 7,805 đánh giá)",
       "phone": "+84 912 900 887",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJE00Dh5x7NjERJnIicVFMXNY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJE00Dh5x7NjERJnIicVFMXNY",
+      "rating": 4.3,
+      "reviews": 7805
     },
     {
       "id": "gmaps-ChIJl7OUwr-rNTERr7RCHxAFMNU",
@@ -757,11 +833,13 @@
       ],
       "street": "The Note Coffee, 64 P. Lương Văn Can, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "ca-phe-sua-da",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (6,985 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.3★, 6,985 đánh giá)",
       "phone": "+84 975 194 466",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJl7OUwr-rNTERr7RCHxAFMNU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJl7OUwr-rNTERr7RCHxAFMNU",
+      "rating": 4.3,
+      "reviews": 6985
     },
     {
       "id": "gmaps-ChIJf7GAgS4TcTERwlOjuixZwTE",
@@ -773,11 +851,13 @@
       ],
       "street": "An Cafe, 63Bis Ba Tháng Hai, Xuân Hương - Đà Lạt, Lâm Đồng 661100, Việt Nam",
       "dish": "ca-phe-sua-da",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (5,828 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.3★, 5,828 đánh giá)",
       "phone": "+84 961 100 063",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJf7GAgS4TcTERwlOjuixZwTE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJf7GAgS4TcTERwlOjuixZwTE",
+      "rating": 4.3,
+      "reviews": 5828
     },
     {
       "id": "gmaps-ChIJfU5r3xwndTERXFDWavANj0E",
@@ -789,11 +869,13 @@
       ],
       "street": "Tiệm cà phê Noọng Ơi, 283/2 Đ. Linh Đông, Hiệp Bình, Hồ Chí Minh 700000, Việt Nam",
       "dish": "ca-phe-sua-da",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (5,482 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.5★, 5,482 đánh giá)",
       "phone": "+84 932 704 286",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLc1wRxhspKqMmFompuGkT_kdCffaoRVVJT6Evi58DhbyuDx4kg46co1fh-MWvpsz11Zx2p--S2I0VlAfSh1EuSa5TzOomlGXqa05DAt3izFNwGCds6eKTGPZ8WbLuMxS_zF61wL=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJfU5r3xwndTERXFDWavANj0E"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJfU5r3xwndTERXFDWavANj0E",
+      "rating": 4.5,
+      "reviews": 5482
     },
     {
       "id": "gmaps-ChIJwYgVi7-rNTERLWjR63qaaFg",
@@ -805,11 +887,13 @@
       ],
       "street": "Cafe Đinh, 13 Đinh Tiên Hoàng, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "ca-phe-sua-da",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (4,891 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.6★, 4,891 đánh giá)",
       "phone": "+84 24 3824 2960",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfcqJvaWIBPsukaoD4m6Nt2vYX81ENrEdE1d6WwTipdW6eetrun84acl1at5O9CUfD2Pj3PTCVzFY9teXXQAwWqOUs-2cK02gcGHDZfcpAJ4766YWlJK7Z6RMzb9k2cE0cXIsY=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJwYgVi7-rNTERLWjR63qaaFg"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJwYgVi7-rNTERLWjR63qaaFg",
+      "rating": 4.6,
+      "reviews": 4891
     },
     {
       "id": "gmaps-ChIJ9bBIK5ovdTERXOUNNEW8YGo",
@@ -821,11 +905,13 @@
       ],
       "street": "Bánh Mì Huynh Hoa - Lê Thị Riêng, 26 Lê Thị Riêng, Bến Thành, Hồ Chí Minh, Việt Nam",
       "dish": "banh-mi",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (7,852 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.1★, 7,852 đánh giá)",
       "phone": "+84 338 044 646",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLekb17Uv9eJ5OxLiDDhynLkbOMu8oBRgsqJRdwhg4DRcl047JLwQMPiwJFZGpxbz_khO_4ZjmxR-lHNp-gCIc6IqH-4bnPgPAaI55xeXww3ZU55_Lbe_fNqUift19l8jyeXwN4E=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ9bBIK5ovdTERXOUNNEW8YGo"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ9bBIK5ovdTERXOUNNEW8YGo",
+      "rating": 4.1,
+      "reviews": 7852
     },
     {
       "id": "gmaps-ChIJS0g3UDwvdTERVnrWATZwqJM",
@@ -837,11 +923,13 @@
       ],
       "street": "Bánh Mì Hồng Hoa, 54 Nguyễn Văn Tráng, Bến Thành, Hồ Chí Minh, Việt Nam",
       "dish": "banh-mi",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (2,464 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.5★, 2,464 đánh giá)",
       "phone": "+84 908 811 594",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfOaRrOt1ER2xLTpRxvf4h8r9VbPm--fezAAA7UrEX9DlmxqWM3225HOmznYBZHc5JJFtd2j7xTYGTQgmuymhoJpVtPgV0Gb9PIP410aH3YtVIGXcl_XtFrwvlhmilqfnTD-aFK=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJS0g3UDwvdTERVnrWATZwqJM"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJS0g3UDwvdTERVnrWATZwqJM",
+      "rating": 4.5,
+      "reviews": 2464
     },
     {
       "id": "gmaps-ChIJHcwijyEvdTERt9X0yTz8iVk",
@@ -853,11 +941,13 @@
       ],
       "street": "Bánh Mì Hòa Mã, 53 Cao Thắng, Bàn Cờ, Hồ Chí Minh, Việt Nam",
       "dish": "banh-mi",
-      "note": "TP. Hồ Chí Minh · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (1,971 đánh giá Google Maps) · TP. Hồ Chí Minh · Đã đóng cửa",
+      "source": "Google Maps (4.3★, 1,971 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeP31pV7UmzyF7JZNV60VEgQmvOhuCtVCtRY8sal_BZ-TMTWX-fFy5-wu6rgAEW-WU8HcjZZnFNf2BCAfKmaGfvqnNyC5sWSXckIhZ3574OzYS1YEASi26rwhkt3eqVUrMUCnRm-A=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJHcwijyEvdTERt9X0yTz8iVk"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJHcwijyEvdTERt9X0yTz8iVk",
+      "rating": 4.3,
+      "reviews": 1971
     },
     {
       "id": "gmaps-ChIJrwB9tr-rNTER6xgPK_KsePg",
@@ -869,11 +959,13 @@
       ],
       "street": "Bánh Mì Long Hội, 7 P. Hàng Quạt, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "banh-mi",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (1,588 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.5★, 1,588 đánh giá)",
       "phone": "+84 835 116 866",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLed894B_xQBwId4Y3qde9v5pFDvXU9wzntBhecOcBC-ZGtUPZtBsHEUrdv02V1KKnFPtUQw-hk3O8GUbqo1vAljYkllD0SRMG73UuvhbNyeq4eVJpw_3OeY4Skl1v69gkcx2F9fUpRaX2Dl=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJrwB9tr-rNTER6xgPK_KsePg"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJrwB9tr-rNTER6xgPK_KsePg",
+      "rating": 4.5,
+      "reviews": 1588
     },
     {
       "id": "gmaps-ChIJl7C0JssodTERTeorMNGQnKA",
@@ -885,11 +977,13 @@
       ],
       "street": "Bánh mì Bảy Hổ, 25 Huỳnh Khương Ninh, Quận 1, Hồ Chí Minh 70000, Việt Nam",
       "dish": "banh-mi",
-      "note": "TP. Hồ Chí Minh · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (823 đánh giá Google Maps) · TP. Hồ Chí Minh · Đã đóng cửa",
+      "source": "Google Maps (4.1★, 823 đánh giá)",
       "phone": "+84 907 321 160",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLc5rjcwnk1ZqPJmVyKrYx3E3X9bfE1NUliGxJBy9iyt-seL3Vt9W9rdNZZ9QASDDJ5Gka4S7bRS85BHGBJlcbV8shK7bDUEYiluyZEWYfaqg_Qp8g5NkpuL0AtsOrjhnnklLQg=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJl7C0JssodTERTeorMNGQnKA"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJl7C0JssodTERTeorMNGQnKA",
+      "rating": 4.1,
+      "reviews": 823
     },
     {
       "id": "gmaps-ChIJPSwAMz0vdTERPs4NXMo-5UY",
@@ -901,11 +995,13 @@
       ],
       "street": "Bánh mì Bùi Thị Xuân, 122E Bùi Thị Xuân, Quận 1, Hồ Chí Minh, Việt Nam",
       "dish": "banh-mi",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (791 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.1★, 791 đánh giá)",
       "phone": "+84 28 6271 9997",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeDP1BnSvcg08BcpCyLvIXbKGEVC1Ls0lcMTIoDfTCMPuxXt2os6aDZG7biEyeakZG4qeJZCUAKuyrGSRxS5EgInfQzewh8BXt6sosDjmcPNhXg5kLZW4fax_YQ7zLNHbFyD1S5=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJPSwAMz0vdTERPs4NXMo-5UY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJPSwAMz0vdTERPs4NXMo-5UY",
+      "rating": 4.1,
+      "reviews": 791
     },
     {
       "id": "gmaps-ChIJ2eSxOIQvdTERaL5Ume1Fz1w",
@@ -917,11 +1013,13 @@
       ],
       "street": "Cơm Tấm Sà Bì Chưởng - Trần Bình Trọng, 179 Trần Bình Trọng, Chợ Quán, Hồ Chí Minh 700000, Việt Nam",
       "dish": "com-tam",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (7,087 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.7★, 7,087 đánh giá)",
       "phone": "+84 971 095 261",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeYwBAGCzQyfXN1o5En3x5B_Je76aOemQfJajIQjrpJdsmtJ18FS_119Fl73K8zIgHxk1vUL14UvwETU9Hgm1ePwEZKlp-KrpyBHUSzJ9ys5MG_eO1hVnE9OnmT5m8Vs94Autsk=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ2eSxOIQvdTERaL5Ume1Fz1w"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ2eSxOIQvdTERaL5Ume1Fz1w",
+      "rating": 4.7,
+      "reviews": 7087
     },
     {
       "id": "gmaps-ChIJfxqV1cYodTER4QneDp0SI-A",
@@ -933,11 +1031,13 @@
       ],
       "street": "Cơm Tấm Tài - Không Chi Nhánh, 1 Nguyễn An Ninh, Bình Thạnh, Hồ Chí Minh, Việt Nam",
       "dish": "com-tam",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (1,863 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.2★, 1,863 đánh giá)",
       "phone": "+84 28 3841 3388",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdr32cWkmYok0FwNbvByf300nv5gaZ7gSugJ55SbGM9AlegB8sK2-0VakC6H7-jWSjXW1PCmOuLDEVQAdw5_IP3F-EnZVY9jnSlGi8Zti0FT3jyx6mdBMmX-Ai2aS17T5irkmHqdA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJfxqV1cYodTER4QneDp0SI-A"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJfxqV1cYodTER4QneDp0SI-A",
+      "rating": 4.2,
+      "reviews": 1863
     },
     {
       "id": "gmaps-ChIJ-wzyp_oodTERMYW7Bnns8uI",
@@ -949,11 +1049,13 @@
       ],
       "street": "Cơm Tấm Tài, 100 Đ.Nguyễn Văn Nghi, Gò Vấp, Hồ Chí Minh 70000, Việt Nam",
       "dish": "com-tam",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (1,416 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.3★, 1,416 đánh giá)",
       "phone": "+84 984 804 038",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLessyGjaM8CrLIBkPoFQ5o2E1cj9zINNwaoPzQPSby0vQ-TjcCr8wYuPviPy6pRjslgTKAfjKW9y7ZeddVOOCIf80na03VGh-Qe_XP3_2ky4siPTRQ3X4fb67Gk_0pl1g-8WoBZkKJavr4p=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ-wzyp_oodTERMYW7Bnns8uI"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ-wzyp_oodTERMYW7Bnns8uI",
+      "rating": 4.3,
+      "reviews": 1416
     },
     {
       "id": "gmaps-ChIJY1VhDYdvdTERTL7ZN9rVxc8",
@@ -965,11 +1067,13 @@
       ],
       "street": "Quán cơm tấm Ngày Xưa, 3 Trưng Nhị, Vũng Tàu, Hồ Chí Minh 79000, Việt Nam",
       "dish": "com-tam",
-      "note": "Bà Rịa - Vũng Tàu · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (1,275 đánh giá Google Maps) · Bà Rịa - Vũng Tàu · Sắp đóng cửa",
+      "source": "Google Maps (4.5★, 1,275 đánh giá)",
       "phone": "+84 908 593 828",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJY1VhDYdvdTERTL7ZN9rVxc8"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJY1VhDYdvdTERTL7ZN9rVxc8",
+      "rating": 4.5,
+      "reviews": 1275
     },
     {
       "id": "gmaps-ChIJ7f-3qVsvdTERIu4FtN_tNlk",
@@ -981,11 +1085,13 @@
       ],
       "street": "Cơm tấm Tài 476 Nguyễn Tri Phương (Tai Broken Rice Restaurant), 476 Nguyễn Tri Phương, Vườn Lài, Hồ Chí Minh, Việt Nam",
       "dish": "com-tam",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (995 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.1★, 995 đánh giá)",
       "phone": "+84 981 828 809",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeI2vcV1UFMYQaPbZ99IOr9CuEfeJgM5LXJWn5N5NWGmOPmigJS-yWoyps0usrErkZH8BGWHSZP4wY9Y0_AuuXhhD1cu6i885miDvk9cQCtL4BqWyhaBFXl0Njgmcy8LHpCBxG4=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ7f-3qVsvdTERIu4FtN_tNlk"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ7f-3qVsvdTERIu4FtN_tNlk",
+      "rating": 4.1,
+      "reviews": 995
     },
     {
       "id": "gmaps-ChIJj91eOTKrNTERHAc4S4YZsCU",
@@ -997,11 +1103,13 @@
       ],
       "street": "CƠM TẤM TƯ MẬP - 241 THỤY KHUÊ, 241 Đ. Thụy Khuê, Tây Hồ, Hà Nội, Việt Nam",
       "dish": "com-tam",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (676 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.0★, 676 đánh giá)",
       "phone": "+84 776 969 527",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLf1P3vAtRSq5-2NegIJDIK3Lu1o7Zq9AQwHxvRf8XKqckXaiKnJg4TRkcnV7TGI8Y5j4I5mBVanXcYUNofK1Rs-RzQw1SIYMoL-guPduUzW2JMQN3yeE9uJBQHtfptSD7OOEhxy=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJj91eOTKrNTERHAc4S4YZsCU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJj91eOTKrNTERHAc4S4YZsCU",
+      "rating": 4.0,
+      "reviews": 676
     },
     {
       "id": "gmaps-ChIJrYhLgoZncDER6fpXnhTtHH8",
@@ -1013,11 +1121,13 @@
       ],
       "street": "Nem Nướng Đặng Văn Quyên, 16A Lãn Ông, Nha Trang, Khánh Hòa 650000, Việt Nam",
       "dish": "nem-lui",
-      "note": "Khánh Hòa / Nha Trang · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (6,025 đánh giá Google Maps) · Khánh Hòa / Nha Trang · Sắp đóng cửa",
+      "source": "Google Maps (4.1★, 6,025 đánh giá)",
       "phone": "+84 258 3826 737",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeTPZc5o7_X97qpbtUUr1JPHu0awyEEt-AnJ5EhGVkJRE1kky_DuCuh6GYMqUGCyTdHlR37VoCUj6k1VvKPqrTItf_Fggqo8IAt230JjRnEj6e0pw_IlpL2dTBxF26LpoeQksk=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJrYhLgoZncDER6fpXnhTtHH8"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJrYhLgoZncDER6fpXnhTtHH8",
+      "rating": 4.1,
+      "reviews": 6025
     },
     {
       "id": "gmaps-ChIJzXQmeYZncDERA90eIpdsb5o",
@@ -1029,11 +1139,13 @@
       ],
       "street": "Nem Nướng Nha Trang - Đặng Văn Quyên, 2-4 Đ. Phan Bội Châu, Nha Trang, Khánh Hòa 650000, Việt Nam",
       "dish": "nem-lui",
-      "note": "Khánh Hòa / Nha Trang · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (1,638 đánh giá Google Maps) · Khánh Hòa / Nha Trang · Đang mở cửa",
+      "source": "Google Maps (4.0★, 1,638 đánh giá)",
       "phone": "+84 258 3814 888",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdAknN-9btJQ3AnoL_QCuAKygTxd1X6aeJltG0Xp2eEfi3DAtv3w-J_1cSFxY9fArhEqjRdR6wHAMcI_mQWYnubxiEXgaxd17jIBAygMrPSL9BboGdUgkzKv7boZ-LPZ9wRmK1CNA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJzXQmeYZncDERA90eIpdsb5o"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJzXQmeYZncDERA90eIpdsb5o",
+      "rating": 4.0,
+      "reviews": 1638
     },
     {
       "id": "gmaps-ChIJcSDYvC0TcTERpWEGjcxU90o",
@@ -1045,11 +1157,13 @@
       ],
       "street": "Nem nướng Phượng, 23A Nguyễn Trãi, Xuân Hương - Đà Lạt, Lâm Đồng 67000, Việt Nam",
       "dish": "nem-lui",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (1,164 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.1★, 1,164 đánh giá)",
       "phone": "+84 931 286 696",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLccvc-noKy11a1Cj74TL5c1nKo6mGeX2-2ni3zFcHAEVYuZg7ze6Grmnnmx9TKQIoiHGpOLfqTt7lOMld-iP46u6Du2WP9t60aJcJrXYlOMTto_k0OqQAXlJqawPeNKb0b5_6kO=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJcSDYvC0TcTERpWEGjcxU90o"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJcSDYvC0TcTERpWEGjcxU90o",
+      "rating": 4.1,
+      "reviews": 1164
     },
     {
       "id": "gmaps-ChIJcxM5BygTcTERkKl-2nE2NrQ",
@@ -1061,11 +1175,13 @@
       ],
       "street": "Nem Nướng Hùng Vân, 150 Đường Bùi Thị Xuân, Xuân Hương - Đà Lạt, Lâm Đồng 670000, Việt Nam",
       "dish": "nem-lui",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (622 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.0★, 622 đánh giá)",
       "phone": "+84 946 711 413",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd2wJTQezQBH0QN7-rh5CbJkLWAeBcZ6JfUGKHQFFcv0k_G_oxy-a89r6QavceAGtVJPAPKKCcrd9OA3mQxaZR5v2M-QOOpk6s922nufhEwIWmtFjqFxRSARwKKzzWP363cgYc4=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJcxM5BygTcTERkKl-2nE2NrQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJcxM5BygTcTERkKl-2nE2NrQ",
+      "rating": 4.0,
+      "reviews": 622
     },
     {
       "id": "gmaps-ChIJBSHKqIZncDERXNKFLU6KYyI",
@@ -1077,11 +1193,13 @@
       ],
       "street": "Nem nướng Cô Nô, 26 Đ. Hai Bà Trưng, Xuong Huan, Nha Trang, Khánh Hòa 650000, Việt Nam",
       "dish": "nem-lui",
-      "note": "Khánh Hòa / Nha Trang · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (323 đánh giá Google Maps) · Khánh Hòa / Nha Trang · Đang mở cửa",
+      "source": "Google Maps (4.2★, 323 đánh giá)",
       "phone": "+84 935 882 710",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd2XkRcVD3-gxAaQ8df82etwtFB_Bl0nZV1_EvmfbgrYzEVReYJEMJtJFbCgdLVTHAH_s5TIq-Sw70iZ_6_CKk3yFTymfyKcdURAr8jqcJjpaxlssuqwbRCxeSSqAXJhDn726QX=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJBSHKqIZncDERXNKFLU6KYyI"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJBSHKqIZncDERXNKFLU6KYyI",
+      "rating": 4.2,
+      "reviews": 323
     },
     {
       "id": "gmaps-ChIJFcEXBvNpcDERjALmL7jhOP0",
@@ -1093,11 +1211,13 @@
       ],
       "street": "Nem nướng, Bún cá - Ngon Ninh Hòa, Kiot A11 Mai Xuân Thưởng, Bắc Nha Trang, Khánh Hòa 650000, Việt Nam",
       "dish": "nem-lui",
-      "note": "Khánh Hòa / Nha Trang · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (100 đánh giá Google Maps) · Khánh Hòa / Nha Trang · Đang mở cửa",
+      "source": "Google Maps (4.7★, 100 đánh giá)",
       "phone": "+84 985 350 410",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLe1qr6MSfApR93hNo4njlTqO_ZRBI9LZqjuDUAgX3sBWNoYqLrLGhl0KAK9pPP6vKWQkl59GcfHfMjRxmPYH3hgCjrpytn9YY0nK_YV9v89lTvhQPEQVgen0qFYod_I5H2pTwraxQ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJFcEXBvNpcDERjALmL7jhOP0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJFcEXBvNpcDERjALmL7jhOP0",
+      "rating": 4.7,
+      "reviews": 100
     },
     {
       "id": "gmaps-ChIJcedeLPerNTERDA8DsdSN10g",
@@ -1109,11 +1229,13 @@
       ],
       "street": "Phở Gà Huyền Hương, 20 P. Báo Khánh, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "pho-ga",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (5,389 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.7★, 5,389 đánh giá)",
       "phone": "+84 973 928 505",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfwjAygH5nkZiBPyA9ObtLO9Z1PSnm_N54D1reL4fKxE1XotA7o3n44LeIaqKZ2aBpg8CS6o1AAHYSthpybUDdlIcoS1s3NeF7g-3ryKSYazRISuK5xxRAfBTU7ptUpnisCKU2h=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJcedeLPerNTERDA8DsdSN10g"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJcedeLPerNTERDA8DsdSN10g",
+      "rating": 4.7,
+      "reviews": 5389
     },
     {
       "id": "gmaps-ChIJv54u7pWrNTERst-ohKAJY1I",
@@ -1125,11 +1247,13 @@
       ],
       "street": "Phở Gà Nguyệt, 5b P. Phủ Doãn, Hàng Trống, Hoàn Kiếm, Hà Nội 100000, Việt Nam",
       "dish": "pho-ga",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (3,704 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.4★, 3,704 đánh giá)",
       "phone": "+84 777 579 966",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLddc1dxorNPDQYDTA-CiTdI93vY1bFBqqWE-nowLcNMPWIZozQs2JASsiEMdGNUs2amnJEQf8IOKyF03XkjqUWjHzFXtVNAwNASEprmFtDErmMsOiac16Tlhooi4UGLR75_Uck=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJv54u7pWrNTERst-ohKAJY1I"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJv54u7pWrNTERst-ohKAJY1I",
+      "rating": 4.4,
+      "reviews": 3704
     },
     {
       "id": "gmaps-ChIJ5al_vmtBzTYRddpLHR_q3Q0",
@@ -1141,11 +1265,13 @@
       ],
       "street": "Nhà Hàng A Phủ, 15 Fansipan, Sa Pa, Lào Cai, Việt Nam",
       "dish": "lau",
-      "note": "Lào Cai / Sa Pa · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (3,945 đánh giá Google Maps) · Lào Cai / Sa Pa · Đang mở cửa",
+      "source": "Google Maps (4.7★, 3,945 đánh giá)",
       "phone": "+84 868 159 900",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfsPEkmBLyRiNKDUVXdwBnFiZoRxfWdwjTuDyUrz8LYGpymoE7zVMvxKZX2BQrwu7Rh4EvcGrxyZ0mKAoYc9SEP46IFcqedN9AsKujbkyGPZUjjcdSgoSxEbWAcDgDzuS7F-V9B=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ5al_vmtBzTYRddpLHR_q3Q0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ5al_vmtBzTYRddpLHR_q3Q0",
+      "rating": 4.7,
+      "reviews": 3945
     },
     {
       "id": "gmaps-ChIJJcVmoh-IoDEREXEUXrzGpbU",
@@ -1157,11 +1283,13 @@
       ],
       "street": "Quán Lẩu Vịt Nấu Chao Thành Giao, Hẻm 1/8 Đ. Lý Tự Trọng, Phường, Ninh Kiều, Cần Thơ, Việt Nam",
       "dish": "lau",
-      "note": "Cần Thơ · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (2,871 đánh giá Google Maps) · Cần Thơ · Đang mở cửa",
+      "source": "Google Maps (4.1★, 2,871 đánh giá)",
       "phone": "+84 939 933 949",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfzRFRbsJ58e_7Oh1LRthZ81QSF4LT4fTr0Ytnb7bmxNp0SYsNpNpL7_C5Rjxq-u8CbxfaBBQsZp9pnl4DzuSnhBz2dae2DjHjpu6naN044AXe81qOvFwQ4c5JS31Ah3seqjZXHZw=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJJcVmoh-IoDEREXEUXrzGpbU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJJcVmoh-IoDEREXEUXrzGpbU",
+      "rating": 4.1,
+      "reviews": 2871
     },
     {
       "id": "gmaps-ChIJl_AGxS0pdTER37KzGFvTplQ",
@@ -1173,11 +1301,13 @@
       ],
       "street": "Lẩu Dê Tri Kỷ, 351 Đ. Lê Văn Sỹ, Tân Sơn Hòa, Hồ Chí Minh 700000, Việt Nam",
       "dish": "lau",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (1,983 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.1★, 1,983 đánh giá)",
       "phone": "+84 384 176 767",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcp7MAgCIpycWRrnTUBDpNeTsXVBwUjodaBIp2Qva3FTob-7xnYkAnghned-KPLDT6eF43xVnJks1KRJBbmZ8weJIHP7YbllPgawGxCX1dFN2yMGVqLdbDW8vD7QUGdf5Q9WYWY8lTdlEZd=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJl_AGxS0pdTER37KzGFvTplQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJl_AGxS0pdTER37KzGFvTplQ",
+      "rating": 4.1,
+      "reviews": 1983
     },
     {
       "id": "gmaps-ChIJJUMX2CwTcTEREjdQsMLMo_Y",
@@ -1189,11 +1319,13 @@
       ],
       "street": "Quán lẩu bò Dìn, Hẻm 8/1 Hẻm Hoàng Diệu, Cam Ly - Đà Lạt, Lâm Đồng, Việt Nam",
       "dish": "lau",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (1,665 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.4★, 1,665 đánh giá)",
       "phone": "+84 988 525 730",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd3ig2_1usbmnF5QVMtoYbxR_ABoDJs9PUwXPGv4KGFP7cBb4l8eJBYuzRvTMWGC_LfnLX_7MZmzpJDzIg_9Xm8GhNcl7C95BG2AOo2Ow0XSg_U6w_U9M7oRqtZ3lmj2sH5TfaERJh1rfaT=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJJUMX2CwTcTEREjdQsMLMo_Y"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJJUMX2CwTcTEREjdQsMLMo_Y",
+      "rating": 4.4,
+      "reviews": 1665
     },
     {
       "id": "gmaps-ChIJI--YtOArdTERSTDGIt7ylgw",
@@ -1205,11 +1337,13 @@
       ],
       "street": "Quán Lẩu Dê Anh Ba, 524 Lê Trọng Tấn, Tây Thạnh, Hồ Chí Minh, Việt Nam",
       "dish": "lau",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (1,400 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.1★, 1,400 đánh giá)",
       "phone": "+84 355 135 135",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcf4PHed_HyKYJCl8Qy1rRQwVc0U7yS3NlGQhKsWrZFPza0vf3BNfsnCUSVLt-5es8pvJ_PjR20B5ieDPziKuj6e7Ji60pvPa5_kDNV1KMwkAd19fg_CEF3fAz7cn9Ue984IGukZ5nYRlPB=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJI--YtOArdTERSTDGIt7ylgw"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJI--YtOArdTERSTDGIt7ylgw",
+      "rating": 4.1,
+      "reviews": 1400
     },
     {
       "id": "gmaps-ChIJ_QYPBUAvdTERgoLjQ24Qhlc",
@@ -1221,11 +1355,13 @@
       ],
       "street": "Quán Lẩu Dê 218 - 老賴羊肉火锅 - 1980, 218 Nguyễn Công Trứ, Bến Thành, Hồ Chí Minh, Việt Nam",
       "dish": "lau",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (1,258 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.7★, 1,258 đánh giá)",
       "phone": "+84 28 3825 1085",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLft-s-P5un0UjIFGsJ0dVb32k51G1KXBQU_dzEx3IUflp8fX-FH3lrqd-rVZu0LZrsTopWKWFudq8UMWogvp_R1PYee2LYdTSeRmvunwXuOKmfVFmf7YKau5_jZVQ5zO1W1N4w=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_QYPBUAvdTERgoLjQ24Qhlc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_QYPBUAvdTERgoLjQ24Qhlc",
+      "rating": 4.7,
+      "reviews": 1258
     },
     {
       "id": "gmaps-ChIJf5GG8n6hQTERFvp84sVz72I",
@@ -1237,11 +1373,13 @@
       ],
       "street": "Bún Bò Huế Sen, 69 Võ Thị Sáu, Thuận Hóa, Huế 49000, Việt Nam",
       "dish": "bun-bo-hue",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (3,573 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.7★, 3,573 đánh giá)",
       "phone": "+84 932 413 313",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfaOD6fQFQ6dOyzb_HoaRX9jNQb9IbcF7LJXyxIRJ-Qhbr1dxxtPEA1SrtombxCEBUT2NMwkEbZo_W0zf9NkedrD3RWyTx2eKjlskAzv2-wGrohoyrGW3sM7KOaOXurysCTZmNk_60s2G0=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJf5GG8n6hQTERFvp84sVz72I"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJf5GG8n6hQTERFvp84sVz72I",
+      "rating": 4.7,
+      "reviews": 3573
     },
     {
       "id": "gmaps-ChIJOWbOuoSsNTER5M18W1YG5Ac",
@@ -1253,11 +1391,13 @@
       ],
       "street": "Bún Bò Huế 65, 65 Đ. Láng, Đống Đa, Hà Nội, Việt Nam",
       "dish": "bun-bo-hue",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (2,471 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.0★, 2,471 đánh giá)",
       "phone": "+84 838 656 865",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLf_ngTOoqEGl2UNw73sOrzxmhidYx5Hr67mlhtRN_KkrWRaZyv3pE3mlePmRGsp6fvq-wTGuH0_iCUI3Nu8izM9YCQvFml8JmWVuBsD7P2yYTDXWH4Svfv40lQjWqTnZavKw5yh=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJOWbOuoSsNTER5M18W1YG5Ac"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJOWbOuoSsNTER5M18W1YG5Ac",
+      "rating": 4.0,
+      "reviews": 2471
     },
     {
       "id": "gmaps-ChIJ24FT3jCrNTER81O40ID2kBg",
@@ -1269,11 +1409,13 @@
       ],
       "street": "Bún Bò Huế Trịnh - cs2, P. Nghĩa Tân, Khu tập thể Nghĩa Tân, Nghĩa Đô, Hà Nội 122383, Việt Nam",
       "dish": "bun-bo-hue",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (2,058 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.3★, 2,058 đánh giá)",
       "phone": "+84 984 357 268",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ24FT3jCrNTER81O40ID2kBg"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ24FT3jCrNTER81O40ID2kBg",
+      "rating": 4.3,
+      "reviews": 2058
     },
     {
       "id": "gmaps-ChIJ7cdFcK2tNTERsTBC5aU8PhY",
@@ -1285,11 +1427,13 @@
       ],
       "street": "BÚN BÒ HUẾ NGỰ UYỂN - NGỤY NHƯ KON TUM, 73 P. Ngụy Như Kon Tum, Thanh Xuân, Hà Nội, Việt Nam",
       "dish": "bun-bo-hue",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (1,984 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.8★, 1,984 đánh giá)",
       "phone": "+84 925 650 363",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfBiP118uQabYgAUz7i03sUtD9MLRzL9gedWVntaHHhVeHVsXJYc_bCoQ0a-_4shA2Adsf9oyJCcvovlPFqif88Yrq8dTr1FG04XS2UKGrpXjIDNXRjcM6LCD2kT5Mrpd7MUao=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ7cdFcK2tNTERsTBC5aU8PhY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ7cdFcK2tNTERsTBC5aU8PhY",
+      "rating": 4.8,
+      "reviews": 1984
     },
     {
       "id": "gmaps-ChIJXfWw8kutNTERizGhmCrUiR8",
@@ -1301,11 +1445,13 @@
       ],
       "street": "BÚN BÒ HUẾ NGỰ UYỂN, 123 P. Nguyễn Văn Lộc, Làng Việt kiều Châu Âu, Hà Đông, Hà Nội, Việt Nam",
       "dish": "bun-bo-hue",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (1,622 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.7★, 1,622 đánh giá)",
       "phone": "+84 921 375 668",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXfWw8kutNTERizGhmCrUiR8"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXfWw8kutNTERizGhmCrUiR8",
+      "rating": 4.7,
+      "reviews": 1622
     },
     {
       "id": "gmaps-ChIJD2M6K2CrNTERG-duxT5ANyU",
@@ -1317,11 +1463,13 @@
       ],
       "street": "Bún Bò Huế Quân, 167 Đ. Nguyễn Ngọc Vũ, Yên Hòa, Hà Nội, Việt Nam",
       "dish": "bun-bo-hue",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (1,340 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.1★, 1,340 đánh giá)",
       "phone": "+84 977 204 125",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdfODP596YQBtHHm6AlOnyY55rnM7lW9y1LAz1ZTEMzFv4TElkJvZRMFtpyLNmGVvXAzxjry4LWf7nb-wRyzyfkLFJ6M17abc1o4PElhY37u-n-GM9YgzxbltzOX2MM9S4HEpeXWg=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJD2M6K2CrNTERG-duxT5ANyU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJD2M6K2CrNTERG-duxT5ANyU",
+      "rating": 4.1,
+      "reviews": 1340
     },
     {
       "id": "gmaps-ChIJHRmt7soZQjERhuei1xWj9Xs",
@@ -1333,11 +1481,13 @@
       ],
       "street": "Mì Quảng Ếch bếp Trang, 441 Ông Ích Khiêm, Hải Châu, Đà Nẵng 55000, Việt Nam",
       "dish": "mi-quang-ech",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (3,303 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.4★, 3,303 đánh giá)",
       "phone": "+84 766 771 772",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLf_DwTLl6hCixhmNw8K5wrgaD28_AnIUQPIe7En0b9m9H6UXZv9Q-tuOEDD7Z9AsoHEuICvEUg8KH7OikauZM8RQD5UbyCljW9iV5bDWb422Dwn-vIcgvRnQ3eBkS9abeI7z1vvQmJkIlAE=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJHRmt7soZQjERhuei1xWj9Xs"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJHRmt7soZQjERhuei1xWj9Xs",
+      "rating": 4.4,
+      "reviews": 3303
     },
     {
       "id": "gmaps-ChIJKeCbF2wXQjER-IRdONrbizs",
@@ -1349,11 +1499,13 @@
       ],
       "street": "Mì Quảng Ếch Bếp Trang - Đặc sản Đà Nẵng 177 Hồ Nghinh, 177 Hồ Nghinh, An Hải, Đà Nẵng 550000, Việt Nam",
       "dish": "mi-quang-ech",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (1,603 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.2★, 1,603 đánh giá)",
       "phone": "+84 766 771 772",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfo8jZ2fTTQKFAwJ-X3F8XgZrZ0sfpvbxFIyU5hA-WFSy2TJSExIPkZUgKb29KM__9MmkxybgcPTdR5j2KYA9GEfOrgNmmbYSTJuFkJHaXkGu9la_d3JsPhYVALz1kLIbTTKtqmGA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJKeCbF2wXQjER-IRdONrbizs"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJKeCbF2wXQjER-IRdONrbizs",
+      "rating": 4.2,
+      "reviews": 1603
     },
     {
       "id": "gmaps-ChIJ5U9i63EPQjERDeFIbcFEa5w",
@@ -1365,11 +1517,13 @@
       ],
       "street": "Quán Cao lầu Bá Lễ, 49/3 Trần Hưng Đạo, Hội An, Đà Nẵng 56000, Việt Nam",
       "dish": "cao-lau",
-      "note": "Quảng Nam / Hội An · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (2,840 đánh giá Google Maps) · Quảng Nam / Hội An · Đang mở cửa",
+      "source": "Google Maps (4.7★, 2,840 đánh giá)",
       "phone": "+84 937 691 891",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfM16d6pWfRdBjNZseRbWfuNbRX7kfFUYg91esoKAuszuUQTV8XOwE-VTzYsQXuxgVErPW2aMdr93d6BR1E7Mg9iT_bQ0yB2MGgeiMYc1ounex-WRLS5arG3l6r2z06mBssgB4=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ5U9i63EPQjERDeFIbcFEa5w"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ5U9i63EPQjERDeFIbcFEa5w",
+      "rating": 4.7,
+      "reviews": 2840
     },
     {
       "id": "gmaps-ChIJVfRmEnkOQjER78PSHGeyTW0",
@@ -1381,11 +1535,13 @@
       ],
       "street": "Quán Cao Lầu Thanh, 26 Thái Phiên, Hội An, Đà Nẵng, Việt Nam",
       "dish": "cao-lau",
-      "note": "Quảng Nam / Hội An · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (2,634 đánh giá Google Maps) · Quảng Nam / Hội An · Đã đóng cửa",
+      "source": "Google Maps (4.6★, 2,634 đánh giá)",
       "phone": "+84 235 2211 909",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdz1Sx-D2Yf79QaRtggjOaGlFfXHikqrNo-RPh5VkoSQDtyYgb6PfCHq81kginZq2_6ViVEwRJLRxKO8P5nj5tf6XG03hCAgWkvU_2hUsdrBnqiOlYDtaEcHY474_cRz3AuzZ8hww=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJVfRmEnkOQjER78PSHGeyTW0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJVfRmEnkOQjER78PSHGeyTW0",
+      "rating": 4.6,
+      "reviews": 2634
     },
     {
       "id": "gmaps-ChIJEULdLCYPQjERyaWM2-leRG0",
@@ -1397,11 +1553,13 @@
       ],
       "street": "Cao Lầu Hồng, 18 Thái Phiên, Hội An, Đà Nẵng, Việt Nam",
       "dish": "cao-lau",
-      "note": "Quảng Nam / Hội An · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (279 đánh giá Google Maps) · Quảng Nam / Hội An · Đang mở cửa",
+      "source": "Google Maps (4.7★, 279 đánh giá)",
       "phone": "+84 905 806 087",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdd14wvY7t6e6rQo8GIu3al2VMSwevBSVa5PRBGWLTrz4A3VEMqzFZQVz1yui-d-4MOyRC1xIubPl242fYKpFXH2hvprS0uOywc07g-0umdWVloKqB3t86PRrKEaill3P3s6bY6DQ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJEULdLCYPQjERyaWM2-leRG0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJEULdLCYPQjERyaWM2-leRG0",
+      "rating": 4.7,
+      "reviews": 279
     },
     {
       "id": "gmaps-ChIJvwwJcXUPQjER5t5Y_wAQtYU",
@@ -1413,11 +1571,13 @@
       ],
       "street": "Quán Mười Mì Quảng Cao Lầu Hội An, 80 Hải Thượng Lãn Ông, Hội An Tây, Đà Nẵng, Việt Nam",
       "dish": "cao-lau",
-      "note": "Quảng Nam / Hội An · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (246 đánh giá Google Maps) · Quảng Nam / Hội An · Đang mở cửa",
+      "source": "Google Maps (4.6★, 246 đánh giá)",
       "phone": "+84 906 457 814",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfevsHh6wEYg_dLXTyAr0Ea5-XtxcvKNVxNiC_zgha6CwmLaLKF5eTXrIO597cuiuE71H1QpcLwHLQ76iXr0GQiCqEKtfwPzpQs-lJHp7sgtATfLfDVYAJKOqQVDhtewJXGELE=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJvwwJcXUPQjER5t5Y_wAQtYU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJvwwJcXUPQjER5t5Y_wAQtYU",
+      "rating": 4.6,
+      "reviews": 246
     },
     {
       "id": "gmaps-ChIJP-ceFDIPQjER0vqx-I9eJGU",
@@ -1429,11 +1589,13 @@
       ],
       "street": "Cao lầu Dì Hát 55 năm, 4 Thái Phiên, Hội An, Đà Nẵng, Việt Nam",
       "dish": "cao-lau",
-      "note": "Quảng Nam / Hội An · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (137 đánh giá Google Maps) · Quảng Nam / Hội An · Đang mở cửa",
+      "source": "Google Maps (4.6★, 137 đánh giá)",
       "phone": "+84 779 434 090",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcF8CfU0ku56kPRbkIxZ9xsU0bhN9tzbkv-iYkHUbIXobCCfH60WR-zDKsx9faRy4-s2kyCovBe63mwCkhJvvIDFJW5rwh-ZNjNmZ7ycBdVyASVWazMz1lXyBGK-oobw2-cymxQ8Q=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJP-ceFDIPQjER0vqx-I9eJGU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJP-ceFDIPQjER0vqx-I9eJGU",
+      "rating": 4.6,
+      "reviews": 137
     },
     {
       "id": "gmaps-ChIJ2-MeCourNTERo34CZCCTQp0",
@@ -1445,11 +1607,13 @@
       ],
       "street": "Hải Xệ - Bánh Rán Cao Lâu, 5 P. Lương Ngọc Quyến, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "cao-lau",
-      "note": "Hà Nội · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (120 đánh giá Google Maps) · Hà Nội · Đã đóng cửa",
+      "source": "Google Maps (4.5★, 120 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeBoS8E5oBks8J92ASFRVCgkH32dVF1HOo8qUYm3Ijo_E5VJl-9c3Ogj3qQ7qBU8KAEIY11l-YfTPOtkX5ZPLJmIBt5-7240hrAzDSWH9zGeC-2p_q7Z0-0eYTuOmHT2WP6gDJl=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ2-MeCourNTERo34CZCCTQp0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ2-MeCourNTERo34CZCCTQp0",
+      "rating": 4.5,
+      "reviews": 120
     },
     {
       "id": "gmaps-ChIJZ0svfoyrNTERfe0Y70PRirY",
@@ -1461,11 +1625,13 @@
       ],
       "street": "Bánh Cuốn Bà Hoành, 66 P. Tô Hiến Thành, Hai Bà Trưng, Hà Nội, Việt Nam",
       "dish": "banh-cuon",
-      "note": "Hà Nội · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (2,695 đánh giá Google Maps) · Hà Nội · Sắp đóng cửa",
+      "source": "Google Maps (4.1★, 2,695 đánh giá)",
       "phone": "+84 989 083 570",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJZ0svfoyrNTERfe0Y70PRirY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJZ0svfoyrNTERfe0Y70PRirY",
+      "rating": 4.1,
+      "reviews": 2695
     },
     {
       "id": "gmaps-ChIJxbUH5LmrNTERZkgJnAK0riU",
@@ -1477,11 +1643,13 @@
       ],
       "street": "Bánh Cuốn Bà Xuân, Dốc P. Hoè Nhai, Ba Đình, Hà Nội, Việt Nam",
       "dish": "banh-cuon",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (1,917 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.3★, 1,917 đánh giá)",
       "phone": "+84 968 404 665",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeDh9cWg2gcUBKlCZeh7vdL5rtIgNrGCIfPQxqf5fe_LmiV0PzDDtgAnL5p3pMvJSrVM_Pfo8n2D2DI_iF7WKlCsbve5kFGs0AUuWklqE2mgiEfy4aL_OWOILYglF6LcAY-wa_6CaRaB2Pt=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJxbUH5LmrNTERZkgJnAK0riU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJxbUH5LmrNTERZkgJnAK0riU",
+      "rating": 4.3,
+      "reviews": 1917
     },
     {
       "id": "gmaps-ChIJ_cJfr76rNTERk1CbU0guunY",
@@ -1493,11 +1661,13 @@
       ],
       "street": "Bánh Cuốn Gia Truyền Thanh Vân, 14 P P. Hàng Gà, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "banh-cuon",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (803 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.3★, 803 đánh giá)",
       "phone": "+84 24 3828 0108",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdezSatoDXbCniWas-9p0SazKn87QmvAS77xwPpX_JumDNwtx9X1pxovMVfW4CADcijM0PNaRfuM_XElcTpT9lr0JNLFINttX9OUhUDzF_iOKdG-ZbzyRcXEANnWelffzVHEaRI8XO-j_Ys=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_cJfr76rNTERk1CbU0guunY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_cJfr76rNTERk1CbU0guunY",
+      "rating": 4.3,
+      "reviews": 803
     },
     {
       "id": "gmaps-ChIJ74IhcKCrNTERxDwO3w1Hxmc",
@@ -1509,11 +1679,13 @@
       ],
       "street": "Quán Bánh Cuốn Nóng Gia Truyền 50 Đội Cấn, 50 Đội Cấn, Ba Đình, Hà Nội, Việt Nam",
       "dish": "banh-cuon",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (551 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.2★, 551 đánh giá)",
       "phone": "+84 981 630 543",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLflh8jVFHuCadr-ADbxiUQk0IyViCXVXzE0tsnmHqRR9kGRuPBmV-RdD1o1faHARZBAg_-MczuRCqpUg0NFYSnng9QjnaNpSB9ocwHA_lG36yZNtyzg13orEJLYXKNz6uyI6U4=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ74IhcKCrNTERxDwO3w1Hxmc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ74IhcKCrNTERxDwO3w1Hxmc",
+      "rating": 4.2,
+      "reviews": 551
     },
     {
       "id": "gmaps-ChIJ1TWHeQCrNTERXzRM0ndZQ0I",
@@ -1525,11 +1697,13 @@
       ],
       "street": "Bánh Cuốn Nóng Gia Truyền - Anh Dương, 77 P. Quán Thánh, Ba Đình, Hà Nội, Việt Nam",
       "dish": "banh-cuon",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 5.0 (386 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (5.0★, 386 đánh giá)",
       "phone": "+84 387 552 361",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcMk2KXId_h_UIYtvgYTF0VCF-Oz8xMmcw-C79BWNAYl1bPgGfwKgsS9NbiSed5xoBFP_yU4JIH2lxhy8SFxrNqwVlKg1z8VU_A_kYGVm04ElCu6TRC8IHbduejxTwdCdT1MmVpupaPgRQj=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ1TWHeQCrNTERXzRM0ndZQ0I"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ1TWHeQCrNTERXzRM0ndZQ0I",
+      "rating": 5.0,
+      "reviews": 386
     },
     {
       "id": "gmaps-ChIJC4CEHtGrNTER861xt7QE-78",
@@ -1541,11 +1715,13 @@
       ],
       "street": "Bánh cuốn nóng, 27 Hàng Điếu, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "banh-cuon",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (261 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.9★, 261 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcBslitcmFGETXNJFvGVyXuxpy8KsTNM6FmTMlfiI8XRjv6gIQOVP9fm9WLfpzSS0m2mgc-JsqHZLY11IjzbeKX9i2gRXko2ktYUiG3AhIj2lb38HNIOfsWmJQWG_aS_LsTuTIYsXH7loE=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJC4CEHtGrNTER861xt7QE-78"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJC4CEHtGrNTER861xt7QE-78",
+      "rating": 4.9,
+      "reviews": 261
     },
     {
       "id": "gmaps-ChIJw-bA7iChQTERuhJwR1CpO14",
@@ -1557,11 +1733,13 @@
       ],
       "street": "Cơm hến Hoa Đông, 64 Kiệt 7 Ưng Bình, Vỹ Dạ, Huế, Việt Nam",
       "dish": "com-hen",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (2,572 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.4★, 2,572 đánh giá)",
       "phone": "+84 234 3848 359",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcgcG70pv0QX1WpiU3mPCXX_MyokS5kby-jTGTZLXmT_llFn6U9mkj8UTajw08PuK8SGuWkWqGE2S7_41Kn_e9Y1utwvRLUtIvRvbwVlNisjUs92hnzXbuGoAi0Mi2jfVQkKonro7_bHXxe=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJw-bA7iChQTERuhJwR1CpO14"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJw-bA7iChQTERuhJwR1CpO14",
+      "rating": 4.4,
+      "reviews": 2572
     },
     {
       "id": "gmaps-ChIJ6fPj9iGhQTER0pmrsPGaeoM",
@@ -1573,11 +1751,13 @@
       ],
       "street": "Cơm Hến 17 hàn mặc tử, 17 Hàn Mặc Tử, Vỹ Dạ, Huế 52000, Việt Nam",
       "dish": "com-hen",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (741 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.1★, 741 đánh giá)",
       "phone": "+84 985 978 931",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfUQvAsDqqO2xBi2yw7wFfZ5n0FmJYG4lJOPIvMCjF7GKXz71eBz6EQCz9OR9X9TY2twTeeQ9y-SfJdS65fiRFOu4vMkjcomo9ui9Hv4NVtJ4xunB8YZs6XZ1TomMyO49H4liHKcvxGjC83=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ6fPj9iGhQTER0pmrsPGaeoM"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ6fPj9iGhQTER0pmrsPGaeoM",
+      "rating": 4.1,
+      "reviews": 741
     },
     {
       "id": "gmaps-ChIJ8VwHb9-gQTERC-SsKcmOEtk",
@@ -1589,11 +1769,13 @@
       ],
       "street": "Cơm Hến Ngon, 2 Kiệt 7 Ưng Bình, Vỹ Dạ, Huế, Việt Nam",
       "dish": "com-hen",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (84 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.5★, 84 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdfS1axMOmsFlKJnRGkAFqkEK_xOS2jpvweBCTCXlugyLxQ3aSDBiuwJcx_qOg5s1BjVxhKgvDGcXidAER8ReKkdRtHwDMXe1A29ejDCRHpQxk_rNyDJrvuPn7oxjwPWKOD2aVM=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ8VwHb9-gQTERC-SsKcmOEtk"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ8VwHb9-gQTERC-SsKcmOEtk",
+      "rating": 4.5,
+      "reviews": 84
     },
     {
       "id": "gmaps-ChIJjV8vs62hQTER1qmXA5BeSH8",
@@ -1605,11 +1787,13 @@
       ],
       "street": "Quán Cơm Hến Bà Mừng, 28 Trương Định, Thuận Hóa, Huế, Việt Nam",
       "dish": "com-hen",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (69 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.3★, 69 đánh giá)",
       "phone": "+84 818 700 700",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd8ToPvPr850ZVs0f7XfRNwJVENrIEAlv3H0_kW4Q8B3y4ms8TY4GfvVKW4P7tp8YMsPwJYwz8rGT_cRLsX7TkZ3ck7JmErNJtaGKbjmtZkrAgozldsqRiEMxiW8J9VWZhOug5sQ5_5L1TT=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJjV8vs62hQTER1qmXA5BeSH8"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJjV8vs62hQTER1qmXA5BeSH8",
+      "rating": 4.3,
+      "reviews": 69
     },
     {
       "id": "gmaps-ChIJOXrSxiwTcTERUC5y-ke7Tc8",
@@ -1621,11 +1805,13 @@
       ],
       "street": "Bánh Tráng nướng Dì Đinh, 26 Đ. Hoàng Diệu, Cam Ly - Đà Lạt, Lâm Đồng, Việt Nam",
       "dish": "banh-trang-nuong",
-      "note": "Lâm Đồng / Đà Lạt · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (2,476 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Sắp đóng cửa",
+      "source": "Google Maps (4.4★, 2,476 đánh giá)",
       "phone": "+84 385 888 621",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfGc0Ezd9xAZD4pb8Y89sHZhdKiajqNvxAxfAWMugTAereC2hdvYeCQGtGwLLXRoVQkwdXVJ6eWH7fMy-uvbmzrPtwCK-bWyGjt-ds7ZQYRqVeFlXLGbgEpz8Jw3JUFvClbW-jKgn-UfbQ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJOXrSxiwTcTERUC5y-ke7Tc8"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJOXrSxiwTcTERUC5y-ke7Tc8",
+      "rating": 4.4,
+      "reviews": 2476
     },
     {
       "id": "gmaps-ChIJ0UcHMCgTcTERY0yJirIFChE",
@@ -1637,11 +1823,13 @@
       ],
       "street": "Bánh Tráng Nướng 112, 112 Nguyễn Văn Trỗi, Xuân Hương - Đà Lạt, Lâm Đồng, Việt Nam",
       "dish": "banh-trang-nuong",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (664 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.1★, 664 đánh giá)",
       "phone": "+84 915 240 987",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeIkVRm3hteorp8qqa_NAoLAf2Bqv-qTJi2xDJF4BrI9xPgniTEwSb7_HUHxXy5-PqsAjHysvweovZKJ9l2uu6R88_0DLoWDNQIP0gefnXSCpqn-fvOCLQFXsp5XKdMOs55y_s0wA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ0UcHMCgTcTERY0yJirIFChE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ0UcHMCgTcTERY0yJirIFChE",
+      "rating": 4.1,
+      "reviews": 664
     },
     {
       "id": "gmaps-ChIJXwDT5qwTcTER8PcVZJDp5VY",
@@ -1653,11 +1841,13 @@
       ],
       "street": "Bánh tráng nướng Sương Sương, 9 Đường Triệu Việt Vương, Xuân Hương - Đà Lạt, Lâm Đồng 66000, Việt Nam",
       "dish": "banh-trang-nuong",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (416 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.3★, 416 đánh giá)",
       "phone": "+84 342 918 941",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd7TZooBQbsP-YKVMkxSUQNHRkfqKJiU9_16uORaDHjSI8LRq8_LNxaoZf4MKlQEmadzr-s8PiChs8IQu_dVtPH1aRwXkobSx_oJi9Yc9WTb3nRs_u95CdywIpo8qWMujf7jUyHF7EGSNeX=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXwDT5qwTcTER8PcVZJDp5VY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXwDT5qwTcTER8PcVZJDp5VY",
+      "rating": 4.3,
+      "reviews": 416
     },
     {
       "id": "gmaps-ChIJozAvzpITcTERYZS62y7_VFs",
@@ -1669,11 +1859,13 @@
       ],
       "street": "Bánh tráng nướng Cô Hương 46 Nguyễn Văn Trỗi, 46 Nguyễn Văn Trỗi, Xuân Hương - Đà Lạt, Lâm Đồng, Việt Nam",
       "dish": "banh-trang-nuong",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (347 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.5★, 347 đánh giá)",
       "phone": "+84 817 000 745",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcDXf4iTxqmf91muxi8KYf3tD6DA7OVSgUH5F3HjKuqY8Zg-bA-Qol75vRPEmXeRgSZePLaNQpraWfqHT_wvdTt0u-YmcCGcUcyagJ_kaHsYg8IAw3916nKIcrOGKrzGYJBy9FI-Q=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJozAvzpITcTERYZS62y7_VFs"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJozAvzpITcTERYZS62y7_VFs",
+      "rating": 4.5,
+      "reviews": 347
     },
     {
       "id": "gmaps-ChIJi0aho6YTcTERYxmPw_nMqqc",
@@ -1685,11 +1877,13 @@
       ],
       "street": "Bánh Tráng Nướng Cô Phượng, 69c Nguyễn Văn Trỗi, Xuân Hương - Đà Lạt, Lâm Đồng, Việt Nam",
       "dish": "banh-trang-nuong",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (200 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.4★, 200 đánh giá)",
       "phone": "+84 974 826 895",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLe3vrgIs6vC93O3zEaCjxFJACU1It8dmDZkqA5-C6Q4TyGEXIyXH7Nw84B4WzuPB9ZUVwBqvsEAnidUo5ECEYkjP_leTR33WL3Blp6g7tjt5dZs7mtaQW0zCrzdJDY1c66TPznu=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJi0aho6YTcTERYxmPw_nMqqc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJi0aho6YTcTERYxmPw_nMqqc",
+      "rating": 4.4,
+      "reviews": 200
     },
     {
       "id": "gmaps-ChIJHbR-wywTcTERAj-gfgTD_Ks",
@@ -1701,11 +1895,13 @@
       ],
       "street": "Bánh tráng nướng Cô Mai Nhà Chung, 1c Đường Nhà Chung, Xuân Hương - Đà Lạt, Lâm Đồng, Việt Nam",
       "dish": "banh-trang-nuong",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (128 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.4★, 128 đánh giá)",
       "phone": "+84 974 795 845",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfil-d5sHB-1_gZSyf43ls5bvMuEbMkt9PQ0rXld8OxVOIwUNj0gKC2E6TTCkl8rcFYaMCkOnOKm0yrbs1nNS_VWwEsXSbtaIhe53x_NwEDNFON581ALsg8Xup2m_COSO7UmH3KhUieSukv=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJHbR-wywTcTERAj-gfgTD_Ks"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJHbR-wywTcTERAj-gfgTD_Ks",
+      "rating": 4.4,
+      "reviews": 128
     },
     {
       "id": "gmaps-ChIJsVVEWZUudTERhNCdMofMopc",
@@ -1717,11 +1913,13 @@
       ],
       "street": "Quán Hủ Tiếu Nam Vang Nhân Quán, 27P Âu Cơ, Hòa Bình, Hồ Chí Minh, Việt Nam",
       "dish": "hu-tieu",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (2,248 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.3★, 2,248 đánh giá)",
       "phone": "+84 28 3636 5917",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfjdfm22VMERWDNJbz7bVT0NUgrSqKrbLkJG-18VlM5ILWQsgU-KkADMK-iSY1xz52j5aF9PkCqjszzPUiPZz_UyRmuEfRoT0u-gmgAtYkOFMLQosXmlr0dFhFU94_LjlEMZAEv=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJsVVEWZUudTERhNCdMofMopc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJsVVEWZUudTERhNCdMofMopc",
+      "rating": 4.3,
+      "reviews": 2248
     },
     {
       "id": "gmaps-ChIJp1uX7psvdTERI6RcefaAqBM",
@@ -1733,11 +1931,13 @@
       ],
       "street": "Nhân Quán Sài Gòn - Hủ Tiếu Nam Vang, 122D Cách Mạng Tháng Tám, Xuân Hòa, Hồ Chí Minh 700000, Việt Nam",
       "dish": "hu-tieu",
-      "note": "TP. Hồ Chí Minh · Mở cả ngày",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (1,721 đánh giá Google Maps) · TP. Hồ Chí Minh",
+      "source": "Google Maps (4.1★, 1,721 đánh giá)",
       "phone": "+84 902 967 409",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfI7bSSNcdz4kI57jmj2QTFIFpstCbdxERKvrcSf5LzhDrN5JUMYnec4nE9U9jaPWKDtxmEWK-Y8NYJ1TxYRJzM9f9n98loTYvDO6m-9P-ONTOT8rVRQRi1bsTBETInwxLcYgZWuEdmwl4P=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJp1uX7psvdTERI6RcefaAqBM"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJp1uX7psvdTERI6RcefaAqBM",
+      "rating": 4.1,
+      "reviews": 1721
     },
     {
       "id": "gmaps-ChIJH713M5kvdTERSadbbhPgULY",
@@ -1749,11 +1949,13 @@
       ],
       "street": "Hủ tiếu Nam Vang Đạt Thành, 232 Nguyễn Thị Thập, Tân Thuận, Hồ Chí Minh, Việt Nam",
       "dish": "hu-tieu",
-      "note": "TP. Hồ Chí Minh · Mở cả ngày",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (1,018 đánh giá Google Maps) · TP. Hồ Chí Minh",
+      "source": "Google Maps (4.0★, 1,018 đánh giá)",
       "phone": "+84 915 793 796",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcDNo36ELTNEalhuAGhQIu26BvDf-Oxtt0t0yY1m4P8cDJp7iCxsUrgWccvXnYJDw8oONI5vL71bN8_DCSMh5FNsCm_xWeX9kRv9C3UuVlFJc_sOWdZTE-T9WrWkvf3_iSMrgsYlQ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJH713M5kvdTERSadbbhPgULY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJH713M5kvdTERSadbbhPgULY",
+      "rating": 4.0,
+      "reviews": 1018
     },
     {
       "id": "gmaps-ChIJt4yrU5kvdTER5eSNEzxL_kk",
@@ -1765,11 +1967,13 @@
       ],
       "street": "Hủ tiếu Nam Vang Tài Anh, 494 Nguyễn Thị Thập, Tân Hưng, Hồ Chí Minh, Việt Nam",
       "dish": "hu-tieu",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (863 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.0★, 863 đánh giá)",
       "phone": "+84 919 001 990",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcdk6hHCbVeNd1YrfXHS_IU3cf4io8-kfG31ozfIzpyU1S_yYQdZZhP-Z4zc-s6ONg6WCRS-piwJ9poYWGWzlTynFPkegp71i1O7ambBtgGb1v37SSMBf3OGcKN5SLosbwkYWE=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJt4yrU5kvdTER5eSNEzxL_kk"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJt4yrU5kvdTER5eSNEzxL_kk",
+      "rating": 4.0,
+      "reviews": 863
     },
     {
       "id": "gmaps-ChIJ2bwbhSEvdTERjPDEzGiDR3c",
@@ -1781,11 +1985,13 @@
       ],
       "street": "Hủ tiếu Nam Vang Trung Còi, 80 Cao Thắng, Bàn Cờ, Hồ Chí Minh, Việt Nam",
       "dish": "hu-tieu",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (745 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.1★, 745 đánh giá)",
       "phone": "+84 902 551 776",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd9LbQTPTwor-B_Koikyq8Q1wuFKpqtKcVqsOrt992TQzAhXRmtfKGvEXh2ZdVkMMH0uxPLBrdyRjbjQpg58G3XGJ_bbe_8ixLK6GEHapQUJ3FFGA1CNuFBSlNZ5K7iAmaNBXrPMQ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ2bwbhSEvdTERjPDEzGiDR3c"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ2bwbhSEvdTERjPDEzGiDR3c",
+      "rating": 4.1,
+      "reviews": 745
     },
     {
       "id": "gmaps-ChIJg505oakvdTER9xrhD02jmhA",
@@ -1797,11 +2003,13 @@
       ],
       "street": "Hủ Tiếu Nam Vang Nhân Quán, 239 Âu Dương Lân, Chánh Hưng, Hồ Chí Minh, Việt Nam",
       "dish": "hu-tieu",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (553 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.0★, 553 đánh giá)",
       "phone": "+84 934 050 816",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLddsownj4inJhuQ--KGW6YGr9aC0haw5HUdaqOrvqWVkc4_zfDUTD6VviGddljDl-a8a1__TNdJgKqPpO8CZ38W_Agj1fPz3MKQFenBw3usixXnnW3TQ9qF4MCEJn2qzGA2DThh=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJg505oakvdTER9xrhD02jmhA"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJg505oakvdTER9xrhD02jmhA",
+      "rating": 4.0,
+      "reviews": 553
     },
     {
       "id": "gmaps-ChIJX-Pc1zYYQjEROyhEA-ZYJ5g",
@@ -1813,11 +2021,13 @@
       ],
       "street": "Mì Quảng 1A, 5 Hải Phòng, Hải Châu, Đà Nẵng 550000, Việt Nam",
       "dish": "mi-quang",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (2,193 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.0★, 2,193 đánh giá)",
       "phone": "+84 236 3827 936",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeff4B1x55t8fQfQg41KFy7ChMqVjENPLyxdKVcoHB9X9J7pxmL9YMOT61z9fFd9rRq5N8Hpn21ETcLte41JhSSwvlXE1VVdMlJky0q0vg_GGjFG69ODfUYXRpNJE_WWoD-1_9g=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJX-Pc1zYYQjEROyhEA-ZYJ5g"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJX-Pc1zYYQjEROyhEA-ZYJ5g",
+      "rating": 4.0,
+      "reviews": 2193
     },
     {
       "id": "gmaps-ChIJYzRCE9YYQjER-BWS4JP_erM",
@@ -1829,11 +2039,13 @@
       ],
       "street": "Quán Mì Quảng Bà Bích, 1 Đặng Dung, Liên Chiểu, Đà Nẵng 550000, Việt Nam",
       "dish": "mi-quang",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (1,383 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.1★, 1,383 đánh giá)",
       "phone": "+84 236 3732 154",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLf78HB8zSpvEtuyz0QqXwzf1slvBlCAvFf8UBJtyO7BWSA7NpODXlXGsYRJiGXc_kmagejOPP1WgYQOWu_-if-zhdL8rSha9PKUmZlQ2QCJJYlTy_7pz5TZRZnA4M5JephNoQfP=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJYzRCE9YYQjER-BWS4JP_erM"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJYzRCE9YYQjER-BWS4JP_erM",
+      "rating": 4.1,
+      "reviews": 1383
     },
     {
       "id": "gmaps-ChIJ14kOf8kZQjERrdrrQPpiZKA",
@@ -1845,11 +2057,13 @@
       ],
       "street": "Mì Quảng Thi, 251 Hoàng Diệu, Hải Châu, Đà Nẵng 550000, Việt Nam",
       "dish": "mi-quang",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (368 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.3★, 368 đánh giá)",
       "phone": "+84 905 777 452",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeUqTlDZwbzm1-0WdyLxrfGMBmDl3eToc_xFWNxR-bAHpOEHJ_VQsMImIOwbM7Wr91aRJ7Rv22cYUdXCn1Mq3kTc1b1JDBohwo9Axja48WfSU2c2WeHo3gzR6xAlr-3D_qjjuKi=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ14kOf8kZQjERrdrrQPpiZKA"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ14kOf8kZQjERrdrrQPpiZKA",
+      "rating": 4.3,
+      "reviews": 368
     },
     {
       "id": "gmaps-ChIJu2GuJRIXQjERzmEF0pBtsgM",
@@ -1861,11 +2075,13 @@
       ],
       "street": "Mì Quảng Bà Vị - Võ Văn Kiệt, K74/5 Võ Văn Kiệt, An Hải, Đà Nẵng 550000, Việt Nam",
       "dish": "mi-quang",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (176 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.6★, 176 đánh giá)",
       "phone": "+84 905 814 527",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd36vdkQi3CXfX6uU1nrUHFASg9F8fnAf-YXXDqpxuHcsW0foBPWvBoNzwvoUY-zMC0SHYLRd5kmVP4Cwe6e4JNdd9-RidBI6nstNzKiCyffLMKLWu_o5NSUKx6tiasDrHgmgCW=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJu2GuJRIXQjERzmEF0pBtsgM"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJu2GuJRIXQjERzmEF0pBtsgM",
+      "rating": 4.6,
+      "reviews": 176
     },
     {
       "id": "gmaps-ChIJWfcDskkXQjERQzytfEGv108",
@@ -1877,11 +2093,13 @@
       ],
       "street": "Mì Quảng Đặc Biệt PHƯƠNG HỒNG, đối diện 42A, Kiot 45, Chợ Mân Thái/42 Lê Văn Thứ, Sơn Trà, Đà Nẵng, Việt Nam",
       "dish": "mi-quang",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (153 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.6★, 153 đánh giá)",
       "phone": "+84 905 512 535",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLf8ZOMLlvydpsf1MfiMIId1KUJzRLlUc-lPHKiWgjJhxlNA6WTk8xOOvL3yOVl2uv19_mlTGriu-bBBrLOP4mwJU4_RuyRJROx30gDYZe2RJNe6IyQ6M8EGcCxjGfZeRRwoXJPeA8--1h0S=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJWfcDskkXQjERQzytfEGv108"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJWfcDskkXQjERQzytfEGv108",
+      "rating": 4.6,
+      "reviews": 153
     },
     {
       "id": "gmaps-ChIJNzbzAwAZQjERynEwf3zOgYE",
@@ -1893,11 +2111,13 @@
       ],
       "street": "Mì Quảng Bếp Quê - Đặc Sản Đà Nẵng, 46 Nguyễn Hữu Thọ, Hòa Cường, Đà Nẵng 550000, Việt Nam",
       "dish": "mi-quang",
-      "note": "Đà Nẵng · Mở cả ngày",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (56 đánh giá Google Maps) · Đà Nẵng",
+      "source": "Google Maps (4.3★, 56 đánh giá)",
       "phone": "+84 905 207 566",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfY8aHpY5CDPiVDGNJ-wnfQeJwFOb4bCpwrfE5ZORSp6nd5uuV1qv5y9JVJaBImrgTORUMao15jm1hNMjoIBz5-TBUfvffWbkopIyLOQtCoM4Bfnnt1h7BcH6nMe-gfD-LZiBzKajXjwBEB=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJNzbzAwAZQjERynEwf3zOgYE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJNzbzAwAZQjERynEwf3zOgYE",
+      "rating": 4.3,
+      "reviews": 56
     },
     {
       "id": "gmaps-ChIJNUmsQ0gZQjERny4iUkgPNNg",
@@ -1909,11 +2129,13 @@
       ],
       "street": "Chè Liên Đà Nẵng, 189 Hoàng Diệu, Hải Châu, Đà Nẵng 550000, Việt Nam",
       "dish": "che",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (2,147 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.1★, 2,147 đánh giá)",
       "phone": "+84 988 280 898",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdDyKxT4dI-GVxdxukPNR_cJg3IsrcRzPGDAk0i590B8UFoWj1U_7Z0LvDOBcj9Vg3820uL04KgMUlnf43wVAx1bXnb9ZhQcFDZiBnqeq_2dWRSt-4Zod9PJihb6BLGzfUep8Y=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJNUmsQ0gZQjERny4iUkgPNNg"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJNUmsQ0gZQjERny4iUkgPNNg",
+      "rating": 4.1,
+      "reviews": 2147
     },
     {
       "id": "gmaps-ChIJieQ1ULsdbDERNhwI7vvdmmQ",
@@ -1925,11 +2147,13 @@
       ],
       "street": "Biển Hồ chè, Hai hàng thông, Biển Hồ, Gia Lai 60000, Việt Nam",
       "dish": "che",
-      "note": "Gia Lai · Mở cả ngày",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (1,804 đánh giá Google Maps) · Gia Lai",
+      "source": "Google Maps (4.5★, 1,804 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfDPHPkUbANDTw-8uhXRGYHxp63mD7fYkaYkohGo16qOzhcF9TsiWBwyT4tZJ9eztgdKDaYIPFtM0qnaq_j1kh1uTKMPibM4LSF6oJVxZPvHRcWaQlEJdGYsPap3vhlmLTjTXEcTg=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJieQ1ULsdbDERNhwI7vvdmmQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJieQ1ULsdbDERNhwI7vvdmmQ",
+      "rating": 4.5,
+      "reviews": 1804
     },
     {
       "id": "gmaps-ChIJ1_bOoieVMzEROo9nn8xH7nU",
@@ -1941,11 +2165,13 @@
       ],
       "street": "Đồi chè Trái Tim, Unnamed, Road, Thảo Nguyên, Sơn La, Việt Nam",
       "dish": "che",
-      "note": "Sơn La / Mộc Châu · Mở cả ngày",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (1,550 đánh giá Google Maps) · Sơn La / Mộc Châu",
+      "source": "Google Maps (4.2★, 1,550 đánh giá)",
       "phone": "+84 944 002 999",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdP1U7cGeeeSqzOzbzZiyZhiAHlYL-lBbiW6-U_cCFE8qNGXd7jvMwNWwH2eyVMHHisCZFobo4hA1RzEmkIHaQ9qaf8L7Ukd3m-2XD7cimu1fKsWT3-izbSMI_VlO4I_DF1Xt9W=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ1_bOoieVMzEROo9nn8xH7nU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ1_bOoieVMzEROo9nn8xH7nU",
+      "rating": 4.2,
+      "reviews": 1550
     },
     {
       "id": "gmaps-ChIJ_ePHKasZQjERK9SDI1h4a80",
@@ -1957,11 +2183,13 @@
       ],
       "street": "Chè Liên Đà Nẵng - Chè Sầu Liên, 320 Điện Biên Phủ, Thanh Khê, Đà Nẵng 550000, Việt Nam",
       "dish": "che",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (733 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.0★, 733 đánh giá)",
       "phone": "+84 989 595 274",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfmn3ZnvulhfUqPdLbYVKH8k4nWJ1vur5oAoKn0cXTMx0IG4AmStwOLtZKL8G3FOIx_fAdtTFpmyiC_oXQX_zsmowNViEkLT393NoKU37e_GGqzyWRF4NDy5KNf8bJjCDJhgXky=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_ePHKasZQjERK9SDI1h4a80"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_ePHKasZQjERK9SDI1h4a80",
+      "rating": 4.0,
+      "reviews": 733
     },
     {
       "id": "gmaps-ChIJFcnEfK_1sqoRbBWn_V3rDWo",
@@ -1973,11 +2201,13 @@
       ],
       "street": "Đồi Chè Trái Tim Love Mộc Châu, Tổ Dân phố 1/5, Vân Sơn, Sơn La, Việt Nam",
       "dish": "che",
-      "note": "Sơn La / Mộc Châu · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (683 đánh giá Google Maps) · Sơn La / Mộc Châu · Đã đóng cửa",
+      "source": "Google Maps (4.3★, 683 đánh giá)",
       "phone": "+84 983 142 347",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLf6jlA5uhRfe3Kzf5sCgmUCeOPK5O_k5Clt42R8jaFujVidwe80tOFtqMgY5BT__6oU7u9erocKqJS1ZHH42rnxb0NdYvN-ArYliD3dEDn9_S8iCPYUIGrc7mzwdZJgow=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJFcnEfK_1sqoRbBWn_V3rDWo"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJFcnEfK_1sqoRbBWn_V3rDWo",
+      "rating": 4.3,
+      "reviews": 683
     },
     {
       "id": "gmaps-ChIJ8RmZiXLrMzERDOjeYhg2qpI",
@@ -1989,11 +2219,13 @@
       ],
       "street": "Đồi Chè Mộc Châu, 552 Thảo Nguyên, Sơn La, Việt Nam",
       "dish": "che",
-      "note": "Sơn La / Mộc Châu",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (326 đánh giá Google Maps) · Sơn La / Mộc Châu",
+      "source": "Google Maps (4.5★, 326 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeeXA8sPknRF_SRadpFLPyr1XUiSkVvz5Q3Kq9SCOeSslKAPX0jcCn03dpKVXgfV2hWYOcUF-8WaL-Uh6NMsN3_PMIXoenbcef95VuWIcc6eoA21Ceci2wHN5H3t4p_9bcQ-fleCA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ8RmZiXLrMzERDOjeYhg2qpI"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ8RmZiXLrMzERDOjeYhg2qpI",
+      "rating": 4.5,
+      "reviews": 326
     },
     {
       "id": "gmaps-ChIJ96Hse5BsbzERcgYS7BOy0cs",
@@ -2005,11 +2237,13 @@
       ],
       "street": "Bánh Xèo Gia Vỹ 2, 14 Diên Hồng, Quy Nhơn, Gia Lai 59000, Việt Nam",
       "dish": "banh-xeo",
-      "note": "Bình Định / Quy Nhơn · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (2,106 đánh giá Google Maps) · Bình Định / Quy Nhơn · Đang mở cửa",
+      "source": "Google Maps (4.1★, 2,106 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcXFqXv26QH9jmfXjFerIdeBWUPo9oefQAlPpXRTVGUdLRW9pEr9an5ni_aejF2J_lvU0D2bfqQ5yg5j2xE8QSkzVxzsvsUK9445fKzJ0rlhAd9O6-7FjD0iGNVvMgQhOPG3vPJ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ96Hse5BsbzERcgYS7BOy0cs"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ96Hse5BsbzERcgYS7BOy0cs",
+      "rating": 4.1,
+      "reviews": 2106
     },
     {
       "id": "gmaps-ChIJEyM-E-aDdjERHwRgqUTdsOE",
@@ -2021,11 +2255,13 @@
       ],
       "street": "Bánh Xèo bánh căn cây phượng, 49 Tuyên Quang, Phan Thiết, Lâm Đồng, Việt Nam",
       "dish": "banh-xeo",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (186 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.4★, 186 đánh giá)",
       "phone": "+84 367 029 847",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJEyM-E-aDdjERHwRgqUTdsOE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJEyM-E-aDdjERHwRgqUTdsOE",
+      "rating": 4.4,
+      "reviews": 186
     },
     {
       "id": "gmaps-ChIJUSRAjsyrNTER-pjmCPcpj3Q",
@@ -2037,11 +2273,13 @@
       ],
       "street": "Bánh Xèo Dì Út - Đặc Sản Bình Định, 123 Đội Cấn, Ba Đình, Hà Nội, Việt Nam",
       "dish": "banh-xeo",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (179 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.2★, 179 đánh giá)",
       "phone": "+84 339 062 279",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLd49pAcVsa6c0Hmq1RUE8q9qDM7fSkPflzbsV5Js5g7gYAGC_XI3Ka8Bzk3WNmjCWDrfpcOzQ59HNjLHQ5gEmMB20hybQyxuAVcpG6YTjwaptUhVqSv0rj4Wqe-jqHsy2Uk7prJTryRxGYy=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJUSRAjsyrNTER-pjmCPcpj3Q"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJUSRAjsyrNTER-pjmCPcpj3Q",
+      "rating": 4.2,
+      "reviews": 179
     },
     {
       "id": "gmaps-ChIJ1_oArkVtbzERsxHEDBerDNs",
@@ -2053,11 +2291,13 @@
       ],
       "street": "Bánh Xèo Ngọc Liên, 63/13 Thanh Niên, Quy Nhơn Nam, Gia Lai, Việt Nam",
       "dish": "banh-xeo",
-      "note": "Bình Định / Quy Nhơn · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (172 đánh giá Google Maps) · Bình Định / Quy Nhơn · Đang mở cửa",
+      "source": "Google Maps (4.7★, 172 đánh giá)",
       "phone": "+84 935 590 333",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcXyLgGebecNQYcYfGvsVUGrdBz8745O19EYFfUt9ANqUm8BAvi7-K9WL-FQOUojFMGENAl1Gb3w4vfrEq1qkMEaPtgNWXyda0vR7j9w7vdrg-HHAijS17IfQZraOKW5CiPPoxc=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ1_oArkVtbzERsxHEDBerDNs"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ1_oArkVtbzERsxHEDBerDNs",
+      "rating": 4.7,
+      "reviews": 172
     },
     {
       "id": "gmaps-ChIJU5Lx9N0pdTERK3d4nSyYrxI",
@@ -2069,11 +2309,13 @@
       ],
       "street": "Ráng Chiều Rooftop, 39A Trần Khắc Chân, Cầu Kiệu, Hồ Chí Minh 700000, Việt Nam",
       "dish": "bia-chai",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (1,907 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.9★, 1,907 đánh giá)",
       "phone": "+84 367 778 478",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdk5GOiGg1_4UKffIn4YRPOvZTob0DAIc6En0LK8qi-cfQqLt4SaZTTFB6aLB7Avw6TjCq0WKv3TTH59sB7lpzt10cX9IZPj8Zummt8b5qoDWJoLeTGOWZaYahzf_acPIrn2l4R=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJU5Lx9N0pdTERK3d4nSyYrxI"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJU5Lx9N0pdTERK3d4nSyYrxI",
+      "rating": 4.9,
+      "reviews": 1907
     },
     {
       "id": "gmaps-ChIJafJACEwqdTERIV-ixdUz7ok",
@@ -2085,11 +2327,13 @@
       ],
       "street": "BIA DŨNG MẬP, 96/5 Nguyễn Ảnh Thủ, Đ. Tây Lân 7, Bà Điểm, Hồ Chí Minh, Việt Nam",
       "dish": "bia-chai",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (624 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.0★, 624 đánh giá)",
       "phone": "+84 931 915 195",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJafJACEwqdTERIV-ixdUz7ok"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJafJACEwqdTERIV-ixdUz7ok",
+      "rating": 4.0,
+      "reviews": 624
     },
     {
       "id": "gmaps-ChIJ30XRj6v3cTERNtq_xBEBRtY",
@@ -2101,11 +2345,13 @@
       ],
       "street": "Gòn Garden BBQ & Ẩm Thực Đồng Bào Ê-Đê, 327/78 Y Moan Ênuôl, Buôn Ma Thuột, Đắk Lắk, Việt Nam",
       "dish": "bia-chai",
-      "note": "Đắk Lắk · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (406 đánh giá Google Maps) · Đắk Lắk · Đang mở cửa",
+      "source": "Google Maps (4.6★, 406 đánh giá)",
       "phone": "+84 913 471 381",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfI1OBDLEZUUEwcUZ2v6u7Lue8Qazs9lI7jB-85s2Omcr9ij_cZVrgcs7iVqJvXPLqX7432vWyYehDvpfxyia_1TP_Hs3x8NdWLCrCijWWPFpE3yxJi2lyHfCSvEzMyNQOgbzKYmYtab8zE=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ30XRj6v3cTERNtq_xBEBRtY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ30XRj6v3cTERNtq_xBEBRtY",
+      "rating": 4.6,
+      "reviews": 406
     },
     {
       "id": "gmaps-ChIJY7Ifdg5VNDERXRo4kRTQL0E",
@@ -2117,11 +2363,13 @@
       ],
       "street": "Bia Sáu Béo, Số 52 Xóm Trên, Ng. 134 Đ. Cầu Diễn, Nguyên Xá, Tây Tựu, Hà Nội, Việt Nam",
       "dish": "bia-chai",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (191 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.6★, 191 đánh giá)",
       "phone": "+84 961 529 786",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJY7Ifdg5VNDERXRo4kRTQL0E"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJY7Ifdg5VNDERXRo4kRTQL0E",
+      "rating": 4.6,
+      "reviews": 191
     },
     {
       "id": "gmaps-ChIJrZTSalArdTERUDTDhO0oZ-c",
@@ -2133,11 +2381,13 @@
       ],
       "street": "Ẩm Thực Bờ Hồ, 1006 Trường Chinh, Tân Sơn, Hồ Chí Minh, Việt Nam",
       "dish": "bia-chai",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (147 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.0★, 147 đánh giá)",
       "phone": "+84 938 888 513",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJrZTSalArdTERUDTDhO0oZ-c"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJrZTSalArdTERUDTDhO0oZ-c",
+      "rating": 4.0,
+      "reviews": 147
     },
     {
       "id": "gmaps-ChIJF-11ir6rNTEROYeNjSfHxjI",
@@ -2149,11 +2399,13 @@
       ],
       "street": "Xôi chè bà Thìn, 1 P. Bát Đàn, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "xoi",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (1,882 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.2★, 1,882 đánh giá)",
       "phone": "+84 936 628 887",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcBNK6k17hniHbgitvqFPfR_QXJox5jxruELbqWIwcvdueqPZa1bx-VjhRHJDpFt79I2D26EaB9v9_tQHGpwkElzRridNpciWfb24glglT8TgqhWLp5XqQ9TGwZ41O4QIubJJEW=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJF-11ir6rNTEROYeNjSfHxjI"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJF-11ir6rNTEROYeNjSfHxjI",
+      "rating": 4.2,
+      "reviews": 1882
     },
     {
       "id": "gmaps-ChIJXSHMFtigQTERw5ee3042nWE",
@@ -2165,11 +2417,13 @@
       ],
       "street": "Bánh Bèo Nậm Lọc Bà Đỏ, 8 Nguyễn Bỉnh Khiêm, Phú Xuân, Huế, Việt Nam",
       "dish": "banh-beo",
-      "note": "Thừa Thiên Huế · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (1,747 đánh giá Google Maps) · Thừa Thiên Huế · Sắp đóng cửa",
+      "source": "Google Maps (4.0★, 1,747 đánh giá)",
       "phone": "+84 234 3541 182",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLc73ooCHSIah25VrXDG0IP_wvfHUZZU7w77DCSBpinp_XUxUA3-y1GASCy-XufVddSeTB9FxcytbHJoamHCahwUDYs7F-2FUubeWqvwUzqLNvh44ht0BM1T_vTyzmTOAkWnLiY=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXSHMFtigQTERw5ee3042nWE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJXSHMFtigQTERw5ee3042nWE",
+      "rating": 4.0,
+      "reviews": 1747
     },
     {
       "id": "gmaps-ChIJj6_QhNigQTER9tjNs7kG564",
@@ -2181,11 +2435,13 @@
       ],
       "street": "Quán Bánh Bèo Nậm Lọc Huế Xưa, 1 Nguyễn Bỉnh Khiêm, Phú Xuân, Huế, Việt Nam",
       "dish": "banh-beo",
-      "note": "Thừa Thiên Huế · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (1,684 đánh giá Google Maps) · Thừa Thiên Huế · Sắp đóng cửa",
+      "source": "Google Maps (4.8★, 1,684 đánh giá)",
       "phone": "+84 948 628 001",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdyTB9l0ZTSAlwR_ryJ7NxF6tB4XmneUEN7XJJxM47zVnSs90vLn6wJkYao4nlpzb5HjRaLN03n6hS3NQ_Ja1IARdlAtlwudkxSQxFqCKR49f9o1rkntGLms_-MutDuKTQtGW40=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJj6_QhNigQTER9tjNs7kG564"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJj6_QhNigQTER9tjNs7kG564",
+      "rating": 4.8,
+      "reviews": 1684
     },
     {
       "id": "gmaps-ChIJ12QUK34ZQjERtKAYTXO85z0",
@@ -2197,11 +2453,13 @@
       ],
       "street": "Bé Loan - Bánh Bèo, Nậm, Lọc, Ram Ít, 40/10 Trưng Nữ Vương, Hải Châu, Đà Nẵng 550000, Việt Nam",
       "dish": "banh-beo",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (540 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.7★, 540 đánh giá)",
       "phone": "+84 905 610 490",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcHG90ElK4Mjt_MLwrb0PDXzuLW3N5BVFHAey9wY17URSSkKfUAftVlDpirDMMDq76UhEOcE5RWcUbCmBXnD491nV__-fM8kaIslFN2ABgn4M--ccJMBAlOXBoQ4-6cJmHueDsgEhMuyQk=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ12QUK34ZQjERtKAYTXO85z0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ12QUK34ZQjERtKAYTXO85z0",
+      "rating": 4.7,
+      "reviews": 540
     },
     {
       "id": "gmaps-ChIJ-U75YCahQTERi8rBtn8mlcY",
@@ -2213,11 +2471,13 @@
       ],
       "street": "Quán Trung Bộ - Bánh Bèo, Bánh Lọc & Bánh Nậm, 16 Tô Hiến Thành, Phú Xuân, Huế, Việt Nam",
       "dish": "banh-beo",
-      "note": "Thừa Thiên Huế · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.9 (102 đánh giá Google Maps) · Thừa Thiên Huế · Đã đóng cửa",
+      "source": "Google Maps (4.9★, 102 đánh giá)",
       "phone": "+84 234 3518 433",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeqbjfnNnWUxQNcEzYwORyHDT1FrtkxHZdulshbKfWcEZ9amVNC7ghdzK4uMcv_zEoHRLNQs2bMEdfwxtQMXcS523dCHQ-cfpHT1x1vaRUugO_rzss4MAx2V3wRk4ghc3kQyArSnkSsljl8=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ-U75YCahQTERi8rBtn8mlcY"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ-U75YCahQTERi8rBtn8mlcY",
+      "rating": 4.9,
+      "reviews": 102
     },
     {
       "id": "gmaps-ChIJ95nVYQChQTERWhvy6tquVRo",
@@ -2229,11 +2489,13 @@
       ],
       "street": "Bánh Bèo Nậm Lọc, Quán Ăn 789, 15 Nguyễn Bỉnh Khiêm, Phú Xuân, Huế, Việt Nam",
       "dish": "banh-beo",
-      "note": "Thừa Thiên Huế · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 5.0 (73 đánh giá Google Maps) · Thừa Thiên Huế · Sắp đóng cửa",
+      "source": "Google Maps (5.0★, 73 đánh giá)",
       "phone": "+84 914 270 381",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcU9qSEqbe1HW2_CE3I8AyxRM_zQiEoiSerhiwQgeKQl71a-T7tY_Zt8tW4gzSdwLn3MGOCe1UbE55GfUabA9wqShtGmObrt-onOvhDxa4SJjuB2skIoaCgP3OEJ6pGwSAxo7_JAVtGz3bw=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ95nVYQChQTERWhvy6tquVRo"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ95nVYQChQTERWhvy6tquVRo",
+      "rating": 5.0,
+      "reviews": 73
     },
     {
       "id": "gmaps-ChIJZzQZFQCkQTERRHE-v9x4k5k",
@@ -2245,11 +2507,13 @@
       ],
       "street": "Quán Bánh Bèo Nậm Lọc Nani, 83 Lê Ng. Cát, Thủy Xuân, Huế, Việt Nam",
       "dish": "banh-beo",
-      "note": "Thừa Thiên Huế · Mở cả ngày",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (62 đánh giá Google Maps) · Thừa Thiên Huế",
+      "source": "Google Maps (4.3★, 62 đánh giá)",
       "phone": "+84 772 422 302",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeP8FmL4uDrbo_hktTYnENLhPckzuv2SVHc70zW_DaAc5nnvQ8r4_kqc8AyUd1DOgQ83C9bzX6Rf_SQ4FPiHJkjWFYYoY-vfF6bwh8Tiilef5NsT_MvXkVvcb0snKUbQQ1tkggchA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJZzQZFQCkQTERRHE-v9x4k5k"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJZzQZFQCkQTERRHE-v9x4k5k",
+      "rating": 4.3,
+      "reviews": 62
     },
     {
       "id": "gmaps-ChIJSXEv-X1vdTERTIy3glR4puI",
@@ -2261,11 +2525,13 @@
       ],
       "street": "Bánh khọt 14, 14 Hoàng Hoa Thám, Vũng Tàu, Hồ Chí Minh, Việt Nam",
       "dish": "banh-khot",
-      "note": "Bà Rịa - Vũng Tàu · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (1,688 đánh giá Google Maps) · Bà Rịa - Vũng Tàu · Đã đóng cửa",
+      "source": "Google Maps (4.2★, 1,688 đánh giá)",
       "phone": "+84 254 3859 709",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLePwVobJckkktN_GGDQcMFpjWziQkhJqkyrEUqyIXm90UCft9hCm71z_zrthPnGGLv-9iG3BDHx_eZKYAGeGxBdki9IkbdcPO29lQ1AJ6-AzEi5fcC_OZqMyvnbNl5zYvRac5uU0KiRYXMQ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJSXEv-X1vdTERTIy3glR4puI"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJSXEv-X1vdTERTIy3glR4puI",
+      "rating": 4.2,
+      "reviews": 1688
     },
     {
       "id": "gmaps-ChIJORk8cPJvdTERi1xQIQM3YDQ",
@@ -2277,11 +2543,13 @@
       ],
       "street": "Bánh Khọt Bà Hai, 42 Trần Đồng, Vũng Tàu, Hồ Chí Minh, Việt Nam",
       "dish": "banh-khot",
-      "note": "Bà Rịa - Vũng Tàu · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (1,351 đánh giá Google Maps) · Bà Rịa - Vũng Tàu · Đã đóng cửa",
+      "source": "Google Maps (4.0★, 1,351 đánh giá)",
       "phone": "+84 907 303 836",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLes3MbrQ3_Vf_YH8waN7exMOF8r1yb7vwDAAUZnyw4p_CAo5DLFVlOYm0B58FRnmLEw3xpn7n38WqhvesvSdL_jNWy5Ac8leXMyP1ZGkIBBED5Nqv-68HbV6Do5RlnRtXxq9NaUn0TeRS-D=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJORk8cPJvdTERi1xQIQM3YDQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJORk8cPJvdTERi1xQIQM3YDQ",
+      "rating": 4.0,
+      "reviews": 1351
     },
     {
       "id": "gmaps-ChIJb-2E4ExvdTERtOD09UPi0i0",
@@ -2293,11 +2561,13 @@
       ],
       "street": "Bánh khọt Cô Phượng Vũng Tàu, 33 Thống Nhất, Vũng Tàu, Hồ Chí Minh 78000, Việt Nam",
       "dish": "banh-khot",
-      "note": "Bà Rịa - Vũng Tàu · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (441 đánh giá Google Maps) · Bà Rịa - Vũng Tàu · Đã đóng cửa",
+      "source": "Google Maps (4.8★, 441 đánh giá)",
       "phone": "+84 937 597 268",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdpGiZqIewuSSiBseUVh4uBUOsvn1LTLX6nop7UriCskXleRzjHvRDofF6dGkZ2ZpMvd293tZwYO1tBvxFNh7n1pB3VBHPh3IgmmRozkMMbP0EllAIjmXVGHNvhtmRbkugxumDUUMVn4fk=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJb-2E4ExvdTERtOD09UPi0i0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJb-2E4ExvdTERtOD09UPi0i0",
+      "rating": 4.8,
+      "reviews": 441
     },
     {
       "id": "gmaps-ChIJW2T0CpVvdTERFrAUMzTzTP4",
@@ -2309,11 +2579,13 @@
       ],
       "street": "Quán Bánh Khọt 56, 56 Lê Lợi, Vũng Tàu, Hồ Chí Minh, Việt Nam",
       "dish": "banh-khot",
-      "note": "Bà Rịa - Vũng Tàu · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (414 đánh giá Google Maps) · Bà Rịa - Vũng Tàu · Đã đóng cửa",
+      "source": "Google Maps (4.3★, 414 đánh giá)",
       "phone": "+84 355 327 876",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLevy5_xKkveSlmX_47m2jX5kFj2l5tJfm5mncZmpe5PBbbIJEgKHhyUMWJCGWk3gYfwi8v4ugyDXgRbF-5Hj6__yhNQCMfqPM3xS6q3S218GrqudEI8M3HOSnBhHUmQA5p15JLTSw=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJW2T0CpVvdTERFrAUMzTzTP4"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJW2T0CpVvdTERFrAUMzTzTP4",
+      "rating": 4.3,
+      "reviews": 414
     },
     {
       "id": "gmaps-ChIJB-mtf91xdTERTD_b2qDiM44",
@@ -2325,11 +2597,13 @@
       ],
       "street": "Bánh khọt cô Xuân, 419 Đ. 30 Tháng 4, Rạch Dừa, Hồ Chí Minh 780000, Việt Nam",
       "dish": "banh-khot",
-      "note": "TP. Hồ Chí Minh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (353 đánh giá Google Maps) · TP. Hồ Chí Minh · Đang mở cửa",
+      "source": "Google Maps (4.1★, 353 đánh giá)",
       "phone": "+84 907 595 344",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLe_mip9VMecVL3ao40NpQRRAmbDj22tojOn_YTQPnv8hcrRwth_VjprdZ8YKus5mX--oPnEO1QwDv1FHYCUd7cvI3iG_icYTSk3C6phxaiKKfUgVWAB4CR46QOYxw2zoU9HijT7=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJB-mtf91xdTERTD_b2qDiM44"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJB-mtf91xdTERTD_b2qDiM44",
+      "rating": 4.1,
+      "reviews": 353
     },
     {
       "id": "gmaps-ChIJAbFkdwBvdTERx-xy3trO7PU",
@@ -2341,11 +2615,13 @@
       ],
       "street": "QUÁN BÁNH KHỌT - CÔ HAI THẢO, 117 Hoàng Hoa Thám, Vũng Tàu, Hồ Chí Minh 793990, Việt Nam",
       "dish": "banh-khot",
-      "note": "Bà Rịa - Vũng Tàu · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (286 đánh giá Google Maps) · Bà Rịa - Vũng Tàu · Đang mở cửa",
+      "source": "Google Maps (4.7★, 286 đánh giá)",
       "phone": "+84 902 915 888",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcKmqnKkPjrf7GLms0LssSuzogpQx3a0EUarNGPnEMUPithHAuWLWQVPGDLM6h6n8OkE94kpQv8i3LT5zhyZi-OpRggyG-t8E_Sq3j8oHZaLxJADJZnMKqzfwqLS-ZxZTe-E-PVgk25n_Q=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJAbFkdwBvdTERx-xy3trO7PU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJAbFkdwBvdTERx-xy3trO7PU",
+      "rating": 4.7,
+      "reviews": 286
     },
     {
       "id": "gmaps-ChIJQ7Wm3ssZQjERC5aR2l8cnno",
@@ -2357,11 +2633,13 @@
       ],
       "street": "Quán Cô Hồng - Gỏi Cá Nam Ô, 38 Lê Hồng Phong, Hải Châu, Đà Nẵng 550000, Việt Nam",
       "dish": "goi-ca-nam-o",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (1,283 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.5★, 1,283 đánh giá)",
       "phone": "+84 905 935 755",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJQ7Wm3ssZQjERC5aR2l8cnno"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJQ7Wm3ssZQjERC5aR2l8cnno",
+      "rating": 4.5,
+      "reviews": 1283
     },
     {
       "id": "gmaps-ChIJt7IubzSIoDERpETZbvPUYcA",
@@ -2373,11 +2651,13 @@
       ],
       "street": "Quán Bún Mắm 173, 594 Đ. 30 Tháng 4, Tân An, Cần Thơ, Việt Nam",
       "dish": "bun-mam",
-      "note": "Cần Thơ · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (1,064 đánh giá Google Maps) · Cần Thơ · Đang mở cửa",
+      "source": "Google Maps (4.3★, 1,064 đánh giá)",
       "phone": "+84 914 063 042",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJt7IubzSIoDERpETZbvPUYcA"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJt7IubzSIoDERpETZbvPUYcA",
+      "rating": 4.3,
+      "reviews": 1064
     },
     {
       "id": "gmaps-ChIJkUPrYowZQjERnKt8r7iVImQ",
@@ -2389,11 +2669,13 @@
       ],
       "street": "Quán Mậu - Bánh Tráng Cuốn Thịt Heo, 47 Đỗ Thúc Tịnh, Phường, Cẩm Lệ, Đà Nẵng 550000, Việt Nam",
       "dish": "banh-trang-cuon-thit-heo",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (952 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.1★, 952 đánh giá)",
       "phone": "+84 344 599 706",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeH_py7mQRSh9WhC-w6woikdnr8yG9WW0ZBoU5vv6A-qEpNBeC93Xd-fGijrpP76AQDrmDcW1C5Zwnoi9WBMHTKvK42JMcO9QHXq15WdRCKcYk7TwGHtawYezweX_5YPAmsNGo=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJkUPrYowZQjERnKt8r7iVImQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJkUPrYowZQjERnKt8r7iVImQ",
+      "rating": 4.1,
+      "reviews": 952
     },
     {
       "id": "gmaps-ChIJ2VicQwAZQjERnEOxyC0UA9Q",
@@ -2405,11 +2687,13 @@
       ],
       "street": "Bánh tráng thịt heo Quán Cốm Đại Lộc, 103 Trưng Nữ Vương, Hải Châu, Đà Nẵng 550000, Việt Nam",
       "dish": "banh-trang-cuon-thit-heo",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (703 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.7★, 703 đánh giá)",
       "phone": "+84 911 982 717",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcr_dJ3UrSWPDixHPKwv_eugfoh27td2objXeJdBeqc4ZSvmrpF1s7EQDG0ZkoILKPDNJTPTad0kr6Ofg4txEnZnuCm3OSaGJhsUWVqH5Sj-lSH5rtORyLLtoczO3GjsZ2487aElX0i52K4=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ2VicQwAZQjERnEOxyC0UA9Q"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ2VicQwAZQjERnEOxyC0UA9Q",
+      "rating": 4.7,
+      "reviews": 703
     },
     {
       "id": "gmaps-ChIJmYle38sZQjER5E6UYlOc7Zk",
@@ -2421,11 +2705,13 @@
       ],
       "street": "Bánh Tráng Thịt Heo Đại Lộc 2, 124 Huỳnh Thúc Kháng, Hải Châu, Đà Nẵng 550000, Việt Nam",
       "dish": "banh-trang-cuon-thit-heo",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (450 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.2★, 450 đánh giá)",
       "phone": "+84 766 697 279",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfHP3X3GweU-LJcPthJJZFO3nMCWUdzD0LoHN_2ggvLeWoMAeiL3E1NB29cdu6BA65EIk9D3CRVZF5HOQytxqN0pb6OKNKYepYYcnmXhEHtQ6-GlMC325eNvRxh8RVjYXdvg2ma=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJmYle38sZQjER5E6UYlOc7Zk"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJmYle38sZQjER5E6UYlOc7Zk",
+      "rating": 4.2,
+      "reviews": 450
     },
     {
       "id": "gmaps-ChIJI1OmCS2rNTERT3uD3NyV_3w",
@@ -2437,11 +2723,13 @@
       ],
       "street": "Bánh Tráng Cuốn Thịt Heo 43 - Cơ sở 300 Thái Hà, 300 P. Thái Hà, Ô Chợ Dừa, Hà Nội 100000, Việt Nam",
       "dish": "banh-trang-cuon-thit-heo",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (435 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.6★, 435 đánh giá)",
       "phone": "+84 387 883 788",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeKuN2n5Llh0K6a724zXtAEL_BuWrHJBw5I8MnZSdlwzirU9B-maN2_yuLnv7kQgK1ZZeH0JEuKqTqGRHnCkP9esxrrWCJ_b4WHZ7347c61wM2gWuPSvSanWU1iDPFkz_0EEK78h-2RQXLw=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJI1OmCS2rNTERT3uD3NyV_3w"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJI1OmCS2rNTERT3uD3NyV_3w",
+      "rating": 4.6,
+      "reviews": 435
     },
     {
       "id": "gmaps-ChIJz7KEHc4NQjERFZCy6XLM3eE",
@@ -2453,11 +2741,13 @@
       ],
       "street": "Bánh Tráng cuốn thịt heo Gia Lộc, 124Trần Nhân Tông, Hội An Đông, Đà Nẵng 560000, Việt Nam",
       "dish": "banh-trang-cuon-thit-heo",
-      "note": "Quảng Nam / Hội An · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (217 đánh giá Google Maps) · Quảng Nam / Hội An · Đang mở cửa",
+      "source": "Google Maps (4.4★, 217 đánh giá)",
       "phone": "+84 905 860 774",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLf2n2nG2BK91DZJIlhVqgSC5WBJQ1LbvFkbZCQqKaImPAUrBo71rP3IDYlKAYpsfJA8YHA6znbI2e8gizbK-no3XTAazbv4Mdz5h1x4seQaLZEgt34lpAbTIhAI02FJn3BI4s8b=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJz7KEHc4NQjERFZCy6XLM3eE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJz7KEHc4NQjERFZCy6XLM3eE",
+      "rating": 4.4,
+      "reviews": 217
     },
     {
       "id": "gmaps-ChIJN7_8VCkZQjERex9hdKdIEiQ",
@@ -2469,11 +2759,13 @@
       ],
       "street": "Bánh tráng thịt heo Bà Hường, 126 Duy Tân, Hòa Cường, Đà Nẵng 550000, Việt Nam",
       "dish": "banh-trang-cuon-thit-heo",
-      "note": "Đà Nẵng · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (213 đánh giá Google Maps) · Đà Nẵng · Đang mở cửa",
+      "source": "Google Maps (4.2★, 213 đánh giá)",
       "phone": "+84 983 550 959",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfs4GX9poKIExOxX6nrR6R4RuqLQsksCRX874bzHJVzZvmp6CpIQuTOExvFlEghUND61ed9cF0rVLxMav_TxeKIwS_s3Oons-aoof9rM_rS0uauarQDe515erywGA-3MolNO4KPVSNgs7U=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJN7_8VCkZQjERex9hdKdIEiQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJN7_8VCkZQjERex9hdKdIEiQ",
+      "rating": 4.2,
+      "reviews": 213
     },
     {
       "id": "gmaps-ChIJ9f-5O90BNTER__zRP-ulHDU",
@@ -2485,11 +2777,13 @@
       ],
       "street": "Quán Nướng Rặng Tre Long, 239 Đào Duy Tùng, Đài Bi, Đông Anh, Hà Nội, Việt Nam",
       "dish": "tre",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (746 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.0★, 746 đánh giá)",
       "phone": "+84 981 526 368",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ9f-5O90BNTER__zRP-ulHDU"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ9f-5O90BNTER__zRP-ulHDU",
+      "rating": 4.0,
+      "reviews": 746
     },
     {
       "id": "gmaps-ChIJxztwxb9rCzERoVnI_hD8BO0",
@@ -2501,11 +2795,13 @@
       ],
       "street": "BÁNH CANH ÚT THIÊN, 88 Nguyễn Đình Chiểu, khu phố 16, Tân Ninh, Tây Ninh, Việt Nam",
       "dish": "banh-canh-ca-loc",
-      "note": "Tây Ninh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (678 đánh giá Google Maps) · Tây Ninh · Đang mở cửa",
+      "source": "Google Maps (4.3★, 678 đánh giá)",
       "phone": "+84 335 235 350",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcjdTKh7VFLACZMAaL1hhVWWMihARSozIyChSztPk_mqt_GAMZbsQAlCKXx-BY3BIzOdcU8eMw4lCMwvlajbKEr0pLLg05klCslfvLxiZhZP0Qbaizi4b5YHTqDVHHWe_NUVdnF=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJxztwxb9rCzERoVnI_hD8BO0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJxztwxb9rCzERoVnI_hD8BO0",
+      "rating": 4.3,
+      "reviews": 678
     },
     {
       "id": "gmaps-ChIJWS-UKcKDdjERbWJs4r_7_0w",
@@ -2517,11 +2813,13 @@
       ],
       "street": "Bánh canh Bà Lý, 566 Trần Hưng Đạo, Tiến Thành, Lâm Đồng, Việt Nam",
       "dish": "banh-canh-ca-loc",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (598 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (4.2★, 598 đánh giá)",
       "phone": "+84 368 412 372",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJWS-UKcKDdjERbWJs4r_7_0w"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJWS-UKcKDdjERbWJs4r_7_0w",
+      "rating": 4.2,
+      "reviews": 598
     },
     {
       "id": "gmaps-ChIJgTjxWoNrCzERdJCQ1k3K5vE",
@@ -2533,11 +2831,13 @@
       ],
       "street": "Bánh canh Trảng Bàng 168, 59 Nguyễn Đình Chiểu, Tân Ninh, Tây Ninh, Việt Nam",
       "dish": "banh-canh-ca-loc",
-      "note": "Tây Ninh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (471 đánh giá Google Maps) · Tây Ninh · Đang mở cửa",
+      "source": "Google Maps (4.6★, 471 đánh giá)",
       "phone": "+84 977 450 168",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcNNHXiSxEFpwB0Yclq38tjAn0AHtDFao51EZjqu-t_5e-e5ZVdcAQCp5Rg_8sMcXDdAkqrohYkLm0Ly3nOf3qmFT9VEFumNqR_wc_ZZst9B7kS7oWShHOlZQ-imeLpUMXXxK_6J0bksXI6=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJgTjxWoNrCzERdJCQ1k3K5vE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJgTjxWoNrCzERdJCQ1k3K5vE",
+      "rating": 4.6,
+      "reviews": 471
     },
     {
       "id": "gmaps-ChIJqeUPArdUNDERpmnz7DWRUes",
@@ -2549,11 +2849,13 @@
       ],
       "street": "Quán Quảng Bình Ơi - Bánh canh cá lóc, C29 Ngõ 69 P. Dương Khuê, Từ Liêm, Hà Nội, Việt Nam",
       "dish": "banh-canh-ca-loc",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (240 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.3★, 240 đánh giá)",
       "phone": "+84 971 736 673",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJqeUPArdUNDERpmnz7DWRUes"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJqeUPArdUNDERpmnz7DWRUes",
+      "rating": 4.3,
+      "reviews": 240
     },
     {
       "id": "gmaps-ChIJf8YqUQBrCzERHzGP-qAufLQ",
@@ -2565,11 +2867,13 @@
       ],
       "street": "Bánh Canh Trảng Bàng Thị Bối, 139 Huỳnh Tấn Phát, Tân Ninh, Tây Ninh, Việt Nam",
       "dish": "banh-canh-ca-loc",
-      "note": "Tây Ninh · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 5.0 (238 đánh giá Google Maps) · Tây Ninh · Đang mở cửa",
+      "source": "Google Maps (5.0★, 238 đánh giá)",
       "phone": "+84 937 807 104",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLejnsYMk3tf9Ah68JLYVe9SpgCWe3xC25GwpvXS_rfseCYMDWY5IkipKEXkCwlggYQWtkkyWlaRzICGrqg4ml8gtzR6yS60cjmyBWeoFGMuFt1CPTs2nEjOVRa8hQZgz1a1a3ST5ZZYphzX=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJf8YqUQBrCzERHzGP-qAufLQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJf8YqUQBrCzERHzGP-qAufLQ",
+      "rating": 5.0,
+      "reviews": 238
     },
     {
       "id": "gmaps-ChIJwWFthO5qCzERPuKnNAB86IE",
@@ -2581,11 +2885,13 @@
       ],
       "street": "Bánh Canh - Bánh Tráng Trảng Bàng Hồng Hà, 172A Nguyễn Tri Phương, Khu phố 4, Long Hoa, Tây Ninh, Việt Nam",
       "dish": "banh-canh-ca-loc",
-      "note": "Tây Ninh · Sắp đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (87 đánh giá Google Maps) · Tây Ninh · Sắp đóng cửa",
+      "source": "Google Maps (4.3★, 87 đánh giá)",
       "phone": "+84 969 026 162",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeH6x2EY2g6HTWhvNyZ7gyeYXxD1Txr9_VUMgW4skWV30j15PZ_TtTd8r0wBXY9fBMSq7LvJbsuKasVQn_TnBOfI2uJ4OoNq3VDvBXJRVjVsDmbeqSMWeJJikTcw3NdXH2HYoXU=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJwWFthO5qCzERPuKnNAB86IE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJwWFthO5qCzERPuKnNAB86IE",
+      "rating": 4.3,
+      "reviews": 87
     },
     {
       "id": "gmaps-ChIJ8alytP-rNTEREt8ZsWvn88A",
@@ -2597,11 +2903,13 @@
       ],
       "street": "Bún Chả Bình Minh - Nem Cua Bể, 23 P. Bát Sứ, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội 10000, Việt Nam",
       "dish": "nem-ran",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.4 (564 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.4★, 564 đánh giá)",
       "phone": "+84 943 391 966",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ8alytP-rNTEREt8ZsWvn88A"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ8alytP-rNTEREt8ZsWvn88A",
+      "rating": 4.4,
+      "reviews": 564
     },
     {
       "id": "gmaps-ChIJF0wU3WSrNTER-t57pfdTtms",
@@ -2613,11 +2921,13 @@
       ],
       "street": "Quán bún chả, nem cua bể, 59 P. Hàng Mã, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "nem-ran",
-      "note": "Hà Nội · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (56 đánh giá Google Maps) · Hà Nội · Đã đóng cửa",
+      "source": "Google Maps (4.5★, 56 đánh giá)",
       "phone": "+84 942 892 895",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJF0wU3WSrNTER-t57pfdTtms"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJF0wU3WSrNTER-t57pfdTtms",
+      "rating": 4.5,
+      "reviews": 56
     },
     {
       "id": "gmaps-ChIJ8av8JA2rNTERXPZIZjiGLzc",
@@ -2629,11 +2939,13 @@
       ],
       "street": "Bún Riêu Bề Bề Tiến Huân, A19 Ngõ 66 Phố Dịch Vọng Hậu, Cầu Giấy, Hà Nội, Việt Nam",
       "dish": "bun-rieu",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (560 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.3★, 560 đánh giá)",
       "phone": "+84 977 872 466",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfkLog41Ef8P-SIr-eG5YYSR1T4L2wv7qKXYzQU0m7qa1hDX0SUZdu1aELdICwmUH5Y3u0JZQL54z4e8tpaYNuGkv-ULIDlER8elrW_H0iUKIo-0R6fEaKL3SYWePyqvMLTjKXR5g=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ8av8JA2rNTERXPZIZjiGLzc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ8av8JA2rNTERXPZIZjiGLzc",
+      "rating": 4.3,
+      "reviews": 560
     },
     {
       "id": "gmaps-ChIJ_SaUiAarNTERr8qOJExsCc4",
@@ -2645,11 +2957,13 @@
       ],
       "street": "Bún riêu tóp mỡ mọc giòn Cô Hương Béo - 57 Trần Xuân Soạn, 57 P. Trần Xuân Soạn, Hai Bà Trưng, Hà Nội, Việt Nam",
       "dish": "bun-rieu",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (501 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.0★, 501 đánh giá)",
       "phone": "+84 899 498 998",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLe0XumfTsY2syRGZPNSyUvwOUdvLJFhVV4CQ06IA16tLBHnB7B8Tsmq8uoBCHFTAlVV5KXXSB93Uwxh5kP-6HsQzJ2vqwGo6zGb2I4hLkBVIjMGaYWC-CBkgSnvftnt4iIc7DfR8UUzPYE=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_SaUiAarNTERr8qOJExsCc4"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ_SaUiAarNTERr8qOJExsCc4",
+      "rating": 4.0,
+      "reviews": 501
     },
     {
       "id": "gmaps-ChIJ0aru4XSsNTERw7F8dXL8zWQ",
@@ -2661,11 +2975,13 @@
       ],
       "street": "Bún riêu Ngà, 6 Ng. Đình Đại, Bạch Mai, Hà Nội, Việt Nam",
       "dish": "bun-rieu",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.3 (471 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.3★, 471 đánh giá)",
       "phone": "+84 913 141 533",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfdhu31P8FQV1ibZ5tYUyZ2E4VA_KH9nbigXniWQRgwAmjWJosXR6TTIvdRQOENF-swUJ5rLtbmcxPTdbYEuU3a_HtRtMSc9OytxG41qwLWgjCzkqhoSJEuq58RRtJpYmAavMyD=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ0aru4XSsNTERw7F8dXL8zWQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ0aru4XSsNTERw7F8dXL8zWQ",
+      "rating": 4.3,
+      "reviews": 471
     },
     {
       "id": "gmaps-ChIJ4flFNFOrNTERSLZiVHsZwoQ",
@@ -2677,11 +2993,13 @@
       ],
       "street": "Bún riêu Chang, 14 Ng. 16 P. Huỳnh Thúc Kháng, Giảng Võ, Hà Nội 100000, Việt Nam",
       "dish": "bun-rieu",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (192 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.8★, 192 đánh giá)",
       "phone": "+84 988 211 166",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfQpofoUfYp8LmItlzgy-vkhLKof4Iy6pSypWRzDwNgtbzIqP2Ct6q5H5CkWzCKAgBMUGkXikuhLd9ILdDqIs53zWALIYt0JDF1ogASQgv9CBZLyqimYSZBDj_weYSEgu-neHZt3lNGgLfI=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ4flFNFOrNTERSLZiVHsZwoQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ4flFNFOrNTERSLZiVHsZwoQ",
+      "rating": 4.8,
+      "reviews": 192
     },
     {
       "id": "gmaps-ChIJv8MzWlSrNTER1VRau6kZ318",
@@ -2693,11 +3011,13 @@
       ],
       "street": "Bún Riêu Cô Lan - 59 Bà Triệu, 59 Bà Triệu, Cửa Nam, Hà Nội 100000, Việt Nam",
       "dish": "bun-rieu",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (139 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.5★, 139 đánh giá)",
       "phone": "+84 395 508 594",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdG5Ubu2reCjhk5SoFqroxYCBpZB1HWVO1AI1brVrPsRimGVNmk-Wlm5Z9zBuZgjXLxW57AWbPOWXIZZeR2IcQcs4VOCTxwfek1M0KxfRXnIlfdz3C-OS_Y5pVok7gBIqdWQ-3idGyq1Ss=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJv8MzWlSrNTER1VRau6kZ318"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJv8MzWlSrNTER1VRau6kZ318",
+      "rating": 4.5,
+      "reviews": 139
     },
     {
       "id": "gmaps-ChIJn21OOwmtNTERuTldnoMzPlg",
@@ -2709,11 +3029,13 @@
       ],
       "street": "Bún riêu 66 Vũ Trọng Phụng, 66 Đ. Vũ Trọng Phụng, Thanh Xuân, Hà Nội, Việt Nam",
       "dish": "bun-rieu",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (134 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.0★, 134 đánh giá)",
       "phone": "",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcb54Nrrik5Bvi6lXzwK97Z8MbSF9SHe18vj_-nKuOjOZ4CtTiWnNBVLFDT94lkQA_TrAGTuorXoK94OaSp_YvEHUwr8bodO12g-OWbEOiCG9hFS-QdDN64vNSg64HG_Irt9Dzonw=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJn21OOwmtNTERuTldnoMzPlg"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJn21OOwmtNTERuTldnoMzPlg",
+      "rating": 4.0,
+      "reviews": 134
     },
     {
       "id": "gmaps-ChIJbw_vyaGtNTER5xdIPtboodg",
@@ -2725,11 +3047,13 @@
       ],
       "street": "PS+ Nem nướng Nha Trang- Bún Đậu Mắm Tôm (2C Đặng Văn Ngữ), 2C P. Đặng Văn Ngữ, Kim Liên, Hà Nội 100000, Việt Nam",
       "dish": "bun-dau",
-      "note": "Khánh Hòa / Nha Trang · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (402 đánh giá Google Maps) · Khánh Hòa / Nha Trang · Đang mở cửa",
+      "source": "Google Maps (4.8★, 402 đánh giá)",
       "phone": "+84 947 868 958",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLe5B-gGjVz7AbBCsR0fyOYvQtAcaq7srIkkK9xdhu1dqGiOqbM0PeFu6BfnlAPNjZqxm1IqfI4imGF-ww6Tsj98QSQZdNR1x6f7nW6CLM-mWqupy5YF2vH39CVkssdPipLypZo=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJbw_vyaGtNTER5xdIPtboodg"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJbw_vyaGtNTER5xdIPtboodg",
+      "rating": 4.8,
+      "reviews": 402
     },
     {
       "id": "gmaps-ChIJlf9nAwCrNTER5jrnZkPCk7k",
@@ -2741,11 +3065,13 @@
       ],
       "street": "BÚN ĐẬU AN AN (AN AN’s Noodle & Tofu With Shrimp Sauce), 7 Ng. Gạch, Phố cổ Hà Nội, Hoàn Kiếm, Hà Nội, Việt Nam",
       "dish": "bun-dau",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (244 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.5★, 244 đánh giá)",
       "phone": "+84 886 863 679",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLeuNTtv2W7OtvEB-tmXuuUEawwvaMFSzhNncBpNs3aUrUKCZiUYyGq79BppIU87eMSQzD2OSn4QMA_MrWh-Sc_fXtMLzB_H9zOiv_ZrbteWJE2a0bmkoz4IqlQHR0szjHFGUejRSyLcn5b1=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJlf9nAwCrNTER5jrnZkPCk7k"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJlf9nAwCrNTER5jrnZkPCk7k",
+      "rating": 4.5,
+      "reviews": 244
     },
     {
       "id": "gmaps-ChIJDXw45HKhQTERMfw2YkD-rB4",
@@ -2757,11 +3083,13 @@
       ],
       "street": "Cơm hến 05 hàn mặc tử. Cơm hến, bún hến, bánh lọc, bánh Nậm, 05 Hàn Mặc Tử, Vỹ Dạ, Huế, Việt Nam",
       "dish": "banh-nam",
-      "note": "Thừa Thiên Huế · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.8 (304 đánh giá Google Maps) · Thừa Thiên Huế · Đang mở cửa",
+      "source": "Google Maps (4.8★, 304 đánh giá)",
       "phone": "+84 982 050 005",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdh_BRJAE3suX8WIcvRbJfx4JdvBaKHvYTa0WbLc0EImKy_cUKlPhQAXHGtrxk8JAbnlpaDPxVx6_QdLPfqgVEd2MiTFYoosCd6k4UB2pzs5E1mbwp-b1aoOlQFJ5y4B6Yi5DOZ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJDXw45HKhQTERMfw2YkD-rB4"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJDXw45HKhQTERMfw2YkD-rB4",
+      "rating": 4.8,
+      "reviews": 304
     },
     {
       "id": "gmaps-ChIJPwaINeKrNTER1f_5eh0W_QE",
@@ -2773,11 +3101,13 @@
       ],
       "street": "Cơm gà Hội An - De Faifo, GH 308, tầng 3, The Loop IPH, 241 Xuân Thuỷ, Cầu Giấy, HN, Đ. Xuân Thủy, Cầu Giấy, Hà Nội 100000, Việt Nam",
       "dish": "com-ga-hoi-an",
-      "note": "Quảng Nam / Hội An · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (244 đánh giá Google Maps) · Quảng Nam / Hội An · Đang mở cửa",
+      "source": "Google Maps (4.0★, 244 đánh giá)",
       "phone": "+84 911 426 688",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJPwaINeKrNTER1f_5eh0W_QE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJPwaINeKrNTER1f_5eh0W_QE",
+      "rating": 4.0,
+      "reviews": 244
     },
     {
       "id": "gmaps-ChIJS6MqeZRTNDERZgz-MygxGsQ",
@@ -2789,11 +3119,13 @@
       ],
       "street": "Cơm gà Hội An, hai bên đường, ô số 02 Lê Trọng Tấn, Khu Đô Thị Mới, Tây Mỗ, Hà Nội 00001, Việt Nam",
       "dish": "com-ga-hoi-an",
-      "note": "Quảng Nam / Hội An · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (173 đánh giá Google Maps) · Quảng Nam / Hội An · Đang mở cửa",
+      "source": "Google Maps (4.0★, 173 đánh giá)",
       "phone": "+84 934 322 286",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJS6MqeZRTNDERZgz-MygxGsQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJS6MqeZRTNDERZgz-MygxGsQ",
+      "rating": 4.0,
+      "reviews": 173
     },
     {
       "id": "gmaps-ChIJ5YnAUsJVNDERQ3Y2a9LwWg0",
@@ -2805,11 +3137,13 @@
       ],
       "street": "Cô Hoa - Cơm Gà & Đồ Ăn Vặt, Gà Rán - Khoai Lắc, 3 Đường P. Võ Quý Huân, Phú Diễn, Hà Nội 100000, Việt Nam",
       "dish": "com-ga-hoi-an",
-      "note": "Hà Nội · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.5 (136 đánh giá Google Maps) · Hà Nội · Đang mở cửa",
+      "source": "Google Maps (4.5★, 136 đánh giá)",
       "phone": "+84 988 841 263",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLdp0M9qwR1S6_hw8aE7A3GZa8lj80CoGt1vLqjFJ4f8BXrzpOeIJiyoCl8gRuyOPgD5en7vGRNxn2aoNH9DbRR_TUKqv1Dy2eJTDvl0x9Q945SOUkXrTd4uDoQX_2smuA6aUUkqkQ=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ5YnAUsJVNDERQ3Y2a9LwWg0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ5YnAUsJVNDERQ3Y2a9LwWg0",
+      "rating": 4.5,
+      "reviews": 136
     },
     {
       "id": "gmaps-ChIJoYbbiumrNTERX4LClFaeBVE",
@@ -2821,11 +3155,13 @@
       ],
       "street": "Tasty Hội An - Cơm Gà Hội An, 06 Ng. 28 P. Nguyên Hồng, Láng, Hà Nội 10000, Việt Nam",
       "dish": "com-ga-hoi-an",
-      "note": "Quảng Nam / Hội An · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.0 (123 đánh giá Google Maps) · Quảng Nam / Hội An · Đang mở cửa",
+      "source": "Google Maps (4.0★, 123 đánh giá)",
       "phone": "+84 868 099 930",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJoYbbiumrNTERX4LClFaeBVE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJoYbbiumrNTERX4LClFaeBVE",
+      "rating": 4.0,
+      "reviews": 123
     },
     {
       "id": "gmaps-ChIJ-U5aWgCrNTERQEQPVupbT6k",
@@ -2837,11 +3173,13 @@
       ],
       "street": "Duy Hội An - Cơm gà, Mỳ quảng, 79 Tô Hiệu Nhỏ, Khu tập thể Nghĩa Tân, Nghĩa Đô, Hà Nội, Việt Nam",
       "dish": "com-ga-hoi-an",
-      "note": "Quảng Nam / Hội An",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (53 đánh giá Google Maps) · Quảng Nam / Hội An",
+      "source": "Google Maps (4.7★, 53 đánh giá)",
       "phone": "+84 833 425 198",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ-U5aWgCrNTERQEQPVupbT6k"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ-U5aWgCrNTERQEQPVupbT6k",
+      "rating": 4.7,
+      "reviews": 53
     },
     {
       "id": "gmaps-ChIJGaZwBwBRNDERC5hgdN4MyOQ",
@@ -2853,11 +3191,13 @@
       ],
       "street": "2J7R+4QR Cơm gà Hội An Quốc Oai, Quốc Oai, Hà Nội, Việt Nam",
       "dish": "com-ga-hoi-an",
-      "note": "Quảng Nam / Hội An",
-      "source": "Google Maps",
+      "note": "⭐ 4.2 (48 đánh giá Google Maps) · Quảng Nam / Hội An",
+      "source": "Google Maps (4.2★, 48 đánh giá)",
       "phone": "+84 865 818 129",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJGaZwBwBRNDERC5hgdN4MyOQ"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJGaZwBwBRNDERC5hgdN4MyOQ",
+      "rating": 4.2,
+      "reviews": 48
     },
     {
       "id": "gmaps-ChIJ5enKAiGIoDERtnOH5aqiQAE",
@@ -2869,11 +3209,13 @@
       ],
       "street": "Cù Lần - Bò Nướng Ngói, C140-C141, Hẻm 15 Đ. Trần Văn Hoài, Ninh Kiều, Cần Thơ 94000, Việt Nam",
       "dish": "bo-la-lot",
-      "note": "Cần Thơ · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.1 (208 đánh giá Google Maps) · Cần Thơ · Đang mở cửa",
+      "source": "Google Maps (4.1★, 208 đánh giá)",
       "phone": "+84 939 033 693",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ5enKAiGIoDERtnOH5aqiQAE"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ5enKAiGIoDERtnOH5aqiQAE",
+      "rating": 4.1,
+      "reviews": 208
     },
     {
       "id": "gmaps-ChIJtccUrbdncDERZzCrvR0rI3A",
@@ -2885,11 +3227,13 @@
       ],
       "street": "Bún Thịt Nướng - Nem Ninh Hoà CÔ PHƯỚC, 24B Đ. Đoàn Thị Điểm, Nha Trang, Khánh Hòa 650000, Việt Nam",
       "dish": "bun-thit-nuong",
-      "note": "Khánh Hòa / Nha Trang · Đã đóng cửa",
-      "source": "Google Maps",
+      "note": "⭐ 4.7 (204 đánh giá Google Maps) · Khánh Hòa / Nha Trang · Đã đóng cửa",
+      "source": "Google Maps (4.7★, 204 đánh giá)",
       "phone": "+84 775 243 579",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLfcrIPjvS-p2qy7X8V2aSeHuEiSfpJbBz1wij2p9qs6ZbRrKBkKly2Xtw13JE-H02SL6vGmjAw_DpZIhVUQO6GmcIp75EzDpxWmRp3s-dkTjsziKKSD6wotbVzXeywZp_SYl-B3QA=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJtccUrbdncDERZzCrvR0rI3A"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJtccUrbdncDERZzCrvR0rI3A",
+      "rating": 4.7,
+      "reviews": 204
     },
     {
       "id": "gmaps-ChIJ-ZD8kqdtbzERL9PuHAWCSYc",
@@ -2901,11 +3245,13 @@
       ],
       "street": "BÁNH XÈO QUY NHƠN • BÚN THỊT NƯỚNG HOÀ, 66 Trần Cao Vân, Quy Nhơn, Gia Lai, Việt Nam",
       "dish": "bun-thit-nuong",
-      "note": "Bình Định / Quy Nhơn · Mở cả ngày",
-      "source": "Google Maps",
+      "note": "⭐ 4.6 (132 đánh giá Google Maps) · Bình Định / Quy Nhơn",
+      "source": "Google Maps (4.6★, 132 đánh giá)",
       "phone": "+84 949 840 979",
       "photo": "https://lh3.googleusercontent.com/grass-cs/AABkmLcBY7pogg1PQksrBxtHAfqVBYT55i66ZOXAylgrPPH3MRUkVoHj0-JTzK-0Jjh29yAG-u8HG7B7SONjPwSTCf1ihkJ-eqJXFlqRtuwRn3zyb9X0EhvXWTh4-N_xNnbQmqZQABgRiF6XnTgP=w500-h350-k-no",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ-ZD8kqdtbzERL9PuHAWCSYc"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJ-ZD8kqdtbzERL9PuHAWCSYc",
+      "rating": 4.6,
+      "reviews": 132
     },
     {
       "id": "gmaps-ChIJg4XJWVkZQjERVOuuY25EzR0",
@@ -2917,11 +3263,13 @@
       ],
       "street": "Chả Bò Bà Yến – Đặc Sản Đà Nẵng Làm Quà, 100, Trần Thánh Tông/Số 2 An Thượng 32, Sơn Trà, Đà Nẵng, Việt Nam",
       "dish": "cha-bo",
-      "note": "Đà Nẵng · Mở cả ngày",
-      "source": "Google Maps",
+      "note": "⭐ 5.0 (57 đánh giá Google Maps) · Đà Nẵng",
+      "source": "Google Maps (5.0★, 57 đánh giá)",
       "phone": "+84 935 125 516",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJg4XJWVkZQjERVOuuY25EzR0"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJg4XJWVkZQjERVOuuY25EzR0",
+      "rating": 5.0,
+      "reviews": 57
     },
     {
       "id": "gmaps-ChIJDZYJt-SDdjERtTJBsA7mPfI",
@@ -2933,11 +3281,13 @@
       ],
       "street": "Bột chiên Phan Thiết. Chuẩn vị SG, Đối diện nhà may tuân, 26/5 Võ Văn Tần, Phan Thiết, Lâm Đồng, Việt Nam",
       "dish": "bot-chien",
-      "note": "Lâm Đồng / Đà Lạt · Đang mở cửa",
-      "source": "Google Maps",
+      "note": "⭐ 5.0 (44 đánh giá Google Maps) · Lâm Đồng / Đà Lạt · Đang mở cửa",
+      "source": "Google Maps (5.0★, 44 đánh giá)",
       "phone": "+84 356 810 575",
       "photo": "",
-      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJDZYJt-SDdjERtTJBsA7mPfI"
+      "mapsUrl": "https://www.google.com/maps/place/?q=place_id:ChIJDZYJt-SDdjERtTJBsA7mPfI",
+      "rating": 5.0,
+      "reviews": 44
     }
   ]
 }

@@ -83,6 +83,8 @@ const famSpots = (famous.places || []).filter((f) => {
   source: f.source || "",
   phone: f.phone || "",
   photo: f.photo || "",
+  rating: f.rating,
+  reviews: f.reviews,
   famous: true,
 }));
 
@@ -91,7 +93,7 @@ const osmIds = new Set(osmInZone.map((p) => p.id));
 // Hợp nhất dữ liệu famous vào các quán OSM có sẵn
 const mergedOsm = osmInZone.map((p) => {
   const fam = (famous.places || []).find((f) => f.id === p.id);
-  return fam ? { ...p, photo: fam.photo || p.photo, phone: fam.phone || p.phone, note: fam.note, source: fam.source, famous: true } : p;
+  return fam ? { ...p, photo: fam.photo || p.photo, phone: fam.phone || p.phone, note: fam.note, source: fam.source, rating: fam.rating, reviews: fam.reviews, famous: true } : p;
 });
 // Thêm các quán famous độc lập (chưa có trong OSM)
 const newFam = famSpots.filter((f) => !osmIds.has(f.id));
@@ -192,7 +194,7 @@ function paint() {
         <h4>${esc(p.name)}</h4>
         <span class="meta">${esc(p.street)} · ${esc(p.tier)}</span>
         <span class="meta">${named.length ? esc(named.join(" · ")) : "—"}</span>
-        <span class="r2">${verdictPill()}
+        <span class="r2">${verdictPill()} ${p.rating ? `<span class="pill ok soft" style="font-weight:600">⭐ ${p.rating} (${(p.reviews || 0).toLocaleString()})</span>` : ""}
           ${/* Bỏ giá theo từng quán: trường `prices` trong places.json đã gỡ vì
                 nó khai một con số cụ thể tại một hàng quán có tên mà không ai
                 đo. Dải giá của KHU thì vẫn thật và vẫn hiện ở trang món. */""}

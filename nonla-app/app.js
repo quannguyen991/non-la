@@ -2159,12 +2159,16 @@ function renderEat(filter = "") {
         <p class="kicker" style="margin:4px 0 8px">${curLang() === "vi" ? "Quán nổi tiếng khớp từ khoá" : "Eateries matching your search"} (${matchFamous.length})</p>
         ${matchFamous.slice(0, 6).map((fm) => {
           const d = dishById(fm.dish);
+          const starBadge = fm.rating ? `⭐ ${fm.rating} (${Number(fm.reviews || 0).toLocaleString()} ${curLang() === "vi" ? "đánh giá" : "reviews"})` : "";
           return `<button class="row" ${fm.at ? `data-goto="${esc(fm.at.join(","))}" data-goname="${esc(fm.name)}"` : ""}>
             <span class="dot" data-l="unknown"></span>
             <span>
               <span class="nm">${esc(fm.name)}</span>
               <span class="note">${esc(fm.street || "")}${fm.note ? ` · ${esc(fm.note)}` : ""}</span>
-              ${d ? `<span class="note" style="color:var(--brand,#0e2c24);font-weight:600">${curLang() === "vi" ? "Món" : "Dish"}: ${esc(d.vi)}</span>` : ""}
+              <span class="note" style="display:flex;gap:8px;align-items:center;margin-top:2px;flex-wrap:wrap">
+                ${starBadge ? `<span style="color:#d97706;font-weight:600">${starBadge}</span>` : ""}
+                ${d ? `<span style="color:var(--brand,#0e2c24);font-weight:600">${curLang() === "vi" ? "Món" : "Dish"}: ${esc(d.vi)}</span>` : ""}
+              </span>
             </span>
             <span class="amt">${fm.phone ? esc(fm.phone) : ""}</span>
           </button>`;
@@ -3066,6 +3070,7 @@ function showPlace(id, metres = null) {
     <p class="src">${[diaChi(p), TIER_EN[p.tier] || p.tier, CoSo.dong(dg),
       metres != null ? `${fmtDistance(metres)} away` : ""].filter(Boolean).map(esc).join(" · ")}</p>
     <div style="margin-top:9px">${pill}</div>
+    <div id="gRate" hidden></div>
     ${compassHTML(p)}
     ${chiTietOSM(p)}
     ${wave()}
@@ -3101,6 +3106,7 @@ function showPlace(id, metres = null) {
   // Nạp sau khi thẻ đã mở: chờ mạng xong mới vẽ thẻ thì người dùng nhìn màn
   // hình đứng yên sau cú chạm, mà phần quan trọng nhất — giá và Đúng Giá —
   // vốn đã có sẵn trong máy.
+  ratingBlock(p);
   paintPlaceCommunity(p);
 }
 

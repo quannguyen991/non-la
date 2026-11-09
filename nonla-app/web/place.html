@@ -67,6 +67,8 @@ if (fam) {
     phone: fam.phone || p?.phone || "",
     photo: fam.photo || p?.photo || "",
     mapsUrl: fam.mapsUrl || p?.mapsUrl || "",
+    rating: fam.rating ?? p?.rating,
+    reviews: fam.reviews ?? p?.reviews,
     famous: true,
   };
 }
@@ -137,8 +139,13 @@ if (!p) {
           <h1>${esc(p.name)}</h1>
           <p class="muted" style="margin-top:8px">${I.pin} ${esc(p.street || (p.ganPho ? `near ${p.ganPho}` : ""))} ·
             ${esc(p.tier)} · <small>${p.photo ? (p.source ? esc(p.source) : esc(p.name)) : T("illustration, not a photo of this place")}</small></p>
-          <div style="margin-top:12px">${verdictPill()}</div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            ${verdictPill()}
+            ${p.rating ? `<span class="pill ok soft" style="font-weight:600">⭐ ${p.rating} · ${(p.reviews || 0).toLocaleString()} ${T("reviews")} ${T("on Google")}</span>` : ""}
+          </div>
           <div class="facts">
+            ${p.rating ? `<div class="fact"><b>⭐ ${p.rating} Google Maps</b>
+              <p>${(p.reviews || 0).toLocaleString()} ${T("reviews")}${p.mapsUrl ? ` · <a href="${esc(p.mapsUrl)}" target="_blank" rel="noopener noreferrer">${T("Google Maps")}</a>` : ""}</p></div>` : ""}
             <div class="fact"><b>${I.bowl}${T("Known for")}</b>
               <p>${(p.known || []).map((k) => esc(dishOf(k)?.vi || k)).join(" · ") || "—"}</p></div>
             <div class="fact"><b>${I.clock}${T("Typical price")}</b>
