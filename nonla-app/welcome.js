@@ -52,6 +52,7 @@
 
 import * as Auth from "./auth.js";
 import * as Local from "./localdb.js";
+import { t as T } from "./i18n.js";
 
 const SEEN_KEY = "nl.seen.welcome";
 
@@ -165,7 +166,7 @@ function decoPrice() {
              decoding="async" onerror="this.style.visibility='hidden'">
         <div class="wc-recticle" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         <div class="wc-menu">
-          <h4>Hội An eatery</h4>
+          <h4>${esc(T("Hội An eatery"))}</h4>
           ${rows.map(([vi, en, p, on]) => `
             <div class="wc-mrow${on ? " on" : ""}">
               <em>${esc(vi)}<small>${esc(en)}</small></em><b>${esc(p)}</b>
@@ -175,7 +176,7 @@ function decoPrice() {
     </div>
     <div class="wc-tag tl">
       <i class="gold">${SVG.shield}</i>
-      <span><b>Fair price</b><span>34 scans nearby</span></span>
+      <span><b>${esc(T("Fair price"))}</b><span>34 scans nearby</span></span>
     </div>
     <div class="wc-tag br opt">
       <i>${SVG.chart}</i>
@@ -279,7 +280,7 @@ function brandHtml(crest) {
     <header class="wc-brand">
       <img src="assets/motifs/chua-cau.webp" alt="" aria-hidden="true"
            onerror="this.hidden=true">
-      <b>Nón Lá · Việt Nam</b>
+      <b>${esc(T("Nón Lá · Việt Nam"))}</b>
       <span class="wc-crest" aria-hidden="true">${
         crest === "bell" ? SVG.bell
           : `<img src="assets/motifs/hoa-gio.webp" alt="" onerror="this.hidden=true">`}</span>
@@ -323,7 +324,7 @@ function slideHtml(i) {
         ${dotsHtml(i)}
         <button class="wc-cta" data-wc="next">${last ? "Get started" : "Next"}<i
           aria-hidden="true">${SVG.arrow}</i></button>
-        <button class="wc-skip" data-wc="skip">Skip</button>
+        <button class="wc-skip" data-wc="skip">${esc(T("Skip"))}</button>
       </footer>
     </div>`;
 }
@@ -345,13 +346,14 @@ function accountHtml() {
              onerror="this.closest('.wc-round').hidden=true">
       </div>
       <div class="wc-form">
-        <h1 class="wc-title">Ready to explore?</h1>
+        <h1 class="wc-title">${esc(T("Ready to explore?"))}</h1>
         <img class="wc-may" src="assets/motifs/may.webp" alt="" aria-hidden="true"
              onerror="this.hidden=true">
-        <p class="wc-text">Pick a name and you're in. It goes on anything you write, and on
-          this build it never leaves the phone — no password, no email, no waiting.</p>
+        <p class="wc-text">${cloudOn
+          ? T("Pick a name and you're in. Sign up with an email and password to join the community; the phone number is optional.")
+          : T("Pick a name and you're in. It goes on anything you write, and on this build it never leaves the phone — no password, no email, no waiting.")}</p>
 
-        <label class="wc-fld"><span>Display name</span>
+        <label class="wc-fld"><span>${esc(T("Display name"))}</span>
           <input id="wcName" type="text" maxlength="32" autocomplete="nickname"
             required aria-required="true"
             placeholder="e.g. Quân" value="${esc(who)}"></label>
@@ -361,7 +363,7 @@ function accountHtml() {
         <p class="wc-err" id="wcErr" hidden></p>
       </div>
       <footer class="wc-foot">${cloudOn ? cloudActions() : `
-        <button class="wc-cta" data-wc="local">Start exploring<i
+        <button class="wc-cta" data-wc="local">${esc(T("Start exploring"))}<i
           aria-hidden="true">${SVG.arrow}</i></button>`}</footer>
     </div>`;
 }
@@ -393,8 +395,8 @@ function cloudActions() {
   return `
     <button class="wc-cta" data-wc="signin"${cho}>${
       M.sending ? "Working…" : "Sign in"}<i aria-hidden="true">${SVG.arrow}</i></button>
-    <button class="wc-sec" data-wc="signup"${cho}>Create an account</button>
-    <button class="wc-sec" data-wc="local">Continue without an account</button>`;
+    <button class="wc-sec" data-wc="signup"${cho}>${esc(T("Create an account"))}</button>
+    <button class="wc-sec" data-wc="local">${esc(T("Continue without an account"))}</button>`;
 }
 
 /* Không có máy chủ. Nói ra sự thật, nhưng là sự thật về việc DỮ LIỆU Ở ĐÂU
@@ -409,13 +411,13 @@ function localCard() {
     <div class="wc-card">
       <img src="assets/motifs/chim-lac-dung.webp" alt="" aria-hidden="true"
            onerror="this.hidden=true">
-      <span><b>A private notebook</b>
+      <span><b>${esc(T("A private notebook"))}</b>
         ${coMayChu
           ? `Sign-in is not switched on for this build yet, so your name and everything you
              write stay on this phone. Nothing else changes — scans, map and journal all
              work without an account.`
           : `There is no server behind this build, so your name and everything you write stay
-             on this phone. Turn the shared layer on any time in <em>You → Community</em>.`}</span>
+             on this phone. Turn the shared layer on any time in <em>${esc(T("You → Community"))}</em>.`}</span>
     </div>`;
 }
 
@@ -491,7 +493,7 @@ function finish() {
      gõ xong là qua. Nhưng nó phải có, vì mọi bài viết trong sổ tay đều
      ký tên bằng nó, và một feed toàn bài không tên thì không đọc được. */
   if (!identified()) {
-    err("Add a name so your notes have an author");
+    err(T("Add a name so your notes have an author"));
     $("#wcName", M.host)?.focus();
     return false;
   }

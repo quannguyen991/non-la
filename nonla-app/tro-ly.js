@@ -67,5 +67,5 @@ ${sightLines || "(none described)"}`;
 /** Địa chỉ hàm trợ lý: cùng tên miền trên Vercel, còn lại gọi sang bản Vercel. */
 export function diemTroLy(loc = globalThis.location) {
   const host = loc?.hostname || "";
-  return /\.vercel\.app$/.test(host) ? "/api/tro-ly" : "https://nonla-app.vercel.app/api/tro-ly";
+  return /\.(vercel\.app|pages\.dev)$/.test(host) ? "/api/tro-ly" : "https://nonla-etm.pages.dev/api/tro-ly";
 }

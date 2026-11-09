@@ -118,17 +118,17 @@ export function socialLinks(q, tags = []) {
   const tag = tags.map(hashtag).filter(Boolean)[0] || hashtag(q);
   return [
     { id: "tiktok", label: "TikTok", url: `https://www.tiktok.com/search?q=${enc(q)}`,
-      note: "video gần đây" },
+      note: "recent videos" },
     { id: "tiktok-tag", label: `#${tag}`, url: `https://www.tiktok.com/tag/${enc(tag)}`,
       note: "hashtag" },
     { id: "facebook", label: "Facebook", url: `https://www.facebook.com/search/top?q=${enc(q)}`,
-      note: "trang và bài viết" },
+      note: "pages and posts" },
     { id: "instagram", label: "Instagram",
       url: `https://www.instagram.com/explore/tags/${enc(tag)}/`, note: "hashtag" },
     { id: "youtube", label: "YouTube",
-      url: `https://www.youtube.com/results?search_query=${enc(q)}`, note: "video dài" },
+      url: `https://www.youtube.com/results?search_query=${enc(q)}`, note: "long videos" },
     { id: "google", label: "Google", url: `https://www.google.com/search?q=${enc(q)}`,
-      note: "tất cả" },
+      note: "everything" },
   ];
 }
 
@@ -149,7 +149,7 @@ export function shareTargets(text, url = "") {
     { id: "whatsapp", label: "WhatsApp", url: `https://wa.me/?text=${enc(`${text}${url ? ` ${url}` : ""}`)}` },
     { id: "telegram", label: "Telegram",
       url: `https://t.me/share/url?url=${u || t}${url ? `&text=${t}` : ""}` },
-    { id: "tiktok", label: "TikTok", url: null, copy: true, note: "chép chú thích rồi dán vào app" },
+    { id: "tiktok", label: "TikTok", url: null, copy: true, note: "copy the caption, then paste it in the app" },
   ];
   return out;
 }

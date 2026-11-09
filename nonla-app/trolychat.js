@@ -19,6 +19,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 import { diemTroLy } from "./tro-ly.js";
+import { t as T } from "./i18n.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -37,19 +38,19 @@ export function mount({ host, zone, zoneName }) {
   if (M.host) return;
   M.host = host; M.zone = zone; M.zoneName = zoneName;
   host.insertAdjacentHTML("beforeend", `
-    <button class="tlfab" id="tlFab" aria-label="Ask the Nón Lá helper" aria-expanded="false">${ICON_CHAT}</button>
-    <section class="tlpanel" id="tlPanel" hidden aria-label="Nón Lá helper">
+    <button class="tlfab" id="tlFab" aria-label="${esc(T("Ask the Nón Lá helper"))}" aria-expanded="false">${ICON_CHAT}</button>
+    <section class="tlpanel" id="tlPanel" hidden aria-label="${esc(T("Nón Lá helper"))}">
       <header class="tlhead">
         <span class="tlava"><img src="assets/motifs/trong-dong-v2.webp" alt="" aria-hidden="true"></span>
-        <span class="tlname"><b>Nón Lá helper</b><i id="tlZone"></i></span>
-        <button class="tlx" id="tlClose" aria-label="Close the helper">${ICON_X}</button>
+        <span class="tlname"><b>${esc(T("Nón Lá helper"))}</b><i id="tlZone"></i></span>
+        <button class="tlx" id="tlClose" aria-label="${esc(T("Close the helper"))}">${ICON_X}</button>
       </header>
       <div class="tllog" id="tlLog" aria-live="polite"></div>
       <div class="tlgoi" id="tlGoi"></div>
       <form class="tlask" id="tlForm">
         <input id="tlInput" autocomplete="off" maxlength="800" enterkeyhint="send"
-          placeholder="Is 45k for cao lầu normal?">
-        <button class="tlsend" type="submit" aria-label="Send">${ICON_GUI}</button>
+          placeholder="${esc(T("Is 45k for cao lầu normal?"))}">
+        <button class="tlsend" type="submit" aria-label="${esc(T("Send"))}">${ICON_GUI}</button>
       </form>
       <p class="tlfoot">AI helper · answers from this area's reference prices, not a field survey ·
         questions are not stored</p>
@@ -204,7 +205,7 @@ async function gui(raw) {
       ? (local ? "The helper answers on the deployed app, not on this local server." : "Could not reach the helper — check the connection.")
       : e.message;
     out.classList.add("err");
-    out.innerHTML = `${render(msg)}<button class="tlretry" data-retry="1" type="button">Try again</button>`;
+    out.innerHTML = `${render(msg)}<button class="tlretry" data-retry="1" type="button">${esc(T("Try again"))}</button>`;
   } finally {
     M.busy = false;
     M.host.querySelector("#tlLog").scrollTop = 1e9;

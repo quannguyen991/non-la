@@ -13,16 +13,16 @@
    Lịch sử hội thoại KHÔNG được lưu ở đâu: nhận, gọi model, trả lời, hết.
    ═══════════════════════════════════════════════════════════════ */
 
-import { readFileSync } from "fs";
 import { nguCanhTroLy } from "../tro-ly.js";
 import { NGUON, cauHinh, cors, quaTai, goiModel } from "./_chan.js";
 
 export const config = { maxDuration: 60 };
 
-const doc = (p) => JSON.parse(readFileSync(new URL(`../data/${p}.json`, import.meta.url), "utf8"));
-const DATA = {
-  prices: doc("prices"), places: doc("places"), dishes: doc("dishes"), maps: doc("maps"),
-};
+import pricesDoc from "../data/prices.json";
+import placesDoc from "../data/places.json";
+import dishesDoc from "../data/dishes.json";
+import mapsDoc from "../data/maps.json";
+const DATA = { prices: pricesDoc, places: placesDoc, dishes: dishesDoc, maps: mapsDoc };
 const NGU_CANH = new Map();                  // zid -> chuỗi ngữ cảnh, dựng một lần mỗi phiên chạy
 
 export default async function handler(req, res) {

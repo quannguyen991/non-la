@@ -19,7 +19,6 @@
    Ảnh KHÔNG được lưu ở đâu cả: đọc xong, gửi đi, trả kết quả, hết.
    ═══════════════════════════════════════════════════════════════ */
 
-import { readFileSync } from "fs";
 import { loiNhacNhanMon, docKetQuaNhanMon } from "../nhan-mon.js";
 import { NGUON, cauHinh, cors, quaTai, goiModel } from "./_chan.js";
 
@@ -28,7 +27,8 @@ import { NGUON, cauHinh, cors, quaTai, goiModel } from "./_chan.js";
    là người dùng nhận lỗi cho một ảnh đáng lẽ đọc được. 60 giây là trần của gói. */
 export const config = { maxDuration: 60 };
 
-const DISHES = JSON.parse(readFileSync(new URL("../data/dishes.json", import.meta.url), "utf8")).dishes;
+import dishesDoc from "../data/dishes.json";
+const DISHES = dishesDoc.dishes;
 const LOI_NHAC = loiNhacNhanMon(DISHES);
 const TOI_DA_ANH = 700_000;
 const TOI_DA_LUOT = 12;

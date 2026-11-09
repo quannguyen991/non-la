@@ -77,6 +77,14 @@ const money = (vnd) => {
   return `${fmtVND(vnd)}${fx ? `<small class="fx">≈ ${esc(fx)}</small>` : ""}`;
 };
 
+/* Khoảng giá: đổi CẢ HAI đầu, không để money() đổi mỗi đầu trên. Trước đây
+   "60.000₫ – 80.000₫ ≈ $3.07" chỉ quy đổi cận trên, nên khách đọc thấy cả
+   khoảng chỉ bằng một con số. */
+const moneyRange = (a, b) => {
+  const fa = fmtFX(a, S.fx), fb = fmtFX(b, S.fx);
+  return `${fmtVND(a)}–${fmtVND(b)}${fa && fb ? `<small class="fx">≈ ${esc(fa)}–${esc(fb)}</small>` : ""}`;
+};
+
 const shippedIcon = (k) => (S.assets?.icons?.has(k) ? `assets/icons/${k}.webp` : null);
 const markIcon = (kind) => Img.iconOf(kind) || shippedIcon(kind) || sightIcon(kind);
 
@@ -544,18 +552,18 @@ function startCam() {
   if (S.stream || S.camTried) return;
   S.camTried = true;
   if (!navigator.mediaDevices?.getUserMedia || !window.isSecureContext) {
-    return showCamFallback(`<strong>Camera needs HTTPS.</strong><br>Open this page over https or on localhost, or use <em>Enter prices by hand</em>.`);
+    return showCamFallback(`<strong>${esc(T("Camera needs HTTPS."))}</strong><br>Open this page over https or on localhost, or use <em>${esc(T("Enter prices by hand"))}</em>.`);
   }
   // nếu người dùng không trả lời hộp thoại quyền, vẫn phải cho họ lối đi tiếp
   const nudge = setTimeout(() => showCamFallback(
-    `<strong>Waiting for camera permission.</strong><br>Allow it in the address bar, or use <em>Enter prices by hand</em> below.`), 4000);
+    `<strong>${esc(T("Waiting for camera permission."))}</strong><br>Allow it in the address bar, or use <em>${esc(T("Enter prices by hand"))}</em> below.`), 4000);
 
   const fail = (msg) => {
     clearTimeout(nudge);
     S.camTried = false;                       // cho phép thử lại
     // showCamFallback đã tự đặt display:grid — gán lại "" ở đây sẽ xoá nó
     // và thông báo vừa dựng lại biến mất ngay.
-    showCamFallback(`${msg}<br>Use <em>Enter prices by hand</em>, or tap to retry.`);
+    showCamFallback(`${msg}<br>Use <em>${esc(T("Enter prices by hand"))}</em>, or tap to retry.`);
     const fb = $("#camFallback");
     fb.onclick = () => { fb.onclick = null; startCam(); };
   };
@@ -578,7 +586,7 @@ function startCam() {
     try {
       await v.play();
     } catch (e) {
-      return fail(`<strong>Camera blocked from playing</strong> (${esc(e.name)}).`);
+      return fail(`<strong>${esc(T("Camera blocked from playing"))}</strong> (${esc(e.name)}).`);
     }
 
     /* Chó canh: play() trả về thành công vẫn chưa nghĩa là có khung hình.
@@ -588,7 +596,7 @@ function startCam() {
     clearTimeout(S._camWatch);
     S._camWatch = setTimeout(() => {
       if (!v.videoWidth) {
-        fail(`<strong>Camera gave no picture.</strong> Another app may be holding it — close other camera apps and tap to retry.`);
+        fail(`<strong>${esc(T("Camera gave no picture."))}</strong> Another app may be holding it — close other camera apps and tap to retry.`);
       }
     }, 3500);
 
@@ -601,13 +609,14 @@ function startCam() {
     // quyền, NotFoundError là máy không có camera, NotReadableError là
     // camera đang bị chiếm. Gộp hết thành "unavailable" là vứt đi manh mối.
     const why = {
-      NotAllowedError: "Permission denied. Tap the lock icon next to the address bar → Permissions → Camera → Allow.",
-      NotFoundError: "This device reports no camera.",
-      NotReadableError: "The camera is busy — another app is using it.",
-      OverconstrainedError: "No camera matches the requested settings.",
-      SecurityError: "Blocked by the browser's security settings.",
+      NotAllowedError: T("Permission denied. Tap the lock icon next to the address bar → Permissions → Camera → Allow."),
+      NotFoundError: T("This device reports no camera."),
+      NotReadableError: T("The camera is busy — another app is using it."),
+      OverconstrainedError: T("No camera matches the requested settings."),
+      SecurityError: T("Blocked by the browser's security settings."),
     }[e.name] || esc(e.message || "");
-    fail(`<strong>Camera unavailable</strong> (${esc(e.name)}).<br>${why}`);
+    console.warn("camera:", e.name, e.message);
+    fail(`<strong>${esc(T("Camera unavailable"))}</strong>.<br>${why}`);
   });
 }
 
@@ -813,13 +822,12 @@ function whyHTML(dishId) {
     <p class="wtitle">${esc(pv.title)}</p>
     <p>${esc(pv.line)}</p>
     ${st ? `<dl class="wgrid">
-      <div><dt>Cheap end</dt><dd>${fmtVND(st.p25)}</dd></div>
-      <div><dt>Middle</dt><dd>${fmtVND(st.p50)}</dd></div>
-      <div><dt>Dear end</dt><dd>${fmtVND(st.p75)}</dd></div>
-      <div><dt>Called high above</dt><dd>${fmtVND(st.p95)}</dd></div>
+      <div><dt>${esc(T("Cheap end"))}</dt><dd>${fmtVND(st.p25)}</dd></div>
+      <div><dt>${esc(T("Middle"))}</dt><dd>${fmtVND(st.p50)}</dd></div>
+      <div><dt>${esc(T("Dear end"))}</dt><dd>${fmtVND(st.p75)}</dd></div>
+      <div><dt>${esc(T("Called high above"))}</dt><dd>${fmtVND(st.p95)}</dd></div>
     </dl>
-    <p class="wfoot">A price is called fair up to the dear end, and high once it
-      passes the last figure. Those two lines are the whole verdict.</p>` : ""}
+    <p class="wfoot">${esc(T("A price is called fair up to the dear end, and high once it passes the last figure. Those two lines are the whole verdict."))}</p>` : ""}
     <button class="btn sec" data-act="surveyOpen">${esc(T("Record what you paid"))}</button>
   </details>`;
 }
@@ -998,7 +1006,7 @@ const predictedHTML = anToan(function (preds) {
       <span class="dot" data-l="unknown"></span>
       <span><span class="nm">${esc(label)}</span><span class="note">${esc(T("estimate"))} · ${
         esc(T("from"))} ${p.basis.dishZones} ${esc(T("other zones"))}</span></span>
-      <span class="amt" data-l="unknown">${money(p.p25)}–${money(p.p75)}<small>${
+      <span class="amt" data-l="unknown">${moneyRange(p.p25, p.p75)}<small>${
         esc(p.fromSeed ? T("seed estimate") : T("estimate"))}</small></span>
     </div>`).join("")}
     <p class="seedwarn">${esc(T("These are worked out from prices in other zones, not measured here. Treat them as a rough bearing, not a verdict."))}</p>`;
@@ -1080,7 +1088,7 @@ const noMenuHTML = anToan(function () {
         </button>`;
       }).join("")}
     </div>
-    <button class="btn sec" data-act="close">Close</button>`;
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`;
 });
 
 /* ── Ước tính hoá đơn TRƯỚC khi gọi ──────────────────────────
@@ -1105,7 +1113,7 @@ const preorderHTML = anToan(function () {
     ${po.rows.length ? po.rows.map((r, i) => `
       <div class="po-row">
         <span><span class="nm">${esc(r.label)}</span>
-          <span class="sub">${money(r.price)}${r.st ? ` · ${esc(T("typical"))} ${money(r.st.p25)}–${money(r.st.p75)}` : ""}</span></span>
+          <span class="sub">${money(r.price)}${r.st ? ` · ${esc(T("typical"))} ${moneyRange(r.st.p25, r.st.p75)}` : ""}</span></span>
         <span class="po-step">
           <button data-act="poMinus" data-i="${i}" aria-label="less">−</button>
           <span class="n">${r.qty}</span>
@@ -1121,7 +1129,7 @@ const preorderHTML = anToan(function () {
       esc(treo.map((t) => t.text.slice(0, 28)).join(" · "))}. ${esc(T("Ask the weight first."))}</span></div>` : ""}
     <div class="warnbox infobox">${I.clock}<span>${
       esc(T("This is what the menu says you will pay. Extras nobody mentioned — wet towels, tea, peanuts — are not on it."))}</span></div>
-    <button class="btn sec" data-act="close">Close</button>`;
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`;
 });
 
 function showMenuResult(rows, conf, traps = null) {
@@ -1168,7 +1176,7 @@ function showMenuResult(rows, conf, traps = null) {
     <h3>Menu · ${esc(z.name)}</h3>
     <p class="src">${rows.length} item${rows.length===1?"":"s"} read · ${esc(basis)} · updated ${esc(z.updated)}${conf!=null?` · OCR confidence ${Math.round(conf)}%`:""}</p>
     ${wave()}
-    ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">No prices found in that shot. Move closer, hold steady, or enter by hand.</p>`}
+    ${rows.length ? rows.map(rowHTML).join("") : `<p class="muted">${esc(T("No prices found in that shot. Move closer, hold steady, or enter by hand."))}</p>`}
     ${monLaHTML(rows)}
     ${trapLineHTML(traps)}
     ${lichHTML()}
@@ -1207,10 +1215,10 @@ function showMenuResult(rows, conf, traps = null) {
           ? `<button class="btn sec" data-act="taxStart">${esc(T("Compare with the other menu"))}</button>` : ""}
         <button class="btn sec" data-act="show">${esc(T("Say it in Vietnamese"))}</button>
         ${manualBlock()}
-        ${seeded ? `<p class="seedwarn">Reference prices here are estimates, not a completed field survey. Tap any line to see where its number came from.</p>` : ""}
+        ${seeded ? `<p class="seedwarn">${esc(T("Reference prices here are estimates, not a completed field survey. Tap any line to see where its number came from."))}</p>` : ""}
       </div>
     </details>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 /* Đổi chế độ quét. Tách khỏi bộ điều phối vì màn đếm tiền thối cũng cần
@@ -1242,10 +1250,10 @@ function showCashResult(text, { tuHinh = null } = {}) {
 
   if (!notes.length) {
     setEdge(null);
-    return openSheet(`<h3>No banknotes recognised</h3>
-      <p class="src">Lay the notes flat with the big number facing the camera, then scan again.</p>
+    return openSheet(`<h3>${esc(T("No banknotes recognised"))}</h3>
+      <p class="src">${esc(T("Lay the notes flat with the big number facing the camera, then scan again."))}</p>
       ${manualBlock("cash")}
-      <button class="btn sec" data-act="close">Close</button>`);
+      <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   }
   const total = notes.reduce((a, b) => a + b, 0);
   const expected = S.session.reduce((a, r) => a + r.price, 0) || null;
@@ -1260,7 +1268,7 @@ function showCashResult(text, { tuHinh = null } = {}) {
 
   const counts = notes.reduce((m, v) => (m[v] = (m[v] || 0) + 1, m), {});
   openSheet(`
-    <h3>You're holding</h3>
+    <h3>${esc(T("You're holding"))}</h3>
     <p class="src">${esc(nguonDoc)}</p>
     <p style="font-size:32px;font-weight:700;letter-spacing:-.035em;font-variant-numeric:tabular-nums;margin-top:4px">${fmtVND(total)}</p>
     ${wave()}
@@ -1271,9 +1279,9 @@ function showCashResult(text, { tuHinh = null } = {}) {
     ${expected ? `<div class="warnbox ${slip ? "" : "okbox"}">
         ${slip ? `Your bill is ${fmtVND(expected)}. That's ${slip.factor}× less — one zero more in your hand. Check before you hand it over.`
                : `Your bill is ${fmtVND(expected)}. This looks right.`}</div>`
-      : `<div class="warnbox infobox">Scan a menu or a bill first and Nón Lá will check this against what you owe.</div>`}
+      : `<div class="warnbox infobox">${esc(T("Scan a menu or a bill first and Nón Lá will check this against what you owe."))}</div>`}
     <button class="btn pri" data-act="chOpen">${I.coins}${esc(T("Check my change"))}</button>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 /* ── bưu thiếp cuối chuyến ─────────────────────────────────
@@ -1297,19 +1305,18 @@ function loadArt(src) {
 async function openPostcard() {
   const s = Postcard.tripSummary(journal.all(), { zoneNames: zoneNames() });
   if (s.empty) {
-    return openSheet(`<h3>Nothing to put on it yet</h3>
-      <p class="src">The postcard is built from prices you have read. Scan one
-        menu and it has something to say.</p>
-      <button class="btn sec" data-act="close">Close</button>`);
+    return openSheet(`<h3>${esc(T("Nothing to put on it yet"))}</h3>
+      <p class="src">${esc(T("The postcard is built from prices you have read. Scan one menu and it has something to say."))}</p>
+      <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   }
 
   openSheet(`
-    <h3>Your trip, on one card</h3>
+    <h3>${esc(T("Your trip, on one card"))}</h3>
     <p class="src">Built from ${s.scans} reading${s.scans === 1 ? "" : "s"} on this
       phone. Nothing here is an estimate — if Nón Lá cannot count it, it is not on the card.</p>
     <div class="pc-wrap"><canvas id="pcCanvas" aria-label="Trip postcard"></canvas></div>
     <button class="btn pri" data-act="pcSave">${I.share}${esc(T("Save the image"))}</button>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 
   const cv = $("#pcCanvas");
   /* Đợi phông TẢI XONG rồi mới vẽ. canvas không tự vẽ lại khi một phông
@@ -1343,7 +1350,7 @@ function openTrip() {
   if (trip.rong) {
     return openSheet(`<h3>${esc(T("Nothing to tell yet"))}</h3>
       <p class="src">${esc(T("The page is built from prices you have read. Scan one menu and it has something to say."))}</p>
-      <button class="btn sec" data-act="close">Close</button>`);
+      <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   }
 
   openSheet(`
@@ -1366,7 +1373,7 @@ function openTrip() {
       esc(T("more days on the page"))}</p>` : ""}
     <button class="btn pri" data-act="tripSave">${I.share}${esc(T("Save the page"))}</button>
     <p class="seedwarn">${esc(T("Everything on the page comes from your own price checks on this phone. There is no line telling you how much you saved — nobody knows what you would have paid otherwise."))}</p>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 async function saveTrip() {
@@ -1478,11 +1485,9 @@ function renderTax() {
     ${/* Câu này KHÔNG được bỏ đi khi chênh lệch lớn. Đúng lúc con số gây
          phẫn nộ nhất là lúc người đọc cần nhớ rằng nó có cách giải thích
          lương thiện — và app không có cách nào biết là cách nào. */""}
-    <p class="seedwarn">Two menus can differ for honest reasons: a different
-      portion, a takeaway price, or one of them printed a year ago. This is a
-      measurement, not a verdict on the place.</p>
+    <p class="seedwarn">${esc(T("Two menus can differ for honest reasons: a different portion, a takeaway price, or one of them printed a year ago. This is a measurement, not a verdict on the place."))}</p>
 
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 /* ── đếm tiền thối ─────────────────────────────────────────
@@ -1519,7 +1524,7 @@ function changeNotesHTML(due) {
     Math.round(b.note / 1000)}k</span>`.repeat(b.count)).join("");
   return `<div class="ch-notes" aria-hidden="true">${notes}</div>
     <p class="src">${fmtVND(due)} = ${text}</p>
-    <p class="src">Usually handed back as these notes.</p>`;
+    <p class="src">${esc(T("Usually handed back as these notes."))}</p>`;
 }
 
 function renderChange() {
@@ -1534,8 +1539,7 @@ function renderChange() {
 
   openSheet(`
     <h3>${esc(T("Check my change"))}</h3>
-    <p class="src">Tap the notes you handed over, then the notes you got back.
-      Nón Lá does the subtraction and names the gap if there is one.</p>
+    <p class="src">${esc(T("Tap the notes you handed over, then the notes you got back. Nón Lá does the subtraction and names the gap if there is one."))}</p>
     ${wave()}
 
     <label class="ch-bill">
@@ -1552,7 +1556,7 @@ function renderChange() {
     <h2 class="sect">${esc(T("You got back"))}</h2>
     <div class="ch-tally">${tallyLine("got", g.got)}<b>${got ? fmtVND(got) : ""}</b></div>
     <div class="ch-pad">${noteRow("got")}</div>
-    <button class="btn sec" data-act="chScan">Scan the change instead</button>
+    <button class="btn sec" data-act="chScan">${esc(T("Scan the change instead"))}</button>
 
     ${due != null && due >= 0 ? `
       <div class="ch-due">
@@ -1574,7 +1578,7 @@ function renderChange() {
     ${v && v.level !== "ok"
       ? sayBlock("Cho tôi xem lại tiền thối ạ", "chaw toy sem lai tien toy ah") : ""}
 
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 
   const bi = $("#chBill");
   if (bi) {
@@ -1657,11 +1661,11 @@ function showBillResult(rows) {
   setEdge(extra.length ? "high" : "ok");
 
   openSheet(`
-    <h3>Bill check</h3>
+    <h3>${esc(T("Bill check"))}</h3>
     <p class="src">${S.session.length ? `Matched against ${S.session.length} item${S.session.length===1?"":"s"} from the menu you scanned` : "No menu scanned yet — showing the bill as read"}</p>
     ${wave()}
     ${matched.map(rowHTML).join("")}
-    ${extra.length ? `<h2 class="sect" style="color:var(--son)">Not on your menu scan</h2>${extra.map(rowHTML).join("")}` : ""}
+    ${extra.length ? `<h2 class="sect" style="color:var(--son)">${esc(T("Not on your menu scan"))}</h2>${extra.map(rowHTML).join("")}` : ""}
     <div class="row" style="border-top:1px solid var(--line);margin-top:6px">
       <span></span><span class="nm">${esc(T("Bill total"))}</span><span class="amt">${fmtVND(total)}</span></div>
     ${S.session.length ? `<div class="warnbox ${extra.length ? "" : "okbox"}">
@@ -1673,8 +1677,8 @@ function showBillResult(rows) {
     <button class="btn sec" data-act="chOpen">${esc(T("Check my change"))}</button>
     ${extra.length ? sayBlock("Cho tôi xem lại hoá đơn", "chaw toy sem lai hwa dun") : ""}
     <button class="btn sec" data-act="show">${esc(T("Say it in Vietnamese"))}</button>
-    <p class="muted" style="margin-top:10px">Ask politely first. Most extra lines are honest mistakes, and they come off the bill when you point at them.</p>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <p class="muted" style="margin-top:10px">${esc(T("Ask politely first. Most extra lines are honest mistakes, and they come off the bill when you point at them."))}</p>
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 /* Lớp phiên âm tên là `sayph`, KHÔNG phải `ph`.
@@ -1689,19 +1693,19 @@ const sayBlock = (vi, ph) => `<button class="say" data-say="${esc(vi)}">
   <span class="spk">${spkIcon}</span></button>`;
 
 const manualBlock = (kind = "menu") => `
-  <h2 class="sect">Use a photo you already have</h2>
+  <h2 class="sect">${esc(T("Use a photo you already have"))}</h2>
   <p class="muted">${kind === "cash" ? "Pick a photo of the notes." : "Pick a photo of the menu."}
     It is read on this device and never uploaded.</p>
-  <button class="btn sec" data-act="pickfile">Choose a photo</button>
+  <button class="btn sec" data-act="pickfile">${esc(T("Choose a photo"))}</button>
   <input id="mFile" type="file" accept="image/*" hidden>
 
-  <h2 class="sect">Enter by hand</h2>
+  <h2 class="sect">${esc(T("Enter by hand"))}</h2>
   <p class="muted">${kind === "cash" ? "Type the notes you're holding, one per line." : "Type an item and its price. Nón Lá never leaves you stuck."}</p>
   <div class="manual">
     <input id="mName" placeholder="${kind === "cash" ? "500000" : "Cao lầu"}" ${kind==="cash"?'inputmode="numeric"':""}>
     <input id="mPrice" placeholder="${kind === "cash" ? "× 1" : "55000"}" inputmode="numeric">
   </div>
-  <button class="btn pri" data-act="manual" data-kind="${kind}">Check it</button>`;
+  <button class="btn pri" data-act="manual" data-kind="${kind}">${esc(T("Check it"))}</button>`;
 
 /* ── xử lý quét ───────────────────────────────────────────── */
 async function doScan() {
@@ -1713,10 +1717,10 @@ async function doScan() {
      CHÍNH tấm ảnh ấy — không bắt người dùng đổi chế độ rồi chụp lại. */
   S.khungMau = S.mode === "menu" && c ? grabFrame({ colour: true }) : null;
   if (!c) {
-    openSheet(`<h3>No camera image</h3>
-      <p class="src">This device has no usable camera, or the page isn't served over HTTPS.</p>
+    openSheet(`<h3>${esc(T("No camera image"))}</h3>
+      <p class="src">${esc(T("This device has no usable camera, or the page isn't served over HTTPS."))}</p>
       ${manualBlock(S.mode === "cash" ? "cash" : "menu")}
-      <button class="btn sec" data-act="close">Close</button>`);
+      <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
     return;
   }
   /* Chế độ Cash thử ĐỌC BẰNG HÌNH DẠNG trước, rồi mới tới OCR.
@@ -1806,20 +1810,19 @@ async function doDishScan() {
      không có mới rơi về chọn món bằng tay — trước đây thiếu khoá riêng là
      dừng luôn, tức gần như mọi người dùng đều không quét được món. */
   if (!Img.hasKey() && !(await Img.mayChuNhanMon())) {
-    return openSheet(`<h3>Dish recognition is not on yet</h3>
-      <p class="src">Reading a photo of food takes a vision model, which runs online.
-        Text on menus is read on your own device and always works offline.</p>
+    return openSheet(`<h3>${esc(T("Dish recognition is not on yet"))}</h3>
+      <p class="src">${esc(T("Reading a photo of food takes a vision model, which runs online. Text on menus is read on your own device and always works offline."))}</p>
       <div class="warnbox infobox">${I.clock}<span>You can add your own key under
-        <b>You → Illustrations</b>, or just pick the dish by hand below.</span></div>
+        <b>${esc(T("You → Illustrations"))}</b>, or just pick the dish by hand below.</span></div>
       ${dishPickerHTML()}
-      <button class="btn sec" data-act="close">Close</button>`);
+      <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   }
   const c = grabFrame({ colour: true });
   if (!c) {
-    return openSheet(`<h3>No camera image</h3>
-      <p class="src">This device has no usable camera, or the page isn't served over HTTPS.</p>
+    return openSheet(`<h3>${esc(T("No camera image"))}</h3>
+      <p class="src">${esc(T("This device has no usable camera, or the page isn't served over HTTPS."))}</p>
       ${dishPickerHTML()}
-      <button class="btn sec" data-act="close">Close</button>`);
+      <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   }
   return doDishKhung(c);
 }
@@ -1837,23 +1840,23 @@ async function doDishKhung(c) {
     const top = await Img.identifyDish(c.toDataURL("image/jpeg", 0.72), S.dishes);
     showDishGuess(top);
   } catch (e) {
-    openSheet(`<h3>Could not read the photo</h3>
+    openSheet(`<h3>${esc(T("Could not read the photo"))}</h3>
       <p class="src">${esc(e.message || String(e))}</p>
       ${dishPickerHTML()}
-      <button class="btn sec" data-act="close">Close</button>`);
+      <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   } finally {
     busy.classList.remove("on");
   }
 }
 
 const dishPickerHTML = () => `
-  <h2 class="sect">Pick the dish yourself</h2>
+  <h2 class="sect">${esc(T("Pick the dish yourself"))}</h2>
   <div class="manual" style="grid-template-columns:1fr">
     <select id="dishPick" style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;background:#fff">
       ${S.dishes.map((d) => `<option value="${esc(d.id)}">${esc(d.vi)} — ${esc(d.en || "")}</option>`).join("")}
     </select>
   </div>
-  <button class="btn pri" data-act="dishPick">See the local price</button>`;
+  <button class="btn pri" data-act="dishPick">${esc(T("See the local price"))}</button>`;
 
 /* Kết quả nhận diện. KHÔNG tự chốt một món rồi phán giá luôn: model chỉ
    đạt 71–98% ngay cả khi đã ép chọn trong danh sách, và ở đây đoán sai
@@ -1861,15 +1864,15 @@ const dishPickerHTML = () => `
    trước, app nói giá sau. */
 function showDishGuess(top) {
   if (!top.length) {
-    return openSheet(`<h3>Not a dish it knows</h3>
+    return openSheet(`<h3>${esc(T("Not a dish it knows"))}</h3>
       <p class="src">Nothing in the local list matched this photo. That doesn't mean the dish
         is unusual — the list only covers ${S.dishes.length} dishes so far.</p>
       ${dishPickerHTML()}
-      <button class="btn sec" data-act="close">Close</button>`);
+      <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   }
   openSheet(`
-    <h3>Is this what you're looking at?</h3>
-    <p class="src">Read from your photo · tap to confirm</p>
+    <h3>${esc(T("Is this what you're looking at?"))}</h3>
+    <p class="src">${esc(T("Read from your photo · tap to confirm"))}</p>
     ${wave()}
     ${top.map(({ id, confidence }) => {
       const d = dishById(id), st = stat(id);
@@ -1884,7 +1887,7 @@ function showDishGuess(top) {
       never what this seller charges. Confirm the dish, then scan the menu or enter the price
       you were quoted to get a verdict.</span></div>
     ${dishPickerHTML()}
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 function handleText(text, conf) {
@@ -2007,7 +2010,7 @@ function priceCheckHTML(place, dishId) {
     <div class="hd">
       <span class="spark" aria-hidden="true">${I.spark}</span>
       <div>
-        <h3>Price check</h3>
+        <h3>${esc(T("Price check"))}</h3>
         <p>Compared with the local range for ${esc(d.vi)}</p>
       </div>
       <span class="verdict ${inside ? "in" : "out"}">
@@ -2025,9 +2028,9 @@ function priceCheckHTML(place, dishId) {
           ${inside ? I.shield : I.trendUp}</span>
       </div>
       <div class="scale">
-        <div>Local low<b>${fmtVND(lo)}</b></div>
-        <div>Average<b>${fmtVND(mid)}</b></div>
-        <div>Local high<b>${fmtVND(hi)}</b></div>
+        <div>${esc(T("Local low"))}<b>${fmtVND(lo)}</b></div>
+        <div>${esc(T("Average"))}<b>${fmtVND(mid)}</b></div>
+        <div>${esc(T("Local high"))}<b>${fmtVND(hi)}</b></div>
       </div>
     </div>
     <p class="seedwarn">Based on ${st.n} places recorded nearby, updated ${esc(zone().updated)}.
@@ -2110,19 +2113,19 @@ function renderEat(filter = "") {
 
     <div class="fact-grid">
       <div class="fact">
-        <span class="hd"><span class="ico">${I.bowl}</span><span class="ttl">Known for</span></span>
+        <span class="hd"><span class="ico">${I.bowl}</span><span class="ttl">${esc(T("Known for"))}</span></span>
         <span class="val">${f.place.known.map((k) => esc(dishById(k)?.vi || k)).join(" · ")}</span>
         <span class="note">${esc(heroDish.en)}.</span>
       </div>
       <div class="fact">
-        <span class="hd"><span class="ico">${I.coins}</span><span class="ttl">Typical price</span></span>
-        <span class="val"><b>${fmtVND(heroStat.p25)} – ${money(heroStat.p75)}</b><br>${esc(heroDish.unit || "")}</span>
+        <span class="hd"><span class="ico">${I.coins}</span><span class="ttl">${esc(T("Typical price"))}</span></span>
+        <span class="val"><b>${moneyRange(heroStat.p25, heroStat.p75)}</b><br>${esc(heroDish.unit || "")}</span>
         <span class="note">Range recorded across ${heroStat.n} nearby places.</span>
       </div>
       <div class="fact">
-        <span class="hd"><span class="ico">${I.clock}</span><span class="ttl">Best time</span></span>
+        <span class="hd"><span class="ico">${I.clock}</span><span class="ttl">${esc(T("Best time"))}</span></span>
         <span class="val">11:00 – 13:00<br>17:30 – 19:30</span>
-        <span class="note">Local meal times — busiest at lunch and dinner.</span>
+        <span class="note">${esc(T("Local meal times — busiest at lunch and dinner."))}</span>
       </div>
     </div>
 
@@ -2130,7 +2133,7 @@ function renderEat(filter = "") {
 
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
-      <h2>Signature dishes</h2>
+      <h2>${esc(T("Signature dishes"))}</h2>
       <span class="rule" aria-hidden="true"></span>
     </div>
     <div class="dish-rail">
@@ -2138,9 +2141,8 @@ function renderEat(filter = "") {
     </div>
 
     <button class="btn save" data-act="save">${I.bookmark}Save trusted spot</button>
-    <p class="savenote">Saved places stay on this device and are easy to find later.</p>
-    ` : `<p class="muted" style="margin-top:18px">No badged place for this area yet —
-      Nón Lá needs 20 independent scans before it will recommend one.</p>`}
+    <p class="savenote">${esc(T("Saved places stay on this device and are easy to find later."))}</p>
+    ` : `<p class="muted" style="margin-top:18px">${esc(T("No badged place for this area yet — Nón Lá needs 20 independent scans before it will recommend one."))}</p>`}
 
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
@@ -2176,8 +2178,7 @@ function renderEat(filter = "") {
         : (!matchFamous.length ? `<p class="muted">Nothing matches “${esc(filter)}”.</p>` : "")}
     </div>
 
-    <p class="seedwarn">Prices shown are the local typical range, not what any one place
-      charges. Scan a menu to check a real one.</p>`;
+    <p class="seedwarn">${esc(T("Prices shown are the local typical range, not what any one place charges. Scan a menu to check a real one."))}</p>`;
 }
 
 /* ── Vì sao món này ở đây ─────────────────────────────────────
@@ -2238,12 +2239,12 @@ function showDish(id) {
     <p class="src">${esc(d.en)}${d.spice !== "none" ? ` · ${esc(d.spice)} heat` : ""}</p>
     ${wave()}
     <p class="muted" style="font-size:13.5px">${esc(d.desc)}</p>
-    <div class="tagrow">${d.tags.map((t) => `<span class="tg ${tagCls(t)}">${esc(t)}</span>`).join("")}${d.spice === "hot" ? '<span class="tg hot">Spicy</span>' : ""}</div>
-    ${st ? `<div class="card"><p class="kicker">Local price</p>
-        <p style="font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:3px">${fmtVND(st.p25)} – ${money(st.p75)}</p>
+    <div class="tagrow">${d.tags.map((t) => `<span class="tg ${tagCls(t)}">${esc(t)}</span>`).join("")}${d.spice === "hot" ? '<span class="tg hot">${esc(T("Spicy"))}</span>' : ""}</div>
+    ${st ? `<div class="card"><p class="kicker">${esc(T("Local price"))}</p>
+        <p style="font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:3px">${moneyRange(st.p25, st.p75)}</p>
         <p class="src">Typical range in ${esc(zone().name)} · ${esc(zone().updated)}${Fresh.freshness(zone().updated) === "stale" ? " · dữ liệu cũ, hãy hỏi giá tại quán" : ""}</p></div>` : ""}
     ${(() => { const h = Hints.hintFor(id, curLang());
-      return h ? `<div class="card"><p class="kicker">Before you order</p>
+      return h ? `<div class="card"><p class="kicker">${esc(T("Before you order"))}</p>
         <p>${esc(h.text)}</p>${h.source ? `<p class="src">Source: ${esc(h.source)}</p>` : ""}</div>` : ""; })()}
     ${storyHTML(d)}
     ${whyHTML(id)}
@@ -2255,7 +2256,7 @@ function showDish(id) {
     <button class="btn sec" data-act="shareThing" data-name="${esc(d.vi)}"
       data-sub="${esc(d.en)}" data-tags="${esc([d.vi, d.en].join("|"))}">
       ${I.share}Share this dish</button>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 /* Món không có toạ độ, nên khối liên kết của nó KHÔNG có phần bản đồ —
@@ -2266,11 +2267,11 @@ function dishLinksHTML(d) {
   const q = `${d.vi} ${d.en || ""}`.trim();
   const nets = socialLinks(q, [d.vi, d.en || ""]).filter((n) => n.id !== "google");
   return `
-    <h2 class="sect">See it before you order</h2>
+    <h2 class="sect">${esc(T("See it before you order"))}</h2>
     <div class="netgrid">
       ${nets.map((n) => `<a class="netchip" href="${esc(n.url)}" target="_blank"
         rel="noopener noreferrer">${I[PLATFORM_ICON[n.id]] || I.globe}<span>
-        <b>${esc(n.label)}</b><i>${esc(n.note)}</i></span></a>`).join("")}
+        <b>${esc(n.label)}</b><i>${esc(T(n.note))}</i></span></a>`).join("")}
     </div>
     <p class="seedwarn">Searches on each platform for <strong>${esc(d.vi)}</strong> — not results
       Nón Lá has checked. Portion sizes and prices in a video are whatever that shop charged
@@ -2316,7 +2317,7 @@ function whereToEat(dishId) {
     <span class="amt">${right}</span></button>`;
 
   return `
-    <h2 class="sect">Where to eat this</h2>
+    <h2 class="sect">${esc(T("Where to eat this"))}</h2>
     ${tracked.length ? tracked.map((p) => row(
       p.name,
       `${p.street || ""} · ${CoSo.dong(dgOf(p))}`,
@@ -2351,8 +2352,8 @@ function whereToEat(dishId) {
         e.at, "unknown", "—",
       )).join("")}` : ""}
 
-    ${S.me ? `<p class="src">Tap a row for walking directions from where you are.</p>`
-           : `<p class="src">Turn on location in the map to get directions from where you are.</p>`}`;
+    ${S.me ? `<p class="src">${esc(T("Tap a row for walking directions from where you are."))}</p>`
+           : `<p class="src">${esc(T("Turn on location in the map to get directions from where you are."))}</p>`}`;
 }
 
 /* ── Tab Nearby — "Explore by map" ───────────────────────
@@ -2386,7 +2387,7 @@ function alertCardHTML(p) {
       <span class="meta">${esc(p.street)} · ${esc(p.tier)} · ${esc(CoSo.dong(dgOf(p)))}</span>
       <span class="pill bad">${I.trendUp}Above range</span>
       <span class="reason" role="status">${esc(CoSo.dong(dgOf(p)))}</span>
-      <span class="known"><b>Known for</b>${known}</span>
+      <span class="known"><b>${esc(T("Known for"))}</b>${known}</span>
     </span>
   </button>`;
 }
@@ -2406,7 +2407,7 @@ function miniCardHTML(p) {
         <span style="display:block;margin-top:6px"><span class="chip-scan">${
           esc(CoSo.dong(dg))}</span></span></span>
     </span>
-    <span class="known"><b>Known for</b>${known}</span>
+    <span class="known"><b>${esc(T("Known for"))}</b>${known}</span>
   </button>`;
 }
 
@@ -2613,8 +2614,8 @@ function premiumSectionHTML() {
         <span class="prem-band">${esc(v.band || "")}</span>
         ${v.known ? `<small class="prem-known">${esc(v.known)}</small>` : ""}
         <div class="prem-links">
-          ${v.maps ? `<a href="${esc(v.maps)}" target="_blank" rel="noopener noreferrer">Maps</a>` : ""}
-          ${v.src ? `<a href="${esc(v.src)}" target="_blank" rel="noopener noreferrer">Source</a>` : ""}
+          ${v.maps ? `<a href="${esc(v.maps)}" target="_blank" rel="noopener noreferrer">${esc(T("Maps"))}</a>` : ""}
+          ${v.src ? `<a href="${esc(v.src)}" target="_blank" rel="noopener noreferrer">${esc(T("Source"))}</a>` : ""}
         </div>
       </li>`).join("")}
     </ul>`;
@@ -2653,14 +2654,13 @@ function showTrip(id) {
     <p class="muted" style="font-size:13.5px">${esc(t.blurb)}</p>
 
     <div class="todo">
-      <div><span class="ic">${I.bus}</span><b>Getting there</b><small>${esc(t.travel)}</small></div>
-      ${t.ticket ? `<div><span class="ic">${I.ticket}</span><b>Entry</b>
+      <div><span class="ic">${I.bus}</span><b>${esc(T("Getting there"))}</b><small>${esc(t.travel)}</small></div>
+      ${t.ticket ? `<div><span class="ic">${I.ticket}</span><b>${esc(T("Entry"))}</b>
         <small>${esc(t.ticket)}</small></div>` : ""}
-      <div><span class="ic">${I.spark}</span><b>Worth knowing</b><small>${esc(t.tip)}</small></div>
+      <div><span class="ic">${I.spark}</span><b>${esc(T("Worth knowing"))}</b><small>${esc(t.tip)}</small></div>
     </div>
 
-    ${inApp ? `<div class="warnbox infobox">${I.check}<span>Nón Lá has prices and a map for
-      this area. Switch to it to see the local range and the fair-price places.</span></div>
+    ${inApp ? `<div class="warnbox infobox">${I.check}<span>${esc(T("Nón Lá has prices and a map for this area. Switch to it to see the local range and the fair-price places."))}</span></div>
       <button class="btn pri" data-act="gotoZone" data-zone="${esc(t.zone)}">
         Switch to ${esc(S.prices[t.zone].en || S.prices[t.zone].name)}</button>` : ""}
 
@@ -2671,7 +2671,7 @@ function showTrip(id) {
     <p class="seedwarn">Travel times, fares and ticket prices are written down, not measured —
       treat them as the right order of magnitude, not a quote. Entry tickets in Vietnam change
       most years. The distance above is straight-line; by road it is always further.</p>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 /* Quán giờ là quán THẬT từ OpenStreetMap — hàng trăm mỗi vùng. Khay và bản đồ
@@ -2720,7 +2720,7 @@ function renderMap() {
       <span class="ex-div" aria-hidden="true"></span>
       <div class="ex-stat">
         <span class="ico bad">${I.alert}</span>
-        <span><b>${flagged.length}</b><i>Above range nearby</i></span>
+        <span><b>${flagged.length}</b><i>${esc(T("Above range nearby"))}</i></span>
       </div>
     </div>
 
@@ -2771,7 +2771,7 @@ function renderMap() {
     ${S.showAll && rest.length ? `
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
-      <h2>Everything else nearby</h2>
+      <h2>${esc(T("Everything else nearby"))}</h2>
       <span class="rule" aria-hidden="true"></span>
       <span class="note">${I.clock}Still checking…</span>
     </div>
@@ -2786,8 +2786,7 @@ function renderMap() {
           và chuyến đi trong ngày trước, bảng quán cao cấp là thứ tra cứu khi cần. */""}
     ${premiumSectionHTML()}
 
-    <p class="seedwarn">Nón Lá never calls a business dishonest. It reports how a price compares
-      with others nearby, shows the sample size, and gives owners a way to contest it.</p>`;
+    <p class="seedwarn">${esc(T("Nón Lá never calls a business dishonest. It reports how a price compares with others nearby, shows the sample size, and gives owners a way to contest it."))}</p>`;
 
   const geo = S.maps[S.zone];
   if (geo) {
@@ -2852,9 +2851,9 @@ function priceBreakdown(p) {
   const label = { bad: "Above range", ok: "In range", low: "Below range", none: "not scanned" };
   const daQuet = rows.filter((r) => r.paid != null).length;
   return `
-    <h2 class="sect">What was scanned here</h2>
+    <h2 class="sect">${esc(T("What was scanned here"))}</h2>
     <div class="pcmp">
-      <div class="pcmp-h"><span>Menu item</span><span>Local range</span><span>Scanned here</span></div>
+      <div class="pcmp-h"><span>${esc(T("Menu item"))}</span><span>${esc(T("Local range"))}</span><span>${esc(T("Scanned here"))}</span></div>
       ${rows.map((r) => `<div class="pcmp-r" data-s="${r.state}">
         <span class="it"><span class="nm">${esc(r.d.vi)}</span>
           <span class="un">${esc(r.d.unit || "")}</span></span>
@@ -2882,13 +2881,13 @@ function whatToDo(p) {
     .map((x) => ({ x, m: p.at ? distance(p.at, x.at) : Infinity }))
     .sort((a, b) => a.m - b.m).slice(0, 3);
   return `
-    <h2 class="sect">What you can do</h2>
+    <h2 class="sect">${esc(T("What you can do"))}</h2>
     <div class="todo">
-      <div><span class="ic">${I.clock}</span><b>Compare the menu</b>
-        <small>Check a few items before you order, not just one.</small></div>
-      <div><span class="ic">${I.question}</span><b>Ask before ordering</b>
-        <small>Confirm the price of set menus and anything sold by weight.</small></div>
-      <div><span class="ic">${I.shield}</span><b>Or walk a little</b>
+      <div><span class="ic">${I.clock}</span><b>${esc(T("Compare the menu"))}</b>
+        <small>${esc(T("Check a few items before you order, not just one."))}</small></div>
+      <div><span class="ic">${I.question}</span><b>${esc(T("Ask before ordering"))}</b>
+        <small>${esc(T("Confirm the price of set menus and anything sold by weight."))}</small></div>
+      <div><span class="ic">${I.shield}</span><b>${esc(T("Or walk a little"))}</b>
         <small>${alt.length ? `${alt.length} fair-price places within ${fmtDistance(alt[alt.length - 1].m)}.`
           : "No fair-price place recorded nearby yet."}</small></div>
     </div>
@@ -2994,11 +2993,11 @@ async function shareThing({ name, sub = "", tags = [] }) {
       ${nets.map((t) => `<a class="netchip" href="${esc(t.url)}" target="_blank"
         rel="noopener noreferrer">${I.share}<span><b>${esc(t.label)}</b></span></a>`).join("")}
     </div>
-    <button class="btn sec" data-act="copyShare" data-text="${esc(text)}">Copy the caption</button>
+    <button class="btn sec" data-act="copyShare" data-text="${esc(text)}">${esc(T("Copy the caption"))}</button>
     <p class="seedwarn">${off.length ? `${esc(off.join(" and "))} can only share a link to a web
       page, and this is a place, not a page — ` : ""}copy the caption and paste it into the app
       when you post.</p>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 /* ── thẻ quán: dữ liệu CÓ THẬT, không có thì nói không có ──────────── */
@@ -3021,7 +3020,7 @@ function chiTietOSM(p) {
   if (p.cuisine) rows.push(["Cuisine", esc(String(p.cuisine).replace(/_/g, " ").replace(/;/g, ", "))]);
   if (!rows.length) return "";
   return `<dl class="osminfo">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>
-    <p class="seedwarn">Source: OpenStreetMap.</p>`;
+    <p class="seedwarn">${esc(T("Source: OpenStreetMap."))}</p>`;
 }
 
 /* GIÁ THƯỜNG GẶP TRONG VÙNG cho quán chưa suy ra được món. Đây là dải giá của
@@ -3044,7 +3043,7 @@ function giaVungHTML(p) {
         <span><span class="nm">${esc(d.vi)}</span><span class="note">${esc(d.en)}</span></span>
         <span class="amt">${money(st.p50)}<small>typical</small></span>
       </button>`).join("")}
-    <p class="seedwarn">Area prices — not this place's own menu.</p>`;
+    <p class="seedwarn">${esc(T("Area prices — not this place's own menu."))}</p>`;
 }
 
 function showPlace(id, metres = null) {
@@ -3070,8 +3069,7 @@ function showPlace(id, metres = null) {
     ${compassHTML(p)}
     ${chiTietOSM(p)}
     ${wave()}
-    ${dg.muc === "high" ? `<div class="warnbox">${I.alert}<span>Worth checking a few
-      items against the menu before you order — and this says nothing about the food.</span></div>` : ""}
+    ${dg.muc === "high" ? `<div class="warnbox">${I.alert}<span>${esc(T("Worth checking a few items against the menu before you order — and this says nothing about the food."))}</span></div>` : ""}
     ${dg.muc === null ? `<div class="warnbox infobox">${I.clock}<span>${
       dg.n ? `${dg.n}/${CoSo.MIN_QUAN_SAT} scans here so far.`
            : `No menu scans here yet — ${CoSo.MIN_QUAN_SAT} needed for a price badge.`}</span></div>` : ""}
@@ -3079,7 +3077,7 @@ function showPlace(id, metres = null) {
       esc(T("Price conditions this place declared"))}</button>
     ${priceBreakdown(p)}
     ${whatToDo(p)}
-    ${p.known.length ? `<h2 class="sect">Known for</h2>` : giaVungHTML(p)}
+    ${p.known.length ? `<h2 class="sect">${esc(T("Known for"))}</h2>` : giaVungHTML(p)}
     ${p.known.map((k) => {
       const d = dishById(k), st = stat(k);
       return `<button class="row" data-dish="${esc(k)}">
@@ -3098,8 +3096,8 @@ function showPlace(id, metres = null) {
       data-tags="${esc((p.known || []).map((k) => dishById(k)?.vi || k).join("|"))}">
       ${I.share}Share this place</button>
     <div id="placeCommunity"></div>
-    <button class="btn sec" data-act="review" data-place="${esc(p.id)}">Write a review</button>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="review" data-place="${esc(p.id)}">${esc(T("Write a review"))}</button>
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   // Nạp sau khi thẻ đã mở: chờ mạng xong mới vẽ thẻ thì người dùng nhìn màn
   // hình đứng yên sau cú chạm, mà phần quan trọng nhất — giá và Đúng Giá —
   // vốn đã có sẵn trong máy.
@@ -3143,7 +3141,7 @@ async function paintPlaceCommunity(place) {
   if (!Cloud.ready()) {
     THREAD_EXTRA.splice(0, THREAD_EXTRA.length, ...posts);
     host.innerHTML = posts.length ? `
-      <h2 class="sect">Your notes here</h2>
+      <h2 class="sect">${esc(T("Your notes here"))}</h2>
       ${posts.map((p) => `<div class="cnote-mine">
         ${p.photo ? `<img src="${img(p)}" alt="" loading="lazy">` : ""}
         <div>
@@ -3151,12 +3149,10 @@ async function paintPlaceCommunity(place) {
             p.paidVnd ? ` · paid ${fmtVND(p.paidVnd)}` : ""}${
             Number.isFinite(p.stars) ? ` · ${"★".repeat(p.stars)}` : ""}</span>
           ${p.body ? `<p class="muted" style="font-size:13px">${esc(p.body)}</p>` : ""}
-          <button class="ccomments" data-cthread="${esc(String(p.id))}"><span>Add a note underneath</span></button>
+          <button class="ccomments" data-cthread="${esc(String(p.id))}"><span>${esc(T("Add a note underneath"))}</span></button>
         </div>
       </div>`).join("")}
-      <p class="seedwarn">Kept on this phone only. Nothing here has been sent anywhere,
-        and it never touches the price verdicts above — those come from the reference
-        range, not from what you wrote.</p>` : "";
+      <p class="seedwarn">${esc(T("Kept on this phone only. Nothing here has been sent anywhere, and it never touches the price verdicts above — those come from the reference range, not from what you wrote."))}</p>` : "";
     return;
   }
 
@@ -3170,14 +3166,14 @@ async function paintPlaceCommunity(place) {
     ${s.show ? `<p class="src">${s.avg.toFixed(1)} ★ · ${s.count} ratings from travellers</p>` : ""}
     ${shots.length ? `<div class="cshots">${shots.map((p) =>
       `<img src="${img(p)}" alt="" loading="lazy">`).join("")}</div>` : ""}
-    <h2 class="sect">Discussion about this place</h2>
+    <h2 class="sect">${esc(T("Discussion about this place"))}</h2>
     ${luong.length ? luong.map((p) => `<button class="row" data-cthread="${esc(String(p.id))}">
         <span><span class="nm">${esc(p.authorName)}${p.paidVnd ? ` · paid ${fmtVND(p.paidVnd)}` : ""}</span>
           <span class="note">${esc((p.body || "No note").slice(0, 90))}</span></span>
         <span class="amt">${p.commentCount == null ? "" : `${p.commentCount}<small>comment${p.commentCount === 1 ? "" : "s"}</small>`}</span>
       </button>`).join("")
-      : `<p class="muted" style="font-size:13px">No posts yet.</p>`}
-    <button class="btn sec" data-cact="compose" data-place="${esc(place.id)}">Post about this place</button>`;
+      : `<p class="muted" style="font-size:13px">${esc(T("No posts yet."))}</p>`}
+    <button class="btn sec" data-cact="compose" data-place="${esc(place.id)}">${esc(T("Post about this place"))}</button>`;
 
   // Giá cộng đồng hiện SONG SONG với giá hạt giống, không thay nó. Một người
   // gõ nhầm một số không không được phép kéo lệch phán quyết của cả app.
@@ -3223,8 +3219,7 @@ function taxSectionHTML() {
           <span class="js">${d.dearer} of ${d.seen} places</span>
           <b data-l="${d.ratio > 1.05 ? "high" : d.ratio < 0.95 ? "low" : "same"}">${pc(d.ratio)}</b>
         </div>`).join("")}
-      </div>` : `<p class="js">Compare a few more places and the dishes that
-        move most will be listed here.</p>`}
+      </div>` : `<p class="js">${esc(T("Compare a few more places and the dishes that move most will be listed here."))}</p>`}
     </div>`;
 }
 
@@ -3241,10 +3236,10 @@ function renderJournal() {
 
   $("#journalBody").innerHTML = `
     ${crest(wrap(birdStanding(GOLD, THEN), "-16 -10 200 165"), 112, -4, -14)}
-    <p class="kicker">Your trip</p>
-    <h1 class="title">Journal</h1>
+    <p class="kicker">${esc(T("Your trip"))}</p>
+    <h1 class="title">${esc(T("Journal"))}</h1>
     ${all.length === 0
-      ? `<p class="muted" style="margin-top:14px">Nothing yet. Every scan you make writes itself in here — dishes, prices, places — and you can export it when you get home.</p>`
+      ? `<p class="muted" style="margin-top:14px">${esc(T("Nothing yet. Every scan you make writes itself in here — dishes, prices, places — and you can export it when you get home."))}</p>`
       : `<div class="jstat">
           <div><small>DISHES</small><b>${dishes}</b></div>
           <div><small>FAIR PRICE</small><b>${fair}/${all.length}</b></div>
@@ -3258,8 +3253,8 @@ function renderJournal() {
             <span class="ja">${fmtVND(e.price)}</span>
           </div>`).join("")}`).join("")}
         ${taxSectionHTML()}
-        <button class="btn sec" data-act="export" style="border-color:rgba(201,162,39,.4);color:#EDE4D2">Export as text</button>
-        <button class="btn sec" data-act="clearJournal" style="border-color:rgba(201,162,39,.25);color:#A99B80">Clear journal</button>`}`;
+        <button class="btn sec" data-act="export" style="border-color:rgba(201,162,39,.4);color:#EDE4D2">${esc(T("Export as text"))}</button>
+        <button class="btn sec" data-act="clearJournal" style="border-color:rgba(201,162,39,.25);color:#A99B80">${esc(T("Clear journal"))}</button>`}`;
 }
 
 /* ── màn hình: Tôi ────────────────────────────────────────── */
@@ -3284,7 +3279,7 @@ function iconStudioHTML() {
         (CORS, firewall or offline). Using the built-in hand-drawn icons — everything still works.</p>`
     : ready
       ? `<p class="src" role="status">${c.done}/${c.total} drawn${c.fail ? ` · ${c.fail} failed` : ""}${c.run ? ` · ${c.run} in queue` : ""}</p>`
-      : `<p class="src">No key yet — the map uses the built-in hand-drawn icons. Everything works without this.</p>`;
+      : `<p class="src">${esc(T("No key yet — the map uses the built-in hand-drawn icons. Everything works without this."))}</p>`;
 
   const cell = (it) => {
     const url = Img.iconOf(it.key);
@@ -3337,9 +3332,9 @@ function iconStudioHTML() {
         style="border:1px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;background:#fff;margin-top:8px">
     </div>
     <div class="ic-actions">
-      <button class="btn sec" data-act="aiSave">Use this key</button>
+      <button class="btn sec" data-act="aiSave">${esc(T("Use this key"))}</button>
       <button class="btn sec" data-act="aiGen"${ready ? "" : " disabled"}>Draw all (${c.total})</button>
-      ${c.done ? `<button class="btn sec" data-act="aiClear">Delete saved</button>` : ""}
+      ${c.done ? `<button class="btn sec" data-act="aiClear">${esc(T("Delete saved"))}</button>` : ""}
     </div>
     ${note}
     ${/* Số ảnh là số lần gọi API, tức là tiền. Nói ra trước khi người dùng
@@ -3348,7 +3343,7 @@ function iconStudioHTML() {
       <b>${c.total} calls</b> — check your provider's per-image price first.</p>
     ${sections}
     <p class="src" style="margin-top:10px">The key stays in memory for this session only —
-      reload and you'll enter it again. <b>Images are saved to this device</b> and reloaded
+      reload and you'll enter it again. <b>${esc(T("Images are saved to this device"))}</b> and reloaded
       next time, so you only pay for each one once. They're stored shrunk, not at full size.</p>
   </div>`;
 }
@@ -3368,24 +3363,21 @@ function accountHTML() {
        gắn lên bài trong sổ tay riêng. Bỏ ô đó đi thì mọi bài ký tên "You"
        và người dùng không có cách nào sửa. */
     return `<div class="card" id="acct">
-      <p class="src">Accounts are off. Everything else on this screen works without
-        one — scans, map and journal all live on this device.</p>
+      <p class="src">${esc(T("Accounts are off. Everything else on this screen works without one — scans, map and journal all live on this device."))}</p>
       <div class="manual" style="grid-template-columns:1fr">
         <input id="localName" maxlength="32" placeholder="Display name"
           value="${esc(Local.name())}">
       </div>
-      <button class="btn sec" data-act="saveLocalName">Save this name</button>
-      <p class="src">Used on anything you write in Community. It stays on this phone.</p>
+      <button class="btn sec" data-act="saveLocalName">${esc(T("Save this name"))}</button>
+      <p class="src">${esc(T("Used on anything you write in Community. It stays on this phone."))}</p>
       <div class="manual" style="grid-template-columns:1fr;margin-top:12px">
         <input id="sbUrl" type="url" inputmode="url" autocomplete="off"
           placeholder="https://xxxx.supabase.co">
         <input id="sbKey" type="password" autocomplete="off"
           placeholder="anon public key" style="margin-top:8px">
       </div>
-      <button class="btn sec" data-act="authCfg">Connect a Supabase project</button>
-      <p class="src">Project URL and anon key are public values — they ship in every
-        web build. Security comes from Row Level Security on the server, not from
-        hiding them.</p>
+      <button class="btn sec" data-act="authCfg">${esc(T("Connect a Supabase project"))}</button>
+      <p class="src">${esc(T("Project URL and anon key are public values — they ship in every web build. Security comes from Row Level Security on the server, not from hiding them."))}</p>
     </div>`;
   }
 
@@ -3401,17 +3393,17 @@ function accountHTML() {
         <input id="acctName" placeholder="Display name" value="${esc(p?.name || "")}">
       </div>
       <div class="ic-actions">
-        <button class="btn sec" data-act="authSave"${stale ? " disabled" : ""}>Save name</button>
-        <button class="btn sec" data-act="authOut">Sign out</button>
+        <button class="btn sec" data-act="authSave"${stale ? " disabled" : ""}>${esc(T("Save name"))}</button>
+        <button class="btn sec" data-act="authOut">${esc(T("Sign out"))}</button>
       </div>
-      ${stale ? `<p class="src">Showing your saved profile. Reconnect to sync.</p>` : `
+      ${stale ? `<p class="src">${esc(T("Showing your saved profile. Reconnect to sync."))}</p>` : `
       <div class="pw-box">
-        <h3 class="pw-h">Change password</h3>
+        <h3 class="pw-h">${esc(T("Change password"))}</h3>
         <div class="manual" style="grid-template-columns:1fr">
           <input id="pwNew" type="password" autocomplete="new-password" minlength="6" placeholder="New password (6+ characters)">
           <input id="pwNew2" type="password" autocomplete="new-password" minlength="6" placeholder="Repeat new password" style="margin-top:8px">
         </div>
-        <button class="btn sec" data-act="pwChange" style="margin-top:8px">Change password</button>
+        <button class="btn sec" data-act="pwChange" style="margin-top:8px">${esc(T("Change password"))}</button>
       </div>`}
     </div>`;
   }
@@ -3421,8 +3413,7 @@ function accountHTML() {
        ĐÚNG chỗ nghẽn thay vì hiện một form bấm vào là hỏng. */
     const c = Auth.mayChu();
     return `<div class="card" id="acct">
-      <p class="src">Sign-in is not available on this build yet. Scans, map and journal
-        all work without it — they live on this device.</p>
+      <p class="src">${esc(T("Sign-in is not available on this build yet. Scans, map and journal all work without it — they live on this device."))}</p>
       <div class="warnbox infobox">${I.clock}<span>${
         !c ? "Could not reach the project server."
            : c.canXacNhan ? "The project asks for email confirmation, and its mail service cannot send to addresses outside the project team yet."
@@ -3432,13 +3423,13 @@ function accountHTML() {
         <input id="localName" maxlength="32" placeholder="Display name"
           value="${esc(Local.name())}">
       </div>
-      <button class="btn sec" data-act="saveLocalName">Save this name</button>
-      <button class="btn sec" data-act="authForget">Disconnect project</button>
+      <button class="btn sec" data-act="saveLocalName">${esc(T("Save this name"))}</button>
+      <button class="btn sec" data-act="authForget">${esc(T("Disconnect project"))}</button>
     </div>`;
   }
 
   return `<div class="card" id="acct">
-    <p class="src">Optional — sign in to carry your journal and saved dishes between devices.</p>
+    <p class="src">${esc(T("Optional — sign in to carry your journal and saved dishes between devices."))}</p>
     <div class="manual" style="grid-template-columns:1fr">
       <input id="acctEmail" type="email" inputmode="email" autocomplete="username" placeholder="Email">
       <input id="acctPass" type="password" autocomplete="current-password"
@@ -3448,11 +3439,11 @@ function accountHTML() {
     </div>
     <div class="ic-actions">
       <button class="btn pri" data-act="authIn"${busy ? " disabled" : ""}>${busy ? "Working…" : "Sign in"}</button>
-      <button class="btn sec" data-act="authUp"${busy ? " disabled" : ""}>Create account</button>
+      <button class="btn sec" data-act="authUp"${busy ? " disabled" : ""}>${esc(T("Create account"))}</button>
     </div>
     ${err ? `<div class="warnbox">${I.alert}<span>${esc(err)}</span></div>` : ""}
-    <button class="btn sec" data-act="pwForgot">Forgot password?</button>
-    <button class="btn sec" data-act="authForget">Disconnect project</button>
+    <button class="btn sec" data-act="pwForgot">${esc(T("Forgot password?"))}</button>
+    <button class="btn sec" data-act="authForget">${esc(T("Disconnect project"))}</button>
   </div>`;
 }
 
@@ -3510,7 +3501,7 @@ function renderSplit() {
   setEdge(null);
   openSheet(`
     <h3>${esc(T("Split the bill"))}</h3>
-    <p class="src">Tap the numbers on a line to say who had it</p>
+    <p class="src">${esc(T("Tap the numbers on a line to say who had it"))}</p>
     ${wave()}
 
     <div class="sp-n" role="group" aria-label="How many people">
@@ -3534,14 +3525,12 @@ function renderSplit() {
       ${per.map((v, i) => `<div class="sp-p"><span>${i + 1}</span><b>${fmtVND(v)}</b></div>`).join("")}
     </div>
     <div class="row" style="border-top:1px solid var(--line);margin-top:6px">
-      <span></span><span class="nm">Bill total</span><span class="amt">${fmtVND(total)}</span></div>
+      <span></span><span class="nm">${esc(T("Bill total"))}</span><span class="amt">${fmtVND(total)}</span></div>
     ${/* Câu này phải có: người ta sẽ đối chiếu tổng bốn suất với tờ hoá
           đơn ngay tại bàn, và nếu lệch mà app không nói trước thì họ mất
           niềm tin vào cả những con số khác. */""}
-    <p class="muted" style="margin-top:8px">Shares are rounded down to 1.000₫ and the
-      remainder goes to the first person on each line, so the four shares always add up
-      to the bill exactly.</p>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <p class="muted" style="margin-top:8px">${esc(T("Shares are rounded down to 1.000₫ and the remainder goes to the first person on each line, so the four shares always add up to the bill exactly."))}</p>
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 
 /* ── cảnh báo khi đi ngang một chỗ giá cao ────────────────────
@@ -3843,17 +3832,17 @@ async function buildPriceTable() {
   const dn = (id) => dishById(id)?.vi || id;
   setEdge(null);
   openSheet(`
-    <h3>Price table from your survey</h3>
+    <h3>${esc(T("Price table from your survey"))}</h3>
     <p class="src">${changed.length} dish${changed.length === 1 ? "" : "es"} ready
       · ${pending.length} still collecting</p>
     ${wave()}
-    ${changed.length ? `<h2 class="sect">Would change</h2>
+    ${changed.length ? `<h2 class="sect">${esc(T("Would change"))}</h2>
       ${changed.map((c) => `<div class="row">
         <span><span class="nm">${esc(dn(c.dishId))}</span>
           <span class="note">${esc(S.prices[c.zone]?.en || c.zone)} · ${c.n} samples</span></span>
         <span class="amt">${c.from ? fmtVND(c.from) : "—"} → ${fmtVND(c.to)}</span>
       </div>`).join("")}` : ""}
-    ${pending.length ? `<h2 class="sect">Not enough samples yet</h2>
+    ${pending.length ? `<h2 class="sect">${esc(T("Not enough samples yet"))}</h2>
       ${pending.map((p) => `<div class="row">
         <span><span class="nm">${esc(dn(p.dishId))}</span>
           <span class="note">${esc(S.prices[p.zone]?.en || p.zone)}</span></span>
@@ -3866,12 +3855,12 @@ async function buildPriceTable() {
       range${changed.length === 1 ? "" : "s"} replace the shipped estimates on
       <b>this phone only</b>, and stay through updates. You can put the shipped
       ones back at any time in You → Your data.</div></div>
-    <button class="btn pri" data-act="surveyApply">Use these prices here</button>` : ""}
+    <button class="btn pri" data-act="surveyApply">${esc(T("Use these prices here"))}</button>` : ""}
     <div class="warnbox infobox">${I.shield}<span>Downloading gives you a full
       <code>prices.json</code> to send back, so everyone else gets these numbers
       too — that needs a redeploy, which this app cannot do to itself.</span></div>
-    <button class="btn sec" data-act="surveyDownload">Download prices.json</button>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="surveyDownload">${esc(T("Download prices.json"))}</button>
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
   S._builtPrices = doc;
   S._builtChanged = changed;
 }
@@ -3949,12 +3938,12 @@ function dataHTML() {
   /* Ba trạng thái, ba câu khác nhau. Gộp thành một câu "đồng bộ khi đăng
      nhập" là để người dùng đoán xem mình đang ở trạng thái nào. */
   const cloud = !Auth.isConfigured()
-    ? { cls: "", txt: `<b>This phone only.</b> No server is connected to this build, so
+    ? { cls: "", txt: `<b>${esc(T("This phone only."))}</b> No server is connected to this build, so
         nothing here has ever left the device.` }
     : !Auth.signedIn()
-    ? { cls: "", txt: `<b>This phone only.</b> Sign in above and your history starts
+    ? { cls: "", txt: `<b>${esc(T("This phone only."))}</b> Sign in above and your history starts
         syncing — and comes back if you reinstall or switch phones.` }
-    : { cls: "ok", txt: `<b>Syncing to your account.</b> ${st && st.pending
+    : { cls: "ok", txt: `<b>${esc(T("Syncing to your account."))}</b> ${st && st.pending
         ? `${st.pending} entr${st.pending === 1 ? "y" : "ies"} still waiting to send.`
         : "Everything here is on the server too."}${S.sync.at
         ? ` Last sync ${new Date(S.sync.at).toLocaleTimeString("en-GB",
@@ -3969,13 +3958,13 @@ function dataHTML() {
   return `<div class="card dcard">
     <div class="dgrid">
       ${rows}
-      <div class="drow tot"><span>Total kept</span><b>${st ? st.total : dash}</b></div>
+      <div class="drow tot"><span>${esc(T("Total kept"))}</span><b>${st ? st.total : dash}</b></div>
       ${/* navigator.storage.estimate() đo CẢ ORIGIN: tile bản đồ, tranh
             món, cache của service worker — không phải riêng lịch sử. Đặt
             nhãn "On this device" cạnh bảng đếm lịch sử là để người dùng
             đọc ra "36 MB nhật ký", rồi hoảng. Nói đúng nó là gì. */""}
-      <div class="drow"><span>App storage in total</span><b>${st ? fmtBytes(st.usage) : dash}</b></div>
-      <div class="drow"><span>First entry</span><b>${st ? when(st.first) : dash}</b></div>
+      <div class="drow"><span>${esc(T("App storage in total"))}</span><b>${st ? fmtBytes(st.usage) : dash}</b></div>
+      <div class="drow"><span>${esc(T("First entry"))}</span><b>${st ? when(st.first) : dash}</b></div>
     </div>
 
     ${/* LUÔN dùng infobox. .warnbox trần là kiểu cảnh báo nền hồng chữ
@@ -3995,8 +3984,7 @@ function dataHTML() {
     <button class="btn sec" data-act="gkOpen" style="margin-top:12px">${esc(T("Record a deal"))}</button>
     <button class="btn sec" data-act="addPlaceOpen" style="margin-top:12px">${esc(T("Add a place that is missing"))}</button>
     ${contribHTML()}
-    <p class="src" style="margin-top:6px">Every reference price in this build is an
-      estimate, not a field survey. This is how you replace them with real ones.</p>
+    <p class="src" style="margin-top:6px">${esc(T("Every reference price in this build is an estimate, not a field survey. This is how you replace them with real ones."))}</p>
 
     ${/* Phần đè giá phải HIỆN RA ở đây, kèm đường hoàn nguyên. Người dùng
           vừa được trao quyền thay số tiền mà app nói ra — một thay đổi vô
@@ -4019,7 +4007,7 @@ function dataHTML() {
     ${/* Nút xoá đứng RIÊNG và ở cuối, không xếp cạnh hai nút kia: nó là
           việc không hoàn tác được, và một nút không hoàn tác được nằm
           ngang hàng với "Tải về" là một cái bẫy ngón tay. */""}
-    <button class="btn sec danger" data-act="dataWipe" style="margin-top:8px">Erase my history</button>
+    <button class="btn sec danger" data-act="dataWipe" style="margin-top:8px">${esc(T("Erase my history"))}</button>
     <p class="src" style="margin-top:8px">Downloads a JSON file with every entry above.
       Erasing removes it from this phone${Auth.signedIn() ? " and from your account" : ""},
       and cannot be undone. Your written notes are kept separately and are not touched.
@@ -4134,17 +4122,16 @@ function renderMe() {
       </div>
       <h1 class="you-name">${nm ? esc(nm) : "You"}</h1>
       <p class="you-where">${I.pinSm}${esc(zoneEn())}</p>
-      <p class="you-lede">Your trip, counted on your own phone. Every scan you add
-        makes the next price easier to read.</p>
+      <p class="you-lede">${esc(T("Your trip, counted on your own phone. Every scan you add makes the next price easier to read."))}</p>
     </header>
 
     <div class="you-stats">
       <div class="you-stat"><span class="ic" data-t="a" aria-hidden="true">${I.camera}</span>
-        <b>${st.scans}</b><small>Scans</small></div>
+        <b>${st.scans}</b><small>${esc(T("Scans"))}</small></div>
       <div class="you-stat"><span class="ic" data-t="b" aria-hidden="true">${I.bowl}</span>
-        <b>${st.dishes}</b><small>Dishes</small></div>
+        <b>${st.dishes}</b><small>${esc(T("Dishes"))}</small></div>
       <div class="you-stat"><span class="ic" data-t="c" aria-hidden="true">${I.speech}</span>
-        <b>${st.notes == null ? "—" : st.notes}</b><small>Notes shared</small></div>
+        <b>${st.notes == null ? "—" : st.notes}</b><small>${esc(T("Notes shared"))}</small></div>
     </div>
     <p class="you-note">${I.spark}<span>${record}</span></p>
 
@@ -4152,7 +4139,7 @@ function renderMe() {
 
     <div class="sect-row">
       <span class="spark" aria-hidden="true">${I.spark}</span>
-      <h2>Achievements</h2>
+      <h2>${esc(T("Achievements"))}</h2>
       <span class="rule" aria-hidden="true"></span>
       <span class="act">${earned}/${BADGES.length}</span>
     </div>
@@ -4477,7 +4464,7 @@ const likelyDishesHTML = anToan(function (e) {
         <span><span class="nm">${esc(d?.vi || id)}</span>
           <span class="note">${esc(d?.en || "")} · ${esc(T("from the name"))}${
             confidence < 0.9 ? ` · ${esc(T("less sure"))}` : ""}</span></span>
-        <span class="amt">${st ? `${money(st.p25)}–${money(st.p75)}` : "—"}<small>${
+        <span class="amt">${st ? moneyRange(st.p25, st.p75) : "—"}<small>${
           esc(T("local range"))}</small></span>
       </button>`;
     }).join("")}
@@ -4497,7 +4484,7 @@ async function ratingBlock(e) {
       <span class="grate-t">${esc(T("on Google"))} · ${r.luot.toLocaleString()} ${esc(T("reviews"))}</span>
       ${tag === "good" ? `<span class="pill ok">${esc(T("Well reviewed"))}</span>`
         : tag === "few" ? `<span class="pill unknown">${esc(T("Few reviews"))}</span>` : ""}
-      ${r.uri ? `<a class="grate-l" href="${esc(r.uri)}" target="_blank" rel="noopener noreferrer">Google Maps</a>` : ""}
+      ${r.uri ? `<a class="grate-l" href="${esc(r.uri)}" target="_blank" rel="noopener noreferrer">${esc(T("Google Maps"))}</a>` : ""}
     </div>
     <p class="seedwarn">${esc(T("Rating and review count from Google, shown as Google reports them. Nón Lá does not score places."))}</p>`;
 }
@@ -4521,16 +4508,13 @@ function showEatery(e, metres = null) {
     ${compassHTML(e)}
     ${wave()}
     ${likelyDishesHTML(e)}
-    ${e.hours ? `<h2 class="sect">Opening hours</h2>
+    ${e.hours ? `<h2 class="sect">${esc(T("Opening hours"))}</h2>
       <p class="muted">${esc(e.hours)}</p>` : ""}
-    ${e.veg ? `<div class="warnbox infobox">${I.check}<span>Tagged as serving
-      vegetarian food.</span></div>` : ""}
+    ${e.veg ? `<div class="warnbox infobox">${I.check}<span>${esc(T("Tagged as serving vegetarian food."))}</span></div>` : ""}
 
-    <div class="warnbox infobox">${I.clock}<span>Nón Lá has never scanned a menu here, so it
-      has nothing to say about this place's prices — and nothing to say about whether the
-      food is good. Scan a menu to start a record.</span></div>
+    <div class="warnbox infobox">${I.clock}<span>${esc(T("Nón Lá has never scanned a menu here, so it has nothing to say about this place's prices — and nothing to say about whether the food is good. Scan a menu to start a record."))}</span></div>
 
-    ${tracked ? `<h2 class="sect">Tracked as</h2>
+    ${tracked ? `<h2 class="sect">${esc(T("Tracked as"))}</h2>
       <button class="row" data-place="${esc(tracked.id)}">
         <span class="dot" data-l="${CoSo.nhan(dgOf(tracked)).lvl}"></span>
         <span><span class="nm">${esc(tracked.name)}</span>
@@ -4545,7 +4529,7 @@ function showEatery(e, metres = null) {
       tags: [e.name, e.cuisine || ""] })}
     <p class="seedwarn">Name, address and position from OpenStreetMap contributors (ODbL),
       not from Nón Lá. Details can be out of date — shops in the old town change hands often.</p>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 
   ratingBlock(e);
 }
@@ -4622,8 +4606,7 @@ function showMark(lm, metres = null) {
           <span class="note">${esc(p.known.map((k) => dishById(k)?.vi || k).join(" · ")) || "—"}</span></span>
         <span class="amt">${fmtDistance(m)}<small>away</small></span>
       </button>`).join("")}`
-      : `<div class="warnbox infobox">${I.clock}<span>No place near this sight is being
-        tracked yet. That means no price data — not that the food here is bad.</span></div>`}
+      : `<div class="warnbox infobox">${I.clock}<span>${esc(T("No place near this sight is being tracked yet. That means no price data — not that the food here is bad."))}</span></div>`}
 
     ${ungxuHTML(lm)}
     ${outsideHTML({ name: lm.n, at: lm.at, kind: "sight", addr: lm.en || "",
@@ -4633,12 +4616,12 @@ function showMark(lm, metres = null) {
       ${I.share}Share this sight</button>
     <p class="seedwarn">Nón Lá does not rank sights or recommend restaurants. ${
       lm.src === "osm" && lm.neo
-        ? `OpenStreetMap has no separate point for this, so it is anchored to ${esc(lm.neo)} (<b>OpenStreetMap</b> ${esc(lm.osm || "")})`
+        ? `OpenStreetMap has no separate point for this, so it is anchored to ${esc(lm.neo)} (<b>${esc(T("OpenStreetMap"))}</b> ${esc(lm.osm || "")})`
         : lm.src === "osm"
-          ? `This position comes from <b>OpenStreetMap</b> (${esc(lm.osm || "")})`
+          ? `This position comes from <b>${esc(T("OpenStreetMap"))}</b> (${esc(lm.osm || "")})`
           : "This position is a <b>hand-placed estimate</b>, not a survey"
     } — good enough to orient by, not to navigate by.</p>
-    <button class="btn sec" data-act="close">Close</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
 }
 /* Mở tuyến đi bộ của vùng đang chọn. Vùng nào chưa có tuyến thì nói thẳng,
    không mở ra một màn hình trống rồi để người dùng tự đoán. */
@@ -4686,7 +4669,7 @@ function syncStaticText() {
 function renderTabs() {
   syncStaticText();
   $("#tabbar").innerHTML = TABS.map((t) => t.id === "scan"
-    ? `<button class="scanbtn" id="scanBtn" aria-label="Scan">${sunStar(25, GOLD)}</button>`
+    ? `<button class="scanbtn" id="scanBtn" aria-label="Scan"><img src="icon-192.png" alt="" width="68" height="68" decoding="async"></button>`
     : `<button class="tab" data-tab="${t.id}"${S.tab === t.id ? ' aria-current="page"' : ""}>
         <svg viewBox="0 0 20 20" aria-hidden="true">${t.icon}</svg><span>${esc(T(t.label))}</span></button>`).join("");
 }
@@ -4730,12 +4713,12 @@ const REASONS = [
 async function reportPost(id) {
   if (!(await needAuth())) return;
   openSheet(`
-    <h3>Report this post</h3>
-    <p class="src">Reports are private. Nobody, including us, can see who sent one.</p>
+    <h3>${esc(T("Report this post"))}</h3>
+    <p class="src">${esc(T("Reports are private. Nobody, including us, can see who sent one."))}</p>
     ${REASONS.map(([v, label]) =>
       `<button class="row" data-report="${esc(id)}" data-reason="${esc(v)}">
         <span><span class="nm">${esc(label)}</span></span></button>`).join("")}
-    <button class="btn sec" data-act="close">Cancel</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Cancel"))}</button>`);
 }
 
 /* app.js chưa có helper bận/rảnh — hai chỗ trong ocr() bật tắt #busy bằng tay.
@@ -4795,7 +4778,7 @@ const THREAD_EXTRA = [];
 async function openThread(id) {
   const post = Community.findPost(id, THREAD_EXTRA);
   if (!post) return toast(T("That post is no longer here"));
-  openSheet(`<h3>Discussion</h3><p class="src">Loading…</p>`);
+  openSheet(`<h3>${esc(T("Discussion"))}</h3><p class="src">Loading…</p>`);
   const t = await Community.loadThread(post);
   openSheet(Community.threadHtml(post, t));
 }
@@ -4849,12 +4832,12 @@ async function deleteComment(id, local) {
 async function reportComment(id) {
   if (!(await needAuth())) return;
   openSheet(`
-    <h3>Report this comment</h3>
-    <p class="src">Reports are private. Three reports from different people hide a comment.</p>
+    <h3>${esc(T("Report this comment"))}</h3>
+    <p class="src">${esc(T("Reports are private. Three reports from different people hide a comment."))}</p>
     ${REASONS.map(([v, label]) =>
       `<button class="row" data-ccid="${esc(id)}" data-ccreason="${esc(v)}">
         <span><span class="nm">${esc(label)}</span></span></button>`).join("")}
-    <button class="btn sec" data-act="close">Cancel</button>`);
+    <button class="btn sec" data-act="close">${esc(T("Cancel"))}</button>`);
 }
 
 async function sendCommentReport(id, reason) {
@@ -5631,10 +5614,10 @@ document.addEventListener("click", async (ev) => {
     if (!c) return toast(T("Take the photo again in Dish mode"));
     closeSheet();
     if (!Img.hasKey() && !(await Img.mayChuNhanMon())) {
-      return openSheet(`<h3>Dish recognition is not on yet</h3>
-        <p class="src">You can still pick the dish by hand.</p>
+      return openSheet(`<h3>${esc(T("Dish recognition is not on yet"))}</h3>
+        <p class="src">${esc(T("You can still pick the dish by hand."))}</p>
         ${dishPickerHTML()}
-        <button class="btn sec" data-act="close">Close</button>`);
+        <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`);
     }
     return doDishKhung(c);
   }

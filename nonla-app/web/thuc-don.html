@@ -125,7 +125,7 @@ document.title = T("Read a menu") + " — Nón Lá";
 const $ = (s) => document.querySelector(s);
 const DON_VI_CHON = Object.keys(DON_VI).filter((u) => u !== "thoigia");
 const NGON_NGU_CHUA_DICH = ["ru", "fr", "th", "ms", "de"];
-const diemAnh = () => /\.vercel\.app$/.test(location.hostname) ? "/api/dichthucdon" : "https://nonla-app.vercel.app/api/dichthucdon";
+const diemAnh = () => /\.(vercel\.app|pages\.dev)$/.test(location.hostname) ? "/api/dichthucdon" : "https://nonla-etm.pages.dev/api/dichthucdon";
 const CAY_NHAN = { none: "not spicy", mild: "mild", medium: "medium", hot: "Hot" };
 
 let dishes = [];

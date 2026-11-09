@@ -58,5 +58,5 @@ export function docKetQuaNhanMon(raw, dishes) {
    Origin và chỉ nhận các tên miền của app. */
 export function diemNhanMon(loc = globalThis.location) {
   const host = loc?.hostname || "";
-  return /\.vercel\.app$/.test(host) ? "/api/nhan-mon" : "https://nonla-app.vercel.app/api/nhan-mon";
+  return /\.(vercel\.app|pages\.dev)$/.test(host) ? "/api/nhan-mon" : "https://nonla-etm.pages.dev/api/nhan-mon";
 }

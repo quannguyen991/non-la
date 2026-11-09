@@ -22,6 +22,7 @@
 import * as AnhMap from "./anhmap.js";
 import { CATEGORIES, CATEGORY_COLOR, categoryLabel, muaAnh } from "./posts.js";
 import { distance } from "./geo.js";
+import { t as T } from "./i18n.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -51,28 +52,28 @@ const writeSaved = (set) => { try { localStorage.setItem(SAVED_KEY, JSON.stringi
 function html({ showDots, chips, kicker, placeholder }) {
   return `
     <div class="pm-top">
-      <button id="pmBack" class="pm-round" type="button" aria-label="Back to Community">${I.back}</button>
+      <button id="pmBack" class="pm-round" type="button" aria-label="${esc(T("Back"))}">${I.back}</button>
       <label class="pm-search">${I.search}
-        <input id="pmQ" type="search" enterkeyhint="search" autocomplete="off" placeholder="${esc(placeholder)}" aria-label="Search the map">
-        <button id="pmQx" type="button" hidden aria-label="Clear search">${I.clear}</button>
+        <input id="pmQ" type="search" enterkeyhint="search" autocomplete="off" placeholder="${esc(placeholder)}" aria-label="${esc(T("Search the map"))}">
+        <button id="pmQx" type="button" hidden aria-label="${esc(T("Clear search"))}">${I.clear}</button>
       </label>
     </div>
-    <div class="pm-sub"><button id="pmPlaces" class="pm-pill" type="button" aria-pressed="${showDots}">Places &amp; sights</button></div>
+    <div class="pm-sub"><button id="pmPlaces" class="pm-pill" type="button" aria-pressed="${showDots}">${esc(T("Places & sights"))}</button></div>
     <div id="photoMap" class="pmap"></div>
     <div class="pm-loading" id="pmLoading" role="status"><i></i>Loading map…</div>
-    <button id="pmArea" class="pm-area" type="button" hidden>${I.search}<span>Search this area</span></button>
-    <button id="pmLoc" class="pm-round pm-loc" type="button" aria-label="Show my location">${I.locate}</button>
-    <section class="pm-sheet" id="pmSheet" aria-label="Photos in this area">
+    <button id="pmArea" class="pm-area" type="button" hidden>${I.search}<span>${esc(T("Search this area"))}</span></button>
+    <button id="pmLoc" class="pm-round pm-loc" type="button" aria-label="${esc(T("Show my location"))}">${I.locate}</button>
+    <section class="pm-sheet" id="pmSheet" aria-label="${esc(T("Photos in this area"))}">
       <div class="pm-head" id="pmHead">
-        <button class="pm-grip" id="pmGrip" type="button" aria-label="Show more photos" aria-expanded="false"></button>
+        <button class="pm-grip" id="pmGrip" type="button" aria-label="${esc(T("Show more photos"))}" aria-expanded="false"></button>
         <p class="pm-kick">${esc(kicker)}</p>
-        <div class="pm-titlerow"><h2 id="pmTitle" class="pm-title">Photos on the map</h2><span id="pmCount" class="pm-count"></span></div>
+        <div class="pm-titlerow"><h2 id="pmTitle" class="pm-title">${esc(T("Photos on the map"))}</h2><span id="pmCount" class="pm-count"></span></div>
         <p class="pm-note" id="pmNote" hidden></p>
       </div>
       <div class="pm-body" id="pmBody">
         <img class="pm-orn" src="assets/motifs/dai-sen-may.webp" alt="" aria-hidden="true" onerror="this.hidden=true">
-        <div class="pm-chips" role="group" aria-label="Type of place">
-          <button type="button" data-ccat="" aria-pressed="true">All</button>
+        <div class="pm-chips" role="group" aria-label="${esc(T("Type of place"))}">
+          <button type="button" data-ccat="" aria-pressed="true">${esc(T("All"))}</button>
           ${chips.map((c) =>
             `<button type="button" data-ccat="${esc(c.k)}" aria-pressed="false">${c.color ? `<i style="background:${c.color}"></i>` : ""}${esc(c.label)}</button>`).join("")}
         </div>
@@ -209,7 +210,7 @@ function cardHtml(pin, i) {
   return `<article class="pc" style="--ar:${r}">
     <button class="pc-open" type="button" data-pid="${esc(String(p.id))}" aria-label="${esc(c.title)}"${c.bg ? ` style="background:${c.bg}"` : ""}>
       ${src ? `<img src="${esc(src)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
-      ${src && src.includes("/illus/") ? `<span class="pc-ill">Illustration · not a photo</span>` : ""}
+      ${src && src.includes("/illus/") ? `<span class="pc-ill">${esc(T("Illustration · not a photo"))}</span>` : ""}
       <span class="pc-g"></span>
       <span class="pc-t"><b>${esc(c.title)}</b><small>${esc(c.sub)}</small></span>
       <span class="pc-gem" style="color:${CATEGORY_COLOR[p.category] || "#fff"}" title="${esc(categoryLabel(p.category))}">${I.gem}</span>

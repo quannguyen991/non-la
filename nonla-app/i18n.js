@@ -28,6 +28,9 @@
 import { DICH_THONG_BAO } from "./i18n-thong-bao.js";
 import { DICH_WEB } from "./i18n-web.js";
 import { DICH_KHACH } from "./i18n-khach.js";
+import { DICH_APP } from "./i18n-app.js";
+import { DICH_APP2 } from "./i18n-app-2.js";
+import { DICH_APP3 } from "./i18n-app-3.js";
 import { DICH_TRANG } from "./i18n-trang.js";
 
 const KEY = "nl.lang";
@@ -62,6 +65,17 @@ export const LANGS = [
    Anh ĐỦ DÀI để nó chỉ còn một nghĩa — nhãn kia vì thế là "Pay cash". */
 const DICT = {
   vi: {
+    // cộng đồng, sheet quán, liên kết mạng xã hội
+    "Feed": "Bảng tin", "Photo map": "Bản đồ ảnh", "Share a place": "Chia sẻ một quán",
+    "No posts here yet. Be the first — photograph what you ate, and what you paid for it.":
+      "Chưa có bài nào ở đây. Hãy là người đầu tiên — chụp món bạn ăn và giá bạn trả.",
+    "Opening hours": "Giờ mở cửa",
+    "Tagged as serving vegetarian food.": "Được ghi nhận có món chay.",
+    "Nón Lá has never scanned a menu here, so it has nothing to say about this place's prices — and nothing to say about whether the food is good. Scan a menu to start a record.":
+      "Nón Lá chưa quét thực đơn ở đây, nên chưa biết giá ở đây và cũng chưa nói được món có ngon không. Quét một thực đơn để bắt đầu một hồ sơ.",
+    "recent videos": "video gần đây", "pages and posts": "trang và bài viết",
+    "hashtag": "hashtag", "long videos": "video dài", "everything": "tất cả",
+    "copy the caption, then paste it in the app": "chép chú thích rồi dán vào app",
     // điều hướng
     Nearby: "Quanh đây", Eat: "Ăn gì", Community: "Cộng đồng", You: "Tôi",
     Scan: "Quét", Menu: "Thực đơn", Cash: "Tiền mặt", Bill: "Hoá đơn", Dish: "Món",
@@ -562,7 +576,7 @@ const DICT = {
 
 /* Gộp bảng thông báo. Bản đã có trong DICT được giữ nguyên — bảng riêng chỉ
    lấp chỗ trống, không đè một bản dịch đã được chỉnh sửa. */
-for (const bang of [DICH_THONG_BAO, DICH_WEB, DICH_KHACH, DICH_TRANG]) {
+for (const bang of [DICH_THONG_BAO, DICH_WEB, DICH_KHACH, DICH_TRANG, DICH_APP, DICH_APP2, DICH_APP3]) {
   for (const code of Object.keys(bang)) {
     DICT[code] = { ...bang[code], ...(DICT[code] || {}) };
   }

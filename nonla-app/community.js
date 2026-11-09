@@ -16,6 +16,7 @@ import * as Local from "./localdb.js";
 import { CATEGORIES, CATEGORY_COLOR, categoryLabel, diemAnh, diemDiaDiem, rankRecommended } from "./posts.js";
 import * as Social from "./social.js";
 import * as AnhUI from "./anhmapui.js";
+import { t as T } from "./i18n.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -98,7 +99,7 @@ function tieuDe(p, place) {
   const d = M.dishes.find((x) => x.id === p.dishId);
   if (d) return `<span class="cplace cdish">${esc(d.vi)}<small>${esc(d.en)}</small></span>`;
   if (!p.placeId && p.category) return `<span class="cplace cdish">${esc(categoryLabel(p.category))}</span>`;
-  return p.placeId ? `<span class="cplace cgone">A place no longer on the map</span>` : "";
+  return p.placeId ? `<span class="cplace cgone">${esc(T("A place no longer on the map"))}</span>` : "";
 }
 
 /** Nút mở luồng bàn luận. commentCount null = máy chủ chưa bật bình luận. */
@@ -122,7 +123,7 @@ function hanhDong(p) {
     <button class="cact${liked ? " on" : ""}" data-clike="${esc(String(p.id))}" aria-pressed="${liked}">
       ${liked ? "♥" : "♡"} <span>${n}</span></button>
     ${nutBinhLuan(p)}
-    ${p.seed ? "" : `<button class="cact" data-crepost="${esc(String(p.id))}">↻ <span>Repost</span></button>`}
+    ${p.seed ? "" : `<button class="cact" data-crepost="${esc(String(p.id))}">↻ <span>${esc(T("Repost"))}</span></button>`}
     ${theo ? `<button class="cact${Social.dangTheoDoi(p.authorName) ? " on" : ""}" data-cfollow="${esc(p.authorName)}">${
       Social.dangTheoDoi(p.authorName) ? "Following" : "Follow"}</button>` : ""}
   </div>`;
@@ -140,7 +141,7 @@ function postHtml(p) {
   const img = p.seed ? p.photo
     : p.local ? Local.photoUrl(p)
     : (p.photoPath ? photoUrl(p.photoPath) : "");
-  const goiY = p.recommend ? `<span class="cgoi">Recommended by a traveller</span>` : "";
+  const goiY = p.recommend ? `<span class="cgoi">${esc(T("Recommended by a traveller"))}</span>` : "";
   return `<article class="cpost${p.seed ? " cseed" : ""}">
     ${img ? `<img src="${esc(img)}" alt="" loading="lazy"
        onerror="this.remove()">` : ""}
@@ -167,8 +168,8 @@ function postHtml(p) {
             là để người dùng tốn công vào một cái hộp không có ai đọc. */""}
       ${p.seed ? ""
         : p.local
-        ? `<button class="creport" data-cdel="${esc(p.id)}">Delete</button>`
-        : `<button class="creport" data-creport="${esc(p.id)}">Report</button>`}
+        ? `<button class="creport" data-cdel="${esc(p.id)}">${esc(T("Delete"))}</button>`
+        : `<button class="creport" data-creport="${esc(p.id)}">${esc(T("Report"))}</button>`}
     </div>
   </article>`;
 }
@@ -182,28 +183,28 @@ async function paint() {
   const stuck = all.filter((q) => q.tries >= MAX_TRIES);
   const waiting = all.length - stuck.length;
   M.host.innerHTML = `
-    <p class="kicker">Travellers</p>
-    <h1 class="title">Community</h1>
+    <p class="kicker">${esc(T("Travellers"))}</p>
+    <h1 class="title">${esc(T("Community"))}</h1>
     ${waiting ? `<div class="coutbox">
       <span>${waiting} post${waiting > 1 ? "s" : ""} waiting to send</span>
-      <button class="btn sec" data-cact="flush">Send now</button></div>` : ""}
+      <button class="btn sec" data-cact="flush">${esc(T("Send now"))}</button></div>` : ""}
     ${stuck.length ? `<div class="coutbox stuck">
       <span>${stuck.length} post${stuck.length > 1 ? "s" : ""} could not be sent</span>
-      <button class="btn sec" data-cdiscard>Discard</button></div>` : ""}
+      <button class="btn sec" data-cdiscard>${esc(T("Discard"))}</button></div>` : ""}
     ${/* Banner này trước đây là NGÕ CỤT: nó nói "không có máy chủ" rồi
           dừng lại, không nói ai bật được và bật ở đâu. Người dùng đọc
           xong chỉ biết là thiếu một thứ gì đó mà họ không làm gì được.
           Giờ nó mang theo đường đi — nút dẫn thẳng tới thẻ Account trong
           tab You, chỗ dán được URL và khoá của dự án Supabase. */""}
-    ${ready() ? "" : `<div class="clocal"><b>Notebook mode</b>
+    ${ready() ? "" : `<div class="clocal"><b>${esc(T("Notebook mode"))}</b>
       <span>No server is connected yet, so what you write here stays on this phone —
         yours to keep, but not a feed anyone else can see.
-        Connect a project in <em>You → Account</em> and these notes start syncing.</span>
-      <button class="btn sec" data-cact="connect">Set it up</button></div>`}
-    <button class="btn pri" data-cact="compose">Share a place</button>
+        Connect a project in <em>${esc(T("You → Account"))}</em> and these notes start syncing.</span>
+      <button class="btn sec" data-cact="connect">${esc(T("Set it up"))}</button></div>`}
+    <button class="btn pri" data-cact="compose">${T("Share a place")}</button>
     <div class="cview" role="tablist" aria-label="Community view">
-      <button role="tab" data-cview="feed" aria-selected="${M.view === "feed"}">Feed</button>
-      <button role="tab" data-cview="map" aria-selected="${M.view === "map"}">Photo map</button>
+      <button role="tab" data-cview="feed" aria-selected="${M.view === "feed"}">${T("Feed")}</button>
+      <button role="tab" data-cview="map" aria-selected="${M.view === "map"}">${T("Photo map")}</button>
     </div>
     ${M.view === "map" ? mapPane() : feedPane()}`;
   if (M.view === "map") await mountMap();
@@ -215,8 +216,8 @@ function rcmPane() {
   const top = rankRecommended(M.posts).slice(0, 5);
   if (!top.length) return "";
   return `<div class="cseed-head">
-      <h2>Recommended by travellers</h2>
-      <p>How many travellers recommended each place. This counts their recommendations — Nón Lá does not score places.</p>
+      <h2>${esc(T("Recommended by travellers"))}</h2>
+      <p>${esc(T("How many travellers recommended each place. This counts their recommendations — Nón Lá does not score places."))}</p>
     </div>
     <ol class="crcm">${top.map((r, i) => {
       const pl = M.places.find((x) => x.id === r.placeId);
@@ -247,17 +248,15 @@ function feedPane() {
   return `${rcmPane()}${M.posts.length
       ? `<div class="cfeed">${Social.uuTienTheoDoi(M.posts).map(postHtml).join("")}</div>`
       : `<p class="cempty">${ready()
-          ? "No posts here yet. Be the first — photograph what you ate, and what you paid for it."
+          ? T("No posts here yet. Be the first — photograph what you ate, and what you paid for it.")
           : "Nothing written down yet. Photograph what you ate and what you paid — it saves to this phone."}</p>`}
     ${/* Khối riêng, tiêu đề riêng, và một câu nói thẳng chúng là gì. Trộn
           chung vào .cfeed ở trên thì cái nhãn "sample" trên từng bài thành
           thứ duy nhất phân biệt hai loại — mà nhãn thì người ta lướt qua. */""}
     ${M.seed.length ? `
       <div class="cseed-head">
-        <h2>What this looks like in use</h2>
-        <p>Written by us and shipped with the app, not posted by travellers —
-          so the screen has something to read before anyone has written anything.
-          Every price below comes from the app's own seed data.</p>
+        <h2>${esc(T("What this looks like in use"))}</h2>
+        <p>${esc(T("Written by us and shipped with the app, not posted by travellers — so the screen has something to read before anyone has written anything. Every price below comes from the app's own seed data."))}</p>
       </div>
       <div class="cfeed">${M.seed.map(postHtml).join("")}</div>` : ""}`;
 }
@@ -268,7 +267,7 @@ function feedPane() {
 function mapPane() {
   /* Bản đồ ảnh là một lớp toàn màn hình gắn vào #app (xem anhmapui.js), không nằm
      trong luồng của trang. Ở đây chỉ để lại một dòng cho lúc người dùng đóng nó. */
-  return `<p class="cempty">The photo map is open. Tap ‹ to come back.</p>`;
+  return `<p class="cempty">${esc(T("The photo map is open. Tap ‹ to come back."))}</p>`;
 }
 
 /** Tên + địa chỉ trên thẻ ảnh của một bài thật. */
@@ -333,29 +332,29 @@ export function placeCard(p) {
     <div class="pcard-body">
       <p class="pcard-tags">
         <span class="pcard-tag" style="--c:${col}"><i></i>${esc(categoryLabel(p.category) || "A spot")}</span>
-        ${p.sample ? `<span class="pcard-tag pcard-sample">Sample</span>` : ""}
-        ${p.far ? `<span class="pcard-tag pcard-sample">Posted away from the venue</span>` : ""}
+        ${p.sample ? `<span class="pcard-tag pcard-sample">${esc(T("Sample"))}</span>` : ""}
+        ${p.far ? `<span class="pcard-tag pcard-sample">${esc(T("Posted away from the venue"))}</span>` : ""}
       </p>
       <h3 class="pcard-title">${esc(c.title)}</h3>
       <p class="pcard-sub">${esc(p.sample && p.en ? `${c.sub} · ${p.en}` : c.sub)}</p>
       <div class="pcard-actions">
-        ${at ? `<a class="pcard-act pcard-primary" href="https://www.google.com/maps/dir/?api=1&amp;destination=${at[0]},${at[1]}" target="_blank" rel="noopener">${PI.dir}<span>Directions</span></a>` : ""}
+        ${at ? `<a class="pcard-act pcard-primary" href="https://www.google.com/maps/dir/?api=1&amp;destination=${at[0]},${at[1]}" target="_blank" rel="noopener">${PI.dir}<span>${esc(T("Directions"))}</span></a>` : ""}
         <button class="pcard-act" type="button" data-psave="${id}" aria-pressed="${saved}">${PI.save}<span>${saved ? "Saved" : "Save"}</span></button>
-        <button class="pcard-act" type="button" data-pshare="${id}" data-ptitle="${esc(c.title)}">${PI.share}<span>Share</span></button>
+        <button class="pcard-act" type="button" data-pshare="${id}" data-ptitle="${esc(c.title)}">${PI.share}<span>${esc(T("Share"))}</span></button>
       </div>
       ${real && (p.paidVnd || p.stars != null) ? `<div class="pcard-facts">
-        ${p.paidVnd ? `<div><span>Paid</span><b>${esc(money(p.paidVnd))}</b></div>` : ""}
-        ${p.stars != null ? `<div><span>Rating</span><b>${stars(p.stars)}</b></div>` : ""}
-        ${p.authorName ? `<div><span>Shared by</span><b>${esc(p.authorName)}${p.authorCountry ? ` · ${esc(p.authorCountry)}` : ""}</b></div>` : ""}
-        ${p.createdAt ? `<div><span>When</span><b>${esc(ago(p.createdAt))}</b></div>` : ""}
+        ${p.paidVnd ? `<div><span>${esc(T("Paid"))}</span><b>${esc(money(p.paidVnd))}</b></div>` : ""}
+        ${p.stars != null ? `<div><span>${esc(T("Rating"))}</span><b>${stars(p.stars)}</b></div>` : ""}
+        ${p.authorName ? `<div><span>${esc(T("Shared by"))}</span><b>${esc(p.authorName)}${p.authorCountry ? ` · ${esc(p.authorCountry)}` : ""}</b></div>` : ""}
+        ${p.createdAt ? `<div><span>${esc(T("When"))}</span><b>${esc(ago(p.createdAt))}</b></div>` : ""}
       </div>` : ""}
       ${p.body || p.note ? `<p class="pcard-note">${esc(p.body || p.note)}</p>` : ""}
       <div class="pcard-band" aria-hidden="true"></div>
-      ${p.sample ? `<p class="pcard-foot">A sample photo that ships with the app, not posted by a traveller.</p>` : ""}
+      ${p.sample ? `<p class="pcard-foot">${esc(T("A sample photo that ships with the app, not posted by a traveller."))}</p>` : ""}
       ${real ? nutBinhLuan(p) : ""}
       ${real ? (p.local
-        ? `<button class="creport" data-cdel="${id}">Delete</button>`
-        : `<button class="creport" data-creport="${id}">Report</button>`) : ""}
+        ? `<button class="creport" data-cdel="${id}">${esc(T("Delete"))}</button>`
+        : `<button class="creport" data-creport="${id}">${esc(T("Report"))}</button>`) : ""}
     </div>
   </div>`;
 }
@@ -369,7 +368,7 @@ export function pinSheet(posts) {
   if (ps.length === 1) return placeCard(ps[0]);
   return `<h3>${ps.length} photos here</h3>
     <div class="cfeed">${ps.map(postHtml).join("")}</div>
-    <button class="btn sec" data-act="close">Close</button>`;
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`;
 }
 
 /** Vứt mọi bài đã hỏng đủ MAX_TRIES lần. Gọi từ nút Discard trong banner hàng chờ. */
@@ -462,8 +461,8 @@ function commentHtml(c) {
     <p class="cnote">${esc(c.body)}</p>
     ${c.seed ? "" : `<button class="cact${liked ? " on" : ""}" data-clikec="${esc(String(c.id))}" aria-pressed="${liked}">${liked ? "♥" : "♡"} <span>${Social.soThichBinhLuan(c)}</span></button>`}
     ${c.seed ? ""
-      : c.mine ? `<button class="creport" data-ccdel="${esc(String(c.id))}" data-local="${c.local ? 1 : 0}">Delete</button>`
-      : `<button class="creport" data-ccreport="${esc(String(c.id))}">Report</button>`}
+      : c.mine ? `<button class="creport" data-ccdel="${esc(String(c.id))}" data-local="${c.local ? 1 : 0}">${esc(T("Delete"))}</button>`
+      : `<button class="creport" data-ccreport="${esc(String(c.id))}">${esc(T("Report"))}</button>`}
   </div>`;
 }
 
@@ -477,7 +476,7 @@ export function threadHtml(post, t) {
   }[t.mode];
   const viet = t.mode === "cloud" || t.mode === "local";
   return `
-    <h3>Discussion</h3>
+    <h3>${esc(T("Discussion"))}</h3>
     <div class="cthread-post">${postHtml(post).replace(/<button class="ccomments"[\s\S]*?<\/button>/, "")}</div>
     <h2 class="sect">${n ? `${n} comment${n === 1 ? "" : "s"}` : "No comments yet"}</h2>
     <div class="cthread">${Social.dayBinhLuanLen(t.comments).map(commentHtml).join("")}</div>
@@ -487,8 +486,8 @@ export function threadHtml(post, t) {
         <textarea id="ccBody" maxlength="500" rows="3"
           placeholder="Ask about prices, opening hours, what to order…"></textarea></label>
       <p class="cerr" id="ccErr" hidden></p>
-      <button class="btn" data-cact="csend" data-post="${esc(String(post.id))}">Post comment</button>` : ""}
-    <button class="btn sec" data-act="close">Close</button>`;
+      <button class="btn" data-cact="csend" data-post="${esc(String(post.id))}">${esc(T("Post comment"))}</button>` : ""}
+    <button class="btn sec" data-act="close">${esc(T("Close"))}</button>`;
 }
 
 /* ── chọn quán trong form đăng bài ────────────────────────────
@@ -542,7 +541,7 @@ export function composer({ places = [], dishes = [], place = null } = {}) {
     more: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="18" cy="12" r="1.8" fill="currentColor"/></svg>',
   };
   return `
-    <h3 class="fbh">Create post</h3>
+    <h3 class="fbh">${esc(T("Create post"))}</h3>
     <div class="fbwho">
       <span class="fbav" aria-hidden="true">${esc(ten[0].toUpperCase())}</span>
       <span><b>${esc(ten)}</b>
@@ -554,7 +553,7 @@ export function composer({ places = [], dishes = [], place = null } = {}) {
     <div id="cfNear" class="cnear" aria-live="polite"></div>
 
     <div class="fbadd" role="group" aria-label="Add to your post">
-      <span class="fbadd-t">Add to your post</span>
+      <span class="fbadd-t">${esc(T("Add to your post"))}</span>
       <details class="fbtool">
         <summary aria-label="Photo" title="Photo">${ic.photo}</summary>
         <div class="fbtray">
@@ -597,13 +596,13 @@ export function composer({ places = [], dishes = [], place = null } = {}) {
         <div class="fbtray">
           <label class="fld row2"><input id="cfRcm" type="checkbox"><span>Recommend this place to other travellers
             <small>counts toward the travellers' list, not a score from Nón Lá</small></span></label>
-          <label class="fld row2"><input id="cfReturn" type="checkbox"><span>I'd come back</span></label>
+          <label class="fld row2"><input id="cfReturn" type="checkbox"><span>${esc(T("I'd come back"))}</span></label>
         </div>
       </details>
       <details class="fbtool">
         <summary aria-label="More" title="More">${ic.more}</summary>
         <div class="fbtray">
-          <label class="fld row2"><input id="cfLoc" type="checkbox"><span>Show where I took this on the photo map</span></label>
+          <label class="fld row2"><input id="cfLoc" type="checkbox"><span>${esc(T("Show where I took this on the photo map"))}</span></label>
           <p class="src" id="cfLocNote">Off by default. If you turn it on, the pin sits within about 30 m of where the photo was taken —
             from the photo's own location, or your phone's if the photo has none (your phone will ask permission).
             Left off, the pin sits at the place you chose.</p>
@@ -612,8 +611,8 @@ export function composer({ places = [], dishes = [], place = null } = {}) {
     </div>
 
     <p class="cerr" id="cfErr" hidden></p>
-    <button class="btn pri fbpost" data-cact="submit">Post</button>
-    <button class="btn sec" data-act="close">Cancel</button>`;
+    <button class="btn pri fbpost" data-cact="submit">${esc(T("Post"))}</button>
+    <button class="btn sec" data-act="close">${esc(T("Cancel"))}</button>`;
 }
 
 /**
@@ -688,7 +687,7 @@ export function handleClick(target) {
  */
 export function photoNearHtml(gan, nguon, fmt, chieu, origin) {
   const dau = nguon === "photo" ? "where this photo was taken" : "your current location";
-  if (!nguon) return `<p class="src">This photo has no location, so search the place by name above.</p>`;
+  if (!nguon) return `<p class="src">${esc(T("This photo has no location, so search the place by name above."))}</p>`;
   if (!gan.length) return `<p class="src">No known places within 400 m of ${dau}. Search the place by name above.</p>`;
   const bk = Math.max(80, gan[gan.length - 1].m) * 1.2;      // bán kính hiển thị, mét
   const k = 86 / bk;                                         // pixel mỗi mét

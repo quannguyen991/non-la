@@ -3096,6 +3096,19 @@ console.log("\n── khách nước ngoài: giới thiệu món, đánh giá gi
   }
   setLang("en");
   ok("trang khách + khung web: mọi chuỗi (" + khoaTrang.length + ") có bản dịch ở đủ 9 ngôn ngữ", khongDich.length === 0, khongDich.slice(0, 5).join(" | "));
+  /* Giao diện chính: mọi chuỗi T("…") trong app.js và các module giao diện phải
+     có bản dịch ở đủ 9 ngôn ngữ. Thêm chuỗi mới mà quên dịch thì bộ thử đỏ ngay. */
+  const khoaApp = new Set();
+  for (const f of ["app.js", "community.js", "welcome.js", "links.js", "trolychat.js", "anhmapui.js"]) {
+    for (const m of readFileSync("./" + f, "utf8").matchAll(/\bT\("((?:[^"\\]|\\.)*)"/g)) khoaApp.add(JSON.parse('"' + m[1] + '"'));
+  }
+  const thieuApp = [];
+  for (const l of ["vi", "ko", "zh", "ja", "ru", "fr", "th", "ms", "de"]) {
+    setLang(l);
+    for (const k of khoaApp) if (!coBanDich(l, k)) thieuApp.push(l + ":" + k.slice(0, 40));
+  }
+  setLang("en");
+  ok("giao diện chính: mọi chuỗi T() (" + khoaApp.size + ") có bản dịch ở đủ 9 ngôn ngữ", thieuApp.length === 0, thieuApp.slice(0, 5).join(" | "));
   ok("không còn chuỗi QR trong bản dịch khung web", !Object.values(DICH_WEB).some((b) => Object.keys(b).some((k) => /QR price|seller/.test(k))));
   ok("trang thực đơn không còn gọi bảng QR", !readFileSync("./web/thuc-don.html", "utf8").includes("tao-bang-gia"));
 }
@@ -3271,7 +3284,7 @@ console.log("\n── bản đồ ảnh: lớp quán và mốc, hai quần đả
   eq("nhãn: 4,9 sao trên 3 lượt chỉ là ít", nhanDG({ sao: 4.9, luot: 3 }), "few");
   eq("nhãn: điểm thường thì không nhãn", nhanDG({ sao: 3.9, luot: 900 }), "");
   eq("nhãn: sát ngưỡng", nhanDG({ sao: NGUONG.sao, luot: NGUONG.luot }), "good");
-  eq("địa chỉ hàm khi chạy localhost", diemDanhGia({ hostname: "localhost" }), "https://nonla-app.vercel.app/api/danhgia");
+  eq("địa chỉ hàm khi chạy localhost", diemDanhGia({ hostname: "localhost" }), "https://nonla-etm.pages.dev/api/danhgia");
   eq("lỗi mạng thì null, không ném", await layDanhGia({ name: "A", at: [1, 1] }, async () => { throw new Error("off"); }), null);
   eq("máy chủ chưa bật thì null", await layDanhGia({ name: "A", at: [1, 1] }, async () => ({ ok: false })), null);
   const got = await layDanhGia({ name: "A", at: [1, 1], street: "Tran Hung Dao" },

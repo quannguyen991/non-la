@@ -111,5 +111,5 @@ export function loiNhacKiemDuyet() {
 /** Địa chỉ hàm máy chủ — cùng quy tắc với diemNhanMon() trong nhan-mon.js. */
 export function diemKiemDuyet(loc = globalThis.location) {
   const host = loc?.hostname || "";
-  return /\.vercel\.app$/.test(host) ? "/api/kiemduyet" : "https://nonla-app.vercel.app/api/kiemduyet";
+  return /\.(vercel\.app|pages\.dev)$/.test(host) ? "/api/kiemduyet" : "https://nonla-etm.pages.dev/api/kiemduyet";
 }

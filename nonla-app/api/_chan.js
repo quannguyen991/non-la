@@ -8,7 +8,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 /** Chỉ các tên miền của app: Vercel (cố định và bản xem trước), GitHub Pages, máy dựng. */
-export const NGUON = /^(https:\/\/(nonla-app\.vercel\.app|nonla-[a-z0-9-]+-siu6\.vercel\.app|quannguyen991\.github\.io)|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/;
+export const NGUON = /^(https:\/\/(nonla-etm.pages.dev|[a-z0-9-]+\.nonla-etm.pages.dev|nonla-app\.vercel\.app|nonla-[a-z0-9-]+-siu6\.vercel\.app|quannguyen991\.github\.io)|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/;
 
 export const cauHinh = (model = "NHAN_MON_MODEL") => ({
   key: process.env.NHAN_MON_KEY || "",

@@ -56,7 +56,7 @@ export function nhan(r) {
 /** Địa chỉ hàm máy chủ — cùng quy tắc với diemKiemDuyet() trong kiemduyet.js. */
 export function diemDanhGia(loc = globalThis.location) {
   const host = loc?.hostname || "";
-  return /\.vercel\.app$/.test(host) ? "/api/danhgia" : "https://nonla-app.vercel.app/api/danhgia";
+  return /\.(vercel\.app|pages\.dev)$/.test(host) ? "/api/danhgia" : "https://nonla-etm.pages.dev/api/danhgia";
 }
 
 /** Hỏi hàm máy chủ; mọi lỗi (tắt mạng, chưa bật, quá tải) trả null — thẻ quán vẫn hoạt động bình thường. */

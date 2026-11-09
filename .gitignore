@@ -56,3 +56,8 @@ docs/_sitemap-*.json
 
 # bản phác và tranh nháp của tools/tranh-ban-do.mjs
 /.tmp-tranh/
+
+# Dựng bản triển khai Cloudflare Pages và cache của wrangler — sinh lại được
+.pages-build/
+nonla-app/.pages-build/
+nonla-app/.wrangler/
